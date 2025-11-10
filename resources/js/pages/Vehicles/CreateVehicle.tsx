@@ -39,8 +39,8 @@ export default function CreateVehicle() {
     vehicle_name: "",
     vin_sn: "",
     license_plate: "",
-    type: "Car",
-    fuel_type: "",
+    type: "car",
+    fuel_type: "gasoline",
     year: "",
     make: "",
     model: "",
@@ -232,21 +232,24 @@ export default function CreateVehicle() {
   };
 
   const typeOptions = [
-    { value: "Car", label: "Car" },
-    { value: "Truck", label: "Truck" },
-    { value: "Van", label: "Van" },
-    { value: "SUV", label: "SUV" },
-    { value: "Motorcycle", label: "Motorcycle" },
-    { value: "Other", label: "Other" },
+    { value: "car", label: "Car" },
+    { value: "bus", label: "Bus" },
+    { value: "truck", label: "Truck" },
+    { value: "van", label: "Van" },
+    { value: "suv", label: "SUV" },
+    { value: "motorcycle", label: "Motorcycle" },
+    { value: "tractor", label: "Tractor" },
+    { value: "trailer", label: "Trailer" },
+    { value: "other", label: "Other" },
   ];
 
   const fuelTypeOptions = [
-    { value: "Gasoline", label: "Gasoline" },
-    { value: "Diesel", label: "Diesel" },
-    { value: "Electric", label: "Electric" },
-    { value: "Hybrid", label: "Hybrid" },
-    { value: "CNG", label: "CNG" },
-    { value: "LPG", label: "LPG" },
+    { value: "gasoline", label: "Gasoline" },
+    { value: "diesel", label: "Diesel" },
+    { value: "electric", label: "Electric" },
+    { value: "hybrid", label: "Hybrid" },
+    { value: "cng", label: "CNG" },
+    { value: "lpg", label: "LPG" },
   ];
 
   const renderDetailsSection = () => (

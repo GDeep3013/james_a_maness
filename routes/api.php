@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\DriverController;
+use App\Http\Controllers\VehicleController;
 // use App\Http\Controllers\Apps\LoginController;
 // use App\Http\Controllers\Apps\DriverApiController;
 // use App\Http\Controllers\Apps\RoutesApiController;
@@ -16,7 +17,7 @@ use App\Http\Controllers\DriverController;
 
 
 Route::prefix('auth')->group(function () {
-    Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/login', [AuthController::class, 'login'])->name('api.auth.login');
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout']);
         Route::get('/user', [AuthController::class, 'user']);
@@ -29,6 +30,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::apiResource('drivers', DriverController::class);
     Route::get('/drivers/{id}/edit', [DriverController::class, 'edit'])->where('id', '[0-9]+');
+
+    Route::apiResource('vehicles', VehicleController::class);
+    Route::get('/vehicles/{id}/edit', [VehicleController::class, 'edit'])->where('id', '[0-9]+');
    
 });
 

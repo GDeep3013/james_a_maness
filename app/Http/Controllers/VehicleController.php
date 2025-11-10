@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Vehical;
 use App\Models\Locations;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\File;
 use App\Traits\NotificationTrate;
 use Auth;
 use Illuminate\Support\Facades\Schema;
@@ -42,7 +43,7 @@ class VehicleController extends Controller
                 return response()->json(['status' => false, 'message' => 'Vehicle not found']);
             }
         } else if ($request->page === "page") {
-            $vehicle = $query->paginate(10);
+            $vehicle = $query->paginate(20);
             if (!empty($vehicle)) {
                 return response()->json(['status' => true, 'vehical' => $vehicle]);
             } else {
@@ -70,117 +71,52 @@ class VehicleController extends Controller
         ini_set('max_execution_time', 0);
         try {
             $validatedData = $request->validate([
-                'truck' => 'required',
-                'number_plate' => 'required|unique:vehicals',
-                'track_device_id' => 'nullable|unique:vehicals',
-                'vehicle_reg_file' => 'nullable|mimes:jpeg,jpg,png,pdf,zip|max:5120',
-                'tax_doc_file' => 'nullable|mimes:jpeg,jpg,png,pdf,zip|max:5120',
-                'vehicle_ins_file' => 'nullable|mimes:jpeg,jpg,png,pdf,zip|max:5120',
-                'vehicle_mnl_file' => 'nullable|mimes:jpeg,jpg,png,pdf,zip|max:5120',
-                'other_doc' => 'nullable|mimes:jpeg,jpg,png,pdf,zip|max:5120',
+                'vehicle_name' => 'required|string|max:255',
+                'type' => 'required|string|max:255',
+                'vin_sn' => 'nullable|string|max:255',
+                'license_plate' => 'nullable|string|max:255',
+                'fuel_type' => 'nullable|string|max:255',
+                'year' => 'nullable|string|max:255',
+                'make' => 'nullable|string|max:255',
+                'model' => 'nullable|string|max:255',
+                'trim' => 'nullable|string|max:255',
+                'registration_state_province' => 'nullable|string|max:255',
+                'labels' => 'nullable|string|max:255',
+                'photo' => 'nullable|mimes:jpeg,jpg,png,webp|max:5120',
             ]);
 
-            $vehicalRegistery = "";
-            if ($request->file('vehicle_reg_file')) {
-                $file = $request->file('vehicle_reg_file');
+            $photo = "";
+            if ($request->file('photo')) {
+                $file = $request->file('photo');
                 if ($file->isValid()) {
                     $filePath = $file->getRealPath();
-                    $vehicalRegistery = time() . '.' . $request->vehicle_reg_file->extension();
-                    $request->vehicle_reg_file->move(public_path('vehical/registration'), $vehicalRegistery);
-                    $filePath = public_path('vehical/registration/' . $vehicalRegistery);
-                    chmod($filePath, 0755);   //  // Adjust the storage path as needed
-                } else {
-                    return response()->json(['status' => 'error', 'message' => ['RC_file' => 'Invalid file. Supported formats include .jpg, .png, .jpeg, .pdf, and .zip, with a maximum file size of 2MB.']]);
-                }
-            }
-
-            $taxDocuments = "";
-            if ($request->file('tax_doc_file')) {
-                $file = $request->file('tax_doc_file');
-                if ($file->isValid()) {
-                    $filePath = $file->getRealPath();
-                    $taxDocuments = time() . '.' . $request->tax_doc_file->extension();
-                    $request->tax_doc_file->move(public_path('vehical/tax'), $taxDocuments);
-                    $filePath = public_path('vehical/tax/' . $taxDocuments);
+                    $photo = time() . '.' . $request->photo->extension();
+                    $request->photo->move(public_path('vehicles/photo'), $photo);
+                    $filePath = public_path('vehicles/photo/' . $photo);
                     chmod($filePath, 0755);
                 } else {
-                    return response()->json(['status' => 'error', 'message' => ['tax_file' => 'Invalid file. Supported formats include .jpg, .png, .jpeg, .pdf, and .zip, with a maximum file size of 2MB.']]);
-                }
-            }
-
-            $vehicalInsurance = "";
-            if ($request->file('vehicle_ins_file')) {
-                $file = $request->file('vehicle_ins_file');
-                if ($file->isValid()) {
-                    $filePath = $file->getRealPath();
-                    $vehicalInsurance = time() . '.' . $request->vehicle_ins_file->extension();
-                    $request->vehicle_ins_file->move(public_path('vehical/insurance'), $vehicalInsurance);
-                    $filePath = public_path('vehical/insurance/' . $vehicalInsurance);
-                    chmod($filePath, 0755);
-                } else {
-                    return response()->json(['status' => 'error', 'message' => ['insurance_file' => 'Invalid file. Supported formats include .jpg, .png, .jpeg, .pdf, and .zip, with a maximum file size of 2MB.']]);
-                }
-            }
-
-            $vehicalManual = "";
-            if ($request->file('vehicle_mnl_file')) {
-                $file = $request->file('vehicle_mnl_file');
-                if ($file->isValid()) {
-                    $filePath = $file->getRealPath();
-                    $vehicalManual = time() . '.' . $request->vehicle_mnl_file->extension();
-                    $request->vehicle_mnl_file->move(public_path('vehical/manual'), $vehicalManual);
-                    $filePath = public_path('vehical/manual/' . $vehicalManual);
-                    chmod($filePath, 0755);
-                } else {
-                    return response()->json(['status' => 'error', 'message' => ['manual_file' => 'Invalid file. Supported formats include .jpg, .png, .jpeg, .pdf, and .zip, with a maximum file size of 2MB.']]);
-                }
-            }
-
-            $otherDocuments = "";
-            if ($request->file('other_doc')) {
-                $file = $request->file('other_doc');
-                if ($file->isValid()) {
-                    $filePath = $file->getRealPath();
-                    $otherDocuments = time() . '.' . $request->other_doc->extension();
-                    $request->other_doc->move(public_path('vehical/others'), $otherDocuments);
-                    $filePath = public_path('vehical/others/' . $otherDocuments);
-                    chmod($filePath, 0755);
-                } else {
-                    return response()->json(['status' => 'error', 'message' => ['other_file' => 'Invalid file. Supported formats include .jpg, .png, .jpeg, .pdf, and .zip, with a maximum file size of 2MB.']]);
+                    return response()->json(['status' => 'error', 'errors' => ['photo' => ['Invalid file. Supported formats include .jpg, .png, .jpeg, .webp, with a maximum file size of 5MB.']]], 422);
                 }
             }
 
             $vehicle = new Vehical;
-            $vehicle->user_id = Auth::user()->id;
-            $vehicle->truck = $validatedData['truck'];
-            $vehicle->number_plate = $validatedData['number_plate'];
-            $vehicle->truck_type = $request->truck_type;
-            $vehicle->vin_no = $request->vin_no;
-            $vehicle->make = $request->make;
-            $vehicle->model = $request->model;
-            $vehicle->year = $request->year;
-            $vehicle->fuel_type = $request->fuel_type;
-            $vehicle->reg_country = $request->reg_country;
-            $vehicle->reg_state = $request->reg_state;
-            $vehicle->odometer = $request->odometer;
-            $vehicle->unit = $request->unit;
-            $vehicle->track_device_id = $request->track_device_id;
-            $vehicle->fuel_card = $request->fuel_card;
-            $vehicle->purchase_value = $request->purchase_value;
-            $vehicle->purchase_date = $request->purchase_date;
-            $vehicle->vehicle_reg_file = $vehicalRegistery;
-            $vehicle->tax_doc_file = $taxDocuments;
-            $vehicle->vehicle_ins_file = $vehicalInsurance;
-            $vehicle->vehicle_mnl_file = $vehicalManual;
-            $vehicle->other_doc = $otherDocuments;
-            $vehicle->vehicle_status = $request->vehicle_status;
-            $vehicle->comment = $request->comment;
-            // $liveTrack = $this->getVehicleTracking($request->track_device_id);
-            // $response = json_decode($liveTrack, true);
+            $vehicle->vehicle_name = $validatedData['vehicle_name'];
+            $vehicle->type = $validatedData['type'];
+            $vehicle->vin_sn = $request->vin_sn ?? null;
+            $vehicle->license_plate = $request->license_plate ?? null;
+            $vehicle->fuel_type = $request->fuel_type ?? null;
+            $vehicle->year = $request->year ?? null;
+            $vehicle->make = $request->make ?? null;
+            $vehicle->model = $request->model ?? null;
+            $vehicle->trim = $request->trim ?? null;
+            $vehicle->registration_state = $request->registration_state_province ?? null;
+            $vehicle->labels = $request->labels ?? null;
+            $vehicle->photo = $photo;
+
             if ($vehicle->save()) {
-                return response()->json(['status' => 'success', 'message' => 'Vehicle saved successfully']);
+                return response()->json(['status' => true, 'message' => 'Vehicle saved successfully']);
             } else {
-                return response()->json(['status' => false, 'message' => 'Failed to save vehical'], 401);
+                return response()->json(['status' => false, 'message' => 'Failed to save vehicle'], 500);
             }
             // if (!empty($request->track_device_id) && $response != null) {
 
@@ -214,7 +150,9 @@ class VehicleController extends Controller
             // }
 
         } catch (\Illuminate\Validation\ValidationException $e) {
-            return response()->json(['status' => 'error', 'message' => $e->validator->errors()], 401);
+            return response()->json(['status' => 'error', 'errors' => $e->validator->errors()], 422);
+        } catch (\Exception $e) {
+            return response()->json(['status' => false, 'message' => 'An error occurred while creating the vehicle. Please try again.'], 500);
         }
     }
     /**
@@ -241,7 +179,30 @@ class VehicleController extends Controller
      */
     public function edit($id)
     {
-        //
+        if (!empty($id)) {
+            $data = Vehical::where('id', $id)->first();
+            if ($data) {
+                $vehicleData = [
+                    'vehicle_name' => $data->vehicle_name,
+                    'type' => $data->type,
+                    'vin_sn' => $data->vin_sn,
+                    'license_plate' => $data->license_plate,
+                    'fuel_type' => $data->fuel_type,
+                    'year' => $data->year,
+                    'make' => $data->make,
+                    'model' => $data->model,
+                    'trim' => $data->trim,
+                    'registration_state_province' => $data->registration_state,
+                    'labels' => $data->labels,
+                    'photo' => $data->photo ? asset('vehicles/photo/' . $data->photo) : null,
+                ];
+                return response()->json(['status' => true, 'message' => 'Vehicle data', 'data' => $vehicleData]);
+            } else {
+                return response()->json(['status' => false, 'message' => 'Vehicle not found'], 404);
+            }
+        } else {
+            return response()->json(['status' => false, 'message' => 'Vehicle ID is required'], 400);
+        }
     }
 
     /**
@@ -254,169 +215,72 @@ class VehicleController extends Controller
     public function update(Request $request, $id)
     {
         ini_set('max_execution_time', 0);
+        
+        if (empty($id)) {
+            return response()->json(['status' => false, 'message' => 'Vehicle ID is required'], 400);
+        }
+
+        $vehicle = Vehical::find($id);
+        if (!$vehicle) {
+            return response()->json(['status' => false, 'message' => 'Vehicle not found'], 404);
+        }
+
         try {
             $validatedData = $request->validate([
-                'truck' => 'required',
-                'number_plate' => 'required|unique:vehicals,number_plate,' . $id,
-                // 'purchase_value'=>'nullable',
-                // 'model' => 'nullable|string|min:4',
-                'track_device_id' => 'nullable|unique:vehicals,track_device_id,' . $id,
-                'vehicle_reg_file' => 'nullable|mimes:jpeg,jpg,png,pdf,zip|max:5120',
-                'tax_doc_file' => 'nullable|mimes:jpeg,jpg,png,pdf,zip|max:5120',
-                'vehicle_ins_file' => 'nullable|mimes:jpeg,jpg,png,pdf,zip|max:5120',
-                'vehicle_mnl_file' => 'nullable|mimes:jpeg,jpg,png,pdf,zip|max:5120',
-                'other_doc' => 'nullable|mimes:jpeg,jpg,png,pdf,zip|max:5120',
+                'vehicle_name' => 'required|string|max:255',
+                'type' => 'required|string|max:255',
+                'vin_sn' => 'nullable|string|max:255',
+                'license_plate' => 'nullable|string|max:255',
+                'fuel_type' => 'nullable|string|max:255',
+                'year' => 'nullable|string|max:255',
+                'make' => 'nullable|string|max:255',
+                'model' => 'nullable|string|max:255',
+                'trim' => 'nullable|string|max:255',
+                'registration_state_province' => 'nullable|string|max:255',
+                'labels' => 'nullable|string|max:255',
+                'photo' => 'nullable|mimes:jpeg,jpg,png,webp|max:5120',
             ]);
 
-            $vehical = Vehical::find($id);
-            if (!$vehical) {
-                return response()->json(['status' => false, 'message' => 'Vehical not found']);
-            }
+            $photo = $vehicle->photo;
 
-            $vehicalRegistery = "";
-            if ($request->has('exist_vehicle_reg_file')) {
-                $vehicalRegistery = $request->exist_vehicle_reg_file;
-            } else if ($request->file('vehicle_reg_file')) {
-                $file = $request->file('vehicle_reg_file');
+            if ($request->file('photo')) {
+                $file = $request->file('photo');
                 if ($file->isValid()) {
-                    $filePath = $file->getRealPath();
-                    $vehicalRegistery = time() . '.' . $request->vehicle_reg_file->extension();
-                    $request->vehicle_reg_file->move(public_path('vehical/registration'), $vehicalRegistery);
-                    $filePath = public_path('vehical/registration/' . $vehicalRegistery);
-                    chmod($filePath, 0755);  //  // Adjust the storage path as needed
-                } else {
-                    return response()->json(['status' => 'error', 'message' => ['vendor_fileRC_file' => 'Invalid file. Supported formats include .jpg, .png, .jpeg, .pdf, and .zip, with a maximum file size of 2MB.']]);
-                }
-            }
-
-            $taxDocuments = "";
-            if ($request->has('exist_tax_doc_file')) {
-                $taxDocuments = $request->exist_tax_doc_file;
-            } else if ($request->file('tax_doc_file')) {
-                $file = $request->file('tax_doc_file');
-                if ($file->isValid()) {
-                    $filePath = $file->getRealPath();
-                    $taxDocuments = time() . '.' . $request->tax_doc_file->extension();
-                    $request->tax_doc_file->move(public_path('vehical/tax'), $taxDocuments);
-                    $filePath = public_path('vehical/tax/' . $taxDocuments);
+                    if ($photo && File::exists(public_path('vehicles/photo/' . $photo))) {
+                        File::delete(public_path('vehicles/photo/' . $photo));
+                    }
+                    $photo = time() . '.' . $request->photo->extension();
+                    $request->photo->move(public_path('vehicles/photo'), $photo);
+                    $filePath = public_path('vehicles/photo/' . $photo);
                     chmod($filePath, 0755);
                 } else {
-                    return response()->json(['status' => 'error', 'message' => ['tax_file' => 'Invalid file. Supported formats include .jpg, .png, .jpeg, .pdf, and .zip, with a maximum file size of 2MB.']]);
+                    return response()->json(['status' => 'error', 'errors' => ['photo' => ['Invalid file. Supported formats include .jpg, .png, .jpeg, .webp, with a maximum file size of 5MB.']]], 422);
                 }
             }
 
-            $vehicalInsurance = "";
-            if ($request->has('exist_vehicle_ins_file')) {
+            $vehicle->vehicle_name = $validatedData['vehicle_name'];
+            $vehicle->type = $validatedData['type'];
+            $vehicle->vin_sn = $request->vin_sn ?? null;
+            $vehicle->license_plate = $request->license_plate ?? null;
+            $vehicle->fuel_type = $request->fuel_type ?? null;
+            $vehicle->year = $request->year ?? null;
+            $vehicle->make = $request->make ?? null;
+            $vehicle->model = $request->model ?? null;
+            $vehicle->trim = $request->trim ?? null;
+            $vehicle->registration_state = $request->registration_state_province ?? null;
+            $vehicle->labels = $request->labels ?? null;
+            $vehicle->photo = $photo;
 
-                $vehicalInsurance = $request->exist_vehicle_ins_file;
-            } else   if ($request->file('vehicle_ins_file')) {
-                $file = $request->file('vehicle_ins_file');
-                if ($file->isValid()) {
-                    $filePath = $file->getRealPath();
-                    $vehicalInsurance = time() . '.' . $request->vehicle_ins_file->extension();
-                    $request->vehicle_ins_file->move(public_path('vehical/insurance'), $vehicalInsurance);
-                    $filePath = public_path('vehical/insurance/' . $vehicalInsurance);
-                    chmod($filePath, 0755);
-                } else {
-                    return response()->json(['status' => 'error', 'message' => ['insurance_file' => 'Invalid file. Supported formats include .jpg, .png, .jpeg, .pdf, and .zip, with a maximum file size of 2MB.']]);
-                }
-            }
-
-
-            $vehicalManual = "";
-            if ($request->has('exist_vehicle_mnl_file')) {
-                $vehicalManual = $request->exist_vehicle_mnl_file;
-            } else  if ($request->file('vehicle_mnl_file')) {
-                $file = $request->file('vehicle_mnl_file');
-                if ($file->isValid()) {
-                    $filePath = $file->getRealPath();
-                    $vehicalManual = time() . '.' . $request->vehicle_mnl_file->extension();
-                    $request->vehicle_mnl_file->move(public_path('vehical/manual'), $vehicalManual);
-                    $filePath = public_path('vehical/manual/' . $vehicalManual);
-                    chmod($filePath, 0755);
-                } else {
-                    return response()->json(['status' => 'error', 'message' => ['manual_file' => 'Invalid file. Supported formats include .jpg, .png, .jpeg, .pdf, and .zip, with a maximum file size of 2MB.']]);
-                }
-            }
-
-            $otherDocuments = "";
-            if ($request->has('exist_other_doc')) {
-                $otherDocuments = $request->exist_other_doc;
-            } else  if ($request->file('other_doc')) {
-                $file = $request->file('other_doc');
-                if ($file->isValid()) {
-                    $filePath = $file->getRealPath();
-                    $otherDocuments = time() . '.' . $request->other_doc->extension();
-                    $request->other_doc->move(public_path('vehical/others'), $otherDocuments);
-                    $filePath = public_path('vehical/others/' . $otherDocuments);
-                    chmod($filePath, 0755);
-                } else {
-                    return response()->json(['status' => 'error', 'message' => ['other_file' => 'Invalid file. Supported formats include .jpg, .png, .jpeg, .pdf, and .zip, with a maximum file size of 2MB.']]);
-                }
-            }
-            $vehicle = Vehical::find($id);
-            $vehicle->user_id = Auth::user()->id;
-            $vehicle->truck = $validatedData['truck'];
-            $vehicle->number_plate = $validatedData['number_plate'];
-            $vehicle->truck_type = $request->truck_type;
-            $vehicle->vin_no = $request->vin_no;
-            $vehicle->make = $request->make;
-            $vehicle->model = $request->model;
-            $vehicle->year = $request->year;
-            $vehicle->fuel_type = $request->fuel_type;
-            $vehicle->reg_country = $request->reg_country;
-            $vehicle->reg_state = $request->reg_state;
-            $vehicle->odometer = $request->odometer;
-            $vehicle->unit = $request->unit;
-            $vehicle->track_device_id = $request->track_device_id;
-            $vehicle->fuel_card = $request->fuel_card;
-            $vehicle->purchase_value =  $request->purchase_value;
-            $vehicle->purchase_date = $request->purchase_date;
-            $vehicle->vehicle_reg_file = $vehicalRegistery;
-            $vehicle->tax_doc_file = $taxDocuments;
-            $vehicle->vehicle_ins_file = $vehicalInsurance;
-            $vehicle->vehicle_mnl_file = $vehicalManual;
-            $vehicle->other_doc = $otherDocuments;
-            $vehicle->vehicle_status = $request->vehicle_status;
-            $vehicle->comment = $request->comment;
             if ($vehicle->save()) {
-                return response()->json(['status' => 'success', 'message' => 'Vehicle details update successfully']);
+                return response()->json(['status' => true, 'message' => 'Vehicle updated successfully']);
             } else {
-                return response()->json(['status' => false, 'message' => 'Failed to update vehical details'], 500);
+                return response()->json(['status' => false, 'message' => 'Failed to update vehicle'], 500);
             }
-            // $liveTrack = $this->getVehicleTracking($validatedData['track_device_id']);
-            // $response = json_decode($liveTrack, true);
-            // if (!empty($validatedData['track_device_id']) && $response != null) {
-            //     if (isset($response['devices'])) {
-            //         $conditions = ['device_id' => $response['devices'][0]['id']];
-            //         $address = $this->getaddress($response['devices'][0]['latitude'], $response['devices'][0]['longitude']);
-            //         $addressData = json_decode($address, true);
-            //         Locations::updateOrCreate($conditions, [
-            //             'device_id' => $response['devices'][0]['id'],
-            //             'name' => $response['devices'][0]['name'],
-            //             'angle' => $response['devices'][0]['angle'],
-            //             'speed' => $response['devices'][0]['speed'],
-            //             'ignition' => $response['devices'][0]['ignition'],
-            //             'odometer' => $response['devices'][0]['odometer'],
-            //             'device_time' => $response['devices'][0]['device_time'],
-            //             'server_time' => $response['devices'][0]['server_time'],
-            //             'latitude' => $response['devices'][0]['latitude'],
-            //             'longitude' => $response['devices'][0]['longitude'],
-            //             'address' => $addressData['display_name'],
-            //         ]);
-            //         if ($vehicle->save()) {
-            //             return response()->json(['status' => 'success', 'message' => 'Vehicle saved successfully']);
-            //         } else {
-            //             return response()->json(['status' => false, 'message' => 'Failed to save vehical'], 500);
-            //         }
-            //     } else {
-            //         return response()->json(['status' => 'api-error', 'message' => 'Vehicle tracking id is not valid'], 500);
-            //     }
-            // } else {
-            //     return response()->json(['status' => 'api-error', 'message' => 'Vehicle tracking ID is required and cannot be left blank. Please enter a valid ID'], 500);
-            // }
+            
         } catch (\Illuminate\Validation\ValidationException $e) {
-            return response()->json(['status' => 'error', 'message' => $e->validator->errors()]);
+            return response()->json(['status' => 'error', 'errors' => $e->validator->errors()], 422);
+        } catch (\Exception $e) {
+            return response()->json(['status' => false, 'message' => 'An error occurred while updating the vehicle. Please try again.'], 500);
         }
     }
 
@@ -431,10 +295,7 @@ class VehicleController extends Controller
     {
         if ($id) {
             $Vehical = Vehical::find($id);
-            $location = Locations::where('device_id', $Vehical->track_device_id)->first();
-
-
-            if ($Vehical->delete() && $location->delete()) {
+            if ($Vehical->delete()) {
                 return response()->json(['status' => true, 'message' => 'Vehical Delete Successfully',]);
             } else {
                 return response()->json(['status' => false, 'message' => 'Vehical not found']);
