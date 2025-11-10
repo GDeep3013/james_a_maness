@@ -185,11 +185,11 @@ export default function CreateDriver() {
           sin_no: String(driver.sin_no || ""),
           phone: String(driver.phone || ""),
           email: String(driver.email || ""),
-          address: String(driver.user.address || ""),
-          country: String(driver.user.country || ""),
-          state: String(driver.user.state || ""),
-          city: String(driver.user.city || ""),
-          zip: String(driver.user.zip || ""),
+          address: String((driver.user && typeof driver.user === "object" && "address" in driver.user) ? (driver.user as Record<string, unknown>).address || "" : ""),
+          country: String((driver.user && typeof driver.user === "object" && "country" in driver.user) ? (driver.user as Record<string, unknown>).country || "" : ""),
+          state: String((driver.user && typeof driver.user === "object" && "state" in driver.user) ? (driver.user as Record<string, unknown>).state || "" : ""),
+          city: String((driver.user && typeof driver.user === "object" && "city" in driver.user) ? (driver.user as Record<string, unknown>).city || "" : ""),
+          zip: String((driver.user && typeof driver.user === "object" && "zip" in driver.user) ? (driver.user as Record<string, unknown>).zip || "" : ""),
           license_no: String(driver.license_no || ""),
           license_no_file: null,
           license_class: String(driver.license_class || "Class 1"),
@@ -212,8 +212,8 @@ export default function CreateDriver() {
           comment: String(driver.comment || ""),
         });
 
-        if (driver?.user?.profile_picture && typeof driver.user?.profile_picture === 'string') {
-          setProfilePicturePreview(driver?.user?.profile_picture as string);
+        if (driver?.user && typeof driver.user === "object" && "profile_picture" in driver.user && typeof driver.user.profile_picture === 'string') {
+          setProfilePicturePreview(driver.user.profile_picture as string);
         }
 
       }

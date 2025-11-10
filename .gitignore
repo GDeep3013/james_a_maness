@@ -1,7 +1,6 @@
 /node_modules
 /public/build
 /public/hot
-/public/storage
 /public/invoice
 /public/driver
 /public/insurance
@@ -11,8 +10,8 @@
 /public/users
 /public/vehical
 /public/vms
-/storage/*
 /storage/*.key
+/storage/*.log
 /storage/fonts/
 /vendor
 .env
