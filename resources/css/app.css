@@ -1,0 +1,19 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
+
+:root {
+    --theme-color: #5321B1;
+    --delete-color: #cb3a3a;
+    --secondary-color: #26ade1;
+}
+
+body {
+    font-family: "Outfit", sans-serif;
+}
+
+
+.kav-side-bar-bg {
+    background: linear-gradient(180deg, #2F0886 0%, #6B2AC2 51.44%, #9466EF 100%);
+}
+.kav-side-bar-bg span.menu-item-icon-size svg path {
+    fill: #fff;
+}

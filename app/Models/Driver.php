@@ -1,0 +1,74 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Laravel\Sanctum\HasApiTokens;
+
+class Driver extends Model
+{
+    use HasApiTokens, HasFactory;
+    protected $table = 'drivers';
+
+    protected $fillable = [
+        'user_id',
+        'profile_picture',
+        'first_name',
+        'last_name',
+        'gender',
+        'dob',
+        'sin_no',
+        'phone',
+        'email',
+        'address',
+        'country',
+        'state',
+        'city',
+        'zip',
+        'license_no',
+        'license_no_file',
+        'license_class',
+        'license_issue_country',
+        'license_issue_state',
+        'license_issue_date',
+        'license_expire_date',
+        'status_in_country',
+        'doc_expiry_date',
+        'job_join_date',
+        'offer_letter_file',
+        'job_leave_date',
+        'emergency_contact_name',
+        'emergency_contact_no',
+        'emergency_contact_address',
+        'password',
+        'designation',
+        'status',
+        'immigration_status',
+        'comment'
+    ];
+    protected $hidden = [
+        'password',
+        'tokens',
+        'one_time_pin',
+        'verify_otp'
+    ];
+
+    protected $casts = [
+        'dob' => 'date',
+        'license_issue_date' => 'date',
+        'license_expire_date' => 'date',
+        'doc_expiry_date' => 'date',
+        'job_join_date' => 'date',
+        'job_leave_date' => 'date',
+        'verify_otp' => 'boolean',
+        'one_time_pin' => 'integer'
+    ];
+
+
+
+    function user(){
+        return $this->belongsTo(User::class, 'user_id', 'id');
+    }
+
+}

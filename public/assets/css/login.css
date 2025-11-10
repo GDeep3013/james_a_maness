@@ -1,0 +1,350 @@
+@import url(style.css);
+
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
+
+body{
+     font-family: "Outfit", sans-serif;
+}
+
+.startOuter {
+    background: url(../img/new-bg-img.webp) no-repeat center center;
+    height: 100%;
+    width: 100%;
+    display: table;
+    min-height: 100vh;
+    overflow: hidden;
+    background-size: cover;
+    padding: 30px 0;
+}
+
+.startOuter .loginOuter {
+    display: table-cell;
+    vertical-align: middle;
+}
+.startOuter .loginOuter button.custom_btn:after {
+    display: none;
+}
+.verticalCenter .logo img {
+    width: 120px;
+}
+
+.login_image_text {
+    z-index: 1;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    max-width: 325px;
+    text-align: center;
+}
+
+.welcomeBox {
+    background-color: var(--white);
+    padding: 30px;
+    text-align: center;
+    border-radius: 10px;
+    margin-top: 24px;
+}
+
+.welcomeBox h2 {
+    color: var(--black);
+    font-size: 17px;
+    font-weight: 500;
+}
+
+.welcomeBox p {
+    color: #848483;
+    font-size: 12px;
+    font-weight: 300;
+}
+
+.start_btn {
+    margin-top: 39px;
+}
+
+.start_btn .custom_btn {
+    min-width: 120px;
+    min-height: 42px;
+    line-height: 42px;
+    text-align: center;
+}
+
+/* .start_btn .custom_btn:hover {
+    text-decoration: none;
+    color: var(--white);
+} */
+
+.start_btn p {
+    display: inline-block;
+    margin-left: 29px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--black);
+}
+
+.loginOuter .verticalCenter {
+    height: 100%;
+    display: table;
+    width: 100%;
+    position: relative;
+}
+
+
+.loginOuter .verticalCenter .textCenter {
+    display: table-cell;
+    vertical-align: middle;
+}
+
+.verticalCenter h4 {
+    font-size: 35px;
+    font-weight: 600;
+    color: #0A0A0A;
+    position: relative;
+    font-family: "Outfit", sans-serif;
+    line-height: 41px;
+    margin-bottom: 12px;
+}
+
+.verticalCenter h4 img {
+    position: absolute;
+    top: -11px;
+    left: -34px;
+}
+
+.verticalCenter p {
+    color: #0A0A0A;
+    font-size: 16px;
+    margin: 14px 0 0 0;
+    font-family: "Outfit", sans-serif;
+    font-weight: 400;
+}
+
+.form-control:focus {
+    border-color: #898989;
+}
+
+.start_btn h5 {
+    font-size: 13px;
+    color: var(--black);
+    font-weight: 400;
+}
+
+.start_btn h5 a {
+    color: var(--black);
+    font-weight: 600;
+}
+
+.start_btn h5 a:hover {
+    text-decoration: none;
+}
+.loginOuter .back-to-login {
+    font-size: 14px;
+    font-family: "Outfit", sans-serif;
+    font-weight: 500;
+    display: block;
+    width: 100%;
+    text-align: right;
+    text-underline-offset: 2px;
+    text-transform: capitalize;
+    transition: .4s all ease-in-out;
+}
+.start_btn.login {
+    text-align: center;
+}
+
+.start_btn.login .custom_btn {
+    background: #382473;
+    color: #fff;
+    border-radius: 6px;
+    width: 100%;
+    font-size: 16px;
+    font-weight: 700;
+    min-height: 57px;
+    text-transform: uppercase;
+    font-family: "Outfit", sans-serif;
+    letter-spacing: 0.08px;
+    margin: 0;
+    transition: .4s all ease-in-out;
+}
+
+.loginOuter .custom_btn::after {
+    background-color: rgba(13, 36, 69, 0.2);
+}
+.loginOuter .form-group img.password-right-img {
+    position: absolute;
+    right: 18px;
+    margin-left: auto;
+}
+.startOuter .loginOuter .form-logo img {
+    max-width: 133px;
+    height: 100px;
+    object-fit: contain;
+    filter: brightness(0) invert(1);
+}
+
+.startOuter .form-img {
+    min-height: calc(100vh - 63px);
+    position: relative;
+    background: url(../img/main-bg-login.webp) no-repeat;
+    background-size: 100% 100%;
+    text-align: center;
+    height: 100%;
+}
+
+.startOuter form .forgot-pass a {
+    font-weight: 500;
+    padding: 0px;
+    text-decoration: underline;
+    font-family: "Outfit", sans-serif;
+    font-size: 14px;
+}
+
+.startOuter form .forgot-pass {
+    float: right;
+}
+
+.startOuter form {
+    width: 100%;
+    max-width: 500px;
+    margin: auto;
+    text-align: center;
+}
+.loginOuter .verticalCenter .form-group input::placeholder {
+    color: rgba(255, 255, 255, 70%);
+    font-size: 12px;
+    font-family: "Outfit", sans-serif;
+    font-weight: 400;
+    letter-spacing: 0;
+}
+.startOuter form .forgot-pass a.btn {
+    font-family: "Outfit", sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0;
+    line-height: 14px;
+    margin: 24px 0 0 0;
+    transition: .4s all ease-in-out;
+    color: #515151;
+}
+.startOuter form .forgot-pass a.btn:hover, .loginOuter .back-to-login:hover {
+    color: #382473 !important;
+}
+.startOuter form label {
+    margin-bottom: 10px;
+    font-family: "Outfit", sans-serif;
+    font-weight: 400;
+    font-size: 14px;
+    color: #0A0A0A;
+}
+
+.startOuter .form-logo {
+   text-align: center;
+   margin-top: 150px;
+   display: inline-block;
+}
+
+.bg-login-image .verticalCenter {
+    position: absolute;
+    height: auto;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+
+.startOuter .fortruck img {
+    width: 100%;
+    max-width: 100%;
+}
+.loginOuter h1 {
+    font-size: 54px;
+    font-weight: bold;
+    font-family: "Outfit", sans-serif, sans-serif;
+    line-height: normal;
+    margin: 39px auto 0;
+}
+.loginOuter .form-group img {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    right: 20px;
+}
+/* .loginOuter input:-webkit-autofill,
+.loginOuter input:-webkit-autofill:hover, 
+.loginOuter input:-webkit-autofill:focus, 
+.loginOuter input:-webkit-autofill:active{
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: #ffffff;
+    transition: background-color 5000s ease-in-out 0s;
+    box-shadow: unset;
+} */
+.loginOuter .form-group {
+    position: relative;
+    margin-bottom: 0;
+    width: 100%;
+    border-radius: 5px;
+    text-align: left;
+}
+.loginOuter .form-group .form-control {
+    background-color: transparent;
+    border-width: 4px;
+    font-size: 14px;
+    color: #000;
+    min-height: 56px;
+    padding: 0 14px;
+    border: 1px solid #D0D0D0;
+}
+.loginOuter .form-group .form-control:focus{
+    border-color: #000;
+}
+.loginOuter span.input-divider {
+    border-left: 1px solid #ffff;
+    padding-left: 0px;
+    height: 15px;
+    position: relative;
+    left: 51px;
+}
+.startOuter form .form-outer {
+    margin-top: 33px;
+}
+.loginOuter .form-group .form-control::placeholder{ color: #000; }
+.loginOuter .form-group .form-control:focus{ outline: none; box-shadow: none;}
+
+.startOuter form .form-outer .input-outer{
+    position: relative;
+}
+.startOuter .form-img .text-left {
+    max-width: 73%;
+    margin: 50px auto 0;
+    display: inline-block;
+    text-align: left;
+}
+.startOuter .form-img .text-left p {
+    font-size: 18px;
+    color: #fff;
+    line-height: 26px;
+    font-weight: 500;
+}
+.form-outer .rember-password input {
+    width: 23px;
+    height: 23px;
+    border: 1px solid #D0D0D0;
+    margin-right: 14px;
+    accent-color: #382473;
+}
+.form-outer .rember-password label {
+    font-size: 14px;
+    color: #0A0A0A;
+    font-family: "Outfit", sans-serif;
+    font-weight: 400;
+}
+.loginOuter .form-group {
+    margin-bottom: 13px;
+}
+
+@media screen and (max-width:767px) {
+    .hide-mobile{
+        display: none;
+    }
+}
