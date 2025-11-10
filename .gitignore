@@ -8,9 +8,9 @@
 /public/license_proof/
 /public/proof/
 /public/refuel
-/public/setting
+/public/users
 /public/vehical
-/public/vendor
+/public/vms
 /storage/*
 /storage/*.key
 /storage/fonts/
