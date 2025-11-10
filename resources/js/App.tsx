@@ -23,6 +23,7 @@ import ProtectedRoute from "./components/auth/ProtectedRoute";
 import Drivers from "./pages/Drivers/index";
 import CreateDriver from "./pages/Drivers/CreateDriver";
 import Vehicles from "./pages/Vehicles/index";
+import CreateVehicle from "./pages/Vehicles/CreateVehicle";
 
 export default function App() {
   return (
@@ -74,6 +75,14 @@ export default function App() {
               element={
                 <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
                   <Vehicles />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/vehicles/create"
+              element={
+                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                  <CreateVehicle />
                 </ProtectedRoute>
               }
             />
