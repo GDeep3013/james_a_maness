@@ -57,8 +57,10 @@ import { ReactComponent as ErrorHexaIcon } from "./info-hexa.svg?react";
 import { ReactComponent as CarIcon } from "./car.svg?react";
 import { ReactComponent as SettingsIcon } from "./settings.svg?react";
 import { ReactComponent as IssuesIcon } from "./issues.svg?react";
+import { ReactComponent as AvtarIcon } from "./user-icon.svg?react";
 
 export {
+  AvtarIcon,
   ErrorHexaIcon,
   AlertHexaIcon,
   MoreDotIcon,

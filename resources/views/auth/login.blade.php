@@ -75,6 +75,7 @@
                         </div>
                     </form>
                 </div>
+                <p class="copyright-text">© 2025 KAV Expediting. All Rights Reserved</p>
             </div>
         </div>
 

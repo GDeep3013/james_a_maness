@@ -163,6 +163,12 @@ layer(base);
   --z-index-9999: 9999;
   --z-index-99999: 99999;
   --z-index-999999: 999999;
+
+  --primary-color: #0A0A0A;
+  --primary-button: #382473;
+  --primary-hover-color: #E06B04;
+  --primary-bg: #382473;
+
 }
 
 /*
@@ -775,4 +781,10 @@ span.flatpickr-weekday,
 
 .simplebar-scrollbar.simplebar-visible:before {
   @apply opacity-100;
+}
+.primary-color{
+  color: var(--primary-color);
+}
+.primary-button{
+  background-color: var(--primary-button);
 }

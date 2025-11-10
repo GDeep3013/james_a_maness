@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { DropdownItem } from "../ui/dropdown/DropdownItem";
 import { Dropdown } from "../ui/dropdown/Dropdown";
+import { AvtarIcon } from "../../icons";
 // import { Link } from "react-router";
 
 export default function UserDropdown() {
@@ -42,6 +43,7 @@ export default function UserDropdown() {
             strokeLinejoin="round"
           />
         </svg>
+        <AvtarIcon />
       </button>
 
       <Dropdown
