@@ -1,5 +1,5 @@
 import React from "react";
-import newBgImg from "/assets/img/new-bg-img.webp";
+import newBgImg from "../../assets/images/new-bg-img.webp";
 
 export default function AuthLayout({
   children,

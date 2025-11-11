@@ -6,7 +6,7 @@ import Input from "../form/input/InputField";
 import Checkbox from "../form/input/Checkbox";
 import Button from "../ui/button/Button";
 import { useAuth } from "../../context/AuthContext";
-import kavLogo from "/assets/img/kav-logo.png";
+import kavLogo from "../../assets/images/kav-logo.png";
 
 export default function SignInForm() {
   const [showPassword, setShowPassword] = useState(false);
