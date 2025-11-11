@@ -1,5 +1,3 @@
-import React from 'react'
-
 export default function IncompleteWorkOrder() {
     const workOrders = [
         {
@@ -23,7 +21,6 @@ export default function IncompleteWorkOrder() {
             assignedTo: 'Mechanic C',
             dueDate: '2025-07-14',
         },
-        ,
         {
             woId: 'WO-104',
             assetId: 'VAN-005',
@@ -60,10 +57,10 @@ export default function IncompleteWorkOrder() {
 
             {/* Work Orders List */}
             <div className="space-y-6">
-                {workOrders.map((order, index) => (
+                {workOrders.filter((order) => order).map((order, index, filteredArray) => (
                     <div
                         key={index}
-                        className={`flex justify-between items-start ${index < workOrders.length - 1 ? 'border-b pb-6' : ''}`}
+                        className={`flex justify-between items-start ${index < filteredArray.length - 1 ? 'border-b pb-6' : ''}`}
                     >
                         {/* Left Content (IDs, Description, Assignment) */}
                         <div className="flex-grow">

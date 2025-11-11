@@ -39,8 +39,8 @@ export default function SignInForm() {
                 try {
                   await login(email, password);
                   navigate("/");
-                } catch (err: any) {
-                  setError(err.message || "Login failed. Please try again.");
+                } catch (err) {
+                  setError((err as unknown as Error).message || "Login failed. Please try again.");
                 } finally {
                   setLoading(false);
                 }
@@ -61,7 +61,6 @@ export default function SignInForm() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="info@gmail.com"
-                    required
                   />
                 </div>
                 <div>
@@ -74,7 +73,6 @@ export default function SignInForm() {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="Enter your password"
-                      required
                     />
                     <span
                       onClick={() => setShowPassword(!showPassword)}
