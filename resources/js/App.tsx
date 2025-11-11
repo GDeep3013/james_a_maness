@@ -1,7 +1,7 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router";
 import SignIn from "./pages/AuthPages/SignIn";
-import SignUp from "./pages/AuthPages/SignUp";
+// import SignUp from "./pages/AuthPages/SignUp";
 import NotFound from "./pages/OtherPage/NotFound";
 import UserProfiles from "./pages/UserProfiles";
 // import Videos from "./pages/UiElements/Videos";
@@ -33,7 +33,10 @@ export default function App() {
         <Routes>
           {/* Auth Layout */}
           <Route path="/signin" element={<SignIn />} />
+<<<<<<< HEAD
+=======
           <Route path="/login" element={<SignIn />} />
+>>>>>>> cdbd52525fda852cc70230e431c6e703ba0f1c72
           {/* <Route path="/signup" element={<SignUp />} /> */}
 
           {/* Dashboard Layout - Protected Routes */}
