@@ -226,6 +226,7 @@ class VehicleController extends Controller
         }
 
         try {
+            
             $validatedData = $request->validate([
                 'vehicle_name' => 'required|string|max:255',
                 'type' => 'required|string|max:255',
