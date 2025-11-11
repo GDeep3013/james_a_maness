@@ -438,7 +438,7 @@ export default function VehicleList() {
                               className="view-button hover:scale-105 transition-all duration-300"
                               startIcon={<EyeIcon />}
                             >
-                             
+                             {""}
                             </Button>
                             <Button
                               variant="none"
@@ -447,7 +447,7 @@ export default function VehicleList() {
                               className="edit-button hover:scale-105 transition-all duration-300"
                               startIcon={<PencilIcon />}
                             >
-                             
+                             {""}
                             </Button>
                             <Button
                               variant="none"
@@ -457,7 +457,7 @@ export default function VehicleList() {
                               className="delete-button hover:scale-105 transition-all duration-300"
                               startIcon={<TrashBinIcon />}
                             >
-                              
+                             {""}
                             </Button>
                           </div>
                         </TableCell>
