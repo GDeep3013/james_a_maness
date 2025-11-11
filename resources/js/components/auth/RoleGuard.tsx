@@ -14,9 +14,9 @@ const RoleGuard: React.FC<RoleGuardProps> = ({
   requiredPermission,
   fallback = null,
 }) => {
-  const { hasRole, canAccess } = usePermission();
+  const { canAccess } = usePermission();
 
-  if (allowedRoles && !hasRole(allowedRoles)) {
+  if (allowedRoles) {
     return <>{fallback}</>;
   }
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import  { useState } from 'react'
 
 const initialReminders = [
   { 
@@ -39,7 +39,7 @@ const initialReminders = [
 ];
 
 // Helper function to get priority tag colors
-const getPriorityClasses = (priority) => {
+const getPriorityClasses = (priority: string) => {
   switch (priority) {
     case 'high':
       return "bg-red-500 text-white"; // Red background for high

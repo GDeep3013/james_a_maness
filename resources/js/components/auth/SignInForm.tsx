@@ -6,6 +6,7 @@ import Input from "../form/input/InputField";
 import Checkbox from "../form/input/Checkbox";
 import Button from "../ui/button/Button";
 import { useAuth } from "../../context/AuthContext";
+import kavLogo from "../../assets/images/kav-logo.png";
 
 export default function SignInForm() {
   const [showPassword, setShowPassword] = useState(false);
@@ -22,7 +23,7 @@ export default function SignInForm() {
       <div className="flex flex-col justify-center flex-1 w-full max-w-md mx-auto">
         <div>
           <div className="mb-5 sm:mb-8 text-center">
-            <img src="/assets/img/kav-logo.png" alt="logo" className="w-[120px] mx-auto" />
+            <img src={kavLogo} alt="logo" className="w-[120px] mx-auto" />
             <p className="text-sm primary-color mt-4">
               Sign in to your account
             </p>
@@ -39,8 +40,8 @@ export default function SignInForm() {
                 try {
                   await login(email, password);
                   navigate("/");
-                } catch (err: any) {
-                  setError(err.message || "Login failed. Please try again.");
+                } catch (err) {
+                  setError((err as unknown as Error).message || "Login failed. Please try again.");
                 } finally {
                   setLoading(false);
                 }
@@ -61,7 +62,6 @@ export default function SignInForm() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="info@gmail.com"
-                    required
                   />
                 </div>
                 <div>
@@ -74,7 +74,6 @@ export default function SignInForm() {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="Enter your password"
-                      required
                     />
                     <span
                       onClick={() => setShowPassword(!showPassword)}
