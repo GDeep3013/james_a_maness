@@ -30,7 +30,7 @@ class CheckPageAccess
                     'error' => null
                 ], 401);
             }
-            return redirect()->route('login');
+            return redirect()->to('/login');
         }
 
         $user = Auth::user();

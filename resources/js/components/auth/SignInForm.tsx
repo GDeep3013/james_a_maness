@@ -17,7 +17,7 @@ export default function SignInForm() {
   const { login } = useAuth();
   const navigate = useNavigate();
   return (
-    <div className="flex flex-col flex-1">
+    <div className="flex flex-col flex-1 relative">
       
       <div className="flex flex-col justify-center flex-1 w-full max-w-md mx-auto">
         <div>
@@ -95,34 +95,30 @@ export default function SignInForm() {
                       Keep me logged in
                     </span>
                   </div>
-                  <Link
-                    to="/reset-password"
-                    className="text-sm text-primary-color hover:!text-[#E06B04] hover:underline dark:text-brand-400"
-                  >
-                    Forgot password?
-                  </Link>
                 </div>
                 <div>
                   <Button className="w-full" size="sm" disabled={loading}>
                     {loading ? "Signing in..." : "Sign in"}
                   </Button>
                 </div>
+                <div className="text-end">
+                <Link
+                    to="/reset-password"
+                    className="text-sm text-primary-color hover:!text-[#E06B04] hover:underline dark:text-brand-400"
+                  >
+                    Forgot password?
+                  </Link>
+                </div>
               </div>
             </form>
 
-            <div className="mt-5">
-              <p className="text-sm font-normal text-center text-gray-700 dark:text-gray-400 sm:text-start flex justify-center">
-                Don&apos;t have an account? 
-                <Link
-                  to="/signup"
-                  className="text-primary-color ml-1 hover:text-brand-600 hover:underline hover:!text-[#E06B04] dark:text-brand-400"
-                > Sign Up
-                </Link>
-              </p>
-            </div>
+
           </div>
         </div>
       </div>
+
+     <p className="absolute bottom-[22px] left-[30px] text-center text-sm text-[#8A8A8A]">© 2025 KAV Expediting. All Rights Reserved</p>
+
     </div>
   );
 }
