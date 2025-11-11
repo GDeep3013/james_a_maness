@@ -19,7 +19,7 @@ body {
 }
 
 .login-image-bg{
-    background: url(../assets/img/main-bg-login.webp) no-repeat;
+    background: url(/assets/img/main-bg-login.webp) no-repeat;
     background-size: 100% 100%;
     min-height: calc(100vh - 63px);
 }

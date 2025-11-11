@@ -6,6 +6,7 @@ import Input from "../form/input/InputField";
 import Checkbox from "../form/input/Checkbox";
 import Button from "../ui/button/Button";
 import { useAuth } from "../../context/AuthContext";
+import kavLogo from "/assets/img/kav-logo.png";
 
 export default function SignInForm() {
   const [showPassword, setShowPassword] = useState(false);
@@ -22,7 +23,7 @@ export default function SignInForm() {
       <div className="flex flex-col justify-center flex-1 w-full max-w-md mx-auto">
         <div>
           <div className="mb-5 sm:mb-8 text-center">
-            <img src="/assets/img/kav-logo.png" alt="logo" className="w-[120px] mx-auto" />
+            <img src={kavLogo} alt="logo" className="w-[120px] mx-auto" />
             <p className="text-sm primary-color mt-4">
               Sign in to your account
             </p>
