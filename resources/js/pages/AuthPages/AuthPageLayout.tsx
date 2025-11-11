@@ -10,24 +10,19 @@ export default function AuthLayout({
 }) {
   return (
     <div className="relative p-6 bg-white z-1 dark:bg-gray-900 sm:p-0">
-      <div className="relative flex flex-col justify-center w-full h-screen lg:flex-row dark:bg-gray-900 sm:p-0">
+      <div className="relative flex flex-col justify-center w-full h-screen bg-[url('/assets/img/new-bg-img.webp')] bg-cover bg-center bg-no-repeat lg:flex-row dark:bg-gray-900 sm:p-0">
         {children}
-        <div className="items-center hidden w-full h-full lg:w-1/2 bg-brand-950 dark:bg-white/5 lg:grid">
-          <div className="relative flex items-center justify-center z-1">
-            {/* <!-- ===== Common Grid Shape Start ===== --> */}
-            <GridShape />
-            <div className="flex flex-col items-center max-w-xs">
-              <Link to="/" className="block mb-4">
-                <img
-                  width={231}
-                  height={48}
-                  src="/images/logo/auth-logo.svg"
-                  alt="Logo"
-                />
-              </Link>
-              <p className="text-center text-gray-400 dark:text-white/60">
-                Free and Open-Source Tailwind CSS Admin Dashboard Template
-              </p>
+        <div className="items-center hidden w-full h-full lg:w-1/2 lg:grid py-7 max-w-[704px]">
+          <div className="login-image-bg w-full h-full ml-auto">
+            <div className="relative flex items-center justify-center z-1">
+              <div className="flex flex-col items-center max-w-[540px] mt-[75px]">
+                <h2 className="text-white text-[51px] font-extrabold leading-normal">
+                Trusted to Deliver. Committed to Precision.
+                </h2>
+                <p className="text-left text-white">
+                Monitor and manage your entire fleet with real-time status updates and analyticsFree and Open-Source Tailwind CSS Admin Dashboard Template
+                </p>
+              </div>
             </div>
           </div>
         </div>

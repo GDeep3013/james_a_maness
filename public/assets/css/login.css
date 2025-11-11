@@ -342,6 +342,13 @@ body{
 .loginOuter .form-group {
     margin-bottom: 13px;
 }
+.loginOuter p.copyright-text {
+    position: absolute;
+    bottom: 0;
+    left: 30px;
+    color: #8A8A8A;
+    margin: 0;
+}
 
 @media screen and (max-width:767px) {
     .hide-mobile{

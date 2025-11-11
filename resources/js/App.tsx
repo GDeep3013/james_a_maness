@@ -33,6 +33,10 @@ export default function App() {
         <Routes>
           {/* Auth Layout */}
           <Route path="/signin" element={<SignIn />} />
+<<<<<<< HEAD
+=======
+          <Route path="/login" element={<SignIn />} />
+>>>>>>> cdbd52525fda852cc70230e431c6e703ba0f1c72
           {/* <Route path="/signup" element={<SignUp />} /> */}
 
           {/* Dashboard Layout - Protected Routes */}

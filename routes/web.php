@@ -6,7 +6,8 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\StaffController;
 
 
-Route::get('/', [HomeController::class, 'index'])->name('signin');
+Route::get('/', [HomeController::class, 'index'])->name('login');
+Route::get('/login', [HomeController::class, 'index']);
 Route::get('/signin', [HomeController::class, 'index'])->name('signin');
 
 
@@ -16,7 +17,7 @@ Route::get('/create-password/{id}', [StaffController::class, 'getStaff'])->middl
 
 Route::post('/create-password', [StaffController::class, 'confirmPassword'])->middleware('guest')->name('create-password.store');
 
-Auth::routes(['register' => false]);
+Auth::routes(['register' => false, 'login' => false     ]);
 
 Route::middleware(['page.access'])->group(function () {
 
