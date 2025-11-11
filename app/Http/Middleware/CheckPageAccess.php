@@ -36,6 +36,8 @@ class CheckPageAccess
         $user = Auth::user();
         $path = $request->path();
 
+        //dd($user->type);
+
         foreach ($this->pagePermissions as $pattern => $allowedRoles) {
             if ($this->matchPattern($pattern, $path)) {
                 if (!in_array($user->type, $allowedRoles)) {

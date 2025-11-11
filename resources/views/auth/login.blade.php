@@ -84,16 +84,11 @@
 
                     <div class="text-left">
                         <h1 class="text-white">Trusted to 
-Deliver. Committed 
-to Precision.</h1>
-<p>Monitor and manage your entire fleet with real-time status updates and analytics</p>
+                        Deliver. Committed 
+                        to Precision.</h1>
+                        <p>Monitor and manage your entire fleet with real-time status updates and analytics</p>
                     </div>
-
-                <!-- <div class="verticalCenter">
-                    <div class="fortruck">
-                        <img src="/assets/img/form-truck.png" alt="form-truck">
-                    </div>
-                </div> -->
+                
             </div>
             
         </div>

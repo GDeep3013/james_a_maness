@@ -1,11 +1,12 @@
 import React, { useState } from "react";
-import PageBreadcrumb from "../../components/common/PageBreadCrumb";
-import ComponentCard from "../../components/common/ComponentCard";
+// import PageBreadcrumb from "../../components/common/PageBreadCrumb";
+// import ComponentCard from "../../components/common/ComponentCard";
 import PageMeta from "../../components/common/PageMeta";
 import VehicleList from "./VehicleList";
 import Tabs from "../../components/tabs/tabs";
 import { PlusIcon, UserIcon } from "../../icons";
 import Button from "../../components/ui/button/Button";
+import { Link } from "react-router";
 
 export default function Vehicles() {
 
@@ -42,7 +43,10 @@ export default function Vehicles() {
           Vehicles
         </h2>
 
-        <Button size="sm" variant="primary"> <PlusIcon /> Add Vehicle</Button>
+        <Link to="/trucks/create">
+          <Button size="sm" variant="primary"> <PlusIcon /> Add Vehicle</Button>
+        </Link>
+
 
       </div>
       <div className="space-y-6">

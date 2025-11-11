@@ -1,3 +1,4 @@
+import React from "react";
 import { useModal } from "../../hooks/useModal";
 import { Modal } from "../ui/modal";
 import Button from "../ui/button/Button";
@@ -33,7 +34,7 @@ export default function UserMetaCard() {
                 </p>
               </div>
             </div>
-            <div className="flex items-center order-2 gap-2 grow xl:order-3 xl:justify-end">
+            {/* <div className="flex items-center order-2 gap-2 grow xl:order-3 xl:justify-end">
               <a
                 href="https://www.facebook.com/PimjoHQ"
                 target="_blank"
@@ -117,7 +118,7 @@ export default function UserMetaCard() {
                   />
                 </svg>
               </a>
-            </div>
+            </div> */}
           </div>
           <button
             onClick={openModal}
@@ -148,49 +149,17 @@ export default function UserMetaCard() {
             <h4 className="mb-2 text-2xl font-semibold text-gray-800 dark:text-white/90">
               Edit Personal Information
             </h4>
-            <p className="mb-6 text-sm text-gray-500 dark:text-gray-400 lg:mb-7">
+            <p className="mb-3 text-sm text-gray-500 dark:text-gray-400 lg:mb-7">
               Update your details to keep your profile up-to-date.
             </p>
           </div>
           <form className="flex flex-col">
             <div className="custom-scrollbar h-[450px] overflow-y-auto px-2 pb-3">
-              <div>
-                <h5 className="mb-5 text-lg font-medium text-gray-800 dark:text-white/90 lg:mb-6">
-                  Social Links
-                </h5>
-
-                <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
-                  <div>
-                    <Label>Facebook</Label>
-                    <Input
-                      type="text"
-                      value="https://www.facebook.com/PimjoHQ"
-                    />
-                  </div>
-
-                  <div>
-                    <Label>X.com</Label>
-                    <Input type="text" value="https://x.com/PimjoHQ" />
-                  </div>
-
-                  <div>
-                    <Label>Linkedin</Label>
-                    <Input
-                      type="text"
-                      value="https://www.linkedin.com/company/pimjo"
-                    />
-                  </div>
-
-                  <div>
-                    <Label>Instagram</Label>
-                    <Input type="text" value="https://instagram.com/PimjoHQ" />
-                  </div>
-                </div>
-              </div>
-              <div className="mt-7">
-                <h5 className="mb-5 text-lg font-medium text-gray-800 dark:text-white/90 lg:mb-6">
+           
+              <div className="">
+                {/* <h5 className="mb-5 text-lg font-medium text-gray-800 dark:text-white/90 lg:mb-6">
                   Personal Information
-                </h5>
+                </h5> */}
 
                 <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
                   <div className="col-span-2 lg:col-span-1">
@@ -213,10 +182,7 @@ export default function UserMetaCard() {
                     <Input type="text" value="+09 363 398 46" />
                   </div>
 
-                  <div className="col-span-2">
-                    <Label>Bio</Label>
-                    <Input type="text" value="Team Manager" />
-                  </div>
+                  
                 </div>
               </div>
             </div>

@@ -11,7 +11,7 @@
 /public/vehical
 /public/vms
 /storage/*.key
-/storage/*.log
+/storage/logs/*.log
 /storage/fonts/
 /vendor
 .env

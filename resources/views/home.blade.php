@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>KAV EXPEDITING</title>
-    <link rel="icon" href="{{asset('assets/img/favicon.jpg')}}" type="image/x-icon" />
+    <link rel="icon" href="{{asset('/images/fav.png')}}" type="image/x-icon" />
     <script>
          var Config={
             user:<?php echo Auth::user() ? Auth::user() : 'null' ?>,

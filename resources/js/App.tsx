@@ -33,7 +33,8 @@ export default function App() {
         <Routes>
           {/* Auth Layout */}
           <Route path="/signin" element={<SignIn />} />
-          <Route path="/signup" element={<SignUp />} />
+          <Route path="/login" element={<SignIn />} />
+          {/* <Route path="/signup" element={<SignUp />} /> */}
 
           {/* Dashboard Layout - Protected Routes */}
           <Route
@@ -71,7 +72,7 @@ export default function App() {
             />
 
             <Route
-              path="/vehicles"
+              path="/trucks"
               element={
                 <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
                   <Vehicles />
@@ -79,7 +80,15 @@ export default function App() {
               }
             />
             <Route
-              path="/vehicles/create"
+              path="/trucks/create"
+              element={
+                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                  <CreateVehicle />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/trucks/:id/edit"
               element={
                 <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
                   <CreateVehicle />
