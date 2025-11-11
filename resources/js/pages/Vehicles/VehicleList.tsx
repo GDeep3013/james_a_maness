@@ -12,7 +12,8 @@ import Input from "../../components/form/input/InputField";
 import Button from "../../components/ui/button/Button";
 import PageMeta from "../../components/common/PageMeta";
 import { vehicleService } from "../../services/vehicleService";
-import { PencilIcon, TrashBinIcon } from "../../icons";
+import { PencilIcon, TrashBinIcon, ExportIcon, EyeIcon } from "../../icons";
+import Select from "../../components/form/Select";
 
 interface Vehicle {
   id: number;
@@ -55,6 +56,8 @@ export default function VehicleList() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>("");
   const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
+  const [fuelTypeFilter, setFuelTypeFilter] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [pagination, setPagination] = useState<PaginationData>({
     current_page: 1,
@@ -121,6 +124,30 @@ export default function VehicleList() {
     navigate(`/trucks/${id}/edit`);
   };
 
+  const handleView = (id: number) => {
+    navigate(`/trucks/${id}/VehicleDetail`);
+  };
+
+  const handleExport = () => {
+    
+  };
+
+  const statusOptions = [
+    { value: "", label: "All Status" },
+    { value: "active", label: "Active" },
+    { value: "inactive", label: "Inactive" },
+    { value: "maintenance", label: "In Maintenance" },
+    { value: "available", label: "Available" },
+  ];
+
+  const fuelTypeOptions = [
+    { value: "", label: "All Fuel Types" },
+    { value: "gasoline", label: "Gasoline" },
+    { value: "diesel", label: "Diesel" },
+    { value: "electric", label: "Electric" },
+    { value: "hybrid", label: "Hybrid" },
+  ];
+
   const renderPagination = () => {
     const pages: number[] = [];
     const maxPages = 5;
@@ -143,6 +170,7 @@ export default function VehicleList() {
             size="sm"
             onClick={() => setCurrentPage(currentPage - 1)}
             disabled={currentPage === 1 || loading}
+            className="min-height-[34px] !leading-[34px]"
           >
             Previous
           </Button>
@@ -151,13 +179,14 @@ export default function VehicleList() {
             size="sm"
             onClick={() => setCurrentPage(currentPage + 1)}
             disabled={currentPage === pagination.last_page || loading}
+            className="min-height-[34px] !leading-[34px]"
           >
             Next
           </Button>
         </div>
         <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
           <div>
-            <p className="text-sm text-gray-700 dark:text-gray-300">
+            <p className="text-sm text-gray-700">
               Showing{" "}
               <span className="font-medium">
                 {pagination.total === 0
@@ -181,7 +210,7 @@ export default function VehicleList() {
                 size="sm"
                 onClick={() => setCurrentPage(currentPage - 1)}
                 disabled={currentPage === 1 || loading}
-                className="rounded-r-none"
+                className="rounded-r-none min-height-[34px] !leading-[34px]"
               >
                 Previous
               </Button>
@@ -192,7 +221,7 @@ export default function VehicleList() {
                   size="sm"
                   onClick={() => setCurrentPage(page)}
                   disabled={loading}
-                  className="rounded-none border-l-0"
+                  className="rounded-none border-l-0 min-height-[34px] !leading-[34px]"
                 >
                   {page}
                 </Button>
@@ -202,7 +231,7 @@ export default function VehicleList() {
                 size="sm"
                 onClick={() => setCurrentPage(currentPage + 1)}
                 disabled={currentPage === pagination.last_page || loading}
-                className="rounded-l-none border-l-0"
+                className="rounded-l-none border-l-0 min-height-[34px] !leading-[34px]"
               >
                 Next
               </Button>
@@ -221,35 +250,45 @@ export default function VehicleList() {
       />
 
       <div className="space-y-6">
-        <div className="flex gap-4 justify-end">
-          <div className="w-full max-w-[400px]">
-            <form onSubmit={handleSearch} className="flex gap-2">
-              <div className="relative flex-1 max-w-md">
-                <Input
-                  type="text"
-                  placeholder="Search vehicles by name, VIN, license plate..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pr-10"
-                />
-                <button
-                  type="submit"
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                  </svg>
-                </button>
-              </div>
-              <button
-                type="submit"
-                className="inline-flex items-center justify-center gap-2 rounded-lg transition px-4 py-2.5 text-sm bg-brand-500 text-white shadow-theme-xs hover:bg-brand-600"
-              >
-                Search
-              </button>
-            </form>
+        <form onSubmit={handleSearch} className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl p-4">
+          <div className="flex flex-wrap items-center gap-4">
+            <div className="flex-1 max-w-[50%]">
+              <Input
+                type="text"
+                placeholder="Search by ID, name, driver, or license plate..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="!bg-[#F3F3F5] max-w-full border-none !rounded-[8px]"
+              />
+            </div>
+            <div className="w-full max-w-[20%]">
+              <Select
+                options={statusOptions}
+                placeholder="All Status"
+                onChange={(value) => setStatusFilter(value)}
+                defaultValue=""
+                className="!bg-[#F3F3F5] border-gray-200"
+              />
+            </div>
+            <div className="w-full max-w-[20%]">
+              <Select
+                options={fuelTypeOptions}
+                placeholder="All Fuel Types"
+                onChange={(value) => setFuelTypeFilter(value)}
+                defaultValue=""
+                className="!bg-[#F3F3F5] border-gray-200"
+              />
+            </div>
+            <Button
+              variant="outline"
+              onClick={handleExport}
+              className="bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-white/10 hover:bg-gray-100 dark:hover:bg-gray-800 w-full max-w-[10%] min-h-[44px] !leading-[44px]"
+            >
+              <ExportIcon />
+              Export
+            </Button>
           </div>
-        </div>
+        </form>
 
         {error && (
           <div className="p-4 bg-error-50 dark:bg-error-900/20 border border-error-200 dark:border-error-800 rounded-lg">
@@ -319,7 +358,7 @@ export default function VehicleList() {
                       </TableCell>
                       <TableCell
                         isHeader
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400 w-[10%]"
                       >
                         Actions
                       </TableCell>
@@ -331,7 +370,7 @@ export default function VehicleList() {
                       <TableRow key={vehicle.id}>
                         <TableCell className="px-5 py-4 sm:px-6 text-start">
                           <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 overflow-hidden rounded-lg bg-gray-200 dark:bg-gray-700">
+                            {/* <div className="w-10 h-10 overflow-hidden rounded-lg bg-gray-200 dark:bg-gray-700">
                               {vehicle.photo ? (
                                 <img
                                   width={40}
@@ -350,7 +389,7 @@ export default function VehicleList() {
                                   </svg>
                                 </div>
                               )}
-                            </div>
+                            </div> */}
                             <div>
                               <span className="block font-medium text-gray-800 text-theme-sm dark:text-white/90">
                                 {vehicle.vehicle_name}
@@ -392,22 +431,33 @@ export default function VehicleList() {
                         </TableCell>
                         <TableCell className="px-4 py-3 text-start">
                           <div className="flex items-center gap-2">
-                            <Button
-                              variant="outline"
+                          <Button
+                              variant="none"
                               size="sm"
-                              onClick={() => handleEdit(vehicle.id)}
-                              startIcon={<PencilIcon className="w-4 h-4" />}
+                              onClick={() => handleView(vehicle.id)}
+                              className="view-button hover:scale-105 transition-all duration-300"
+                              startIcon={<EyeIcon />}
                             >
-                              Edit
+                             
                             </Button>
                             <Button
-                              variant="outline"
+                              variant="none"
+                              size="sm"
+                              onClick={() => handleEdit(vehicle.id)}
+                              className="edit-button hover:scale-105 transition-all duration-300"
+                              startIcon={<PencilIcon />}
+                            >
+                             
+                            </Button>
+                            <Button
+                              variant="none"
                               size="sm"
                               onClick={() => handleDelete(vehicle.id)}
                               disabled={deletingId === vehicle.id}
-                              startIcon={<TrashBinIcon className="w-4 h-4" />}
+                              className="delete-button hover:scale-105 transition-all duration-300"
+                              startIcon={<TrashBinIcon />}
                             >
-                              {deletingId === vehicle.id ? "Deleting..." : "Delete"}
+                              
                             </Button>
                           </div>
                         </TableCell>

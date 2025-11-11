@@ -26,8 +26,10 @@ Route::middleware(['page.access'])->group(function () {
         
     Route::get('/trucks', [HomeController::class, 'index']);
     Route::get('/trucks/create', [HomeController::class, 'index']);
+    Route::get('/trucks/add', [HomeController::class, 'index']);
     Route::get('/trucks/{id}', [HomeController::class, 'index'])->where('id', '[0-9]+');
     Route::get('/trucks/{id}/edit', [HomeController::class, 'index'])->where('id', '[0-9]+');
+    Route::get('/trucks/{id}/VehicleDetail', [HomeController::class, 'index'])->where('id', '[0-9]+');
     
     
     // Route::get('/drivers', [HomeController::class, 'index']);

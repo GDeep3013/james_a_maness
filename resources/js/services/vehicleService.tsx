@@ -80,5 +80,8 @@ export const vehicleService = {
 
   getForEdit: (id: number) =>
     api.get(`/vehicles/${id}/edit`),
+
+  getStatistics: () =>
+    api.get('/vehicles'),
 };
 

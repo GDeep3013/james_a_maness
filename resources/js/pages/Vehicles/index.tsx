@@ -7,6 +7,7 @@ import Tabs from "../../components/tabs/tabs";
 import { PlusIcon, UserIcon } from "../../icons";
 import Button from "../../components/ui/button/Button";
 import { Link } from "react-router";
+import VehicleOverview from "./VehicleOverview";
 
 export default function Vehicles() {
 
@@ -43,18 +44,15 @@ export default function Vehicles() {
           Vehicles
         </h2>
 
-        <Link to="/trucks/create">
-          <Button size="sm" variant="primary"> <PlusIcon /> Add Vehicle</Button>
+        <Link to="/trucks/add">
+          <Button size="sm" variant="primary" className="min-w-[190px] !bg-[#5321B1]"> <PlusIcon /> Add New Vehicle</Button>
         </Link>
 
 
       </div>
       <div className="space-y-6">
-        <Tabs
-            items={tabItems}
-            selected={selectedTab}
-            onSelect={(item) => setSelectedTab(item)}
-        />
+        <VehicleOverview />
+        <VehicleList />
       </div>
     </>
   );

@@ -24,6 +24,8 @@ import Drivers from "./pages/Drivers/index";
 import CreateDriver from "./pages/Drivers/CreateDriver";
 import Vehicles from "./pages/Vehicles/index";
 import CreateVehicle from "./pages/Vehicles/CreateVehicle";
+import VehicleDetail from "./pages/Vehicles/VehicleDetail";
+import AddVehicle from "./pages/Vehicles/AddVehicle";
 
 export default function App() {
   return (
@@ -33,10 +35,7 @@ export default function App() {
         <Routes>
           {/* Auth Layout */}
           <Route path="/signin" element={<SignIn />} />
-<<<<<<< HEAD
-=======
           <Route path="/login" element={<SignIn />} />
->>>>>>> cdbd52525fda852cc70230e431c6e703ba0f1c72
           {/* <Route path="/signup" element={<SignUp />} /> */}
 
           {/* Dashboard Layout - Protected Routes */}
@@ -91,10 +90,26 @@ export default function App() {
               }
             />
             <Route
+              path="/trucks/add"
+              element={
+                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                  <AddVehicle />
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/trucks/:id/edit"
               element={
                 <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
                   <CreateVehicle />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/trucks/:id/VehicleDetail"
+              element={
+                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                  <VehicleDetail />
                 </ProtectedRoute>
               }
             />

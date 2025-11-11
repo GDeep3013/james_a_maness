@@ -1,4 +1,6 @@
-type BadgeVariant = "light" | "solid";
+import React from 'react';
+
+type BadgeVariant = "light" | "solid" | "outline";
 type BadgeSize = "sm" | "md";
 type BadgeColor =
   | "primary"
@@ -10,12 +12,12 @@ type BadgeColor =
   | "dark";
 
 interface BadgeProps {
-  variant?: BadgeVariant; // Light or solid variant
-  size?: BadgeSize; // Badge size
-  color?: BadgeColor; // Badge color
-  startIcon?: React.ReactNode; // Icon at the start
-  endIcon?: React.ReactNode; // Icon at the end
-  children: React.ReactNode; // Badge content
+  variant?: BadgeVariant;
+  size?: BadgeSize;
+  color?: BadgeColor; 
+  startIcon?: React.ReactNode; 
+  endIcon?: React.ReactNode;
+  children: React.ReactNode; 
 }
 
 const Badge: React.FC<BadgeProps> = ({
@@ -27,41 +29,47 @@ const Badge: React.FC<BadgeProps> = ({
   children,
 }) => {
   const baseStyles =
-    "inline-flex items-center px-2.5 py-0.5 justify-center gap-1 rounded-full font-medium";
+    "inline-flex items-center px-2.5 py-0.5 justify-center gap-1 font-medium";
 
-  // Define size styles
   const sizeStyles = {
-    sm: "text-theme-xs", // Smaller padding and font size
-    md: "text-sm", // Default padding and font size
+    sm: "text-theme-xs",
+    md: "text-sm",
   };
 
-  // Define color styles for variants
   const variants = {
     light: {
       primary:
-        "bg-brand-50 text-brand-500 dark:bg-brand-500/15 dark:text-brand-400",
+        "bg-brand-50 text-brand-500 dark:bg-brand-500/15 dark:text-brand-400 rounded-full",
       success:
-        "bg-success-50 text-success-600 dark:bg-success-500/15 dark:text-success-500",
+        "bg-success-50 text-success-600 dark:bg-success-500/15 dark:text-success-500 rounded-full",
       error:
-        "bg-error-50 text-error-600 dark:bg-error-500/15 dark:text-error-500",
+        "bg-error-50 text-error-600 dark:bg-error-500/15 dark:text-error-500 rounded-full",
       warning:
-        "bg-warning-50 text-warning-600 dark:bg-warning-500/15 dark:text-orange-400",
-      info: "bg-blue-light-50 text-blue-light-500 dark:bg-blue-light-500/15 dark:text-blue-light-500",
-      light: "bg-gray-100 text-gray-700 dark:bg-white/5 dark:text-white/80",
-      dark: "bg-gray-500 text-white dark:bg-white/5 dark:text-white",
+        "bg-warning-50 text-warning-600 dark:bg-warning-500/15 dark:text-orange-400 rounded-full",
+      info: "bg-blue-light-50 text-blue-light-500 dark:bg-blue-light-500/15 dark:text-blue-light-500 rounded-full",
+      light: "bg-gray-100 text-gray-700 dark:bg-white/5 dark:text-white/80 rounded-full",
+      dark: "bg-gray-500 text-white dark:bg-white/5 dark:text-white rounded-full",
     },
     solid: {
-      primary: "bg-brand-500 text-white dark:text-white",
-      success: "bg-success-500 text-white dark:text-white",
-      error: "bg-error-500 text-white dark:text-white",
-      warning: "bg-warning-500 text-white dark:text-white",
-      info: "bg-blue-light-500 text-white dark:text-white",
-      light: "bg-gray-400 dark:bg-white/5 text-white dark:text-white/80",
-      dark: "bg-gray-700 text-white dark:text-white",
+      primary: "bg-brand-500 text-white dark:text-white rounded-full",
+      success: "bg-success-500 text-white dark:text-white rounded-full",
+      error: "bg-error-500 text-white dark:text-white rounded-full",
+      warning: "bg-warning-500 text-white dark:text-white rounded-full",
+      info: "bg-blue-light-500 text-white dark:text-white rounded-full",
+      light: "bg-gray-400 dark:bg-white/5 text-white dark:text-white/80 rounded-full",
+      dark: "bg-gray-700 text-white dark:text-white rounded-full",
+    },
+    outline: {
+      primary: "bg-white border border-gray-300 text-gray-700 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 rounded-lg",
+      success: "bg-white border border-gray-300 text-gray-700 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 rounded-lg",
+      error: "bg-white border border-gray-300 text-gray-700 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 rounded-lg",
+      warning: "bg-white border border-gray-300 text-gray-700 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 rounded-lg",
+      info: "bg-white border border-gray-300 text-gray-700 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 rounded-lg",
+      light: "bg-white border border-gray-300 text-gray-700 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 rounded-lg",
+      dark: "bg-white border border-gray-300 text-gray-700 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 rounded-lg",
     },
   };
 
-  // Get styles based on size and color variant
   const sizeClass = sizeStyles[size];
   const colorStyles = variants[variant][color];
 

@@ -58,8 +58,17 @@ import { ReactComponent as CarIcon } from "./car.svg?react";
 import { ReactComponent as SettingsIcon } from "./settings.svg?react";
 import { ReactComponent as IssuesIcon } from "./issues.svg?react";
 import { ReactComponent as AvtarIcon } from "./user-icon.svg?react";
+import { ReactComponent as ExportIcon } from "./export.svg?react";
+import { ReactComponent as FuelIcon } from "./fuel.svg?react";
+import { ReactComponent as TotalMileageIcon } from "./total-mileage.svg?react";
+import { ReactComponent as PurchasePriceIcon } from "./purchase-price.svg?react";
+import { ReactComponent as TickIcon } from "./tick.svg?react";
 
 export {
+  TickIcon,
+  FuelIcon,
+  TotalMileageIcon,
+  PurchasePriceIcon,
   AvtarIcon,
   ErrorHexaIcon,
   AlertHexaIcon,
@@ -83,6 +92,7 @@ export {
   ArrowRightIcon,
   GroupIcon,
   BoxIconLine,
+  ExportIcon,
   ShootingStarIcon,
   DollarLineIcon,
   TrashBinIcon,
