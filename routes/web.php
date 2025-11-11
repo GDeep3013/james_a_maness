@@ -32,10 +32,10 @@ Route::middleware(['page.access'])->group(function () {
     Route::get('/trucks/{id}/VehicleDetail', [HomeController::class, 'index'])->where('id', '[0-9]+');
     
     
-    // Route::get('/drivers', [HomeController::class, 'index']);
-    // Route::get('/drivers/create', [HomeController::class, 'index']);
-    // Route::get('/drivers/{id}', [HomeController::class, 'index'])->where('id', '[0-9]+');
-    // Route::get('/drivers/{id}/edit', [HomeController::class, 'index'])->where('id', '[0-9]+');
+    Route::get('/drivers', [HomeController::class, 'index']);
+    Route::get('/drivers/create', [HomeController::class, 'index']);
+    Route::get('/drivers/{id}', [HomeController::class, 'index'])->where('id', '[0-9]+');
+    Route::get('/drivers/{id}/edit', [HomeController::class, 'index'])->where('id', '[0-9]+');
 
     Route::get('profile', [HomeController::class, 'index']);
 });
