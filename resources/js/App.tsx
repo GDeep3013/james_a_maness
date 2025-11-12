@@ -23,7 +23,6 @@ import ProtectedRoute from "./components/auth/ProtectedRoute";
 import Contacts from "./pages/Contacts/index";
 import CreateContacts from "./pages/Contacts/CreateContact";
 import Vehicles from "./pages/Vehicles/index";
-import CreateVehicle from "./pages/Vehicles/CreateVehicle";
 import VehicleDetail from "./pages/Vehicles/VehicleDetail";
 import AddVehicle from "./pages/Vehicles/AddVehicle";
 import EditVehicle from "./pages/Vehicles/EditVehicle";
@@ -86,7 +85,7 @@ export default function App() {
               path="/vehicles/create"
               element={
                 <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
-                  <CreateVehicle />
+                  <AddVehicle />
                 </ProtectedRoute>
               }
             />
