@@ -3,10 +3,10 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
-use App\Http\Controllers\DriverController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\VehicleController;
 // use App\Http\Controllers\Apps\LoginController;
-// use App\Http\Controllers\Apps\DriverApiController;
+// use App\Http\Controllers\Apps\ContactApiController;
 // use App\Http\Controllers\Apps\RoutesApiController;
 // use App\Http\Controllers\ReminderController;
 // use App\Http\Controllers\MainRouteStopsController;
@@ -28,8 +28,8 @@ Route::prefix('auth')->group(function () {
 
 Route::middleware('auth:sanctum')->group(function () {
 
-    Route::apiResource('drivers', DriverController::class);
-    Route::get('/drivers/{id}/edit', [DriverController::class, 'edit'])->where('id', '[0-9]+');
+    Route::apiResource('contacts', ContactController::class);
+    Route::get('/contacts/{id}/edit', [ContactController::class, 'edit'])->where('id', '[0-9]+');
 
     Route::apiResource('vehicles', VehicleController::class);
     Route::get('/vehicles/{id}/edit', [VehicleController::class, 'edit'])->where('id', '[0-9]+');
@@ -52,9 +52,9 @@ Route::middleware('auth:sanctum')->group(function () {
 //     Route::any('/password/reset', [LoginController::class, 'forgotPassword']);
 //     Route::any('/password/verify', [LoginController::class, 'verifyPassword']);
 //     Route::any('/password/new', [LoginController::class, 'updatePassword']);
-//     Route::any('/profile', [DriverApiController::class, 'getDriver']);
-//     Route::any('/profile-update', [DriverApiController::class, 'updateDriver']);
-//     Route::any('/live-tracking', [DriverApiController::class, 'driverLiveTracking']);
+//     Route::any('/profile', [ContactApiController::class, 'getContact']);
+//     Route::any('/profile-update', [ContactApiController::class, 'updateContact']);
+//     Route::any('/live-tracking', [ContactApiController::class, 'contactLiveTracking']);
 //     Route::any('/routes', [RoutesApiController::class, 'getRoutesDetails']);
 //     Route::any('/trip-in-progress', [RoutesApiController::class, 'getRoutesInProgress']);
 //     Route::any('/trip-completed', [RoutesApiController::class, 'getCompletedTrip']);

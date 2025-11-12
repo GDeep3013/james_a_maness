@@ -11,18 +11,24 @@ class Vehical extends Model
 
     protected $fillable = [
         'vehicle_name',
-        'license_plate',
-        'number_plate',
         'type',
-        'vin_sn',
-        'fuel_type',
-        'year',
         'make',
         'model',
-        'trim',
-        'registration_state',
-        'labels',
-        'photo'
+        'year',
+        'vin',
+        'license_plate',
+        'color',
+        'fuel_type',
+        'transmission',
+        'purchase_date',
+        'engine_size',
+        'current_mileage',
+        'purchase_price',
+        'initial_status',
+        'primary_location',
+        'notes',
+        'assigned_driver',
+        'department',
     ];
 
 }

@@ -13,20 +13,28 @@ return new class extends Migration
      */
     public function up()
     {
+
         Schema::create('vehicals', function (Blueprint $table) {
             $table->id();
             $table->string('vehicle_name');
-            $table->string('license_plate')->nullable();
             $table->string('type');
-            $table->string('vin_sn');
-            $table->string('fuel_type')->nullable();
-            $table->string('year')->nullable();
-            $table->string('make')->nullable();
+            $table->string('make');
             $table->string('model')->nullable();
-            $table->string('trim')->nullable();
-            $table->string('registration_state')->nullable();
-            $table->string('labels')->nullable();
-            $table->string('photo')->nullable();
+            $table->string('year')->nullable();
+            $table->string('vin')->nullable();
+            $table->string('license_plate');
+            $table->string('color')->nullable();
+            $table->string('fuel_type')->nullable();
+            $table->string('transmission')->nullable();
+            $table->string('purchase_date')->nullable();
+            $table->string('engine_size')->nullable();
+            $table->string('current_mileage')->nullable();
+            $table->string('purchase_price')->nullable();
+            $table->enum('initial_status', ['available', 'assigned', 'maintenance', 'inactive'])->default('available');
+            $table->string('primary_location')->nullable();
+            $table->text('notes')->nullable();
+            $table->bigInteger('assigned_driver')->nullable();
+            $table->bigInteger('department')->nullable();
             $table->timestamps();
         });
     }

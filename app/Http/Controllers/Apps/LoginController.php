@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Apps;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Driver;
+use App\Models\Contact;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
@@ -128,7 +128,7 @@ class LoginController extends Controller
                 return $this->error('The given data was invalid', $validator->errors());
             }
         // }
-        $driver = Driver::where('phone', $request->username)->orWhere('email', $request->username)->first();
+        $driver = Contact::where('phone', $request->username)->orWhere('email', $request->username)->first();
         if (!Hash::check($request->password, $driver->password)) {
             return $this->error('These credentials do not match our records.', [
                 'password' => ["Please attemp a valid password"]
@@ -181,7 +181,7 @@ class LoginController extends Controller
                 return $this->error('The given data was invalid', $validator->errors());
             }
         }
-        $driver = Driver::where('phone', $request->username)->orWhere('email', $request->username)->first();
+        $driver = Contact::where('phone', $request->username)->orWhere('email', $request->username)->first();
         if (!$driver) {
             return $this->error('Unauthorized token', null, 401);
         }
@@ -239,7 +239,7 @@ class LoginController extends Controller
                 return $this->error('The given data was invalid', $validator->errors());
             }
         }
-        $driver = Driver::where('phone', $request->username)->orWhere('email', $request->username)->first();
+        $driver = Contact::where('phone', $request->username)->orWhere('email', $request->username)->first();
         if (!$driver) {
             return $this->error('Unauthorized token', null, 401);
         }
@@ -293,7 +293,7 @@ class LoginController extends Controller
                 return $this->error('The given data was invalid', $validator->errors());
             }
         }
-        $driver = Driver::where('phone', $request->username)->orWhere('email', $request->username)->first();
+        $driver = Contact::where('phone', $request->username)->orWhere('email', $request->username)->first();
         if (!$driver) {
             return $this->error('Unauthorized token', null, 401);
         }
@@ -329,7 +329,7 @@ class LoginController extends Controller
     public function logout(Request $request)
     {
         $tokenWithoutBearer = str_replace('Bearer ', '', $request->headers->get('authorization'));
-        $driver = Driver::where('tokens', $tokenWithoutBearer)->first();
+        $driver = Contact::where('tokens', $tokenWithoutBearer)->first();
         if (!empty($driver)) {
             $driver->tokens = null;
             $driver->fcm_token = null;

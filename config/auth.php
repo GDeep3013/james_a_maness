@@ -46,9 +46,9 @@ return [
             'provider' => 'users',
         ],
 
-        'driver' => [  // 👈 Custom Guard for Drivers
+        'contact' => [
             'driver' => 'sanctum',
-            'provider' => 'drivers',
+            'provider' => 'contacts',
         ],
     ],
 
@@ -75,9 +75,9 @@ return [
             'model' => App\Models\User::class,
         ],
 
-        'drivers' => [  // 👈 Custom Provider for Drivers
+        'contacts' => [
             'driver' => 'eloquent',
-            'model' => App\Models\Driver::class,
+            'model' => App\Models\Contact::class,
         ],
     ],
 

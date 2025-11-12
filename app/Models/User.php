@@ -53,8 +53,8 @@ class User extends Authenticatable
 
 
 
-    function driver() : Driver {
-        return $this->hasOne(Driver::class, 'user_id', 'id');
+    function contact() : Contact {
+        return $this->hasOne(Contact::class, 'user_id', 'id');
     }
 
 

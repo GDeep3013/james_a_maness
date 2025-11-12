@@ -32,22 +32,22 @@ const navItems: NavItem[] = [
     path: "/",
   },
   {
-    icon: <UserCircleIcon />,
-    name: "Drivers",
-    path: "/drivers",
-    allowedRoles: ["Admin", "Manager"],
-  },
-  {
     icon: <CarIcon />,
     name: "Vehicles",
     allowedRoles: ["Admin", "Manager"],
     subItems: [
-      { name: "Vehicle List", path: "/trucks", pro: false, allowedRoles: ["Admin", "Manager"] },
+      { name: "Asset List", path: "/vehicles", pro: false, allowedRoles: ["Admin", "Manager"] },
       { name: "Vehicle Assignments", path: "/vehicle-assignments", pro: false, allowedRoles: ["Admin", "Manager"] },
       { name: "Meter History", path: "/meter-history", pro: false, allowedRoles: ["Admin", "Manager"] },
       { name: "Expense History", path: "/expense-history", pro: false, allowedRoles: ["Admin", "Manager"] },
       { name: "Replacement Analysis", path: "/replacement-analysis", pro: false, allowedRoles: ["Admin", "Manager"] },
     ],
+  },
+  {
+    icon: <UserCircleIcon />,
+    name: "Contacts",
+    path: "/contacts",
+    allowedRoles: ["Admin", "Manager"],
   },
   {
     icon: <CalenderIcon />,

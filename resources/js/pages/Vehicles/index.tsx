@@ -1,32 +1,14 @@
-import React, { useState } from "react";
+// import React, { useState } from "react";
 // import PageBreadcrumb from "../../components/common/PageBreadCrumb";
 // import ComponentCard from "../../components/common/ComponentCard";
 import PageMeta from "../../components/common/PageMeta";
 import VehicleList from "./VehicleList";
-import Tabs from "../../components/tabs/tabs";
-import { PlusIcon, UserIcon } from "../../icons";
+import { PlusIcon } from "../../icons";
 import Button from "../../components/ui/button/Button";
 import { Link } from "react-router";
 import VehicleOverview from "./VehicleOverview";
 
 export default function Vehicles() {
-
-    const tabItems = [
-        {
-            title: "Vehicle List",
-            key: "vehicle-list",
-            icon: <UserIcon />,
-            component: <VehicleList />
-        },
-        {
-            title: "Vehicle Details",
-            key: "vehicle-details",
-            icon: <UserIcon />,
-            component: <p>Vehicle Details</p>
-        }
-    ];
-  const [selectedTab, setSelectedTab] = useState(tabItems[0].key);
-
 
 
   return (
@@ -44,7 +26,7 @@ export default function Vehicles() {
           Vehicles
         </h2>
 
-        <Link to="/trucks/add">
+        <Link to="/vehicles/add">
           <Button size="sm" variant="primary" className="min-w-[190px] !bg-[#5321B1]"> <PlusIcon /> Add New Vehicle</Button>
         </Link>
 

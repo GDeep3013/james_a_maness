@@ -20,12 +20,13 @@ import AppLayout from "./layout/AppLayout";
 import { ScrollToTop } from "./components/common/ScrollToTop";
 import Home from "./pages/Dashboard/Home";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
-import Drivers from "./pages/Drivers/index";
-import CreateDriver from "./pages/Drivers/CreateDriver";
+import Contacts from "./pages/Contacts/index";
+import CreateContacts from "./pages/Contacts/CreateContact";
 import Vehicles from "./pages/Vehicles/index";
 import CreateVehicle from "./pages/Vehicles/CreateVehicle";
 import VehicleDetail from "./pages/Vehicles/VehicleDetail";
 import AddVehicle from "./pages/Vehicles/AddVehicle";
+import EditVehicle from "./pages/Vehicles/EditVehicle";
 
 export default function App() {
   return (
@@ -49,32 +50,32 @@ export default function App() {
             <Route index path="/" element={<Home />} />
 
             <Route
-              path="/drivers"
+              path="/contacts"
               element={
                 <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
-                  <Drivers />
+                  <Contacts />
                 </ProtectedRoute>
               }
             />
             <Route
-              path="/drivers/create"
+              path="/contacts/create"
               element={
                 <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
-                  <CreateDriver />
+                  <CreateContacts />
                 </ProtectedRoute>
               }
             />
             <Route
-              path="/drivers/:id"
+              path="/contacts/:id"
               element={
                 <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
-                  <CreateDriver />
+                  <CreateContacts />
                 </ProtectedRoute>
               }
             />
 
             <Route
-              path="/trucks"
+              path="/vehicles"
               element={
                 <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
                   <Vehicles />
@@ -82,7 +83,7 @@ export default function App() {
               }
             />
             <Route
-              path="/trucks/create"
+              path="/vehicles/create"
               element={
                 <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
                   <CreateVehicle />
@@ -90,7 +91,7 @@ export default function App() {
               }
             />
             <Route
-              path="/trucks/add"
+              path="/vehicles/add"
               element={
                 <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
                   <AddVehicle />
@@ -98,15 +99,15 @@ export default function App() {
               }
             />
             <Route
-              path="/trucks/:id/edit"
+              path="/vehicles/:id/edit"
               element={
                 <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
-                  <CreateVehicle />
+                  <EditVehicle />
                 </ProtectedRoute>
               }
             />
             <Route
-              path="/trucks/:id/VehicleDetail"
+              path="/vehicles/:id/VehicleDetail"
               element={
                 <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
                   <VehicleDetail />

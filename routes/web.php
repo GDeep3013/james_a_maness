@@ -24,18 +24,18 @@ Route::middleware(['page.access'])->group(function () {
     Route::get('/', [HomeController::class, 'index'])->name('home');
 
         
-    Route::get('/trucks', [HomeController::class, 'index']);
-    Route::get('/trucks/create', [HomeController::class, 'index']);
-    Route::get('/trucks/add', [HomeController::class, 'index']);
-    Route::get('/trucks/{id}', [HomeController::class, 'index'])->where('id', '[0-9]+');
-    Route::get('/trucks/{id}/edit', [HomeController::class, 'index'])->where('id', '[0-9]+');
-    Route::get('/trucks/{id}/VehicleDetail', [HomeController::class, 'index'])->where('id', '[0-9]+');
+    Route::get('/vehicles', [HomeController::class, 'index']);
+    Route::get('/vehicles/create', [HomeController::class, 'index']);
+    Route::get('/vehicles/add', [HomeController::class, 'index']);
+    Route::get('/vehicles/{id}', [HomeController::class, 'index'])->where('id', '[0-9]+');
+    Route::get('/vehicles/{id}/edit', [HomeController::class, 'index'])->where('id', '[0-9]+');
+    Route::get('/vehicles/{id}/VehicleDetail', [HomeController::class, 'index'])->where('id', '[0-9]+');
     
     
-    Route::get('/drivers', [HomeController::class, 'index']);
-    Route::get('/drivers/create', [HomeController::class, 'index']);
-    Route::get('/drivers/{id}', [HomeController::class, 'index'])->where('id', '[0-9]+');
-    Route::get('/drivers/{id}/edit', [HomeController::class, 'index'])->where('id', '[0-9]+');
+    Route::get('/contacts', [HomeController::class, 'index']);
+    Route::get('/contacts/create', [HomeController::class, 'index']);
+    Route::get('/contacts/{id}', [HomeController::class, 'index'])->where('id', '[0-9]+');
+    Route::get('/contacts/{id}/edit', [HomeController::class, 'index'])->where('id', '[0-9]+');
 
     Route::get('profile', [HomeController::class, 'index']);
 });
