@@ -4,7 +4,7 @@ namespace App\Traits;
 
 use Auth;
 use App\Models\Vendor;
-use App\Models\Driver;
+use App\Models\Contact;
 use App\Models\Vehical;
 
 trait TripDataTransformer

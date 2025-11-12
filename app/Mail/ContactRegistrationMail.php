@@ -9,7 +9,7 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class DriverRegistrationMail extends Mailable
+class ContactRegistrationMail extends Mailable
 {
     use Queueable, SerializesModels;
     public $mailData;
@@ -32,7 +32,7 @@ class DriverRegistrationMail extends Mailable
     public function envelope()
     {
         return new Envelope(
-            subject: 'Driver Registration',
+            subject: 'Contact Registration',
         );
         
     }
@@ -46,7 +46,7 @@ class DriverRegistrationMail extends Mailable
     {
         
         return new Content(
-            view: 'mails.driver_registration_mail',
+            view: 'mails.contact_registration_mail',
             with: [
                 'mailData' => $this->mailData,
                 

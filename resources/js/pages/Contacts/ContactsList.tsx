@@ -11,9 +11,9 @@ import Badge from "../../components/ui/badge/Badge";
 import Input from "../../components/form/input/InputField";
 import Button from "../../components/ui/button/Button";
 import PageMeta from "../../components/common/PageMeta";
-import { driverService } from "../../services/driverService";
+import { contactService } from "../../services/contactService";
 
-interface Driver {
+interface Contact {
   id: number;
   first_name: string;
   last_name?: string;
@@ -36,10 +36,10 @@ interface PaginationData {
   total: number;
 }
 
-interface DriversResponse {
+interface ContactsResponse {
   status: boolean;
-  driver: {
-    data: Driver[];
+  contact: {
+    data: Contact[];
     current_page: number;
     last_page: number;
     per_page: number;
@@ -47,9 +47,9 @@ interface DriversResponse {
   };
 }
 
-export default function DriversList() {
+export default function ContactsList() {
   const navigate = useNavigate();
-  const [drivers, setDrivers] = useState<Driver[]>([]);
+  const [contacts, setContacts] = useState<Contact[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>("");
   const [searchTerm, setSearchTerm] = useState("");
@@ -62,65 +62,65 @@ export default function DriversList() {
   });
   const [deletingId, setDeletingId] = useState<number | null>(null);
 
-  const fetchDrivers = useCallback(async (page: number = 1, search: string = "") => {
+  const fetchContacts = useCallback(async (page: number = 1, search: string = "") => {
     setLoading(true);
     setError("");
     try {
-      const response = await driverService.getAll({ page, search });
-      const data = response.data as DriversResponse;
+      const response = await contactService.getAll({ page, search });
+      const data = response.data as ContactsResponse;
       
-      if (data.status && data.driver) {
-        setDrivers(data.driver.data || []);
+      if (data.status && data.contact) {
+        setContacts(data.contact.data || []);
         setPagination({
-          current_page: data.driver.current_page,
-          last_page: data.driver.last_page,
-          per_page: data.driver.per_page,
-          total: data.driver.total,
+          current_page: data.contact.current_page,
+          last_page: data.contact.last_page,
+          per_page: data.contact.per_page,
+          total: data.contact.total,
         });
       } else {
-        setError("Failed to load drivers");
-        setDrivers([]);
+        setError("Failed to load contacts");
+        setContacts([]);
       }
     } catch {
-      setError("An error occurred while loading drivers");
-      setDrivers([]);
+      setError("An error occurred while loading contacts");
+      setContacts([]);
     } finally {
       setLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    fetchDrivers(currentPage, searchTerm);
-  }, [currentPage, searchTerm, fetchDrivers]);
+    fetchContacts(currentPage, searchTerm);
+  }, [currentPage, searchTerm, fetchContacts]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setCurrentPage(1);
-    fetchDrivers(1, searchTerm);
+    fetchContacts(1, searchTerm);
   };
 
   const handleDelete = async (id: number) => {
-    if (!window.confirm("Are you sure you want to delete this driver?")) {
+    if (!window.confirm("Are you sure you want to delete this contact?")) {
       return;
     }
 
     setDeletingId(id);
     try {
-      await driverService.delete(id);
-      fetchDrivers(currentPage, searchTerm);
+      await contactService.delete(id);
+      fetchContacts(currentPage, searchTerm);
     } catch {
-      alert("Failed to delete driver. Please try again.");
+      alert("Failed to delete contact. Please try again.");
     } finally {
       setDeletingId(null);
     }
   };
 
   const handleView = (id: number) => {
-    navigate(`/drivers/${id}`);
+    navigate(`/contacts/${id}`);
   };
 
-  const getFullName = (driver: Driver) => {
-    return `${driver.first_name} ${driver.last_name || ""}`.trim();
+  const getFullName = (contact: Contact) => {
+    return `${contact.first_name} ${contact.last_name || ""}`.trim();
   };
 
   const renderPagination = () => {
@@ -218,8 +218,8 @@ export default function DriversList() {
   return (
     <>
       <PageMeta
-        title="Drivers List"
-        description="Manage and view all drivers"
+        title="Contacts List"
+        description="Manage and view all contacts"
       />
 
       <div className="space-y-6">
@@ -229,7 +229,7 @@ export default function DriversList() {
               <div className="relative flex-1 max-w-md">
                 <Input
                   type="text"
-                  placeholder="Search drivers by name, email, phone, or license..."
+                  placeholder="Search contacts by name, email, phone, or license..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pr-10"
@@ -266,15 +266,15 @@ export default function DriversList() {
                 <div className="text-center">
                   <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-brand-500"></div>
                   <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                    Loading drivers...
+                    Loading contacts...
                   </p>
                 </div>
               </div>
-            ) : drivers.length === 0 ? (
+            ) : contacts.length === 0 ? (
               <div className="flex items-center justify-center py-12">
                 <div className="text-center">
                   <p className="text-gray-600 dark:text-gray-400">
-                    No drivers found
+                    No contacts found
                   </p>
                 </div>
               </div>
@@ -287,7 +287,7 @@ export default function DriversList() {
                         isHeader
                         className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                       >
-                        Driver
+                        Contact
                       </TableCell>
                       <TableCell
                         isHeader
@@ -323,16 +323,16 @@ export default function DriversList() {
                   </TableHeader>
 
                   <TableBody className="divide-y divide-gray-100 dark:divide-white/5">
-                    {drivers.map((driver) => (
-                      <TableRow key={driver.id}>
+                    {contacts.map((contact) => (
+                      <TableRow key={contact.id}>
                         <TableCell className="px-5 py-4 sm:px-6 text-start">
                           <div className="flex items-center gap-3">
                             <div className="w-10 h-10 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
                               <img
                                 width={40}
                                 height={40}
-                                src={driver.user?.profile_picture}
-                                alt={getFullName(driver)}
+                                src={contact.user?.profile_picture}
+                                alt={getFullName(contact)}
                                 className="w-full h-full object-cover"
                                 onError={(e) => {
                                   (e.target as HTMLImageElement).src = "/images/user/user-default.png";
@@ -341,10 +341,10 @@ export default function DriversList() {
                             </div>
                             <div>
                               <span className="block font-medium text-gray-800 text-theme-sm dark:text-white/90">
-                                {getFullName(driver)}
+                                {getFullName(contact)}
                               </span>
                               <span className="block text-gray-500 text-theme-xs dark:text-gray-400">
-                                ID: {driver.id}
+                                ID: {contact.id}
                               </span>
                             </div>
                           </div>
@@ -352,40 +352,40 @@ export default function DriversList() {
                         <TableCell className="px-4 py-3 text-start">
                           <div className="space-y-1">
                             <div className="text-gray-800 text-theme-sm dark:text-white/90">
-                              {driver.email}
+                              {contact.email}
                             </div>
                             <div className="text-gray-500 text-theme-xs dark:text-gray-400">
-                              {driver.phone}
+                              {contact.phone}
                             </div>
                           </div>
                         </TableCell>
                         <TableCell className="px-4 py-3 text-start">
                           <div className="space-y-1">
                             <div className="text-gray-800 text-theme-sm dark:text-white/90">
-                              {driver.license_no || "N/A"}
+                              {contact.license_no || "N/A"}
                             </div>
-                            {driver.license_class && (
+                            {contact.license_class && (
                               <div className="text-gray-500 text-theme-xs dark:text-gray-400">
-                                {driver.license_class}
+                                {contact.license_class}
                               </div>
                             )}
                           </div>
                         </TableCell>
                         <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                          {driver.designation || "N/A"}
+                          {contact.designation || "N/A"}
                         </TableCell>
                         <TableCell className="px-4 py-3 text-start">
                           <Badge
                             size="sm"
                             color={
-                              driver.status === "Active"
+                              contact.status === "Active"
                                 ? "success"
-                                : driver.status === "Inactive"
+                                : contact.status === "Inactive"
                                 ? "error"
                                 : "warning"
                             }
                           >
-                            {driver.status || "Inactive"}
+                            {contact.status || "Inactive"}
                           </Badge>
                         </TableCell>
                         <TableCell className="px-4 py-3 text-start">
@@ -393,17 +393,17 @@ export default function DriversList() {
                             <Button
                               variant="outline"
                               size="sm"
-                              onClick={() => handleView(driver.id)}
+                              onClick={() => handleView(contact.id)}
                             >
                               View
                             </Button>
                             <Button
                               variant="outline"
                               size="sm"
-                              onClick={() => handleDelete(driver.id)}
-                              disabled={deletingId === driver.id}
+                              onClick={() => handleDelete(contact.id)}
+                              disabled={deletingId === contact.id}
                             >
-                              {deletingId === driver.id ? "Deleting..." : "Delete"}
+                              {deletingId === contact.id ? "Deleting..." : "Delete"}
                             </Button>
                           </div>
                         </TableCell>

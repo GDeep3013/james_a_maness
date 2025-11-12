@@ -6,7 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class DriverAuthMiddleware
+class ContactAuthMiddleware
 {
     /**
      * Handle an incoming request.
@@ -17,14 +17,14 @@ class DriverAuthMiddleware
      */
     public function handle(Request $request, Closure $next)
     {
-        $driver = Auth::guard('driver')->user();
+        $contact = Auth::guard('contact')->user();
         
-        // if (!$driver) {
-        //     return response()->json(['error' => 'Unauthorized: Driver not authenticated'], 401);
+        // if (!$contact) {
+        //     return response()->json(['error' => 'Unauthorized: Contact not authenticated'], 401);
         // }
 
-        // Check if the driver is inactive
-        if ($driver->driver_status === 'Inactive') {
+        // Check if the contact is inactive
+        if ($contact->contact_status === 'Inactive') {
             // return response()->json(['error' => 'Your account is inactive. Please contact the administrator.'], 401);
             return response()->json([
                 'status' => false,

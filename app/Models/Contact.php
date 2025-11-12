@@ -6,10 +6,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Sanctum\HasApiTokens;
 
-class Driver extends Model
+class Contact extends Model
 {
     use HasApiTokens, HasFactory;
-    protected $table = 'drivers';
+    protected $table = 'contacts';
 
     protected $fillable = [
         'user_id',

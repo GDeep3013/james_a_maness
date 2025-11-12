@@ -121,11 +121,11 @@ export default function VehicleList() {
   };
 
   const handleEdit = (id: number) => {
-    navigate(`/trucks/${id}/edit`);
+    navigate(`/vehicles/${id}/edit`);
   };
 
   const handleView = (id: number) => {
-    navigate(`/trucks/${id}/VehicleDetail`);
+    navigate(`/vehicles/${id}/VehicleDetail`);
   };
 
   const handleExport = () => {

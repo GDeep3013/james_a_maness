@@ -1,6 +1,6 @@
 import api from './api';
 
-interface DriverData {
+interface ContactData {
   user_id?: number;
   profile_picture?: File | string | null;
   first_name: string;
@@ -37,23 +37,23 @@ interface DriverData {
   comment?: string;
 }
 
-export const driverService = {
+export const contactService = {
   getAll: (params?: { search?: string; page?: number }) => {
     const queryParams = new URLSearchParams();
     if (params?.search) queryParams.append('search', params.search);
     if (params?.page) queryParams.append('page', params.page.toString());
     const queryString = queryParams.toString();
-    return api.get(`/drivers${queryString ? `?${queryString}` : ''}`);
+    return api.get(`/contacts${queryString ? `?${queryString}` : ''}`);
   },
 
   getById: (id: number) =>
-    api.get(`/drivers/${id}`),
+    api.get(`/contacts/${id}`),
 
-  create: (data: DriverData) => {
+  create: (data: ContactData) => {
     const formData = new FormData();
     
     Object.keys(data).forEach((key) => {
-      const value = data[key as keyof DriverData];
+      const value = data[key as keyof ContactData];
       if (value !== null && value !== undefined && value !== '') {
         if (value instanceof File) {
           formData.append(key, value);
@@ -65,18 +65,18 @@ export const driverService = {
       }
     });
 
-    return api.post('/drivers', formData, {
+    return api.post('/contacts', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
     });
   },
 
-  update: (id: number, data: Partial<DriverData>) => {
+  update: (id: number, data: Partial<ContactData>) => { 
     const formData = new FormData();
     
     Object.keys(data).forEach((key) => {
-      const value = data[key as keyof DriverData];
+      const value = data[key as keyof ContactData];
       if (value !== null && value !== undefined && value !== '') {
         if (value instanceof File) {
           formData.append(key, value);
@@ -90,7 +90,7 @@ export const driverService = {
 
     formData.append('_method', 'PUT');
 
-    return api.post(`/drivers/${id}`, formData, {
+    return api.post(`/contacts/${id}`, formData, {      
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -98,8 +98,8 @@ export const driverService = {
   },
 
   delete: (id: number) =>
-    api.delete(`/drivers/${id}`),
+    api.delete(`/contacts/${id}`),
 
   getForEdit: (id: number) =>
-    api.get(`/drivers/${id}/edit`),
+    api.get(`/contacts/${id}/edit`),
 };

@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router';
 import PageMeta from '../../components/common/PageMeta';
 import Label from '../../components/form/Label';
 import Input from '../../components/form/input/InputField';
@@ -9,13 +9,80 @@ import TextArea from '../../components/form/input/TextArea';
 import { typeOptions, fuelTypeOptions, transmissionOptions, statusOptions, addVehicleSteps, defaultVehicleFormData, VehicleFormData } from '../../constants/vehicleConstants';
 import { vehicleService } from '../../services/vehicleService';
 
-export default function AddVehicle() {
+export default function EditVehicle() {
   const navigate = useNavigate();
+  const { id } = useParams<{ id: string }>();
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({...defaultVehicleFormData} as VehicleFormData);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [generalError, setGeneralError] = useState<string>("");
+
+  useEffect(() => {
+    const fetchVehicleData = async () => {
+      if (!id) {
+        setGeneralError("Vehicle ID is required");
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        setIsLoading(true);
+        const response = await vehicleService.getById(Number(id));
+        
+        if (response.data?.status === true && response.data?.vehicle) {
+          const vehicle = response.data.vehicle;
+          setFormData({
+            vehicle_name: vehicle.vehicle_name || '',
+            type: vehicle.type || '',
+            make: vehicle.make || '',
+            model: vehicle.model || '',
+            year: vehicle.year || '',
+            vin: vehicle.vin || '',
+            license_plate: vehicle.license_plate || '',
+            color: vehicle.color || '',
+            fuel_type: vehicle.fuel_type || '',
+            transmission: vehicle.transmission || '',
+            purchase_date: vehicle.purchase_date || '',
+            engine_size: vehicle.engine_size || '',
+            current_mileage: vehicle.current_mileage || '',
+            purchase_price: vehicle.purchase_price || '',
+            initial_status: vehicle.initial_status || 'available',
+            primary_location: vehicle.primary_location || '',
+            notes: vehicle.notes || '',
+            assigned_driver: vehicle.assigned_driver?.toString() || '',
+            department: vehicle.department?.toString() || '',
+          });
+        } else {
+          setGeneralError("Vehicle not found");
+        }
+      } catch (error: unknown) {
+        if (error && typeof error === "object" && "response" in error) {
+          const axiosError = error as {
+            response?: {
+              status?: number;
+              data?: {
+                message?: string;
+                error?: string;
+              };
+            };
+          };
+          setGeneralError(
+            axiosError.response?.data?.message ||
+            axiosError.response?.data?.error ||
+            "Failed to load vehicle data. Please try again."
+          );
+        } else {
+          setGeneralError("Network error. Please check your connection and try again.");
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchVehicleData();
+  }, [id]);
 
   const handleInputChange = (name: string, value: string) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -61,7 +128,7 @@ export default function AddVehicle() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleNext = (e) => {
+  const handleNext = (e: React.FormEvent) => {
     e.preventDefault();
     if (currentStep === 1) {
       if (validateStep1()) {
@@ -89,6 +156,11 @@ export default function AddVehicle() {
       return;
     }
 
+    if (!id) {
+      setGeneralError("Vehicle ID is required");
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -102,7 +174,6 @@ export default function AddVehicle() {
         license_plate: formData.license_plate || undefined,
         color: formData.color || undefined,
         fuel_type: formData.fuel_type || undefined,
-      
         transmission: formData.transmission || undefined,
         purchase_date: formData.purchase_date || undefined,
         engine_size: formData.engine_size || undefined,
@@ -111,16 +182,16 @@ export default function AddVehicle() {
         initial_status: formData.initial_status || undefined,
         primary_location: formData.primary_location || undefined,
         notes: formData.notes || undefined,
-        assigned_driver: formData.assigned_driver || undefined,
-        department: formData.department || undefined,
+        assigned_driver: formData.assigned_driver ? Number(formData.assigned_driver) : undefined,
+        department: formData.department ? Number(formData.department) : undefined,
       };
 
-      const response = await vehicleService.create(vehicleData);
+      const response = await vehicleService.update(Number(id), vehicleData as any);
 
       if (response.data?.status === true || response.status === 200 || response.status === 201) {
         navigate("/vehicles", { replace: true });
       } else {
-        setGeneralError(response.data?.message || "Failed to create vehicle. Please try again.");
+        setGeneralError(response.data?.message || "Failed to update vehicle. Please try again.");
       }
     } catch (error: unknown) {
       if (error && typeof error === "object" && "response" in error) {
@@ -158,7 +229,7 @@ export default function AddVehicle() {
           setGeneralError(
             axiosError.response?.data?.message ||
             axiosError.response?.data?.error ||
-            "An error occurred while creating the vehicle. Please try again."
+            "An error occurred while updating the vehicle. Please try again."
           );
         }
       } else {
@@ -169,18 +240,51 @@ export default function AddVehicle() {
     }
   };
 
+  if (isLoading) {
+    return (
+      <>
+        <PageMeta title="Edit Vehicle" description="Edit vehicle details" />
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="text-center">
+            <svg
+              className="animate-spin h-8 w-8 text-[#5321B1] mx-auto mb-4"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              ></circle>
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              ></path>
+            </svg>
+            <p className="text-sm text-gray-600 dark:text-gray-400">Loading vehicle data...</p>
+          </div>
+        </div>
+      </>
+    );
+  }
+
   return (
     <>
-      <PageMeta title="Add New Vehicle" description="Add a new vehicle to your fleet" />
+      <PageMeta title="Edit Vehicle" description="Edit vehicle details" />
       
       <div className="space-y-6">
         <div className="flex items-start justify-between">
           <div>
             <h1 className="text-2xl font-semibold text-gray-900 dark:text-white mb-2">
-              Add New Vehicle
+              Edit Vehicle
             </h1>
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              Enter vehicle details to add to your fleet
+              Update vehicle details in your fleet
             </p>
           </div>
         </div>
@@ -449,6 +553,9 @@ export default function AddVehicle() {
                       value={formData.purchase_date}
                       onChange={(e) => handleInputChange('purchase_date', e.target.value)}
                     />
+                    {errors.purchase_date && (
+                      <p className="mt-1 text-xs text-error-500">{errors.purchase_date}</p>
+                    )}
                   </div>
 
                   <div>
@@ -461,6 +568,9 @@ export default function AddVehicle() {
                       value={formData.purchase_price}
                       onChange={(e) => handleInputChange('purchase_price', e.target.value)}
                     />
+                    {errors.purchase_price && (
+                      <p className="mt-1 text-xs text-error-500">{errors.purchase_price}</p>
+                    )}
                   </div>
                 </div>
               </div>
@@ -480,6 +590,9 @@ export default function AddVehicle() {
                       onChange={handleSelectChange('initial_status')}
                       defaultValue={formData.initial_status}
                     />
+                    {errors.initial_status && (
+                      <p className="mt-1 text-xs text-error-500">{errors.initial_status}</p>
+                    )}
                   </div>
 
                   <div>
@@ -492,6 +605,9 @@ export default function AddVehicle() {
                       value={formData.assigned_driver}
                       onChange={(e) => handleInputChange('assigned_driver', e.target.value)}
                     />
+                    {errors.assigned_driver && (
+                      <p className="mt-1 text-xs text-error-500">{errors.assigned_driver}</p>
+                    )}
                   </div>
 
                   <div>
@@ -504,6 +620,9 @@ export default function AddVehicle() {
                       value={formData.primary_location}
                       onChange={(e) => handleInputChange('primary_location', e.target.value)}
                     />
+                    {errors.primary_location && (
+                      <p className="mt-1 text-xs text-error-500">{errors.primary_location}</p>
+                    )}
                   </div>
 
                   <div>
@@ -516,6 +635,9 @@ export default function AddVehicle() {
                       value={formData.department}
                       onChange={(e) => handleInputChange('department', e.target.value)}
                     />
+                    {errors.department && (
+                      <p className="mt-1 text-xs text-error-500">{errors.department}</p>
+                    )}
                   </div>
 
                   <div className="md:col-span-2">
@@ -526,6 +648,9 @@ export default function AddVehicle() {
                       value={formData.notes}
                       onChange={handleTextAreaChange('notes')}
                     />
+                    {errors.notes && (
+                      <p className="mt-1 text-xs text-error-500">{errors.notes}</p>
+                    )}
                   </div>
                 </div>
               </div>
@@ -549,7 +674,7 @@ export default function AddVehicle() {
               {currentStep < addVehicleSteps.length ? (
                 <button
                   type="button"
-                  onClick={(e) => handleNext(e)}
+                  onClick={handleNext}
                   className="inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition bg-[#5321B1] text-white shadow-theme-xs hover:bg-brand-600 next-button"
                   disabled={isSubmitting}
                 >
@@ -586,12 +711,12 @@ export default function AddVehicle() {
                           d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                         ></path>
                       </svg>
-                      Saving...
+                      Updating...
                     </>
                   ) : (
                     <>
                       <TickIcon className="w-5 h-5" />
-                      Add Vehicle
+                      Update Vehicle
                     </>
                   )}
                 </button>
@@ -603,3 +728,4 @@ export default function AddVehicle() {
     </>
   );
 }
+

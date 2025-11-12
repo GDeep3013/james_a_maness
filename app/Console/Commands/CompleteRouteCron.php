@@ -4,7 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Trips;
 use App\Models\Routes;
-use App\Models\Driver;
+use App\Models\Contact;
 use App\Traits\NotificationTrate;
 use Auth;
 
@@ -44,7 +44,7 @@ class CompleteRouteCron extends Command
             if ($trips) {
                 for ($i = 0; $i < Count($trips); $i++) {
                     // $serverKey = Auth::user()->project_app_token;
-                    $driverID = Driver::where('id', $trips[$i]->driver_id)->pluck('fcm_token')->all();
+                    $driverID = Contact::where('id', $trips[$i]->driver_id)->pluck('fcm_token')->all();
                     if ($driverID) {
                         $title = "ATTENTION";
                         $body = "Please Complete routes";
