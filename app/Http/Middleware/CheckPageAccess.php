@@ -10,12 +10,12 @@ use Symfony\Component\HttpFoundation\Response;
 class CheckPageAccess
 {
     private $pagePermissions = [
-        'drivers' => ['Admin', 'Manager'],
-        'drivers/create' => ['Admin', 'Manager'],
-        'drivers/*/edit' => ['Admin', 'Manager'],
-        'vehicles' => ['Admin', 'Manager'],
-        'vehicles/create' => ['Admin', 'Manager'],
-        'vehicles/*/edit' => ['Admin', 'Manager'],
+        'contacts' => ['Admin', 'Manager', 'Contact'],
+        'contacts/create' => ['Admin', 'Manager', 'Contact'],
+        'contacts/*/edit' => ['Admin', 'Manager', 'Contact'],
+        'vehicles' => ['Admin', 'Manager', 'Contact'],
+        'vehicles/create' => ['Admin', 'Manager', 'Contact'],
+        'vehicles/*/edit' => ['Admin', 'Manager', 'Contact'],
         'profile' => ['Admin', 'Manager', 'Driver'],
     ];
 
@@ -33,10 +33,10 @@ class CheckPageAccess
             return redirect()->to('/login');
         }
 
-        $user = Auth::user();
-        $path = $request->path();
+         $user = Auth::user();
+         $path = $request->path();
 
-        //dd($user->type);
+        // dd($user->type);
 
         foreach ($this->pagePermissions as $pattern => $allowedRoles) {
             if ($this->matchPattern($pattern, $path)) {

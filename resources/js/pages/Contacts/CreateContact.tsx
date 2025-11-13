@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router";
-import { useDropzone } from "react-dropzone";
 import PageBreadcrumb from "../../components/common/PageBreadCrumb";
 import PageMeta from "../../components/common/PageMeta";
 import Label from "../../components/form/Label";
@@ -8,32 +7,21 @@ import Input from "../../components/form/input/InputField";
 import Select from "../../components/form/Select";
 import TextArea from "../../components/form/input/TextArea";
 import DatePicker from "../../components/form/date-picker";
-import { EyeIcon, EyeCloseIcon, FileIcon, DocsIcon, UserCircleIcon } from "../../icons";
+import Checkbox from "../../components/form/input/Checkbox";
 import Button from "../../components/ui/button/Button";
 import { contactService } from "../../services/contactService";
 
 interface SidebarItem {
   key: string;
   label: string;
-  icon: React.ReactNode;
+  content: React.ReactNode;
 }
 
-const sidebarItems: SidebarItem[] = [
-  { key: "details", label: "Details", icon: <DocsIcon className="w-5 h-5" /> },
-  { key: "license", label: "License", icon: <FileIcon className="w-5 h-5" /> },
-  { key: "immigration", label: "Immigration", icon: <FileIcon className="w-5 h-5" /> },
-  { key: "employment", label: "Employment", icon: <FileIcon className="w-5 h-5" /> },
-  { key: "emergency", label: "Emergency Contact", icon: <FileIcon className="w-5 h-5" /> },
-  { key: "settings", label: "Settings", icon: <FileIcon className="w-5 h-5" /> },
-];
-
 export default function CreateContact() {
+
   const navigate = useNavigate();
   const { id } = useParams<{ id?: string }>();
   const isEditMode = !!id;
-  const [activeSection, setActiveSection] = useState("profile-picture");
-  const [showPassword, setShowPassword] = useState(false);
-  const [profilePicturePreview, setProfilePicturePreview] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -64,6 +52,9 @@ export default function CreateContact() {
     job_join_date: "",
     offer_letter_file: null as File | null,
     job_leave_date: "",
+    job_title: "",
+    employee_number: "",
+    hourly_labor_rate: "",
     emergency_contact_name: "",
     emergency_contact_no: "",
     emergency_contact_address: "",
@@ -72,6 +63,9 @@ export default function CreateContact() {
     status: "Active",
     immigration_status: "Other",
     comment: "",
+    is_operator: false,
+    is_technician: false,
+    is_employee: false,
   });
 
   const handleInputChange = (name: string, value: string | File | null) => {
@@ -107,59 +101,16 @@ export default function CreateContact() {
     }
   };
 
-  const onDropProfilePicture = (acceptedFiles: File[]) => {
-    if (acceptedFiles.length > 0) {
-      const file = acceptedFiles[0];
-      handleInputChange("profile_picture", file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setProfilePicturePreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+  const handleCheckboxChange = (name: string) => (checked: boolean) => {
+    setFormData((prev) => ({ ...prev, [name]: checked }));
+    if (errors[name]) {
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[name];
+        return newErrors;
+      });
     }
   };
-
-  const onDropLicenseFile = (acceptedFiles: File[]) => {
-    if (acceptedFiles.length > 0) {
-      handleInputChange("license_no_file", acceptedFiles[0]);
-    }
-  };
-
-  const onDropOfferLetter = (acceptedFiles: File[]) => {
-    if (acceptedFiles.length > 0) {
-      handleInputChange("offer_letter_file", acceptedFiles[0]);
-    }
-  };
-
-  const {
-    getRootProps: getProfileRootProps,
-    getInputProps: getProfileInputProps,
-    isDragActive: isProfileDragActive,
-  } = useDropzone({
-    onDrop: onDropProfilePicture,
-    accept: { "image/*": [] },
-    multiple: false,
-  });
-
-  const {
-    getRootProps: getLicenseRootProps,
-    getInputProps: getLicenseInputProps,
-    isDragActive: isLicenseDragActive,
-  } = useDropzone({
-    onDrop: onDropLicenseFile,
-    accept: { "application/pdf": [], "image/*": [] },
-    multiple: false,
-  });
-
-  const {
-    getRootProps: getOfferLetterRootProps,
-    getInputProps: getOfferLetterInputProps,
-    isDragActive: isOfferLetterDragActive,
-  } = useDropzone({
-    onDrop: onDropOfferLetter,
-    accept: { "application/pdf": [], "image/*": [] },
-    multiple: false,
-  });
 
   useEffect(() => {
     if (isEditMode && id) {
@@ -202,6 +153,9 @@ export default function CreateContact() {
           job_join_date: String(contact.job_join_date || ""),
           offer_letter_file: null,
           job_leave_date: String(contact.job_leave_date || ""),
+          job_title: String(contact.job_title || ""),
+          employee_number: String(contact.employee_number || ""),
+          hourly_labor_rate: String(contact.hourly_labor_rate || ""),
           emergency_contact_name: String(contact.emergency_contact_name || ""),
           emergency_contact_no: String(contact.emergency_contact_no || ""),
           emergency_contact_address: String(contact.emergency_contact_address || ""),
@@ -210,10 +164,19 @@ export default function CreateContact() {
           status: String(contact.status || "Active"),
           immigration_status: String(contact.immigration_status || "Other"),
           comment: String(contact.comment || ""),
+          is_operator: false,
+          is_technician: false,
+          is_employee: false,
         });
 
-        if (contact?.user && typeof contact.user === "object" && "profile_picture" in contact.user && typeof contact.user.profile_picture === 'string') {
-          setProfilePicturePreview(contact.user.profile_picture as string);
+        if (contact.classification) {
+          const classifications = String(contact.classification).split(",").map((c: string) => c.trim());
+          setFormData((prev) => ({
+            ...prev,
+            is_operator: classifications.includes("Operator"),
+            is_technician: classifications.includes("Technician"),
+            is_employee: classifications.includes("Employee"),
+          }));
         }
 
       }
@@ -241,21 +204,22 @@ export default function CreateContact() {
       newErrors.email = "Please enter a valid email address";
     }
 
-    if (!isEditMode) {
-      if (!formData.password.trim()) {
-        newErrors.password = "Password is required";
-      } else if (formData.password.length < 6) {
-        newErrors.password = "Password must be at least 6 characters";
-      }
-    } else if (formData.password.trim() && formData.password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters";
-    }
+    // if (!isEditMode) {
+    //   if (!formData.password.trim()) {
+    //     newErrors.password = "Password is required";
+    //   } else if (formData.password.length < 6) {
+    //     newErrors.password = "Password must be at least 6 characters";
+    //   }
+    // } else if (formData.password.trim() && formData.password.length < 6) {
+    //   newErrors.password = "Password must be at least 6 characters";
+    // }
     
     if (!formData.license_no.trim()) {
       newErrors.license_no = "License number is required";
     } else if (formData.license_no.length < 10) {
       newErrors.license_no = "License number must be at least 10 characters";
     }
+    console.log(newErrors);
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -267,11 +231,11 @@ export default function CreateContact() {
     setErrors({});
 
     if (!validateForm()) {
-      setActiveSection("details");
       return;
     }
 
     setIsSubmitting(true);
+  
 
     try {
       const baseContactData = {
@@ -299,6 +263,9 @@ export default function CreateContact() {
         job_join_date: formData.job_join_date || undefined,
         offer_letter_file: formData.offer_letter_file,
         job_leave_date: formData.job_leave_date || undefined,
+        job_title: formData.job_title || undefined,
+        employee_number: formData.employee_number || undefined,
+        hourly_labor_rate: formData.hourly_labor_rate ? parseFloat(formData.hourly_labor_rate) : undefined,
         emergency_contact_name: formData.emergency_contact_name || undefined,
         emergency_contact_no: formData.emergency_contact_no || undefined,
         emergency_contact_address: formData.emergency_contact_address || undefined,
@@ -307,18 +274,21 @@ export default function CreateContact() {
         immigration_status: formData.immigration_status as 'LMIA' | 'SINP' | 'Other',
         comment: formData.comment || undefined,
         profile_picture: formData.profile_picture,
+        classification: (() => {
+          const classifications: string[] = [];
+          if (formData.is_operator) classifications.push("Operator");
+          if (formData.is_technician) classifications.push("Technician");
+          if (formData.is_employee) classifications.push("Employee");
+          return classifications.length > 0 ? classifications.join(",") : undefined;
+        })(),
       };
 
-      const contactData = isEditMode && !formData.password.trim()
-        ? baseContactData
-        : { ...baseContactData, password: formData.password };
-
       const response = isEditMode && id
-        ? await contactService.update(parseInt(id), contactData)
-        : await contactService.create(contactData);
+        ? await contactService.update(parseInt(id), baseContactData)
+        : await contactService.create(baseContactData);
 
       if (response.data?.status === true || response.status === 200 || response.status === 201) {
-        navigate("/contacts", { replace: true });
+         navigate("/contacts", { replace: true });
       } else {
         setGeneralError(response.data?.message || `Failed to ${isEditMode ? 'update' : 'create'} contact. Please try again.`);
       }
@@ -345,22 +315,6 @@ export default function CreateContact() {
           });
           setErrors(validationErrors);
 
-          const firstErrorField = Object.keys(validationErrors)[0];
-          if (firstErrorField) {
-            if (["first_name", "last_name", "gender", "dob", "sin_no", "phone", "email", "address", "country", "state", "city", "zip"].includes(firstErrorField)) {
-              setActiveSection("details");
-            } else if (["license_no", "license_no_file", "license_class", "license_issue_country", "license_issue_state", "license_issue_date", "license_expire_date"].includes(firstErrorField)) {
-              setActiveSection("license");
-            } else if (["status_in_country", "immigration_status", "doc_expiry_date"].includes(firstErrorField)) {
-              setActiveSection("immigration");
-            } else if (["job_join_date", "offer_letter_file", "job_leave_date", "designation"].includes(firstErrorField)) {
-              setActiveSection("employment");
-            } else if (["emergency_contact_name", "emergency_contact_no", "emergency_contact_address"].includes(firstErrorField)) {
-              setActiveSection("emergency");
-            } else if (["password", "status", "comment"].includes(firstErrorField)) {
-              setActiveSection("settings");
-            }
-          }
         } else {
           setGeneralError(
             axiosError.response?.data?.message ||
@@ -404,60 +358,6 @@ export default function CreateContact() {
     { value: "Other", label: "Other" },
   ];
 
-  const renderProfilePictureSection = () => (
-    <div className="space-y-6">
-      <div className="flex flex-col items-center">
-        {profilePicturePreview ? (
-          <div className="relative">
-            <img
-              src={profilePicturePreview}
-              alt="Profile preview"
-              className="w-48 h-48 rounded-full object-cover border-4 border-gray-200 dark:border-gray-700 shadow-lg"
-            />
-            <button
-              type="button"
-              onClick={() => {
-                setProfilePicturePreview(null);
-                handleInputChange("profile_picture", null);
-              }}
-              className="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-error-500 text-white flex items-center justify-center hover:bg-error-600 transition-colors shadow-lg"
-              title="Remove image"
-            >
-              <span className="text-lg leading-none">×</span>
-            </button>
-          </div>
-        ) : (
-          <div
-            {...getProfileRootProps()}
-            className={`w-48 h-48 rounded-full border-2 border-dashed flex items-center justify-center cursor-pointer transition ${
-              isProfileDragActive
-                ? "border-brand-500 bg-brand-50 dark:bg-brand-900/20"
-                : "border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-900 hover:border-brand-400"
-            }`}
-          >
-            <input {...getProfileInputProps()} />
-            <div className="flex flex-col items-center px-4">
-              <UserCircleIcon className="w-16 h-16 text-gray-400 dark:text-gray-500 mb-2" />
-              <span className="text-sm text-gray-600 dark:text-gray-400 text-center">
-                {isProfileDragActive ? "Drop Image Here" : "Click or drag to upload"}
-              </span>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {formData.profile_picture && (
-        <div className="text-center">
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            Selected: <span className="font-medium">{formData.profile_picture.name}</span>
-          </p>
-          <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
-            Size: {(formData.profile_picture.size / 1024).toFixed(2)} KB
-          </p>
-        </div>
-      )}
-    </div>
-  );
 
   const renderDetailsSection = () => (
     <div className="space-y-6">
@@ -634,6 +534,9 @@ export default function CreateContact() {
 
   const renderLicenseSection = () => (
     <div className="space-y-6">
+     
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+
       <div>
         <Label htmlFor="license_no">License Number <span className="text-error-500">*</span></Label>
         <Input
@@ -650,42 +553,6 @@ export default function CreateContact() {
         )}
       </div>
 
-      <div>
-        <Label>License File</Label>
-        <div
-          {...getLicenseRootProps()}
-          className={`border border-dashed rounded-xl p-7 cursor-pointer transition ${
-            isLicenseDragActive
-              ? "border-brand-500 bg-gray-100 dark:bg-gray-800"
-              : "border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-900"
-          }`}
-        >
-          <input {...getLicenseInputProps()} />
-          <div className="flex flex-col items-center">
-            <div className="mb-4 flex justify-center">
-              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gray-200 text-gray-700 dark:bg-gray-800 dark:text-gray-400">
-                <FileIcon className="w-8 h-8" />
-              </div>
-            </div>
-            <h4 className="mb-3 text-lg font-semibold text-gray-800 dark:text-white/90">
-              {isLicenseDragActive ? "Drop File Here" : "Drag & Drop File Here"}
-            </h4>
-            <span className="mb-5 block w-full max-w-[290px] text-center text-sm text-gray-700 dark:text-gray-400">
-              Drag and drop your file here or browse
-            </span>
-            <span className="text-sm font-medium text-brand-500 underline">
-              Browse File
-            </span>
-            {formData.license_no_file && (
-              <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                Selected: {formData.license_no_file.name}
-              </p>
-            )}
-          </div>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <div>
           <Label htmlFor="license_class">
             License Class <span className="text-error-500">*</span>
@@ -786,6 +653,32 @@ export default function CreateContact() {
     <div className="space-y-6">
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <div>
+          <Label htmlFor="job_title">Job Title</Label>
+          <Input
+            type="text"
+            id="job_title"
+            name="job_title"
+            value={formData.job_title}
+            onChange={(e) => handleInputChange("job_title", e.target.value)}
+            placeholder="Enter job title"
+          />
+        </div>
+
+        <div>
+          <Label htmlFor="employee_number">Employee Number</Label>
+          <Input
+            type="text"
+            id="employee_number"
+            name="employee_number"
+            value={formData.employee_number}
+            onChange={(e) => handleInputChange("employee_number", e.target.value)}
+            placeholder="Enter employee number"
+          />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+        <div>
           <DatePicker
             id="job_join_date"
             label="Job Join Date"
@@ -804,70 +697,51 @@ export default function CreateContact() {
         </div>
       </div>
 
-      <div>
-        <Label>Offer Letter File</Label>
-        <div
-          {...getOfferLetterRootProps()}
-          className={`border border-dashed rounded-xl p-7 cursor-pointer transition ${
-            isOfferLetterDragActive
-              ? "border-brand-500 bg-gray-100 dark:bg-gray-800"
-              : "border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-900"
-          }`}
-        >
-          <input {...getOfferLetterInputProps()} />
-          <div className="flex flex-col items-center">
-            <div className="mb-4 flex justify-center">
-              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gray-200 text-gray-700 dark:bg-gray-800 dark:text-gray-400">
-                <FileIcon className="w-8 h-8" />
-              </div>
-            </div>
-            <h4 className="mb-3 text-lg font-semibold text-gray-800 dark:text-white/90">
-              {isOfferLetterDragActive ? "Drop File Here" : "Drag & Drop File Here"}
-            </h4>
-            <span className="mb-5 block w-full max-w-[290px] text-center text-sm text-gray-700 dark:text-gray-400">
-              Drag and drop your file here or browse
-            </span>
-            <span className="text-sm font-medium text-brand-500 underline">
-              Browse File
-            </span>
-            {formData.offer_letter_file && (
-              <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                Selected: {formData.offer_letter_file.name}
-              </p>
-            )}
-          </div>
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+        <div>
+          <Label htmlFor="designation">Designation</Label>
+          <Input
+            type="text"
+            id="designation"
+            name="designation"
+            value={formData.designation}
+            onChange={(e) => handleInputChange("designation", e.target.value)}
+            placeholder="Enter designation"
+          />
         </div>
-      </div>
 
-      <div>
-        <Label htmlFor="designation">Designation</Label>
-        <Input
-          type="text"
-          id="designation"
-          name="designation"
-          value={formData.designation}
-          onChange={(e) => handleInputChange("designation", e.target.value)}
-          placeholder="Enter designation"
-        />
+        <div>
+          <Label htmlFor="hourly_labor_rate">Hourly Labor Rate</Label>
+          <Input
+            type="number"
+            id="hourly_labor_rate"
+            name="hourly_labor_rate"
+            value={formData.hourly_labor_rate}
+            onChange={(e) => handleInputChange("hourly_labor_rate", e.target.value)}
+            placeholder="Enter hourly labor rate"
+          />
+        </div>
       </div>
     </div>
   );
 
   const renderEmergencySection = () => (
     <div className="space-y-6">
-      <div>
-        <Label htmlFor="emergency_contact_name">Emergency Contact Name</Label>
-        <Input
-          type="text"
-          id="emergency_contact_name"
-          name="emergency_contact_name"
-          value={formData.emergency_contact_name}
-          onChange={(e) => handleInputChange("emergency_contact_name", e.target.value)}
-          placeholder="Enter emergency contact name"
-        />
-      </div>
 
-      <div>
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+        <div>
+          <Label htmlFor="emergency_contact_name">Emergency Contact Name</Label>
+          <Input
+            type="text"
+            id="emergency_contact_name"
+            name="emergency_contact_name"
+            value={formData.emergency_contact_name}
+            onChange={(e) => handleInputChange("emergency_contact_name", e.target.value)}
+            placeholder="Enter emergency contact name"
+          />
+        </div>
+
+        <div>
         <Label htmlFor="emergency_contact_no">Emergency Contact Number</Label>
         <Input
           type="tel"
@@ -878,6 +752,9 @@ export default function CreateContact() {
           placeholder="Enter emergency contact number"
         />
       </div>
+      
+      </div>
+     
 
       <div>
         <Label htmlFor="emergency_contact_address">Emergency Contact Address</Label>
@@ -891,40 +768,78 @@ export default function CreateContact() {
     </div>
   );
 
-  const renderSettingsSection = () => (
+  const renderClassificationsSection = () => (
     <div className="space-y-6">
       <div>
-        <Label htmlFor="password">
-          Password {!isEditMode && <span className="text-error-500">*</span>}
-          {isEditMode && <span className="text-gray-500 text-xs ml-2">(Leave empty to keep current password)</span>}
-        </Label>
-        <div className="relative">
-          <Input
-            type={showPassword ? "text" : "password"}
-            id="password"
-            name="password"
-            value={formData.password}
-            onChange={(e) => handleInputChange("password", e.target.value)}
-            placeholder="Enter password"
-            className={errors.password ? "border-error-500" : ""}
-          />
-          <button
-            type="button"
-            onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-4 top-1/2 z-30 -translate-y-1/2 cursor-pointer"
-          >
-            {showPassword ? (
-              <EyeIcon className="size-5 fill-gray-500 dark:fill-gray-400" />
-            ) : (
-              <EyeCloseIcon className="size-5 fill-gray-500 dark:fill-gray-400" />
-            )}
-          </button>
-        </div>
-        {errors.password && (
-          <p className="mt-1 text-sm text-error-500">{errors.password}</p>
-        )}
-      </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-6">
+            <div className="flex items-start gap-3">
+              <Checkbox
+                id="is_operator"
+                checked={formData.is_operator}
+                onChange={handleCheckboxChange("is_operator")}
+              />
+              <div className="flex-1">
+                <label
+                  htmlFor="is_operator"
+                  className="block text-sm font-semibold text-gray-800 dark:text-gray-200 mb-1 cursor-pointer"
+                >
+                  Operator
+                </label>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Allow this Contact to be assigned to assets
+                </p>
+              </div>
+            </div>
 
+            <div className="flex items-start gap-3">
+              <Checkbox
+                id="is_technician"
+                checked={formData.is_technician}
+                onChange={handleCheckboxChange("is_technician")}
+              />
+              <div className="flex-1">
+                <label
+                  htmlFor="is_technician"
+                  className="block text-sm font-semibold text-gray-800 dark:text-gray-200 mb-1 cursor-pointer"
+                >
+                  Technician
+                </label>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Allow this Contact to be selected in labor line items on work orders
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-6">
+            <div className="flex items-start gap-3">
+              <Checkbox
+                id="is_employee"
+                checked={formData.is_employee}
+                onChange={handleCheckboxChange("is_employee")}
+              />
+              <div className="flex-1">
+                <label
+                  htmlFor="is_employee"
+                  className="block text-sm font-semibold text-gray-800 dark:text-gray-200 mb-1 cursor-pointer"
+                >
+                  Employee
+                </label>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Current or former employee, for identification purposes only
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderSettingsSection = () => (
+    <div className="space-y-6">
+     
       <div>
         <Label htmlFor="status">Status</Label>
         <Select
@@ -947,38 +862,15 @@ export default function CreateContact() {
     </div>
   );
 
-  const getSectionErrors = (sectionKey: string): boolean => {
-    const sectionFieldsMap: Record<string, string[]> = {
-      details: ["first_name", "last_name", "gender", "dob", "sin_no", "phone", "email", "address", "country", "state", "city", "zip"],
-      license: ["license_no", "license_no_file", "license_class", "license_issue_country", "license_issue_state", "license_issue_date", "license_expire_date"],
-      immigration: ["status_in_country", "immigration_status", "doc_expiry_date"],
-      employment: ["job_join_date", "offer_letter_file", "job_leave_date", "designation"],
-      emergency: ["emergency_contact_name", "emergency_contact_no", "emergency_contact_address"],
-      settings: ["password", "status", "comment"],
-    };
-
-    const fields = sectionFieldsMap[sectionKey] || [];
-    return fields.some((field) => errors[field]);
-  };
-
-  const renderSectionContent = () => {
-    switch (activeSection) {
-      case "details":
-        return renderDetailsSection();
-      case "license":
-        return renderLicenseSection();
-      case "immigration":
-        return renderImmigrationSection();
-      case "employment":
-        return renderEmploymentSection();
-      case "emergency":
-        return renderEmergencySection();
-      case "settings":
-        return renderSettingsSection();
-      default:
-        return renderDetailsSection();
-    }
-  };
+  const sidebarItems: SidebarItem[] = [
+    { key: "details", label: "Basic Details", content: renderDetailsSection() },
+    { key: "classifications", label: "Classifications", content: renderClassificationsSection() },
+    { key: "license", label: "License", content: renderLicenseSection() },
+    { key: "immigration", label: "Immigration", content: renderImmigrationSection() },
+    { key: "employment", label: "Employment", content: renderEmploymentSection() },
+    { key: "emergency", label: "Emergency Contact", content: renderEmergencySection() },
+    { key: "settings", label: "Settings", content: renderSettingsSection() },
+  ];
 
   return (
     <>
@@ -987,46 +879,10 @@ export default function CreateContact() {
         description={isEditMode ? "Edit contact profile" : "Create a new contact profile"}
       />
       <PageBreadcrumb pageTitle={isEditMode ? "Edit Contact" : "Create Contact"} />
-
-      <form onSubmit={handleSubmit}>
-        <div className="flex flex-col lg:flex-row gap-6">
-          <div className="w-full lg:w-64 shrink-0">
-            
-            <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-4 mb-2">
-                {renderProfilePictureSection()}
-            </div>
-
-            <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-4">
-              <nav className="space-y-1">
-                {sidebarItems.map((item) => {
-                  const hasError = getSectionErrors(item.key);
-                  return (
-                    <button
-                      key={item.key}
-                      type="button"
-                      onClick={() => setActiveSection(item.key)}
-                      className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg transition-colors relative ${
-                        activeSection === item.key
-                          ? hasError
-                            ? "bg-error-50 text-error-600 dark:bg-error-900/20 dark:text-error-400 border-l-4 border-error-500"
-                            : "bg-brand-50 text-brand-600 dark:bg-brand-900/20 dark:text-brand-400 border-l-4 border-brand-500"
-                          : hasError
-                          ? "text-error-600 hover:bg-error-50 dark:text-error-400 dark:hover:bg-error-900/10 border-l-4 border-error-500"
-                          : "text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800"
-                      }`}
-                    >
-                      {item.icon}
-                      <span className="flex-1">{item.label}</span>
-                      {hasError && (
-                        <span className="w-2 h-2 bg-error-500 rounded-full shrink-0"></span>
-                      )}
-                    </button>
-                  );
-                })}
-              </nav>
-            </div>
-          </div>
-
+      
+      <div className="flex flex-col lg:flex-row gap-6 justify-center">
+        <form onSubmit={handleSubmit}>
+      
           <div className="flex-1">
             {isLoading ? (
               <div className="flex items-center justify-center py-12">
@@ -1038,68 +894,74 @@ export default function CreateContact() {
                 </div>
               </div>
             ) : (
-              <>
+              <div className="flex flex-col gap-6">
                 {generalError && (
                   <div className="mb-6 p-4 bg-error-50 dark:bg-error-900/20 border border-error-200 dark:border-error-800 rounded-lg">
                     <p className="text-sm text-error-600 dark:text-error-400">{generalError}</p>
                   </div>
                 )}
 
-                <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-6">
-              <h2 className="text-2xl font-semibold text-gray-800 dark:text-white/90 mb-6">
-                {sidebarItems.find((item) => item.key === activeSection)?.label}
-              </h2>
-              {renderSectionContent()}
-            </div>
+                {sidebarItems.map((item) => (
+                  <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-6">
+                   <h2 className="text-2xl font-semibold text-gray-800 dark:text-white/90 mb-6">
+                     {item.label}
+                   </h2>
+                   {item.content}
+                 </div>
+                ))}
+               
 
-            <div className="mt-6 flex justify-end gap-4">
-              <Button
-                variant="outline"
-                size="md"
-                onClick={() => navigate("/contacts")}
-                disabled={isSubmitting}
-              >
-                Cancel
-              </Button>
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="inline-flex items-center justify-center gap-2 rounded-lg transition px-3 py-3 text-sm bg-brand-500 text-white shadow-theme-xs hover:bg-brand-600 disabled:bg-brand-300 disabled:cursor-not-allowed"
-              >
-                {isSubmitting ? (
-                  <>
-                    <svg
-                      className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                    >
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                      ></circle>
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                      ></path>
-                    </svg>
-                    {isEditMode ? "Updating..." : "Saving..."}
-                  </>
-                ) : (
-                  isEditMode ? "Update Contact" : "Save Contact"
-                )}
-              </button>
-            </div>
-              </>
+                <div className="mt-6 flex justify-end gap-4">
+                  <Button
+                    variant="outline"
+                    size="md"
+                    onClick={() => navigate("/contacts")}
+                    disabled={isSubmitting}
+                  >
+                    Cancel
+                  </Button>
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="inline-flex items-center justify-center gap-2 rounded-lg transition px-3 py-3 text-sm bg-brand-500 text-white shadow-theme-xs hover:bg-brand-600 disabled:bg-brand-300 disabled:cursor-not-allowed"
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <svg
+                          className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                          ></circle>
+                          <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                          ></path>
+                        </svg>
+                        {isEditMode ? "Updating..." : "Saving..."}
+                      </>
+                    ) : (
+                      isEditMode ? "Update Contact" : "Save Contact"
+                    )}
+                  </button>
+                </div>
+              </div>
             )}
           </div>
-        </div>
-      </form>
+          
+        </form>
+      </div>
+
+      
     </>
   );
 }

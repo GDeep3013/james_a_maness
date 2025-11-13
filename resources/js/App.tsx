@@ -1,6 +1,6 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router";
-import SignIn from "./pages/AuthPages/SignIn";
+// import SignIn from "./pages/AuthPages/SignIn";
 // import SignUp from "./pages/AuthPages/SignUp";
 import NotFound from "./pages/OtherPage/NotFound";
 import UserProfiles from "./pages/UserProfiles";
@@ -26,6 +26,8 @@ import Vehicles from "./pages/Vehicles/index";
 import VehicleDetail from "./pages/Vehicles/VehicleDetail";
 import AddVehicle from "./pages/Vehicles/AddVehicle";
 import EditVehicle from "./pages/Vehicles/EditVehicle";
+import CreateWorkOrder from "./pages/WorkOrders/CreateWorkOrder";
+import WorkOrdersList from "./pages/WorkOrders/WorkOrdersList";
 
 export default function App() {
   return (
@@ -34,8 +36,8 @@ export default function App() {
         <ScrollToTop />
         <Routes>
           {/* Auth Layout */}
-          <Route path="/signin" element={<SignIn />} />
-          <Route path="/login" element={<SignIn />} />
+          {/* <Route path="/signin" element={<SignIn />} />
+          <Route path="/login" element={<SignIn />} /> */}
           {/* <Route path="/signup" element={<SignUp />} /> */}
 
           {/* Dashboard Layout - Protected Routes */}
@@ -47,6 +49,7 @@ export default function App() {
             }
           >
             <Route index path="/" element={<Home />} />
+            <Route index path="/home" element={<Home />} />
 
             <Route
               path="/contacts"
@@ -113,6 +116,34 @@ export default function App() {
                 </ProtectedRoute>
               }
             />
+
+            <Route
+              path="/work-orders"
+              element={
+                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                  <WorkOrdersList />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/work-orders/create"
+              element={
+                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                  <CreateWorkOrder />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/work-orders/:id"
+              element={
+                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                  <CreateWorkOrder />
+                </ProtectedRoute>
+              }
+            />
+
+
+
 
             <Route
               path="/profile"

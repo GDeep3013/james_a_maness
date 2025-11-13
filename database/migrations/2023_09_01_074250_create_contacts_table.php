@@ -15,7 +15,7 @@ return new class extends Migration
      */
 
 
-    // New Fileds : first_name, last_name, email, classification, mobile_number, home_mobile_number, work_mobile_number, other_mobile_number, job_title, date_of_birth, employee_number, start_date, end_date, hourly_labor_rate, address, country, state, city, zip_code, license_number, license_class, license_issue_state
+    // New Fileds : first_name, last_name, email, classification, mobile_number, home_mobile_number, work_mobile_number, other_mobile_number, job_title, employee_number, start_date, end_date, hourly_labor_rate, address, country, state, city, zip_code, license_number, license_class, license_issue_state
 
     public function up()
     {
@@ -30,11 +30,17 @@ return new class extends Migration
             $table->string('sin_no')->nullable();
             $table->string('phone', 20)->nullable();
             $table->string('email')->nullable();
-            // $table->string('address')->nullable();
-            // $table->string('country')->nullable();
-            // $table->string('state')->nullable();
-            // $table->string('city')->nullable();
-            // $table->string('zip')->nullable();
+
+            $table->string('classification')->nullable();
+    
+            $table->string('job_title')->nullable();
+            $table->string('employee_number')->nullable();
+            $table->decimal('hourly_labor_rate', 10, 2)->nullable();
+            $table->date('job_join_date')->nullable();
+            $table->date('job_leave_date')->nullable();
+            $table->text('offer_letter_file')->nullable();
+
+        
             $table->string('license_no')->nullable();
             $table->text('license_no_file')->nullable();
             $table->enum('license_class', ['Class 1', 'Class 5']);
@@ -44,9 +50,7 @@ return new class extends Migration
             $table->date('license_expire_date')->nullable();
             $table->enum('status_in_country', ['study', 'work', 'permanent', 'citizen']);
             $table->date('doc_expiry_date')->nullable();
-            $table->date('job_join_date')->nullable();
-            $table->text('offer_letter_file')->nullable();
-            $table->date('job_leave_date')->nullable();
+            
             $table->string('emergency_contact_name')->nullable();
             $table->string('emergency_contact_no', 20)->nullable();
             $table->longText('emergency_contact_address')->nullable();

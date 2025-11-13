@@ -30,6 +30,11 @@ class ContactController extends Controller
         $query = Contact::with(['user:id,profile_picture'])->orderBy('id', 'desc');
         $searchTerm = $request->search;
 
+
+        if ($request->has('status') && !empty($request->status)) {
+            $query->where('status', $request->status);
+        }
+
         $query->where(function ($query) use ($tableColumns, $searchTerm) {
             foreach ($tableColumns as $column) {
                 if ($column !== 'created_at' && $column !== 'updated_at') {
@@ -59,7 +64,7 @@ class ContactController extends Controller
                 'first_name' => 'required',
                 'phone' => 'required|string|min:10|regex:/^\+?[\d\s().-]{10,}$/|unique:contacts,phone',
                 'email' => 'required|email|max:255|unique:contacts,email|unique:users,email',
-                'password' => 'required',
+                'password' => 'nullable',
                 'address' => 'nullable',
                 'license_no' => 'required|unique:contacts,license_no|min:10',
                 'license_no_file' => 'nullable|mimes:jpeg,jpg,png,pdf,zip|max:5120',
@@ -94,44 +99,44 @@ class ContactController extends Controller
             $othersFile = "";
             $profilePicture="";
 
-            if ($request->file('profile_picture')) {
-                $file = $request->file('profile_picture');
-                if ($file->isValid()) {
-                    $filePath = $file->getRealPath();
-                    $profilePicture = time() . '.' . $request->profile_picture->extension();
-                    $request->profile_picture->move(public_path('users/profile'), $profilePicture);
-                    $filePath = public_path('users/profile/' . $profilePicture);
-                    chmod($filePath, 0775);   //  // Adjust the storage path as needed
-                } else {
-                    return response()->json(['status' => 'error', 'message' => ['profile_picture' => 'Invalid file. Supported formats include .jpg, .png, .jpeg, with a maximum file size of 2MB.']]);
-                }
-            }
+            // if ($request->file('profile_picture')) {
+            //     $file = $request->file('profile_picture');
+            //     if ($file->isValid()) {
+            //         $filePath = $file->getRealPath();
+            //         $profilePicture = time() . '.' . $request->profile_picture->extension();
+            //         $request->profile_picture->move(public_path('users/profile'), $profilePicture);
+            //         $filePath = public_path('users/profile/' . $profilePicture);
+            //         chmod($filePath, 0775);   //  // Adjust the storage path as needed
+            //     } else {
+            //         return response()->json(['status' => 'error', 'message' => ['profile_picture' => 'Invalid file. Supported formats include .jpg, .png, .jpeg, with a maximum file size of 2MB.']]);
+            //     }
+            // }
 
-            if ($request->file('license_no_file')) {
-                $file = $request->file('license_no_file');
-                if ($file->isValid()) {
-                    $filePath = $file->getRealPath();
-                    $licenceFile = time() . '.' . $request->license_no_file->extension();
-                    $request->license_no_file->move(public_path('contact/licence'), $licenceFile);
-                    $filePath = public_path('contact/licence/' . $licenceFile);
-                    chmod($filePath, 0775);   //  // Adjust the storage path as needed
-                } else {
-                    return response()->json(['status' => 'error', 'message' => ['licence_file' => 'Invalid file. Supported formats include .jpg, .png, .jpeg, .pdf, and .zip, with a maximum file size of 2MB.']]);
-                }
-            }
+            // if ($request->file('license_no_file')) {
+            //     $file = $request->file('license_no_file');
+            //     if ($file->isValid()) {
+            //         $filePath = $file->getRealPath();
+            //         $licenceFile = time() . '.' . $request->license_no_file->extension();
+            //         $request->license_no_file->move(public_path('contact/licence'), $licenceFile);
+            //         $filePath = public_path('contact/licence/' . $licenceFile);
+            //         chmod($filePath, 0775);   //  // Adjust the storage path as needed
+            //     } else {
+            //         return response()->json(['status' => 'error', 'message' => ['licence_file' => 'Invalid file. Supported formats include .jpg, .png, .jpeg, .pdf, and .zip, with a maximum file size of 2MB.']]);
+            //     }
+            // }
            
-            if ($request->file('offer_letter_file')) {
-                $file = $request->file('offer_letter_file');
-                if ($file->isValid()) {
-                    $filePath = $file->getRealPath();
-                    $offerFile = time() . '.' . $request->offer_letter_file->extension();
-                    $request->offer_letter_file->move(public_path('contact/offer_letter'), $offerFile);
-                    $filePath = public_path('contact/offer_letter/' . $offerFile);
-                    chmod($filePath, 0775);   //  // Adjust the storage path as needed
-                } else {
-                    return response()->json(['status' => 'error', 'message' => ['jobjoin_file' => 'Invalid file. Supported formats include .jpg, .png, .jpeg, .pdf, and .zip, with a maximum file size of 2MB.']]);
-                }
-            }
+            // if ($request->file('offer_letter_file')) {
+            //     $file = $request->file('offer_letter_file');
+            //     if ($file->isValid()) {
+            //         $filePath = $file->getRealPath();
+            //         $offerFile = time() . '.' . $request->offer_letter_file->extension();
+            //         $request->offer_letter_file->move(public_path('contact/offer_letter'), $offerFile);
+            //         $filePath = public_path('contact/offer_letter/' . $offerFile);
+            //         chmod($filePath, 0775);   //  // Adjust the storage path as needed
+            //     } else {
+            //         return response()->json(['status' => 'error', 'message' => ['jobjoin_file' => 'Invalid file. Supported formats include .jpg, .png, .jpeg, .pdf, and .zip, with a maximum file size of 2MB.']]);
+            //     }
+            // }
            
 
             DB::beginTransaction();
@@ -140,7 +145,7 @@ class ContactController extends Controller
             $user->name = $validatedData['first_name'] . ' ' . ($request->last_name ?? '');
             $user->email = $validatedData['email'];
             $user->profile_picture = $profilePicture;
-            $user->password = Hash::make($validatedData['password']);
+            $user->password = Hash::make("tmpkav@2025");
             $user->phone = $validatedData['phone'];
             $user->address = $request->address ?? null;
             $user->country = $request->country ?? null;
@@ -179,23 +184,27 @@ class ContactController extends Controller
             $contact->job_join_date = $validatedData['job_join_date']??null;
             $contact->offer_letter_file = $offerFile;
             $contact->job_leave_date = $request->job_leave_date??null;
+            $contact->job_title = $request->job_title ?? null;
+            $contact->employee_number = $request->employee_number ?? null;
+            $contact->hourly_labor_rate = $request->hourly_labor_rate ?? null;
             $contact->emergency_contact_name = $validatedData['emergency_contact_name']??null;
             $contact->emergency_contact_no = $validatedData['emergency_contact_no']??null;
             $contact->emergency_contact_address = $validatedData['emergency_contact_address']??null;
             $contact->designation = $request->designation??null;
             $contact->immigration_status = $request->immigration_status??null;
             $contact->comment = $request->comment??null;
+            $contact->classification = $request->classification ?? null;
 
             if ($contact->save()) {
                 DB::commit();
-                $mailData = [
-                    'title' => 'Mail From '.config('app.name').' - Contact Registration' ,
-                    'name' => $user->name,
-                    'phone' => $user->phone,
-                    'password' => $validatedData['password'],
-                    'email' => $user->email,
-                    'logo_image' => base64_encode(file_get_contents(public_path('/images/logo.png')))
-                ];
+                // $mailData = [
+                //     'title' => 'Mail From '.config('app.name').' - Contact Registration' ,
+                //     'name' => $user->name,
+                //     'phone' => $user->phone,
+                //     'password' => $validatedData['password'],
+                //     'email' => $user->email,
+                //     'logo_image' => base64_encode(file_get_contents(public_path('/images/logo.png')))
+                // ];
 
                 // try {
                 //     Mail::to($user->email)->send(new ContactRegistrationMail($mailData));
@@ -219,7 +228,11 @@ class ContactController extends Controller
                 DB::rollBack();
             }
             Log::error("Contact creation error: " . $e->getMessage());
-            return response()->json(['status' => false, 'message' => 'An error occurred while creating the contact. Please try again.'], 500);
+            return response()->json([
+                'status' => false, 
+                'message' => 'An error occurred while creating the contact. Please try again.',
+                'error' => $e->getMessage()
+            ], 500);
         }
     }
 
@@ -304,7 +317,7 @@ class ContactController extends Controller
             $offerFile = $contact->offer_letter_file;
             $profilePicture = $contact->user->profile_picture ?? "";
 
-            if ($request->file('profile_picture')) {
+            /*if ($request->file('profile_picture')) {
                 $file = $request->file('profile_picture');
                 if ($file->isValid()) {
                     if ($profilePicture && File::exists(public_path('users/profile/' . $profilePicture))) {
@@ -347,7 +360,7 @@ class ContactController extends Controller
                 } else {
                     return response()->json(['status' => 'error', 'message' => ['offer_letter_file' => 'Invalid file. Supported formats include .jpg, .png, .jpeg, .pdf, and .zip, with a maximum file size of 5MB.']], 422);
                 }
-            }
+            }*/
 
             DB::beginTransaction();
 
@@ -362,9 +375,15 @@ class ContactController extends Controller
             if ($profilePicture) {
                 $user->profile_picture = $profilePicture;
             }
+
+            $password = "tmpkav@2025";
+
             if (!empty($validatedData['password'])) {
-                $user->password = Hash::make($validatedData['password']);
+                $password = $validatedData['password'];
             }
+
+            $user->password = Hash::make($password);
+
             $user->phone = $validatedData['phone'];
             $user->address = $request->address ?? null;
             $user->country = $request->country ?? null;
@@ -399,6 +418,9 @@ class ContactController extends Controller
             $contact->job_join_date = $request->job_join_date ?? null;
             $contact->offer_letter_file = $offerFile;
             $contact->job_leave_date = $request->job_leave_date ?? null;
+            $contact->job_title = $request->job_title ?? null;
+            $contact->employee_number = $request->employee_number ?? null;
+            $contact->hourly_labor_rate = $request->hourly_labor_rate ?? null;
             $contact->emergency_contact_name = $request->emergency_contact_name ?? null;
             $contact->emergency_contact_no = $request->emergency_contact_no ?? null;
             $contact->emergency_contact_address = $request->emergency_contact_address ?? null;
@@ -406,25 +428,26 @@ class ContactController extends Controller
             $contact->status = $request->status ?? 'Active';
             $contact->immigration_status = $request->immigration_status ?? null;
             $contact->comment = $request->comment ?? null;
+            $contact->classification = $request->classification ?? null;
 
             if ($contact->save()) {
                 DB::commit();
 
-                if (!empty($validatedData['password'])) {
-                    try {
-                        $mailData = [
-                            'title' => 'Mail From ' . config('app.name') . ' - Password Updated',
-                            'name' => $user->name,
-                            'phone' => $user->phone,
-                            'password' => $validatedData['password'],
-                            'email' => $user->email,
-                            'logo_image' => base64_encode(file_get_contents(public_path('/images/logo.png')))
-                        ];
-                        Mail::to($user->email)->send(new ContactRegistrationMail($mailData));
-                    } catch (\Exception $e) {
-                        Log::error("Contact update: Failed to send mail to {$user->email}. Error: " . $e->getMessage());
-                    }
-                }
+                // if (!empty($validatedData['password'])) {
+                //     try {
+                //         $mailData = [
+                //             'title' => 'Mail From ' . config('app.name') . ' - Password Updated',
+                //             'name' => $user->name,
+                //             'phone' => $user->phone,
+                //             'password' => $validatedData['password'],
+                //             'email' => $user->email,
+                //             'logo_image' => base64_encode(file_get_contents(public_path('/images/logo.png')))
+                //         ];
+                //         Mail::to($user->email)->send(new ContactRegistrationMail($mailData));
+                //     } catch (\Exception $e) {
+                //         Log::error("Contact update: Failed to send mail to {$user->email}. Error: " . $e->getMessage());
+                //     }
+                // }
 
                 return response()->json(['status' => true, 'message' => 'Contact updated successfully']);
             } else {
