@@ -21,7 +21,7 @@ class AuthController extends Controller
             return $this->error('Validation failed', $validator->errors(), 422);
         }
 
-        if (!Auth::attempt($request->only('email', 'password'))) {
+        if (!Auth::attempt($request->only('email', 'password'), $request->boolean('remember'))) {
             return $this->error('Invalid credentials', null, 401);
         }
 
@@ -29,7 +29,15 @@ class AuthController extends Controller
         
         if ($user->status !== 1) {
             Auth::logout();
+            if ($request->hasSession()) {
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+            }
             return $this->error('Account is inactive', null, 403);
+        }
+
+        if ($request->hasSession()) {
+            $request->session()->regenerate();
         }
 
         $token = $user->createToken('auth-token')->plainTextToken;
@@ -50,7 +58,16 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        $request->user()->currentAccessToken()->delete();
+        if ($request->user()) {
+            $request->user()->currentAccessToken()->delete();
+        }
+
+        Auth::guard('web')->logout();
+
+        if ($request->hasSession()) {
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+        }
 
         return $this->success('Logged out successfully');
     }

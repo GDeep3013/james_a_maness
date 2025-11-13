@@ -25,7 +25,7 @@ return new class extends Migration
             $table->string('state')->nullable();
             $table->string('city')->nullable();
             $table->string('zip')->nullable();
-            $table->enum('type', ['Admin', 'Manager', 'Driver'])->default('Driver');
+            $table->enum('type', ['Admin', 'Manager', 'Driver','Contact'])->default('Contact');
             $table->boolean('status')->default(1);
             $table->text('profile_picture')->nullable();
             $table->rememberToken();

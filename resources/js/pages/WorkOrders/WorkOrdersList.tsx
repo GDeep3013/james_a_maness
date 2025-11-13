@@ -11,23 +11,36 @@ import Badge from "../../components/ui/badge/Badge";
 import Input from "../../components/form/input/InputField";
 import Button from "../../components/ui/button/Button";
 import PageMeta from "../../components/common/PageMeta";
-import { contactService } from "../../services/contactService";
+import { workOrderService } from "../../services/workOrderService";
 import { PencilIcon, TrashBinIcon, ExportIcon, EyeIcon } from "../../icons";
 import Select from "../../components/form/Select";
 
-interface Contact {
+interface WorkOrder {
   id: number;
-  first_name: string;
-  last_name?: string;
-  email: string;
-  phone: string;
-  license_no?: string;
-  license_class?: string;
-  status?: string;
-  user: {
-    profile_picture: string;
+  vehicle_id?: number;
+  vehicle?: {
+    vehicle_name?: string;
   };
-  designation?: string;
+  status?: string;
+  repair_priority_class?: string;
+  issue_date?: string;
+  issued_by?: string;
+  scheduled_start_date?: string;
+  actual_start_date?: string;
+  expected_completion_date?: string;
+  actual_completion_date?: string;
+  assigned_to?: number;
+  assignedTo?: {
+    first_name?: string;
+    last_name?: string;
+  };
+  vendor_id?: number;
+  vendor?: {
+    first_name?: string;
+    company_contact?: string;
+  };
+  invoice_number?: string;
+  po_number?: string;
   created_at?: string;
 }
 
@@ -38,10 +51,10 @@ interface PaginationData {
   total: number;
 }
 
-interface ContactsResponse {
+interface WorkOrdersResponse {
   status: boolean;
-  contact: {
-    data: Contact[];
+  work_orders?: {
+    data: WorkOrder[];
     current_page: number;
     last_page: number;
     per_page: number;
@@ -49,9 +62,9 @@ interface ContactsResponse {
   };
 }
 
-export default function ContactsList() {
+export default function WorkOrdersList() {
   const navigate = useNavigate();
-  const [contacts, setContacts] = useState<Contact[]>([]);
+  const [workOrders, setWorkOrders] = useState<WorkOrder[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>("");
   const [searchTerm, setSearchTerm] = useState("");
@@ -65,79 +78,105 @@ export default function ContactsList() {
   });
   const [deletingId, setDeletingId] = useState<number | null>(null);
 
-  const fetchContacts = useCallback(async (page: number = 1, search: string = "" , status: string = "") => {
+  const fetchWorkOrders = useCallback(async (page: number = 1, search: string = "", status: string = "") => {
     setLoading(true);
     setError("");
     try {
-      const response = await contactService.getAll({ page, search, status });
-      const data = response.data as ContactsResponse;
+      const response = await workOrderService.getAll({ page, search, status });
+      const data = response.data as WorkOrdersResponse;
       
-      if (data.status && data.contact) {
-        setContacts(data.contact.data || []);
+      if (data.status && data.work_orders) {
+        setWorkOrders(data.work_orders.data || []);
         setPagination({
-          current_page: data.contact.current_page,
-          last_page: data.contact.last_page,
-          per_page: data.contact.per_page,
-          total: data.contact.total,
+          current_page: data.work_orders.current_page,
+          last_page: data.work_orders.last_page,
+          per_page: data.work_orders.per_page,
+          total: data.work_orders.total,
         });
       } else {
-        setError("Failed to load contacts");
-        setContacts([]);
+        setError("Failed to load work orders");
+        setWorkOrders([]);
       }
     } catch {
-      setError("An error occurred while loading contacts");
-      setContacts([]);
+      setError("An error occurred while loading work orders");
+      setWorkOrders([]);
     } finally {
       setLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    fetchContacts(currentPage, searchTerm, statusFilter);
-  }, [currentPage, searchTerm, statusFilter, fetchContacts]);
+    fetchWorkOrders(currentPage, searchTerm, statusFilter);
+  }, [currentPage, searchTerm, statusFilter, fetchWorkOrders]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setCurrentPage(1);
-    fetchContacts(1, searchTerm, statusFilter);
+    fetchWorkOrders(1, searchTerm, statusFilter);
   };
 
   const handleDelete = async (id: number) => {
-    if (!window.confirm("Are you sure you want to delete this contact?")) {
+    if (!window.confirm("Are you sure you want to delete this work order?")) {
       return;
     }
 
     setDeletingId(id);
     try {
-      await contactService.delete(id);
-      fetchContacts(currentPage, searchTerm , statusFilter);
+      await workOrderService.delete(id);
+      fetchWorkOrders(currentPage, searchTerm, statusFilter);
     } catch {
-      alert("Failed to delete contact. Please try again.");
+      alert("Failed to delete work order. Please try again.");
     } finally {
       setDeletingId(null);
     }
   };
 
   const handleEdit = (id: number) => {
-    navigate(`/contacts/${id}`);
+    navigate(`/work-orders/${id}`);
   };
 
   const handleView = (id: number) => {
-    navigate(`/contacts/${id}`);
+    navigate(`/work-orders/${id}`);
+  };
+
+  const handleCreate = () => {
+    navigate("/work-orders/create");
   };
 
   const handleExport = () => {
     
   };
 
-  const getFullName = (contact: Contact) => {
-    return `${contact.first_name} ${contact.last_name || ""}`.trim();
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return "N/A";
+    try {
+      return new Date(dateString).toLocaleDateString();
+    } catch {
+      return dateString;
+    }
+  };
+
+  const getStatusColor = (status?: string) => {
+    switch (status) {
+      case "Open":
+        return "warning";
+      case "In Progress":
+        return "info";
+      case "Completed":
+        return "success";
+      case "Cancelled":
+        return "error";
+      default:
+        return "warning";
+    }
   };
 
   const statusOptions = [
     { value: "", label: "All Status" },
-    { value: "Active", label: "Active" },
-    { value: "Inactive", label: "Inactive" },
+    { value: "Open", label: "Open" },
+    { value: "In Progress", label: "In Progress" },
+    { value: "Completed", label: "Completed" },
+    { value: "Cancelled", label: "Cancelled" },
   ];
 
   const renderPagination = () => {
@@ -237,17 +276,30 @@ export default function ContactsList() {
   return (
     <>
       <PageMeta
-        title="Contacts List"
-        description="Manage and view all contacts"
+        title="Work Orders List"
+        description="Manage and view all work orders"
       />
 
       <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold text-gray-800 dark:text-white/90">Work Orders</h1>
+          </div>
+          <Button
+            variant="primary"
+            size="md"
+            onClick={handleCreate}
+          >
+            + Create Work Order
+          </Button>
+        </div>
+
         <form onSubmit={handleSearch} className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl p-4">
           <div className="flex flex-wrap items-center gap-4">
             <div className="flex-1 max-w-[50%]">
               <Input
                 type="text"
-                placeholder="Search by name, email, phone, or license..."
+                placeholder="Search by vehicle, invoice number, PO number..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="!bg-[#F3F3F5] max-w-full border-none !rounded-[8px]"
@@ -286,52 +338,58 @@ export default function ContactsList() {
                 <div className="text-center">
                   <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-brand-500"></div>
                   <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                    Loading contacts...
+                    Loading work orders...
                   </p>
                 </div>
               </div>
-            ) : contacts.length === 0 ? (
+            ) : workOrders.length === 0 ? (
               <div className="flex items-center justify-center py-12">
                 <div className="text-center">
                   <p className="text-gray-600 dark:text-gray-400">
-                    No contacts found
+                    No work orders found
                   </p>
                 </div>
               </div>
             ) : (
               <>
                 <Table>
-                    <TableHeader className="border-b border-gray-100 dark:border-white/5">
+                  <TableHeader className="border-b border-gray-100 dark:border-white/5">
                     <TableRow>
                       <TableCell
                         isHeader
                         className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                       >
-                        Contact
+                        Work Order ID
                       </TableCell>
                       <TableCell
                         isHeader
                         className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                       >
-                        Email/Phone
-                      </TableCell>
-                      <TableCell
-                        isHeader
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-                      >
-                        License
-                      </TableCell>
-                      <TableCell
-                        isHeader
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-                      >
-                        Designation
+                        Vehicle
                       </TableCell>
                       <TableCell
                         isHeader
                         className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                       >
                         Status
+                      </TableCell>
+                      <TableCell
+                        isHeader
+                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                      >
+                        Issue Date
+                      </TableCell>
+                      <TableCell
+                        isHeader
+                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                      >
+                        Assigned To
+                      </TableCell>
+                      <TableCell
+                        isHeader
+                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                      >
+                        Invoice/PO
                       </TableCell>
                       <TableCell
                         isHeader
@@ -343,65 +401,81 @@ export default function ContactsList() {
                   </TableHeader>
 
                   <TableBody className="divide-y divide-gray-100 dark:divide-white/5">
-                    {contacts.map((contact) => (
-                      <TableRow key={contact.id}>
+                    {workOrders.map((workOrder) => (
+                      <TableRow key={workOrder.id}>
                         <TableCell className="px-5 py-4 sm:px-6 text-start">
                           <div className="flex items-center gap-3">
                             <div>
                               <span className="block font-medium text-gray-800 text-theme-sm dark:text-white/90">
-                                {getFullName(contact)}
+                                WO-{workOrder.id}
                               </span>
-                              <span className="block text-gray-500 text-theme-xs dark:text-gray-400">
-                                ID: {contact.id}
-                              </span>
+                              {workOrder.repair_priority_class && (
+                                <span className="block text-gray-500 text-theme-xs dark:text-gray-400">
+                                  {workOrder.repair_priority_class}
+                                </span>
+                              )}
                             </div>
                           </div>
                         </TableCell>
                         <TableCell className="px-4 py-3 text-start">
-                          <div className="space-y-1">
-                            <div className="text-gray-800 text-theme-sm dark:text-white/90">
-                              {contact.email}
-                            </div>
-                            <div className="text-gray-500 text-theme-xs dark:text-gray-400">
-                              {contact.phone}
-                            </div>
+                          <div className="text-gray-800 text-theme-sm dark:text-white/90">
+                            {workOrder.vehicle?.vehicle_name || "N/A"}
                           </div>
-                        </TableCell>
-                        <TableCell className="px-4 py-3 text-start">
-                          <div className="space-y-1">
-                            <div className="text-gray-800 text-theme-sm dark:text-white/90">
-                              {contact.license_no || "N/A"}
-                            </div>
-                            {contact.license_class && (
-                              <div className="text-gray-500 text-theme-xs dark:text-gray-400">
-                                {contact.license_class}
-                              </div>
-                            )}
-                          </div>
-                        </TableCell>
-                        <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                          {contact.designation || "N/A"}
                         </TableCell>
                         <TableCell className="px-4 py-3 text-start">
                           <Badge
                             size="sm"
-                            color={
-                              contact.status === "Active"
-                                ? "success"
-                                : contact.status === "Inactive"
-                                ? "error"
-                                : "warning"
-                            }
+                            color={getStatusColor(workOrder.status)}
                           >
-                            {contact.status || "Inactive"}
+                            {workOrder.status || "Open"}
                           </Badge>
+                        </TableCell>
+                        <TableCell className="px-4 py-3 text-start">
+                          <div className="text-gray-800 text-theme-sm dark:text-white/90">
+                            {formatDate(workOrder.issue_date)}
+                          </div>
+                          {workOrder.issued_by && (
+                            <div className="text-gray-500 text-theme-xs dark:text-gray-400">
+                              By: {workOrder.issued_by}
+                            </div>
+                          )}
+                        </TableCell>
+                        <TableCell className="px-4 py-3 text-start">
+                          {workOrder.assignedTo ? (
+                            <div className="text-gray-800 text-theme-sm dark:text-white/90">
+                              {`${workOrder.assignedTo.first_name || ""} ${workOrder.assignedTo.last_name || ""}`.trim() || "N/A"}
+                            </div>
+                          ) : (
+                            <div className="text-gray-500 text-theme-sm dark:text-gray-400">
+                              N/A
+                            </div>
+                          )}
+                        </TableCell>
+                        <TableCell className="px-4 py-3 text-start">
+                          <div className="space-y-1">
+                            {workOrder.invoice_number && (
+                              <div className="text-gray-800 text-theme-sm dark:text-white/90">
+                                Invoice: {workOrder.invoice_number}
+                              </div>
+                            )}
+                            {workOrder.po_number && (
+                              <div className="text-gray-500 text-theme-xs dark:text-gray-400">
+                                PO: {workOrder.po_number}
+                              </div>
+                            )}
+                            {!workOrder.invoice_number && !workOrder.po_number && (
+                              <div className="text-gray-500 text-theme-sm dark:text-gray-400">
+                                N/A
+                              </div>
+                            )}
+                          </div>
                         </TableCell>
                         <TableCell className="px-4 py-3 text-start">
                           <div className="flex items-center gap-2">
                             <Button
                               variant="none"
                               size="sm"
-                              onClick={() => handleView(contact.id)}
+                              onClick={() => handleView(workOrder.id)}
                               className="view-button hover:scale-105 transition-all duration-300"
                               startIcon={<EyeIcon />}
                             >
@@ -410,7 +484,7 @@ export default function ContactsList() {
                             <Button
                               variant="none"
                               size="sm"
-                              onClick={() => handleEdit(contact.id)}
+                              onClick={() => handleEdit(workOrder.id)}
                               className="edit-button hover:scale-105 transition-all duration-300"
                               startIcon={<PencilIcon />}
                             >
@@ -419,8 +493,8 @@ export default function ContactsList() {
                             <Button
                               variant="none"
                               size="sm"
-                              onClick={() => handleDelete(contact.id)}
-                              disabled={deletingId === contact.id}
+                              onClick={() => handleDelete(workOrder.id)}
+                              disabled={deletingId === workOrder.id}
                               className="delete-button hover:scale-105 transition-all duration-300"
                               startIcon={<TrashBinIcon />}
                             >
@@ -441,3 +515,4 @@ export default function ContactsList() {
     </>
   );
 }
+
