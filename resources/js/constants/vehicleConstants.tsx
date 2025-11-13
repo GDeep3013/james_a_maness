@@ -88,6 +88,7 @@ export const addVehicleSteps: Step[] = [
 ];
 
 export interface VehicleFormData {
+  id?: number | undefined;
   vehicle_name: string;
   type: string;
   make: string;
@@ -107,6 +108,8 @@ export interface VehicleFormData {
   notes: string;
   assigned_driver: string;
   department: string;
+  created_at?: string | undefined;
+  updated_at?: string | undefined;
 }
 
 export const defaultVehicleFormData: VehicleFormData = {

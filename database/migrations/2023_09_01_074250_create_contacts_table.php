@@ -6,11 +6,17 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+
+
     /**
      * Run the migrations.
      *
      * @return void
      */
+
+
+    // New Fileds : first_name, last_name, email, classification, mobile_number, home_mobile_number, work_mobile_number, other_mobile_number, job_title, date_of_birth, employee_number, start_date, end_date, hourly_labor_rate, address, country, state, city, zip_code, license_number, license_class, license_issue_state
+
     public function up()
     {
         Schema::create('contacts', function (Blueprint $table) {

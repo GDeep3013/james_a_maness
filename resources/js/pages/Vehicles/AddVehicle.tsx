@@ -61,7 +61,7 @@ export default function AddVehicle() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleNext = (e) => {
+  const handleNext = (e: React.FormEvent) => {
     e.preventDefault();
     if (currentStep === 1) {
       if (validateStep1()) {

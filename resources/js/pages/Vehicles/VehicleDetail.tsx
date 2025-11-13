@@ -5,24 +5,17 @@ import PageMeta from '../../components/common/PageMeta';
 import Button from '../../components/ui/button/Button';
 import Badge from '../../components/ui/badge/Badge';
 import { ChevronLeftIcon, PencilIcon, TrashBinIcon, CalenderIcon, PurchasePriceIcon, FuelIcon, TotalMileageIcon, FileIcon } from '../../icons';
+import { VehicleFormData } from '../../constants/vehicleConstants';
+import {
+    formatCurrency,
+    formatMileage,
+    formatDate,
+    getStatusBadgeColor,
+    getStatusLabel,
+    formatVehicleIdentifier,
+    capitalizeFirst,
+} from '../../utils';
 
-interface Vehicle {
-    id: number;
-    vehicle_name: string;
-    type: string;
-    vin_sn?: string;
-    license_plate?: string;
-    fuel_type?: string;
-    year?: string;
-    make?: string;
-    model?: string;
-    trim?: string;
-    registration_state?: string;
-    labels?: string;
-    photo?: string;
-    created_at?: string;
-    updated_at?: string;
-}
 
 interface MaintenanceRecord {
     id: number;
@@ -50,9 +43,10 @@ interface Document {
 }
 
 export default function VehicleDetail() {
+
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
-    const [vehicle, setVehicle] = useState<Vehicle | null>(null);
+    const [vehicle, setVehicle] = useState<VehicleFormData | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string>('');
     const [activeTab, setActiveTab] = useState('maintenance');
@@ -95,7 +89,7 @@ export default function VehicleDetail() {
                 } else {
                     setError('Vehicle not found');
                 }
-            } catch (err) {
+            } catch {
                 setError('Failed to load vehicle details');
             } finally {
                 setLoading(false);
@@ -107,7 +101,7 @@ export default function VehicleDetail() {
 
     const handleEdit = () => {
         if (id) {
-            navigate(`/trucks/${id}/edit`);
+            navigate(`/vehicles/${id}/edit`);
         }
     };
 
@@ -119,8 +113,8 @@ export default function VehicleDetail() {
 
         try {
             await vehicleService.delete(Number(id));
-            navigate('/trucks');
-        } catch (err) {
+            navigate('/vehicles');
+        } catch {
             alert('Failed to delete vehicle. Please try again.');
         }
     };
@@ -149,7 +143,7 @@ export default function VehicleDetail() {
                     <div className="flex items-center gap-4">
                         <Button
                             variant="outline"
-                            onClick={() => navigate('/trucks')}
+                            onClick={() => navigate('/vehicles')}
                             startIcon={<ChevronLeftIcon />}
                         >
                             Back to Vehicles
@@ -165,10 +159,9 @@ export default function VehicleDetail() {
         );
     }
 
-    const vehicleIdentifier = `TRK-${String(vehicle.id).padStart(3, '0')}`;
-    const nextServiceDate = '2023-07-15';
-    const totalMileage = '125,000 mi';
-    const purchasePrice = '$85,000';
+    const vehicleIdentifier = formatVehicleIdentifier(vehicle.type, vehicle.id || 0);
+    const totalMileage = formatMileage(vehicle.current_mileage);
+    const purchasePrice = formatCurrency(vehicle.purchase_price);
 
     return (
         <>
@@ -180,7 +173,7 @@ export default function VehicleDetail() {
                     <div className="flex items-center gap-3 flex-wrap">
                         <Button
                             variant="outline"
-                            onClick={() => navigate('/trucks')}
+                            onClick={() => navigate('/vehicles')}
                             startIcon={<ChevronLeftIcon />}
                             className="height-[34px] !inline-block py-3"
                         >
@@ -188,7 +181,7 @@ export default function VehicleDetail() {
                         </Button>
                         <div className=''>
                         <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-2">
-                            {vehicle.vehicle_name}
+                            { capitalizeFirst(vehicle.vehicle_name)}
                         </h2>
                         <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400 w-full">
                             <span>{vehicleIdentifier}</span>
@@ -228,7 +221,7 @@ export default function VehicleDetail() {
                                 </div>
                                 <div>
                                     <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Next Service</p>
-                                    <p className="text-sm font-semibold text-gray-900 dark:text-white">{nextServiceDate}</p>
+                                    <p className="text-sm font-semibold text-gray-900 dark:text-white">N/A</p>
                                 </div>
                             </div>
                         </div>
@@ -240,7 +233,7 @@ export default function VehicleDetail() {
                                 </div>
                                 <div>
                                     <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Fuel Type</p>
-                                    <p className="text-sm font-semibold text-gray-900 dark:text-white">{vehicle.fuel_type || 'N/A'}</p>
+                                    <p className="text-sm font-semibold text-gray-900 dark:text-white">{ capitalizeFirst(vehicle.fuel_type) || 'N/A'}</p>
                                 </div>
                             </div>
                         </div>
@@ -277,22 +270,32 @@ export default function VehicleDetail() {
                                 <div className="flex flex-col">
                                     <span className="text-sm text-gray-600 dark:text-gray-400">Status</span>
                                     <span className="inline-block">
-                                    <Badge color="success" size="sm">Active</Badge>
+                                    <Badge color={getStatusBadgeColor(vehicle.initial_status)} size="sm">
+                                        {getStatusLabel(vehicle.initial_status)}
+                                    </Badge>
                                     </span>
                                 </div>
+
+                                <div className="flex flex-col">
+                                    <span className="text-sm text-gray-600 dark:text-gray-400">Vehicle Name </span>
+                                    <span className="text-sm font-medium text-gray-900 dark:text-white">
+                                        { capitalizeFirst(vehicle.vehicle_name)}
+                                    </span>
+                                </div>
+
                                 <div className="flex flex-col">
                                     <span className="text-sm text-gray-600 dark:text-gray-400">Make & Model</span>
                                     <span className="text-sm font-medium text-gray-900 dark:text-white">
-                                        {vehicle.make && vehicle.model ? `${vehicle.make} ${vehicle.model}` : vehicle.vehicle_name}
+                                        {vehicle.make && vehicle.model ? `${capitalizeFirst(vehicle.make)} ${capitalizeFirst(vehicle.model)}` : capitalizeFirst(vehicle.vehicle_name)}
                                     </span>
                                 </div>
                                 <div className="flex flex-col">
                                     <span className="text-sm text-gray-600 dark:text-gray-400">Year</span>
-                                    <span className="text-sm font-medium text-gray-900 dark:text-white">{vehicle.year || 'N/A'}</span>
+                                    <span className="text-sm font-medium text-gray-900 dark:text-white">{ capitalizeFirst(vehicle.year) || 'N/A'}</span>
                                 </div>
                                 <div className="flex flex-col">
                                     <span className="text-sm text-gray-600 dark:text-gray-400">VIN</span>
-                                    <span className="text-sm font-medium text-gray-900 dark:text-white">{vehicle.vin_sn || 'N/A'}</span>
+                                    <span className="text-sm font-medium text-gray-900 dark:text-white">{vehicle.vin || 'N/A'}</span>
                                 </div>
                                 <div className="flex flex-col">
                                     <span className="text-sm text-gray-600 dark:text-gray-400">License Plate</span>
@@ -300,19 +303,23 @@ export default function VehicleDetail() {
                                 </div>
                                 <div className="flex flex-col">
                                     <span className="text-sm text-gray-600 dark:text-gray-400">Color</span>
-                                    <span className="text-sm font-medium text-gray-900 dark:text-white">White</span>
+                                    <span className="text-sm font-medium text-gray-900 dark:text-white">{ capitalizeFirst(vehicle.color) || 'N/A'}</span>
                                 </div>
                                 <div className="flex flex-col">
                                     <span className="text-sm text-gray-600 dark:text-gray-400">Engine Size</span>
-                                    <span className="text-sm font-medium text-gray-900 dark:text-white">6.7L</span>
+                                    <span className="text-sm font-medium text-gray-900 dark:text-white">
+                                        {vehicle.engine_size ? `${vehicle.engine_size}L` : 'N/A'}
+                                    </span>
                                 </div>
                                 <div className="flex flex-col">
                                     <span className="text-sm text-gray-600 dark:text-gray-400">Transmission</span>
-                                    <span className="text-sm font-medium text-gray-900 dark:text-white">Automatic</span>
+                                    <span className="text-sm font-medium text-gray-900 dark:text-white">
+                                        { capitalizeFirst(vehicle.transmission) || 'N/A'}
+                                    </span>
                                 </div>
                                 <div className="flex flex-col">
                                     <span className="text-sm text-gray-600 dark:text-gray-400">Purchase Date</span>
-                                    <span className="text-sm font-medium text-gray-900 dark:text-white">-</span>
+                                    <span className="text-sm font-medium text-gray-900 dark:text-white">{formatDate(vehicle.purchase_date)}</span>
                                 </div>
                             </div>
                         </div>
@@ -434,15 +441,19 @@ export default function VehicleDetail() {
                         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-6">
                             <div className="flex-1">
                                 <span className="block text-sm text-[#595959] mb-1">Assigned Driver</span>
-                                <span className="block text-base text-[#1D2939]">John Smith</span>
+                                <span className="block text-base text-[#1D2939]">
+                                    { capitalizeFirst(vehicle.assigned_driver) || 'Not Assigned'}
+                                </span>
                             </div>
                             <div className="flex-1">
                                 <span className="block text-sm text-[#595959] mb-1">Primary Location</span>
-                                <span className="block text-base text-[#1D2939]">New York, NY</span>
+                                <span className="block text-base text-[#1D2939]">{ capitalizeFirst(vehicle.primary_location) || 'N/A'}</span>
                             </div>
                             <div className="flex-1">
                                 <span className="block text-sm text-[#595959] mb-1">Department</span>
-                                <span className="block text-base text-[#1D2939]">Logistics</span>
+                                <span className="block text-base text-[#1D2939]">
+                                    { capitalizeFirst(vehicle.department) || 'N/A'}
+                                </span>
                             </div>
                         </div>
                     </div>
