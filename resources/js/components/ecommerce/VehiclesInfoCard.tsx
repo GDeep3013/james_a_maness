@@ -11,7 +11,7 @@ export default function VehiclesInfoCard() {
     ];
 
     return (
-        <div className="rounded-2xl border border-gray-200 bg-white p-10 dark:border-gray-800 dark:bg-white/[0.03]">
+        <div className="rounded-2xl border border-gray-200 bg-white p-4 md:p-10 dark:border-gray-800 dark:bg-white/[0.03]">
 
             {/* Title */}
             <h3 className="text-sm font-semibold text-gray-800 dark:text-white/90 mb-4">
@@ -19,7 +19,7 @@ export default function VehiclesInfoCard() {
             </h3>
 
             {/* ✅ Stats Box Group — Height Increased */}
-            <div className="grid grid-cols-4 gap-4 mb-14">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-14">
                 {stats.map((item, idx) => (
                     <div
                         key={idx}

@@ -68,11 +68,11 @@ export default function ReminderList() {
       
       {/* --- Header Section (Upcoming Reminders & Add Button) --- */}
       <header className="flex justify-between items-center mb-6 border-b pb-4">
-        <h2 className="text-xl md:text-2xl font-semibold text-gray-800">
+        <h2 className="text-base md:text-2xl font-semibold text-gray-800">
           Upcoming Reminders
         </h2>
         <button 
-          className="flex items-center space-x-1 px-4 py-2 text-white-600 text-black font-medium rounded-lg hover:text-white-700 transition duration-150 border border-gray-300 hover:bg-gray-50"
+          className="flex items-center space-x-1 px-2 md:px-4 py-2 text-white-600 text-black font-medium rounded-lg hover:text-white-700 transition duration-150 border border-gray-300 hover:bg-gray-50 text-sm md:text-base"
         >
           <span className="text-xl">+</span>
           <span>Add Reminder</span>

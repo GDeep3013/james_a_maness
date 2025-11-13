@@ -17,7 +17,10 @@ body {
 .kav-side-bar-bg span.menu-item-icon-size svg path {
     fill: #fff;
 }
-
+.kav-side-bar-bg span.menu-item-icon-size svg.svg-no-fill path {
+    fill: none;
+    stroke: #fff;
+}
 .login-image-bg{
     background: url(/assets/img/main-bg-login.webp) no-repeat;
     background-size: 100% 100%;
@@ -41,3 +44,20 @@ body {
  .next-button svg path{ 
     stroke: #fff;
  }
+
+.menu-item-others-wrapper {
+    margin-top: auto;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    padding-top: 1rem;
+}
+
+.menu-item-others {
+    border-top: none;
+    padding-top: 0;
+    margin-top: 0;
+}
+
+
+.menu-item-others-icon {
+    opacity: 0.9;
+}

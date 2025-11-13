@@ -34,8 +34,8 @@ export default function IncompleteWorkOrder() {
         <div className="rounded-2xl border border-gray-200 bg-white px-5 pb-5 pt-5 dark:border-gray-800 dark:bg-white/[0.03] sm:px-6 sm:pt-6 min-h-[140px]">
             {/* Header Section */}
             <div className="flex justify-between items-center mb-6 border-b pb-4">
-                <h2 className="text-xl font-semibold text-gray-800">Incomplete Work Orders</h2>
-                <button className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-150 shadow-md">
+                <h2 className="text-base md:text-xl font-semibold text-gray-800">Incomplete Work Orders</h2>
+                <button className="flex items-center space-x-2 px-2 md:px-4 py-2 text-sm md:text-base bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-150 shadow-md">
                     {/* Wrench Icon */}
                     <svg
                         xmlns="http://www.w3.org/2000/svg"

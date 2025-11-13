@@ -4,15 +4,16 @@ import { Link, useLocation } from "react-router";
 
 // Assume these icons are imported from an icon library
 import {
-  CalenderIcon,
   CarIcon,
   ChevronDownIcon,
   GridIcon,
   HorizontaLDots,
-  UserCircleIcon,
-  TimeIcon,
-  SettingsIcon,
-  IssuesIcon
+  ContactsIcon,
+  MaintenanceIcon,
+  VendorIcon,
+  GasStationIcon,
+  PartsIcon,
+  ReportsIcon
 } from "../icons";
 import { useSidebar } from "../context/SidebarContext";
 import { useAuth } from "../context/AuthContext";
@@ -44,78 +45,54 @@ const navItems: NavItem[] = [
     ],
   },
   {
-    icon: <UserCircleIcon />,
+    icon: <MaintenanceIcon className="svg-no-fill"/>,
+    name: "Maintenance",
+    path: "/maintenance",
+    allowedRoles: ["Admin", "Manager"],
+    subItems: [
+      { name: "Work Orders", path: "/maintenance-orders", pro: false, allowedRoles: ["Admin", "Manager"] },
+      { name: "Service Reminders", path: "/maintenance-reminders", pro: false, allowedRoles: ["Admin", "Manager"] },
+      { name: "Services", path: "/maintenance-services", pro: false, allowedRoles: ["Admin", "Manager"] },
+      { name: "Issues", path: "/maintenance-issues", pro: false, allowedRoles: ["Admin", "Manager"] },
+      { name: "Schedules", path: "/maintenance-schedules", pro: false, allowedRoles: ["Admin", "Manager"] },
+    ],
+  },
+  {
+    icon: <ContactsIcon className="svg-no-fill"/>,
     name: "Contacts",
     path: "/contacts",
     allowedRoles: ["Admin", "Manager"],
   },
   {
-    icon: <CalenderIcon />,
-    name: "Inspection",
+    icon: <VendorIcon className="svg-no-fill"/>,
+    name: "Vendors",
+    path: "/vendors",
     allowedRoles: ["Admin", "Manager"],
-    subItems: [
-      { name: "Inspection History", path: "/inspection-history", pro: false, allowedRoles: ["Admin", "Manager"] },
-      { name: "Item Failures", path: "/item-failures", pro: false, allowedRoles: ["Admin", "Manager"] },
-      { name: "Schedules", path: "/schedules", pro: false, allowedRoles: ["Admin", "Manager"] },
-      { name: "Forms", path: "/forms", pro: false, allowedRoles: ["Admin", "Manager"] },
-    ],
   },
-  {
-    icon: <IssuesIcon />,
-    name: "Issues",
-    allowedRoles: ["Admin", "Manager"],
-    subItems: [
-      { name: "Issues", path: "/issues", pro: false, allowedRoles: ["Admin", "Manager"] },
-      { name: "Faults", path: "/faults", pro: false, allowedRoles: ["Admin", "Manager"] },
-      { name: "Recalls", path: "/recalls", pro: false, allowedRoles: ["Admin", "Manager"] },
-    ],
-  },
-  {
-    icon: <TimeIcon />,
-    name: "Service Reminders",
-    allowedRoles: ["Admin", "Manager"],
-    subItems: [
-      { name: "Service Reminders", path: "/service-reminders", pro: false, allowedRoles: ["Admin", "Manager"] },
-      { name: "Vehicle Renewals", path: "/vehicle-renewals", pro: false, allowedRoles: ["Admin", "Manager"] },
-      { name: "Contact Renewals", path: "/contact-renewals", pro: false, allowedRoles: ["Admin", "Manager"] },
-    ],
-  },
-  {
-    icon: <SettingsIcon />,
-    name: "Services",
-    allowedRoles: ["Admin", "Manager"],
-    subItems: [
-      { name: "Service History", path: "/service-history", pro: false, allowedRoles: ["Admin", "Manager"] },
-      { name: "Work Orders", path: "/work-orders", pro: false, allowedRoles: ["Admin", "Manager"] },
-      { name: "Service Tasks", path: "/service-tasks", pro: false, allowedRoles: ["Admin", "Manager"] },
-      { name: "Service Programs", path: "/service-programs", pro: false, allowedRoles: ["Admin", "Manager"] },
-    ],
-  },
-
-
-  // {
-  //   icon: <UserCircleIcon />,
-  //   name: "User Profile",
-  //   path: "/profile",
-  // },
-  // {
-  //   name: "Forms",
-  //   icon: <ListIcon />,
-  //   subItems: [{ name: "Form Elements", path: "/form-elements", pro: false }],
-  // },
-  // {
-  //   name: "Tables",
-  //   icon: <TableIcon />,
-  //   subItems: [{ name: "Basic Tables", path: "/basic-tables", pro: false }],
-  // },
-  // {
-  //   name: "Pages",
-  //   icon: <PageIcon />,
-  //   subItems: [
-  //     { name: "Blank Page", path: "/blank", pro: false },
-  //     { name: "404 Error", path: "/error-404", pro: false },
-  //   ],
-  // },
+    {
+      icon: <GasStationIcon className="svg-no-fill"/>,
+      name: "Fuel & Gas Stations",
+      path: "/fuel",
+      allowedRoles: ["Admin", "Manager"],
+    },
+    {
+      icon: <PartsIcon className="svg-no-fill"/>,
+      name: "Parts",
+      path: "/parts",
+      allowedRoles: ["Admin", "Manager"],
+    },
+    {
+      icon: <ReportsIcon className="svg-no-fill"/>,
+      name: "Reports",
+      path: "/reports",
+      allowedRoles: ["Admin", "Manager"],
+    },
+    {
+      icon:'',
+      name: "Others",
+      path: "/others",
+      allowedRoles: ["Admin", "Manager"],
+    },
 ];
 
 const othersItems: NavItem[] = [
@@ -244,8 +221,12 @@ const AppSidebar: React.FC = () => {
     const filteredItems = filterMenuItems(items);
     return (
     <ul className="flex flex-col gap-4 px-4">
-      {filteredItems.map((nav, index) => (
-        <li key={nav.name}>
+      {filteredItems.map((nav, index) => {
+        const isLastItem = index === filteredItems.length - 1;
+        const isOthersItem = nav.name === "Others";
+        
+        return (
+        <li key={nav.name} className={isOthersItem ? "menu-item-others-wrapper" : ""}>
           {nav.subItems ? (
             <button
               onClick={() => handleSubmenuToggle(index, menuType)}
@@ -257,19 +238,19 @@ const AppSidebar: React.FC = () => {
                 !isExpanded && !isHovered
                   ? "lg:justify-center"
                   : "lg:justify-start"
-              }`}
+              } ${isOthersItem ? "menu-item-others" : ""}`}
             >
               <span
                 className={`menu-item-icon-size  ${
                   openSubmenu?.type === menuType && openSubmenu?.index === index
                     ? "menu-item-icon-active"
                     : "menu-item-icon-inactive"
-                }`}
+                } ${isOthersItem ? "menu-item-others-icon" : ""}`}
               >
                 {nav.icon}
               </span>
               {(isExpanded || isHovered || isMobileOpen) && (
-                <span className="menu-item-text">{nav.name}</span>
+                <span className={`menu-item-text ${isOthersItem ? "menu-item-others-text" : ""}`}>{nav.name}</span>
               )}
               {(isExpanded || isHovered || isMobileOpen) && (
                 <ChevronDownIcon
@@ -288,19 +269,19 @@ const AppSidebar: React.FC = () => {
                 to={nav.path}
                 className={`menu-item group text-base font-medium text-white hover:bg-[#2C0A77] ${
                   isActive(nav.path) ? "menu-item-active bg-[#2C0A77]" : "menu-item-inactive"
-                }`}
+                } ${isOthersItem ? "menu-item-others hover:bg-transparent" : ""}`}
               >
                 <span
                   className={`menu-item-icon-size ${
                     isActive(nav.path)
                       ? "menu-item-icon-active"
                       : "menu-item-icon-inactive"
-                  }`}
+                  } ${isOthersItem ? "menu-item-others-icon" : ""}`}
                 >
                   {nav.icon}
                 </span>
                 {(isExpanded || isHovered || isMobileOpen) && (
-                  <span className="menu-item-text">{nav.name}</span>
+                  <span className={`menu-item-text ${isOthersItem ? "menu-item-others-text text-white opacity-70 font-normal uppercase" : ""}`}>{nav.name}</span>
                 )}
               </Link>
             )
@@ -361,7 +342,8 @@ const AppSidebar: React.FC = () => {
             </div>
           )}
         </li>
-      ))}
+        );
+      })}
     </ul>
     );
   };

@@ -63,13 +63,25 @@ import { ReactComponent as FuelIcon } from "./fuel.svg?react";
 import { ReactComponent as TotalMileageIcon } from "./total-mileage.svg?react";
 import { ReactComponent as PurchasePriceIcon } from "./purchase-price.svg?react";
 import { ReactComponent as TickIcon } from "./tick.svg?react";
+import { ReactComponent as MaintenanceIcon } from "./maintenance.svg?react";
+import { ReactComponent as VendorIcon } from "./vendors.svg?react";
+import { ReactComponent as GasStationIcon } from "./fuel.svg?react";
+import { ReactComponent as PartsIcon } from "./parts.svg?react";
+import { ReactComponent as ReportsIcon } from "./reports.svg?react";
+import { ReactComponent as ContactsIcon } from "./contacts.svg?react";
 
 export {
   TickIcon,
+  MaintenanceIcon,
+  VendorIcon,
+  ContactsIcon,
   FuelIcon,
+  GasStationIcon,
+  PartsIcon,
   TotalMileageIcon,
   PurchasePriceIcon,
   AvtarIcon,
+  ReportsIcon,
   ErrorHexaIcon,
   AlertHexaIcon,
   MoreDotIcon,
