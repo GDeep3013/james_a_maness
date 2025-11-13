@@ -28,6 +28,7 @@ export default function LineItems({
   onEditLineItem,
   onDeleteLineItem,
 }: LineItemsProps) {
+  console.log("workOrderId", workOrderId);
   const [activeTab, setActiveTab] = useState<"Service Tasks" | "Labor" | "Parts">("Service Tasks");
   const [searchTerm, setSearchTerm] = useState("");
 

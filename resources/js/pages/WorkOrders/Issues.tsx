@@ -24,6 +24,7 @@ export default function Issues({
   onEditIssue,
   onDeleteIssue,
 }: IssuesProps) {
+  console.log("workOrderId", workOrderId);
   const [activeTab, setActiveTab] = useState<"Open" | "Resolved" | "Closed">("Closed");
 
   const filteredIssues = issues.filter((issue) => issue.status === activeTab);
