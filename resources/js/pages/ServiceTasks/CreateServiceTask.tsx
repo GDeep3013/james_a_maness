@@ -215,9 +215,6 @@ export default function CreateServiceTask() {
                 )}
 
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-200 text-gray-600 font-semibold">
-                    1
-                  </div>
                   <h2 className="text-2xl font-semibold text-gray-800">Details</h2>
                 </div>
 
