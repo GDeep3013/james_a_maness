@@ -28,12 +28,18 @@ Route::middleware(['page.access'])->group(function () {
     Route::get('/contacts/{id}', [HomeController::class, 'index'])->where('id', '[0-9]+');
     Route::get('/contacts/{id}/edit', [HomeController::class, 'index'])->where('id', '[0-9]+');
 
-
     //
     Route::get('/work-orders', [HomeController::class, 'index']);
     Route::get('/work-orders/create', [HomeController::class, 'index']);
     Route::get('/work-orders/{id}', [HomeController::class, 'index'])->where('id', '[0-9]+');
     Route::get('/work-orders/{id}/edit', [HomeController::class, 'index'])->where('id', '[0-9]+');
 
+
+    Route::get('/service-tasks', [HomeController::class, 'index']);
+    Route::get('/service-tasks/create', [HomeController::class, 'index']);
+    Route::get('/service-tasks/{id}', [HomeController::class, 'index'])->where('id', '[0-9]+');
+    Route::get('/service-tasks/{id}/edit', [HomeController::class, 'index'])->where('id', '[0-9]+');
+
+    
     Route::get('profile', [HomeController::class, 'index']);
 });

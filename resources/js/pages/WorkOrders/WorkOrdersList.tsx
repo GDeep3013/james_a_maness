@@ -12,6 +12,7 @@ import Input from "../../components/form/input/InputField";
 import Button from "../../components/ui/button/Button";
 import PageMeta from "../../components/common/PageMeta";
 import { workOrderService } from "../../services/workOrderService";
+import { WORK_ORDER_STATUS_FILTER_OPTIONS } from "../../constants/selectOptions";
 import { PencilIcon, TrashBinIcon, ExportIcon, EyeIcon } from "../../icons";
 import Select from "../../components/form/Select";
 
@@ -29,8 +30,8 @@ interface WorkOrder {
   actual_start_date?: string;
   expected_completion_date?: string;
   actual_completion_date?: string;
-  assigned_to?: number;
-  assignedTo?: {
+  assigned_to?: {
+    id?: number;
     first_name?: string;
     last_name?: string;
   };
@@ -171,13 +172,6 @@ export default function WorkOrdersList() {
     }
   };
 
-  const statusOptions = [
-    { value: "", label: "All Status" },
-    { value: "Open", label: "Open" },
-    { value: "In Progress", label: "In Progress" },
-    { value: "Completed", label: "Completed" },
-    { value: "Cancelled", label: "Cancelled" },
-  ];
 
   const renderPagination = () => {
     const pages: number[] = [];
@@ -307,7 +301,7 @@ export default function WorkOrdersList() {
             </div>
             <div className="w-full max-w-[20%]">
               <Select
-                options={statusOptions}
+                options={WORK_ORDER_STATUS_FILTER_OPTIONS}
                 placeholder="All Status"
                 onChange={(value) => setStatusFilter(value)}
                 defaultValue=""
@@ -441,9 +435,9 @@ export default function WorkOrdersList() {
                           )}
                         </TableCell>
                         <TableCell className="px-4 py-3 text-start">
-                          {workOrder.assignedTo ? (
+                          {workOrder.assigned_to ? (
                             <div className="text-gray-800 text-theme-sm dark:text-white/90">
-                              {`${workOrder.assignedTo.first_name || ""} ${workOrder.assignedTo.last_name || ""}`.trim() || "N/A"}
+                              {`${workOrder.assigned_to.first_name || ""} ${workOrder.assigned_to.last_name || ""}`.trim() || "N/A"}
                             </div>
                           ) : (
                             <div className="text-gray-500 text-theme-sm dark:text-gray-400">

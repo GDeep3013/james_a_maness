@@ -13,6 +13,7 @@ import { vehicleService } from "../../services/vehicleService";
 import { contactService } from "../../services/contactService";
 import Issues from "./Issues";
 import LineItems from "./LineItems";
+import { WORK_ORDER_STATUS_OPTIONS, REPAIR_PRIORITY_CLASS_OPTIONS } from "../../constants/selectOptions";
 
 interface SidebarItem {
   key: string;
@@ -215,11 +216,11 @@ export default function CreateWorkOrder() {
         issue_date: formData.issue_date || undefined,
         issued_by: formData.issued_by || undefined,
         scheduled_start_date: formData.scheduled_start_date || undefined,
-        send_scheduled_start_date_reminder: formData.send_scheduled_start_date_reminder,
+        send_scheduled_start_date_reminder: Boolean(formData.send_scheduled_start_date_reminder),
         actual_start_date: formData.actual_start_date || undefined,
         expected_completion_date: formData.expected_completion_date || undefined,
         actual_completion_date: formData.actual_completion_date || undefined,
-        use_start_odometer_for_completion_meter: formData.use_start_odometer_for_completion_meter,
+        use_start_odometer_for_completion_meter: Boolean(formData.use_start_odometer_for_completion_meter),
         assigned_to: formData.assigned_to ? parseInt(formData.assigned_to) : undefined,
         labels: formData.labels.length > 0 ? formData.labels : undefined,
         vendor_id: formData.vendor_id ? parseInt(formData.vendor_id) : undefined,
@@ -273,18 +274,6 @@ export default function CreateWorkOrder() {
     }
   };
 
-  const statusOptions = [
-    { value: "Open", label: "Open" },
-    { value: "In Progress", label: "In Progress" },
-    { value: "Completed", label: "Completed" },
-    { value: "Cancelled", label: "Cancelled" },
-  ];
-
-  const repairPriorityClassOptions = [
-    { value: "Scheduled", label: "Scheduled" },
-    { value: "Non-Scheduled", label: "Non-Scheduled" },
-    { value: "Emergency", label: "Emergency" },
-  ];
 
   const vehicleOptions = vehicles.map((vehicle) => ({
     value: vehicle.id.toString(),
@@ -324,7 +313,7 @@ export default function CreateWorkOrder() {
             Status <span className="text-error-500">*</span>
           </Label>
           <Select
-            options={statusOptions}
+            options={WORK_ORDER_STATUS_OPTIONS}
             placeholder="Please select"
             onChange={handleSelectChange("status")}
             defaultValue={formData.status}
@@ -338,7 +327,7 @@ export default function CreateWorkOrder() {
       <div>
         <Label htmlFor="repair_priority_class">Repair Priority Class</Label>
         <Select
-          options={repairPriorityClassOptions}
+          options={REPAIR_PRIORITY_CLASS_OPTIONS}
           placeholder="Please select"
           onChange={handleSelectChange("repair_priority_class")}
           defaultValue={formData.repair_priority_class}
@@ -524,15 +513,18 @@ export default function CreateWorkOrder() {
     </div>
   );
 
-  const renderIssuesSection = () => (
-    <Issues
-      workOrderId={id ? parseInt(id) : undefined}
-      issues={[]}
-      onAddIssue={() => {}}
-      onEditIssue={() => {}}
-      onDeleteIssue={() => {}}
-    />
-  );
+  const renderIssuesSection = () => {
+    const selectedVehicle = vehicles.find(
+      (v) => v.id.toString() === formData.vehicle_id
+    );
+    return (
+      <Issues
+        workOrderId={id ? parseInt(id) : undefined}
+        vehicleId={selectedVehicle?.id}
+        vehicleName={selectedVehicle?.vehicle_name}
+      />
+    );
+  };
 
   const renderLineItemsSection = () => (
     <LineItems
