@@ -15,7 +15,7 @@ class ServiceTaskController extends Controller
     public function index(Request $request)
     {
         $tableColumns = Schema::getColumnListing('service_tasks');
-        $query = ServiceTask::with(['subtasks'])->orderBy('id', 'desc');
+        $query = ServiceTask::with(['subtasks'])->orderBy('name', 'asc');
         
         $searchTerm = $request->search;
 
