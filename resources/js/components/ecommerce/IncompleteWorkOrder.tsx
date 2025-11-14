@@ -34,8 +34,8 @@ export default function IncompleteWorkOrder() {
         <div className="rounded-2xl border border-gray-200 bg-white px-5 pb-5 pt-5 dark:border-gray-800 dark:bg-white/[0.03] sm:px-6 sm:pt-6 min-h-[140px]">
             {/* Header Section */}
             <div className="flex justify-between items-center mb-6 border-b pb-4">
-                <h2 className="text-base md:text-xl font-semibold text-gray-800">Incomplete Work Orders</h2>
-                <button className="flex items-center space-x-2 px-2 md:px-4 py-2 text-sm md:text-base bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-150 shadow-md">
+                <h2 className="text-[15px] md:text-xl font-semibold text-gray-800">Incomplete Work Orders</h2>
+                <button className="flex items-center space-x-2 px-1 md:px-4 py-2 text-sm md:text-base bg-[#5321B1] text-white rounded-lg hover:bg-blue-700 transition duration-150 shadow-md">
                     {/* Wrench Icon */}
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -51,7 +51,7 @@ export default function IncompleteWorkOrder() {
                             d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
                         />
                     </svg>
-                    <span className="text-sm font-medium">New Work Order</span>
+                    <span className="md:text-sm text-xs font-medium">New Work Order</span>
                 </button>
             </div>
 
@@ -65,7 +65,7 @@ export default function IncompleteWorkOrder() {
                         {/* Left Content (IDs, Description, Assignment) */}
                         <div className="flex-grow">
                             <div className="flex items-center space-x-3 mb-1">
-                                <p className="text-lg font-bold text-indigo-600">{order.woId}</p>
+                                <p className="text-lg font-normal text-[#5321B1]">{order.woId}</p>
                                 <span className="text-gray-500 font-medium">{order.assetId}</span>
                             </div>
                             <p className="text-sm text-gray-700 mb-1">{order.description}</p>

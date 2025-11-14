@@ -67,9 +67,9 @@ const AppHeader: React.FC = () => {
             ) : (
               <svg
                 className="menu-icon"
-                width="34"
-                height="34"
-                viewBox="0 0 34 34"
+                width="17"
+                height="17"
+                viewBox="0 0 17.5 17.5"
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
               >
@@ -86,12 +86,12 @@ const AppHeader: React.FC = () => {
 
           <Link to="/" className="lg:hidden">
             <img
-              className="dark:hidden max-w-[99px] md:max-w-full"
+              className="dark:hidden max-w-[99px] sm:max-w-[140px] lg:max-w-full"
               src="./images/logo.png"
               alt="Logo"
             />
             <img
-              className="hidden dark:block max-w-[99px] md:max-w-full"
+              className="hidden dark:block max-w-[99px] sm:max-w-[140px] lg:max-w-full"
               src="./images/logo-dark.png"
               alt="Logo"
             />

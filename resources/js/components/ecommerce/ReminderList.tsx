@@ -97,7 +97,7 @@ export default function ReminderList() {
               
               {/* Reminder Title and Sub-text */}
               <div>
-                <p className="text-base font-medium text-gray-900">
+                <p className="text-base font-normal text-gray-900">
                   {reminder.title}
                 </p>
                 <p className="text-sm text-gray-500">
@@ -111,7 +111,7 @@ export default function ReminderList() {
               
               {/* Priority Tag */}
               <span 
-                className={`text-xs font-semibold uppercase px-2 py-0.5 rounded-full ${getPriorityClasses(reminder.priority)}`}
+                className={`text-xs font-normal capitalize px-2 py-0.5 rounded-full ${getPriorityClasses(reminder.priority)}`}
               >
                 {reminder.priority}
               </span>

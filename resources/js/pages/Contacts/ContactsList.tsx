@@ -244,7 +244,7 @@ export default function ContactsList() {
       <div className="space-y-6">
         <form onSubmit={handleSearch} className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl p-4">
           <div className="flex flex-wrap items-center gap-4">
-            <div className="flex-1 max-w-[50%]">
+            <div className="w-full max-w-full md:max-w-[50%]">
               <Input
                 type="text"
                 placeholder="Search by name, email, phone, or license..."
@@ -253,7 +253,7 @@ export default function ContactsList() {
                 className="!bg-[#F3F3F5] max-w-full border-none !rounded-[8px]"
               />
             </div>
-            <div className="w-full max-w-[20%]">
+            <div className="w-full max-w-[50%] md:max-w-[20%]">
               <Select
                 options={statusOptions}
                 placeholder="All Status"
@@ -265,7 +265,7 @@ export default function ContactsList() {
             <Button
               variant="outline"
               onClick={handleExport}
-              className="bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-white/10 hover:bg-gray-100 dark:hover:bg-gray-800 w-full max-w-[10%] min-h-[44px] !leading-[44px]"
+              className="bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-white/10 hover:bg-gray-100 dark:hover:bg-gray-800 w-full max-w-100 md:max-w-[10%] min-h-[44px] !leading-[44px]"
             >
               <ExportIcon />
               Export

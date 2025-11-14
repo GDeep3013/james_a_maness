@@ -263,8 +263,8 @@ export default function VehicleDetail() {
                         </div>
                     </div>
 
-                    <div className="flex gap-6">
-                        <div className="bg-white rounded-lg p-6 border border-gray-200 max-w-[387px] w-full">
+                    <div className="flex md:flex-nowrap flex-wrap gap-6">
+                        <div className="bg-white rounded-lg lg:p-6 p-3 border border-gray-200 md:max-w-[260px] lg:max-w-[387px] max-w-full w-full">
                             <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Vehicle Information</h2>
                             <div className="space-y-4">
                                 <div className="flex flex-col">
@@ -327,11 +327,11 @@ export default function VehicleDetail() {
                         <div className="bg-white rounded-lg border border-gray-200 w-full">
                            
 
-                            <div className="p-6">
-                            <nav className="flex bg-[#ECECF0] mb-8 rounded-[32px] p-1">
+                            <div className="lg:p-6 p-3">
+                            <nav className="flex bg-[#ECECF0] md:mb-8 mb-4 rounded-[32px] p-1">
                                     <button
                                         onClick={() => setActiveTab('maintenance')}
-                                        className={`px-4 py-3 text-sm font-medium transition-colors rounded-[43px] w-full shadow-none ${activeTab === 'maintenance'
+                                        className={`lg:px-4 px-2 py-3 lg:text-sm text-xs font-medium transition-colors rounded-[43px] w-full shadow-none ${activeTab === 'maintenance'
                                                 ? 'bg-white text-brand-600 dark:text-brand-400'
                                                 : 'text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400'
                                             }`}
@@ -340,7 +340,7 @@ export default function VehicleDetail() {
                                     </button>
                                     <button
                                         onClick={() => setActiveTab('fuel')}
-                                        className={`px-4 py-3 text-sm font-medium transition-colors rounded-[43px] w-full shadow-none ${activeTab === 'fuel'
+                                        className={`lg:px-4 px-2 py-3 lg:text-sm text-xs font-medium transition-colors rounded-[43px] w-full shadow-none ${activeTab === 'fuel'
                                                 ? 'bg-white text-brand-600 dark:text-brand-400'
                                                 : 'text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400'
                                             }`}
@@ -349,7 +349,7 @@ export default function VehicleDetail() {
                                     </button>
                                     <button
                                         onClick={() => setActiveTab('documents')}
-                                        className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors rounded-[43px] w-full shadow-none ${activeTab === 'documents'
+                                        className={`lg:px-4 px-2 py-3 lg:text-sm text-xs font-medium border-b-2 transition-colors rounded-[43px] w-full shadow-none ${activeTab === 'documents'
                                                 ? 'bg-white text-brand-600'
                                                 : 'text-gray-500 hover:text-gray-700'
                                             }`}
@@ -363,7 +363,7 @@ export default function VehicleDetail() {
                                             <div key={record.id} className="flex items-center justify-between p-4 bg-[#F9FAFB]  rounded-lg">
                                                 <div className="flex-1">
                                                     <div className="flex items-center justify-between mb-3">
-                                                        <h3 className="text-base font-normal text-[#1D2939] dark:text-white">{record.name}</h3>
+                                                        <h3 className="md:text-base text-sm font-normal text-[#1D2939] dark:text-white">{record.name}</h3>
                                                         <Badge size="sm" variant="outline">{record.status}</Badge>
                                                     </div>
                                                     <div className="flex items-center gap-4 text-xs text-gray-600 dark:text-gray-400">
