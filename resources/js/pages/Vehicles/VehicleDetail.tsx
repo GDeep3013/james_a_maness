@@ -264,11 +264,11 @@ export default function VehicleDetail() {
                     </div>
 
                     <div className="flex md:flex-nowrap flex-wrap gap-6">
-                        <div className="bg-white rounded-lg lg:p-6 p-3 border border-gray-200 md:max-w-[260px] lg:max-w-[387px] max-w-full w-full">
+                        <div className="bg-white rounded-lg lg:p-6 p-3 border border-gray-200 max-w-[767px]:max-w-full lg:max-w-[387px] max-w-full w-full">
                             <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Vehicle Information</h2>
                             <div className="space-y-4">
                                 <div className="flex flex-col">
-                                    <span className="text-sm text-gray-600 dark:text-gray-400">Status</span>
+                                    <span className="text-sm text-gray-600 dark:text-gray-400">Status </span>
                                     <span className="inline-block">
                                     <Badge color={getStatusBadgeColor(vehicle.initial_status)} size="sm">
                                         {getStatusLabel(vehicle.initial_status)}

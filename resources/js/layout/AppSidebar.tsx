@@ -350,7 +350,7 @@ const AppSidebar: React.FC = () => {
 
   return (
     <aside
-      className={`kav-side-bar-bg fixed mt-0 md:mt-16 flex flex-col lg:mt-0 top-0 px-0 left-0 dark:bg-gray-900 dark:border-gray-800 text-gray-900 h-screen transition-all duration-300 ease-in-out z-[9999999]
+      className={`kav-side-bar-bg fixed mt-0 max-w-[1024px]:mt-16 flex flex-col lg:mt-0 top-0 px-0 left-0 dark:bg-gray-900 dark:border-gray-800 text-gray-900 h-screen transition-all duration-300 ease-in-out z-[9999999]
         ${
           isExpanded || isMobileOpen
             ? "w-[290px]"
@@ -364,7 +364,7 @@ const AppSidebar: React.FC = () => {
       onMouseLeave={() => setIsHovered(false)}
     >
       <div
-        className={`py-3 px-4 flex bg-white mt-[13.8px] md:mt-5 ${
+        className={`py-3 px-4 flex bg-white mt-[13.8px] md:mt-[31px] min-w-[1024px]:mt-5 ${
           !isExpanded && !isHovered ? "lg:justify-center" : "justify-start"
         }`}
       >
