@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import PageMeta from '../../components/common/PageMeta';
 import Label from '../../components/form/Label';
@@ -8,6 +8,13 @@ import { ChevronLeftIcon, TickIcon, AngleRightIcon } from '../../icons';
 import TextArea from '../../components/form/input/TextArea';
 import { typeOptions, fuelTypeOptions, transmissionOptions, statusOptions, addVehicleSteps, defaultVehicleFormData, VehicleFormData } from '../../constants/vehicleConstants';
 import { vehicleService } from '../../services/vehicleService';
+import { contactService } from '../../services/contactService';
+
+interface Contact {
+  id: number;
+  first_name: string;
+  last_name?: string;
+}
 
 export default function AddVehicle() {
   const navigate = useNavigate();
@@ -16,6 +23,8 @@ export default function AddVehicle() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [generalError, setGeneralError] = useState<string>("");
+  const [contacts, setContacts] = useState<Contact[]>([]);
+  const [isLoadingContacts, setIsLoadingContacts] = useState(false);
 
   const handleInputChange = (name: string, value: string) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -34,6 +43,24 @@ export default function AddVehicle() {
 
   const handleSelectChange = (name: string) => (value: string) => {
     handleInputChange(name, value);
+  };
+
+  useEffect(() => {
+    fetchContacts();
+  }, []);
+
+  const fetchContacts = async () => {
+    setIsLoadingContacts(true);
+    try {
+      const response = await contactService.getAll({ page: 1 });
+      if (response.data?.status && response.data?.contact?.data) {
+        setContacts(response.data.contact.data);
+      }
+    } catch (error) {
+      console.error("Error fetching contacts:", error);
+    } finally {
+      setIsLoadingContacts(false);
+    }
   };
 
   const validateStep1 = (): boolean => {
@@ -111,7 +138,7 @@ export default function AddVehicle() {
         initial_status: formData.initial_status || undefined,
         primary_location: formData.primary_location || undefined,
         notes: formData.notes || undefined,
-        assigned_driver: formData.assigned_driver || undefined,
+        assigned_driver: formData.assigned_driver ? Number(formData.assigned_driver) : undefined,
         department: formData.department || undefined,
       };
 
@@ -484,13 +511,17 @@ export default function AddVehicle() {
 
                   <div>
                     <Label htmlFor="assigned_driver">Assigned Driver</Label>
-                    <Input
-                      type="text"
-                      id="assigned_driver"
-                      name="assigned_driver"
-                      placeholder="Select driver (optional)"
-                      value={formData.assigned_driver}
-                      onChange={(e) => handleInputChange('assigned_driver', e.target.value)}
+                    <Select
+                      options={[
+                        { value: "", label: "Select driver (optional)" },
+                        ...contacts.map(contact => ({
+                          value: contact.id.toString(),
+                          label: `${contact.first_name} ${contact.last_name || ""}`.trim()
+                        }))
+                      ]}
+                      placeholder={isLoadingContacts ? "Loading contacts..." : "Select driver (optional)"}
+                      onChange={handleSelectChange('assigned_driver')}
+                      defaultValue={formData.assigned_driver}
                     />
                   </div>
 

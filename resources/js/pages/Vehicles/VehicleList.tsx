@@ -13,22 +13,28 @@ import Button from "../../components/ui/button/Button";
 import PageMeta from "../../components/common/PageMeta";
 import { vehicleService } from "../../services/vehicleService";
 import { PencilIcon, TrashBinIcon, ExportIcon, EyeIcon } from "../../icons";
-import Select from "../../components/form/Select";
+import { formatVehicleIdentifier, formatMileage, formatDate } from "../../utils";
 
 interface Vehicle {
   id: number;
   vehicle_name: string;
   type: string;
-  vin_sn?: string;
+  vin?: string;
   license_plate?: string;
   fuel_type?: string;
   year?: string;
   make?: string;
   model?: string;
-  trim?: string;
-  registration_state?: string;
-  labels?: string;
-  photo?: string;
+  current_mileage?: string;
+  initial_status?: string;
+  primary_location?: string;
+  assigned_driver?: number;
+  driver?: {
+    id?: number;
+    first_name?: string;
+    last_name?: string;
+  };
+  next_service_date?: string;
   created_at?: string;
 }
 
@@ -56,8 +62,6 @@ export default function VehicleList() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>("");
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("");
-  const [fuelTypeFilter, setFuelTypeFilter] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [pagination, setPagination] = useState<PaginationData>({
     current_page: 1,
@@ -132,21 +136,25 @@ export default function VehicleList() {
     
   };
 
-  const statusOptions = [
-    { value: "", label: "All Status" },
-    { value: "active", label: "Active" },
-    { value: "inactive", label: "Inactive" },
-    { value: "maintenance", label: "In Maintenance" },
-    { value: "available", label: "Available" },
-  ];
+  const getStatusColor = (status?: string) => {
+    switch (status?.toLowerCase()) {
+      case "active":
+        return "success";
+      case "maintenance":
+        return "warning";
+      case "inactive":
+        return "error";
+      case "available":
+        return "info";
+      default:
+        return "light";
+    }
+  };
 
-  const fuelTypeOptions = [
-    { value: "", label: "All Fuel Types" },
-    { value: "gasoline", label: "Gasoline" },
-    { value: "diesel", label: "Diesel" },
-    { value: "electric", label: "Electric" },
-    { value: "hybrid", label: "Hybrid" },
-  ];
+  const getStatusLabel = (status?: string) => {
+    if (!status) return "N/A";
+    return status.charAt(0).toUpperCase() + status.slice(1);
+  };
 
   const renderPagination = () => {
     const pages: number[] = [];
@@ -261,24 +269,6 @@ export default function VehicleList() {
                 className="!bg-[#F3F3F5] max-w-full border-none !rounded-[8px]"
               />
             </div>
-            <div className="w-full max-w-[50%] md:max-w-[20%]">
-              <Select
-                options={statusOptions}
-                placeholder="All Status"
-                onChange={(value) => setStatusFilter(value)}
-                defaultValue=""
-                className="!bg-[#F3F3F5] border-gray-200"
-              />
-            </div>
-            <div className="w-full max-w-[50%] md:max-w-[20%]">
-              <Select
-                options={fuelTypeOptions}
-                placeholder="All Fuel Types"
-                onChange={(value) => setFuelTypeFilter(value)}
-                defaultValue=""
-                className="!bg-[#F3F3F5] border-gray-200"
-              />
-            </div>
             <Button
               variant="outline"
               onClick={handleExport}
@@ -324,37 +314,49 @@ export default function VehicleList() {
                         isHeader
                         className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                       >
-                        Vehicle
+                        Vehicle ID
                       </TableCell>
                       <TableCell
                         isHeader
                         className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                       >
-                        Type
+                        Vehicle Details
                       </TableCell>
                       <TableCell
                         isHeader
                         className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                       >
-                        VIN/SN
+                        Status
                       </TableCell>
                       <TableCell
                         isHeader
                         className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                       >
-                        License Plate
+                        VIN
                       </TableCell>
                       <TableCell
                         isHeader
                         className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                       >
-                        Make/Model
+                        Make/Model/Year
                       </TableCell>
                       <TableCell
                         isHeader
                         className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                       >
-                        Year
+                        Driver
+                      </TableCell>
+                      <TableCell
+                        isHeader
+                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                      >
+                        Location
+                      </TableCell>
+                      <TableCell
+                        isHeader
+                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                      >
+                        Next Service
                       </TableCell>
                       <TableCell
                         isHeader
@@ -366,103 +368,105 @@ export default function VehicleList() {
                   </TableHeader>
 
                   <TableBody className="divide-y divide-gray-100 dark:divide-white/5">
-                    {vehicles.map((vehicle) => (
-                      <TableRow key={vehicle.id}>
-                        <TableCell className="px-5 py-4 sm:px-6 text-start">
-                          <div className="flex items-center gap-3">
-                            {/* <div className="w-10 h-10 overflow-hidden rounded-lg bg-gray-200 dark:bg-gray-700">
-                              {vehicle.photo ? (
-                                <img
-                                  width={40}
-                                  height={40}
-                                  src={vehicle.photo.startsWith('http') ? vehicle.photo : `/vehicles/photo/${vehicle.photo}`}
-                                  alt={vehicle.vehicle_name}
-                                  className="w-full h-full object-cover"
-                                  onError={(e) => {
-                                    (e.target as HTMLImageElement).src = "/images/vehicle-default.png";
-                                  }}
-                                />
-                              ) : (
-                                <div className="w-full h-full flex items-center justify-center text-gray-400 dark:text-gray-500">
-                                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                  </svg>
-                                </div>
-                              )}
-                            </div> */}
+                    {vehicles.map((vehicle) => {
+                      const vehicleId = formatVehicleIdentifier(vehicle.type, vehicle.id);
+                      
+                      return (
+                        <TableRow key={vehicle.id}>
+                          <TableCell className="px-5 py-4 text-start">
+                            <div className="text-gray-800 text-theme-sm dark:text-white/90 font-medium">
+                              {vehicleId || "—"}
+                            </div>
+                          </TableCell>
+                          <TableCell className="px-5 py-4 text-start">
                             <div>
-                              <span className="block font-medium text-gray-800 text-theme-sm dark:text-white/90">
-                                {vehicle.vehicle_name}
-                              </span>
-                              <span className="block text-gray-500 text-theme-xs dark:text-gray-400">
-                                ID: {vehicle.id}
-                              </span>
-                            </div>
-                          </div>
-                        </TableCell>
-                        <TableCell className="px-4 py-3 text-start">
-                          <Badge
-                            size="sm"
-                            color="primary"
-                          >
-                            {vehicle.type || "N/A"}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                          {vehicle.vin_sn || "N/A"}
-                        </TableCell>
-                        <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                          {vehicle.license_plate || "N/A"}
-                        </TableCell>
-                        <TableCell className="px-4 py-3 text-start">
-                          <div className="space-y-1">
-                            <div className="text-gray-800 text-theme-sm dark:text-white/90">
-                              {vehicle.make || "N/A"}
-                            </div>
-                            {vehicle.model && (
-                              <div className="text-gray-500 text-theme-xs dark:text-gray-400">
-                                {vehicle.model}
+                              <div className="font-semibold text-gray-900 dark:text-white text-sm">
+                                { vehicle.license_plate}
                               </div>
-                            )}
-                          </div>
-                        </TableCell>
-                        <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                          {vehicle.year || "N/A"}
-                        </TableCell>
-                        <TableCell className="px-4 py-3 text-start">
-                          <div className="flex items-center gap-2">
-                          <Button
-                              variant="none"
+                              {
+                                <div className="text-gray-500 dark:text-gray-400 text-xs mt-0.5">
+                                  {vehicle.vehicle_name}
+                                </div>
+                              }
+                            </div>
+                          </TableCell>
+                          <TableCell className="px-5 py-4 text-start">
+                            <Badge
                               size="sm"
-                              onClick={() => handleView(vehicle.id)}
-                              className="view-button hover:scale-105 transition-all duration-300"
-                              startIcon={<EyeIcon />}
+                              color={getStatusColor(vehicle.initial_status)}
                             >
-                             {""}
-                            </Button>
-                            <Button
-                              variant="none"
-                              size="sm"
-                              onClick={() => handleEdit(vehicle.id)}
-                              className="edit-button hover:scale-105 transition-all duration-300"
-                              startIcon={<PencilIcon />}
-                            >
-                             {""}
-                            </Button>
-                            <Button
-                              variant="none"
-                              size="sm"
-                              onClick={() => handleDelete(vehicle.id)}
-                              disabled={deletingId === vehicle.id}
-                              className="delete-button hover:scale-105 transition-all duration-300"
-                              startIcon={<TrashBinIcon />}
-                            >
-                             {""}
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
+                              {getStatusLabel(vehicle.initial_status)}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="px-5 py-4 text-start">
+                            <div className="text-gray-800 text-theme-sm dark:text-white/90">
+                              {vehicle.vin || "—"}
+                            </div>
+                          </TableCell>
+                          <TableCell className="px-5 py-4 text-start">
+                            <div className="text-gray-800 text-theme-sm dark:text-white/90">
+                              <div className="font-semibold text-gray-900 dark:text-white text-sm">
+                                {`${vehicle.make} - ${vehicle.model}`}
+                              </div>
+                              
+                              <div className="text-gray-500 dark:text-gray-400 text-xs mt-0.5">
+                                {vehicle.year}
+                              </div>
+                              
+
+
+                            </div>
+                          </TableCell>
+                          <TableCell className="px-5 py-4 text-start">
+                            <div className="text-gray-800 text-theme-sm dark:text-white/90">
+                              {vehicle.driver ? `${vehicle.driver.first_name || ""} ${vehicle.driver.last_name || ""}`.trim() : "—"}
+                            </div>
+                          </TableCell>
+                          <TableCell className="px-5 py-4 text-start">
+                            <div className="text-gray-800 text-theme-sm dark:text-white/90">
+                              {vehicle.primary_location || "—"}
+                            </div>
+                          </TableCell>
+                          <TableCell className="px-5 py-4 text-start">
+                            <div className="text-gray-800 text-theme-sm dark:text-white/90">
+                              {vehicle.next_service_date ? formatDate(vehicle.next_service_date) : "—"}
+                            </div>
+                          </TableCell>
+                          <TableCell className="px-5 py-4 text-start">
+                            <div className="flex items-center gap-2">
+                              <Button
+                                variant="none"
+                                size="sm"
+                                onClick={() => handleView(vehicle.id)}
+                                className="view-button hover:scale-105 transition-all duration-300"
+                                startIcon={<EyeIcon />}
+                              >
+                                {""}
+                              </Button>
+                              <Button
+                                variant="none"
+                                size="sm"
+                                onClick={() => handleEdit(vehicle.id)}
+                                className="edit-button hover:scale-105 transition-all duration-300"
+                                startIcon={<PencilIcon />}
+                              >
+                                {""}
+                              </Button>
+                              <Button
+                                variant="none"
+                                size="sm"
+                                onClick={() => handleDelete(vehicle.id)}
+                                disabled={deletingId === vehicle.id}
+                                className="delete-button hover:scale-105 transition-all duration-300"
+                                startIcon={<TrashBinIcon />}
+                              >
+                                {""}
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
                   </TableBody>
                 </Table>
                 {renderPagination()}

@@ -111,39 +111,39 @@ class VendorController extends Controller
                 'zip' => 'nullable',
                 'email' => 'required|email|max:255|unique:vendors,email',
                 'company_contact' => 'required|unique:vendors',
-                'gst_no' => 'nullable|max:15|unique:vendors,gst_no,',
-                'nsc_code' => 'nullable|unique:vendors,nsc_code,',
-                'vendor_file' => 'nullable|mimes:jpeg,jpg,png,pdf,zip|max:5120'
+                'website' => 'nullable|url|max:255',
+                'labels' => 'nullable|string|max:255',
+                'notes' => 'nullable|string',
+                'contact_name' => 'nullable|string|max:255',
+                'contact_phone' => 'nullable|string|max:20',
+                'contact_email' => 'nullable|email|max:255',
+                'charging' => 'nullable|boolean',
+                'fuel' => 'nullable|boolean',
+                'service' => 'nullable|boolean',
+                'vehicle' => 'nullable|boolean',
             ]);
-            $fileName = "";
-            if ($request->file('vendor_file')) {
-                $file = $request->file('vendor_file');
-                if ($file->isValid()) {
-                    $filePath = $file->getRealPath();
-                    $fileName = time() . '.' . $request->vendor_file->extension();
-                    $request->vendor_file->move(public_path('vendor'), $fileName);
-                    $filePath = public_path('vendor/' . $fileName);
-                    chmod($filePath, 0755);   //  // Adjust the storage path as needed
-                } else {
-                    return response()->json(['status' => 'error', 'message' => ['vendor_file' => 'Invalid file. Supported formats include .jpg, .png, .jpeg, .pdf, and .zip, with a maximum file size of 2MB.']]);
-                }
-            }
             $vendor = new Vendor;
             $vendor->user_id = Auth::user()->id;
             $vendor->first_name = $validatedData['first_name'] ? $validatedData['first_name'] : '';
             $vendor->company_contact = $validatedData['company_contact'] ? $validatedData['company_contact'] : '';
             $vendor->email = $validatedData['email'] ? $validatedData['email'] : '';
+            $vendor->website = $validatedData['website'] ?? null;
+            $vendor->labels = $validatedData['labels'] ?? null;
             $vendor->address = $validatedData['address'] ? $validatedData['address'] : '';
             $vendor->latitude = $validatedData['latitude'] ? $validatedData['latitude'] : "";
-            $vendor->longitude = $validatedData['longitude'] ? $validatedData['latitude'] : "";
+            $vendor->longitude = $validatedData['longitude'] ? $validatedData['longitude'] : "";
             $vendor->city = $validatedData['city'] ? $validatedData['city'] : '';
             $vendor->state = $validatedData['state'] ? $validatedData['state'] : '';
             $vendor->country = $validatedData['country'] ? $validatedData['country'] : '';
             $vendor->zip = $validatedData['zip'] ? $validatedData['zip'] : '';
-            $vendor->gst_no = $validatedData['gst_no'] ? $validatedData['gst_no'] : '';
-            $vendor->nsc_code = $validatedData['nsc_code'] ? $validatedData['nsc_code'] : '';
-            $vendor->document = $fileName;
-            $vendor->vendor_no = is_numeric($request->vendor_no) ? (int) $request->vendor_no : null;
+            $vendor->notes = $validatedData['notes'] ?? null;
+            $vendor->contact_name = $validatedData['contact_name'] ?? null;
+            $vendor->contact_phone = $validatedData['contact_phone'] ?? null;
+            $vendor->contact_email = $validatedData['contact_email'] ?? null;
+            $vendor->charging = $validatedData['charging'] ?? false;
+            $vendor->fuel = $validatedData['fuel'] ?? false;
+            $vendor->service = $validatedData['service'] ?? false;
+            $vendor->vehicle = $validatedData['vehicle'] ?? false;
 
             if ($vendor->save()) {
                 return response()->json(['status' => true, 'message' => 'Vendor saved successfully']);
@@ -202,52 +202,43 @@ class VendorController extends Controller
                 'zip' => 'nullable',
                 'email' => 'required|email|max:255|unique:vendors,email,' . $id,
                 'company_contact' => 'required|unique:vendors,company_contact,' . $id,
-                'gst_no' => 'nullable|max:15|unique:vendors,gst_no,' . $id,
-                'nsc_code' => 'nullable',
-                'vendor_file' => 'nullable|mimes:jpeg,jpg,png,pdf,zip|max:5120'
+                'website' => 'nullable|url|max:255',
+                'labels' => 'nullable|string|max:255',
+                'notes' => 'nullable|string',
+                'contact_name' => 'nullable|string|max:255',
+                'contact_phone' => 'nullable|string|max:20',
+                'contact_email' => 'nullable|email|max:255',
+                'charging' => 'nullable|boolean',
+                'fuel' => 'nullable|boolean',
+                'service' => 'nullable|boolean',
+                'vehicle' => 'nullable|boolean',
             ]);
 
             $vendor = Vendor::find($id);
             if (!$vendor) {
                 return response()->json(['status' => false, 'message' => 'Vendor not found']);
             }
-            $fileName = "";
-            if ($request->has('vendor_exist_file')) {
-                $fileName = $request->vendor_exist_file;
-            } else if ($request->file('vendor_file')) {
-                $directory = public_path('vendor');
-                if (File::isDirectory($directory)) {
-                    $filePath = $directory . '/' . $vendor->document;
-                    if (File::exists($filePath)) {
-                        File::delete($filePath);
-                    }
-                }
-                $file = $request->file('vendor_file');
-                if ($file->isValid()) {
-                    $filePath = $file->getRealPath();
-                    $fileName = time() . '.' . $request->vendor_file->extension();
-                    $request->vendor_file->move(public_path('vendor'), $fileName);
-                    $filePath = public_path('vendor/' . $fileName);
-                    chmod($filePath, 0755);   //  // Adjust the storage path as needed
-                } else {
-                    return response()->json(['status' => 'error', 'message' => ['vendor_file' => 'Invalid file. Supported formats include .jpg, .png, .jpeg, .pdf, and .zip, with a maximum file size of 2MB.']]);
-                }
-            }
             $vendor->user_id = Auth::user()->id;
             $vendor->first_name = $validatedData['first_name'] ? $validatedData['first_name'] : '';
             $vendor->company_contact = $validatedData['company_contact'] ? $validatedData['company_contact'] : '';
             $vendor->email = $validatedData['email'] ? $validatedData['email'] : '';
+            $vendor->website = $validatedData['website'] ?? null;
+            $vendor->labels = $validatedData['labels'] ?? null;
             $vendor->address = $validatedData['address'] ? $validatedData['address'] : '';
             $vendor->latitude = $validatedData['latitude'] ? $validatedData['latitude'] : "";
-            $vendor->longitude = $validatedData['longitude'] ? $validatedData['latitude'] : "";
+            $vendor->longitude = $validatedData['longitude'] ? $validatedData['longitude'] : "";
             $vendor->city = $validatedData['city'] ? $validatedData['city'] : '';
             $vendor->state = $validatedData['state'] ? $validatedData['state'] : '';
             $vendor->country = $validatedData['country'] ? $validatedData['country'] : '';
             $vendor->zip = $validatedData['zip'] ? $validatedData['zip'] : '';
-            $vendor->gst_no = $validatedData['gst_no'] ? $validatedData['gst_no'] : '';
-            $vendor->nsc_code = $validatedData['nsc_code'] ? $validatedData['nsc_code'] : '';
-            $vendor->document = $fileName;
-            $vendor->vendor_no = is_numeric($request->vendor_no) ? (int) $request->vendor_no : null;
+            $vendor->notes = $validatedData['notes'] ?? null;
+            $vendor->contact_name = $validatedData['contact_name'] ?? null;
+            $vendor->contact_phone = $validatedData['contact_phone'] ?? null;
+            $vendor->contact_email = $validatedData['contact_email'] ?? null;
+            $vendor->charging = $validatedData['charging'] ?? false;
+            $vendor->fuel = $validatedData['fuel'] ?? false;
+            $vendor->service = $validatedData['service'] ?? false;
+            $vendor->vehicle = $validatedData['vehicle'] ?? false;
             if ($vendor->save()) {
                 return response()->json(['status' => true, 'message' => 'Vendor update successfully']);
             } else {

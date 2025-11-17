@@ -3,14 +3,14 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\Auth\LoginController;
 
+
+Route::get('/', function(){  return view('auth.login');});
+// Route::get('/login', function(){  return view('auth.login');});
+
+Route::get('/logout', [LoginController::class, 'logout'])->name('logout');
 Auth::routes(['register' => false ]);
-
- Route::get('/', [HomeController::class, 'index']);
-// Route::get('/login', [HomeController::class, 'index'])->name('login');
-// Route::get('/signin', [HomeController::class, 'index'])->name('signin');
-Route::get('/logout', function () {  Auth::logout();  return redirect('/login'); })->name('logout');
-
 
 Route::middleware(['page.access'])->group(function () {
 
@@ -44,6 +44,11 @@ Route::middleware(['page.access'])->group(function () {
     Route::get('/issues/create', [HomeController::class, 'index']);
     Route::get('/issues/{id}', [HomeController::class, 'index'])->where('id', '[0-9]+');
     Route::get('/issues/{id}/edit', [HomeController::class, 'index'])->where('id', '[0-9]+');
+
+    Route::get('/vendors', [HomeController::class, 'index']);
+    Route::get('/vendors/create', [HomeController::class, 'index']);
+    Route::get('/vendors/{id}', [HomeController::class, 'index'])->where('id', '[0-9]+');
+    Route::get('/vendors/{id}/edit', [HomeController::class, 'index'])->where('id', '[0-9]+');
 
     
     Route::get('profile', [HomeController::class, 'index']);

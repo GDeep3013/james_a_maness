@@ -23,7 +23,7 @@ class VehicleController extends Controller
     public function index(Request $request)
     {
         $tableColumns = Schema::getColumnListing('vehicals');
-        $query = Vehical::orderBy('id', 'desc');
+        $query = Vehical::with(['driver:id,first_name,last_name'])->orderBy('id', 'desc');
         $searchTerm = $request->search;
 
 

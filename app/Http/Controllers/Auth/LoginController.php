@@ -91,8 +91,8 @@ class LoginController extends Controller
 
     public function logout(Request $request)
     {
-        if ($request->user()) {
-            $request->user()->currentAccessToken()->delete();
+        if ($request->user() && Auth::check()) {
+            //@$request->user()->currentAccessToken()->delete();
         }
 
         $this->guard()->logout();

@@ -8,6 +8,13 @@ import { ChevronLeftIcon, TickIcon, AngleRightIcon } from '../../icons';
 import TextArea from '../../components/form/input/TextArea';
 import { typeOptions, fuelTypeOptions, transmissionOptions, statusOptions, addVehicleSteps, defaultVehicleFormData, VehicleFormData } from '../../constants/vehicleConstants';
 import { vehicleService } from '../../services/vehicleService';
+import { contactService } from '../../services/contactService';
+
+interface Contact {
+  id: number;
+  first_name: string;
+  last_name?: string;
+}
 
 export default function EditVehicle() {
   const navigate = useNavigate();
@@ -18,8 +25,25 @@ export default function EditVehicle() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [generalError, setGeneralError] = useState<string>("");
+  const [contacts, setContacts] = useState<Contact[]>([]);
+  const [isLoadingContacts, setIsLoadingContacts] = useState(false);
+
+  const fetchContacts = async () => {
+    setIsLoadingContacts(true);
+    try {
+      const response = await contactService.getAll({ page: 1 });
+      if (response.data?.status && response.data?.contact?.data) {
+        setContacts(response.data.contact.data);
+      }
+    } catch (error) {
+      console.error("Error fetching contacts:", error);
+    } finally {
+      setIsLoadingContacts(false);
+    }
+  };
 
   useEffect(() => {
+    fetchContacts();
     const fetchVehicleData = async () => {
       if (!id) {
         setGeneralError("Vehicle ID is required");
@@ -597,13 +621,17 @@ export default function EditVehicle() {
 
                   <div>
                     <Label htmlFor="assigned_driver">Assigned Driver</Label>
-                    <Input
-                      type="text"
-                      id="assigned_driver"
-                      name="assigned_driver"
-                      placeholder="Select driver (optional)"
-                      value={formData.assigned_driver}
-                      onChange={(e) => handleInputChange('assigned_driver', e.target.value)}
+                    <Select
+                      options={[
+                        { value: "", label: "Select driver (optional)" },
+                        ...contacts.map(contact => ({
+                          value: contact.id.toString(),
+                          label: `${contact.first_name} ${contact.last_name || ""}`.trim()
+                        }))
+                      ]}
+                      placeholder={isLoadingContacts ? "Loading contacts..." : "Select driver (optional)"}
+                      onChange={(value) => handleInputChange('assigned_driver', value)}
+                      defaultValue={formData.assigned_driver}
                     />
                     {errors.assigned_driver && (
                       <p className="mt-1 text-xs text-error-500">{errors.assigned_driver}</p>

@@ -34,6 +34,7 @@ import ViewServiceTask from "./pages/ServiceTasks/ViewServiceTask";
 import IssuesList from "./pages/Issues/IssuesList";
 import CreateIssue from "./pages/Issues/CreateIssue";
 import IssueDetails from "./pages/Issues/IssueDetails";
+import CreateVendor from "./pages/vendor/CreateVendor";
 
 export default function App() {
   return (
@@ -209,6 +210,39 @@ export default function App() {
               }
             />
 
+            <Route
+              path="/vendors"
+              element={
+                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                  <CreateVendor />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/vendors/create"
+              element={
+                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                  <CreateVendor />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/vendors/:id"
+              element={
+                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                  <CreateVendor />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/vendors/:id/edit"
+              element={
+                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                  <CreateVendor />
+                </ProtectedRoute>
+              }
+            />
+            
 
 
 

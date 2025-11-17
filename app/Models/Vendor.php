@@ -9,29 +9,40 @@ class Vendor extends Model
 {
     use HasFactory;
 
+    protected $table = 'vendors';
+
     protected $fillable = [
-        'user_id',
-        'first_name',
-        'company_contact',
+        'name',
         'email',
+        'phone',
+        'website',
         'address',
+        'latitude',
+        'longitude',
         'city',
         'state',
         'country',
         'zip',
-        'gst_no',
-        'nsc_code',
-        'document',
-        'longitude',
-        'latitude',
-        'vendor_no',
+        'notes',
+        'contact_name',
+        'contact_phone',
+        'contact_email',
+        'charging',
+        'fuel',
+        'service',
+        'vehicle',
     ];
-    public function routes()
+
+    protected $casts = [
+        'charging' => 'boolean',
+        'fuel' => 'boolean',
+        'service' => 'boolean',
+        'vehicle' => 'boolean',
+    ];
+
+    public function workOrders()
     {
-        return $this->hasMany(Trips::class, 'vendor_id', 'id');
-    }
-    public function invoice()
-    {
-        return $this->hasMany(Invoice::class);
+        return $this->hasMany(WorkOrder::class, 'vendor_id', 'id');
     }
 }
+

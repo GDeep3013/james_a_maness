@@ -31,4 +31,11 @@ class Vehical extends Model
         'department',
     ];
 
+
+
+    public function driver()
+    {
+        return $this->belongsTo(Contact::class, 'assigned_driver', 'id');
+    }
+
 }

@@ -30,25 +30,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [loading, setLoading] = useState(true);
 
   const logout = useCallback(() => {
-    const storedToken = localStorage.getItem("auth_token");
-    if (storedToken) {
-      fetch("/api/auth/logout", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${storedToken}`,
-          Accept: "application/json",
-        },
-        credentials: "include",
-      }).catch(() => {});
-    }
-
-    setUser(null);
-    setPermissions([]);
-    setToken(null);
-    localStorage.removeItem("auth_token");
-    localStorage.removeItem("auth_user");
-    localStorage.removeItem("auth_permissions");
-    window.location.href = "/login";
+    // setUser(null);
+    // setPermissions([]);
+    // setToken(null);
+    // localStorage.removeItem("auth_token");
+    // localStorage.removeItem("auth_user");
+    // localStorage.removeItem("auth_permissions");
+    window.location.href = "/logout";
   }, []);
 
   const fetchUser = useCallback(async () => {
