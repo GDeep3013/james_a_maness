@@ -43,7 +43,7 @@ const AppHeader: React.FC = () => {
   return (
     <header className="sticky top-0 flex w-full bg-white z-99999 shadow-theme-md">
       <div className="flex flex-col items-center justify-between grow lg:flex-row lg:px-6">
-        <div className="flex items-center justify-between w-full gap-2 px-3 py-4 border-b border-gray-200 dark:border-gray-800 sm:gap-4 lg:justify-normal lg:border-b-0 lg:px-0 lg:py-5">
+        <div className="flex items-center justify-between w-full gap-2 px-3 py-4 border-b border-gray-200 dark:border-gray-800 sm:gap-4 lg:justify-normal lg:border-b-0 lg:px-0 min-w-[1024px]:py-5">
           <button
             className="items-center justify-center w-10 h-10 text-gray-500 border-gray-200 rounded-lg z-99999 dark:border-gray-800 lg:flex dark:text-gray-400 lg:h-11 lg:w-11 lg:border toggle-sidebar-icon"
             onClick={handleToggle}

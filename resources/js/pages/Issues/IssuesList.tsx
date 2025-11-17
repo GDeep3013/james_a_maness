@@ -324,7 +324,7 @@ export default function IssuesList() {
           <h1 className="text-2xl font-semibold text-gray-800 dark:text-white/90">Issues</h1>
           <Button
             variant="primary"
-            size="md"
+            size="sm"
             onClick={handleCreate}
           >
             + Create Issue
