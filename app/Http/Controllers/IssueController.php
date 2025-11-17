@@ -16,19 +16,12 @@ class IssueController extends Controller
     {
         $tableColumns = Schema::getColumnListing('issues');
         $query = Issue::with([
-            'workOrder:id,status',
             'vehicle:id,vehicle_name',
-            'assignedTo:id,first_name,last_name'
+            'assignedTo:id,first_name,last_name',
+            'workOrder:id,status'
         ])->orderBy('id', 'desc');
         
         $searchTerm = $request->search;
-
-        if ($request->has('work_order_id') && !empty($request->work_order_id)) {
-            $query->where('work_order_id', $request->work_order_id);
-        }
-        if ($request->has('vehicle_id') && !empty($request->vehicle_id)) {
-            $query->where('vehicle_id', $request->vehicle_id);
-        }
 
         if ($request->has('status') && !empty($request->status)) {
             $query->where('status', $request->status);
@@ -75,7 +68,7 @@ class IssueController extends Controller
                 'assigned_to' => 'nullable|exists:contacts,id',
                 'due_date' => 'nullable|date',
                 'primary_meter_due' => 'nullable|numeric',
-                'status' => 'nullable|in:Open,Resolved,Closed',
+                'status' => 'nullable|in:Open,Overdue,Resolved,Closed',
             ]);
 
             DB::beginTransaction();
@@ -106,7 +99,7 @@ class IssueController extends Controller
                 return response()->json([
                     'status' => true, 
                     'message' => 'Issue created successfully',
-                    'data' => $issue->load(['workOrder', 'vehicle', 'assignedTo'])
+                    'data' => $issue->load(['vehicle', 'assignedTo', 'workOrder'])
                 ]);
             } else {
                 DB::rollBack();
@@ -146,9 +139,9 @@ class IssueController extends Controller
         }
 
         $issue = Issue::with([
-            'workOrder:id,status',
             'vehicle:id,vehicle_name',
-            'assignedTo:id,first_name,last_name'
+            'assignedTo:id,first_name,last_name',
+            'workOrder:id,status'
         ])->where('id', $id)->first();
 
         if ($issue) {
@@ -175,9 +168,9 @@ class IssueController extends Controller
         }
 
         $issue = Issue::with([
-            'workOrder:id,status',
             'vehicle:id,vehicle_name',
-            'assignedTo:id,first_name,last_name'
+            'assignedTo:id,first_name,last_name',
+            'workOrder:id,status'
         ])->where('id', $id)->first();
 
         if ($issue) {
@@ -227,7 +220,7 @@ class IssueController extends Controller
                 'assigned_to' => 'nullable|exists:contacts,id',
                 'due_date' => 'nullable|date',
                 'primary_meter_due' => 'nullable|numeric',
-                'status' => 'nullable|in:Open,Resolved,Closed',
+                'status' => 'nullable|in:Open,Overdue,Resolved,Closed',
             ]);
 
             DB::beginTransaction();
@@ -284,7 +277,7 @@ class IssueController extends Controller
                 return response()->json([
                     'status' => true, 
                     'message' => 'Issue updated successfully',
-                    'data' => $issue->load(['workOrder', 'vehicle', 'assignedTo'])
+                    'data' => $issue->load(['vehicle', 'assignedTo', 'workOrder'])
                 ]);
             } else {
                 DB::rollBack();

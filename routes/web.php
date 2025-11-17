@@ -40,6 +40,11 @@ Route::middleware(['page.access'])->group(function () {
     Route::get('/service-tasks/{id}', [HomeController::class, 'index'])->where('id', '[0-9]+');
     Route::get('/service-tasks/{id}/edit', [HomeController::class, 'index'])->where('id', '[0-9]+');
 
+    Route::get('/issues', [HomeController::class, 'index']);
+    Route::get('/issues/create', [HomeController::class, 'index']);
+    Route::get('/issues/{id}', [HomeController::class, 'index'])->where('id', '[0-9]+');
+    Route::get('/issues/{id}/edit', [HomeController::class, 'index'])->where('id', '[0-9]+');
+
     
     Route::get('profile', [HomeController::class, 'index']);
 });

@@ -43,6 +43,15 @@ export const REPAIR_PRIORITY_CLASS_OPTIONS: SelectOption[] = [
 
 export const ISSUE_STATUS_OPTIONS: SelectOption[] = [
   { value: "Open", label: "Open" },
+  { value: "Overdue", label: "Overdue" },
+  { value: "Resolved", label: "Resolved" },
+  { value: "Closed", label: "Closed" },
+];
+
+export const ISSUE_STATUS_FILTER_OPTIONS: SelectOption[] = [
+  { value: "", label: "All Status" },
+  { value: "Open", label: "Open" },
+  { value: "Overdue", label: "Overdue" },
   { value: "Resolved", label: "Resolved" },
   { value: "Closed", label: "Closed" },
 ];

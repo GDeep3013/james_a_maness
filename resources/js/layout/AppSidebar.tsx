@@ -13,7 +13,8 @@ import {
   VendorIcon,
   GasStationIcon,
   PartsIcon,
-  ReportsIcon
+  ReportsIcon,
+  IssuesIcon
 } from "../icons";
 import { useSidebar } from "../context/SidebarContext";
 import { useAuth } from "../context/AuthContext";
@@ -26,12 +27,23 @@ type NavItem = {
   subItems?: { name: string; path: string; pro?: boolean; new?: boolean; allowedRoles?: string[] }[];
 };
 
+
+const ContactMenus : NavItem[] =[
+  {
+    icon: <IssuesIcon />,
+    name: "Issues",
+    path: "/issues",
+    allowedRoles: ["Contact"],
+  }
+]
+
 const navItems: NavItem[] = [
   {
     icon: <GridIcon />,
     name: "Dashboard",
     path: "/",
   },
+  ...ContactMenus,
   {
     icon: <CarIcon />,
     name: "Vehicles",
@@ -54,7 +66,7 @@ const navItems: NavItem[] = [
       { name: "Service Reminders", path: "/maintenance-reminders", pro: false, allowedRoles: ["Admin", "Manager"] },
       { name: "Services", path: "/maintenance-services", pro: false, allowedRoles: ["Admin", "Manager"] },
       { name: "Service Tasks", path: "/service-tasks", pro: false, allowedRoles: ["Admin", "Manager"] },
-      { name: "Issues", path: "/maintenance-issues", pro: false, allowedRoles: ["Admin", "Manager"] },
+      { name: "Issues", path: "/issues", pro: false, allowedRoles: ["Admin", "Manager"] },
       { name: "Schedules", path: "/maintenance-schedules", pro: false, allowedRoles: ["Admin", "Manager"] },
     ],
   },

@@ -48,7 +48,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     localStorage.removeItem("auth_token");
     localStorage.removeItem("auth_user");
     localStorage.removeItem("auth_permissions");
-    window.location.href = "/signin";
+    window.location.href = "/login";
   }, []);
 
   const fetchUser = useCallback(async () => {
