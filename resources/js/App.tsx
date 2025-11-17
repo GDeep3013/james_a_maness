@@ -28,6 +28,12 @@ import AddVehicle from "./pages/Vehicles/AddVehicle";
 import EditVehicle from "./pages/Vehicles/EditVehicle";
 import CreateWorkOrder from "./pages/WorkOrders/CreateWorkOrder";
 import WorkOrdersList from "./pages/WorkOrders/WorkOrdersList";
+import ServiceTasksList from "./pages/ServiceTasks/ServiceTasksList";
+import CreateServiceTask from "./pages/ServiceTasks/CreateServiceTask";
+import ViewServiceTask from "./pages/ServiceTasks/ViewServiceTask";
+import IssuesList from "./pages/Issues/IssuesList";
+import CreateIssue from "./pages/Issues/CreateIssue";
+import IssueDetails from "./pages/Issues/IssueDetails";
 
 export default function App() {
   return (
@@ -35,11 +41,6 @@ export default function App() {
       <Router>
         <ScrollToTop />
         <Routes>
-          {/* Auth Layout */}
-          {/* <Route path="/signin" element={<SignIn />} />
-          <Route path="/login" element={<SignIn />} /> */}
-          {/* <Route path="/signup" element={<SignUp />} /> */}
-
           {/* Dashboard Layout - Protected Routes */}
           <Route
             element={
@@ -138,6 +139,72 @@ export default function App() {
               element={
                 <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
                   <CreateWorkOrder />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/service-tasks"
+              element={
+                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                  <ServiceTasksList />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/service-tasks/create"
+              element={
+                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                  <CreateServiceTask />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/service-tasks/:id"
+              element={
+                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                  <ViewServiceTask />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/service-tasks/:id/edit"
+              element={
+                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                  <CreateServiceTask />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/issues"
+              element={
+                <ProtectedRoute requiredRoles={["Admin", "Manager" , "Contact" ]}>
+                  <IssuesList />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/issues/create"
+              element={
+                <ProtectedRoute requiredRoles={["Admin", "Manager" ,"Contact"]}>
+                  <CreateIssue />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/issues/:id"
+              element={
+                <ProtectedRoute requiredRoles={["Admin", "Manager" ,"Contact"]}>
+                  <IssueDetails />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/issues/:id/edit"
+              element={
+                <ProtectedRoute requiredRoles={["Admin", "Manager" ,"Contact"]}>
+                  <CreateIssue />
                 </ProtectedRoute>
               }
             />

@@ -11,37 +11,31 @@ import Badge from "../../components/ui/badge/Badge";
 import Input from "../../components/form/input/InputField";
 import Button from "../../components/ui/button/Button";
 import PageMeta from "../../components/common/PageMeta";
-import { workOrderService } from "../../services/workOrderService";
-import { WORK_ORDER_STATUS_FILTER_OPTIONS } from "../../constants/selectOptions";
-import { PencilIcon, TrashBinIcon, ExportIcon, EyeIcon } from "../../icons";
+import { issueService } from "../../services/issueService";
+import { LABEL_OPTIONS } from "../../constants/selectOptions";
+import { EyeIcon, PencilIcon, TrashBinIcon } from "../../icons";
 import Select from "../../components/form/Select";
+import { contactService } from "../../services/contactService";
 
-interface WorkOrder {
+interface Issue {
   id: number;
   vehicle_id?: number;
   vehicle?: {
     vehicle_name?: string;
   };
   status?: string;
-  repair_priority_class?: string;
+  priority?: string;
+  summary?: string;
+  source?: string;
   issue_date?: string;
+  reported_date?: string;
   issued_by?: string;
-  scheduled_start_date?: string;
-  actual_start_date?: string;
-  expected_completion_date?: string;
-  actual_completion_date?: string;
   assigned_to?: {
     id?: number;
     first_name?: string;
     last_name?: string;
   };
-  vendor_id?: number;
-  vendor?: {
-    first_name?: string;
-    company_contact?: string;
-  };
-  invoice_number?: string;
-  po_number?: string;
+  labels?: string | string[];
   created_at?: string;
 }
 
@@ -52,10 +46,10 @@ interface PaginationData {
   total: number;
 }
 
-interface WorkOrdersResponse {
+interface IssuesResponse {
   status: boolean;
-  work_orders?: {
-    data: WorkOrder[];
+  issues?: {
+    data: Issue[];
     current_page: number;
     last_page: number;
     per_page: number;
@@ -63,13 +57,22 @@ interface WorkOrdersResponse {
   };
 }
 
-export default function WorkOrdersList() {
+interface Contact {
+  id: number;
+  first_name: string;
+  last_name?: string;
+}
+
+export default function IssuesList() {
   const navigate = useNavigate();
-  const [workOrders, setWorkOrders] = useState<WorkOrder[]>([]);
+  const [issues, setIssues] = useState<Issue[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>("");
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("");
+  const [activeTab, setActiveTab] = useState<"All" | "Open" | "Overdue" | "Resolved" | "Closed">("All");
+  const [assignedToFilter, setAssignedToFilter] = useState("");
+  const [labelFilter, setLabelFilter] = useState("");
+  const [contacts, setContacts] = useState<Contact[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [pagination, setPagination] = useState<PaginationData>({
     current_page: 1,
@@ -79,99 +82,141 @@ export default function WorkOrdersList() {
   });
   const [deletingId, setDeletingId] = useState<number | null>(null);
 
-  const fetchWorkOrders = useCallback(async (page: number = 1, search: string = "", status: string = "") => {
+  const activeFiltersCount = [
+    assignedToFilter,
+    labelFilter,
+  ].filter(Boolean).length;
+
+  useEffect(() => {
+    const fetchContacts = async () => {
+      try {
+        const response = await contactService.getAll({});
+        if (response.data?.status && response.data?.contact?.data) {
+          setContacts(response.data.contact.data);
+        }
+      } catch {
+        // Error fetching contacts, continue without them
+      }
+    };
+    fetchContacts();
+  }, []);
+
+  const fetchIssues = useCallback(async (page: number = 1, search: string = "", status: string = "") => {
     setLoading(true);
     setError("");
     try {
-      const response = await workOrderService.getAll({ page, search, status });
-      const data = response.data as WorkOrdersResponse;
+      const response = await issueService.getAll({ page, search, status });
+      const data = response.data as IssuesResponse;
       
-      if (data.status && data.work_orders) {
-        setWorkOrders(data.work_orders.data || []);
+      if (data.status && data.issues) {
+        setIssues(data.issues.data || []);
         setPagination({
-          current_page: data.work_orders.current_page,
-          last_page: data.work_orders.last_page,
-          per_page: data.work_orders.per_page,
-          total: data.work_orders.total,
+          current_page: data.issues.current_page,
+          last_page: data.issues.last_page,
+          per_page: data.issues.per_page,
+          total: data.issues.total,
         });
       } else {
-        setError("Failed to load work orders");
-        setWorkOrders([]);
+        setError("Failed to load issues");
+        setIssues([]);
       }
     } catch {
-      setError("An error occurred while loading work orders");
-      setWorkOrders([]);
+      setError("An error occurred while loading issues");
+      setIssues([]);
     } finally {
       setLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    fetchWorkOrders(currentPage, searchTerm, statusFilter);
-  }, [currentPage, searchTerm, statusFilter, fetchWorkOrders]);
+    const status = activeTab === "All" ? "" : activeTab;
+    fetchIssues(currentPage, searchTerm, status);
+  }, [currentPage, searchTerm, activeTab, fetchIssues]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setCurrentPage(1);
-    fetchWorkOrders(1, searchTerm, statusFilter);
+    const status = activeTab === "All" ? "" : activeTab;
+    fetchIssues(1, searchTerm, status);
+  };
+
+  const handleView = (id: number) => {
+    navigate(`/issues/${id}`);
+  };
+
+  const handleEdit = (id: number) => {
+    navigate(`/issues/${id}/edit`);
   };
 
   const handleDelete = async (id: number) => {
-    if (!window.confirm("Are you sure you want to delete this work order?")) {
+    if (!window.confirm("Are you sure you want to delete this issue?")) {
       return;
     }
 
     setDeletingId(id);
     try {
-      await workOrderService.delete(id);
-      fetchWorkOrders(currentPage, searchTerm, statusFilter);
+      await issueService.delete(id);
+      const status = activeTab === "All" ? "" : activeTab;
+      fetchIssues(currentPage, searchTerm, status);
     } catch {
-      alert("Failed to delete work order. Please try again.");
+      alert("Failed to delete issue. Please try again.");
     } finally {
       setDeletingId(null);
     }
   };
 
-  const handleEdit = (id: number) => {
-    navigate(`/work-orders/${id}`);
-  };
-
-  const handleView = (id: number) => {
-    navigate(`/work-orders/${id}`);
-  };
-
   const handleCreate = () => {
-    navigate("/work-orders/create");
-  };
-
-  const handleExport = () => {
-    
+    navigate("/issues/create");
   };
 
   const formatDate = (dateString?: string) => {
-    if (!dateString) return "N/A";
+    if (!dateString) return "—";
     try {
-      return new Date(dateString).toLocaleDateString();
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' });
     } catch {
       return dateString;
+    }
+  };
+
+  const getPriorityColor = (priority?: string) => {
+    switch (priority?.toLowerCase()) {
+      case "critical":
+        return "bg-red-500 text-white";
+      case "high":
+        return "bg-orange-500 text-white";
+      case "medium":
+        return "bg-blue-500 text-white";
+      case "low":
+        return "bg-gray-300 text-gray-800";
+      default:
+        return "bg-gray-200 text-gray-600";
     }
   };
 
   const getStatusColor = (status?: string) => {
     switch (status) {
       case "Open":
-        return "warning";
-      case "In Progress":
-        return "info";
-      case "Completed":
-        return "success";
-      case "Cancelled":
         return "error";
+      case "Overdue":
+        return "error";
+      case "In Progress":
+        return "warning";
+      case "Resolved":
+        return "info";
+      case "Closed":
+        return "warning";
       default:
         return "warning";
     }
   };
 
+  const contactOptions = contacts.map(contact => ({
+    value: contact.id.toString(),
+    label: `${contact.first_name} ${contact.last_name || ""}`.trim()
+  }));
+
+  const labelOptions = LABEL_OPTIONS.filter(opt => opt.value !== "");
 
   const renderPagination = () => {
     const pages: number[] = [];
@@ -211,7 +256,7 @@ export default function WorkOrdersList() {
         </div>
         <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
           <div>
-            <p className="text-sm text-gray-700">
+            <p className="text-sm text-gray-700 dark:text-gray-300">
               Showing{" "}
               <span className="font-medium">
                 {pagination.total === 0
@@ -270,52 +315,111 @@ export default function WorkOrdersList() {
   return (
     <>
       <PageMeta
-        title="Work Orders List"
-        description="Manage and view all work orders"
+        title="Issues List"
+        description="Manage and view all issues"
       />
 
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold text-gray-800 dark:text-white/90">Work Orders</h1>
-          </div>
+          <h1 className="text-2xl font-semibold text-gray-800 dark:text-white/90">Issues</h1>
           <Button
             variant="primary"
             size="md"
             onClick={handleCreate}
           >
-            + Create Work Order
+            + Create Issue
           </Button>
+        </div>
+
+        <div className="border-b border-gray-200 dark:border-white/10">
+          <nav className="flex space-x-8" aria-label="Tabs">
+            {(["All", "Open", "Overdue", "Resolved", "Closed"] as const).map((tab) => (
+              <button
+                key={tab}
+                onClick={(e) => {
+                  e.preventDefault();
+                  setActiveTab(tab);
+                  setCurrentPage(1);
+                }}
+                className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                  activeTab === tab
+                    ? "border-brand-500 text-brand-600 dark:text-brand-400"
+                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300"
+                }`}
+              >
+                {tab}
+              </button>
+            ))}
+          </nav>
         </div>
 
         <form onSubmit={handleSearch} className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl p-4">
           <div className="flex flex-wrap items-center gap-4">
-            <div className="flex-1 max-w-[50%]">
-              <Input
-                type="text"
-                placeholder="Search by vehicle, invoice number, PO number..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="!bg-[#F3F3F5] max-w-full border-none !rounded-[8px]"
-              />
+            <div className="flex-1 min-w-[200px]">
+              <div className="relative">
+                <Input
+                  type="text"
+                  placeholder="Search"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="!bg-[#F3F3F5] dark:!bg-white/5 border-none !rounded-[8px] pl-10"
+                />
+                <svg
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
+                </svg>
+              </div>
             </div>
-            <div className="w-full max-w-[20%]">
+            <div className="w-full sm:w-auto min-w-[180px]">
               <Select
-                options={WORK_ORDER_STATUS_FILTER_OPTIONS}
-                placeholder="All Status"
-                onChange={(value) => setStatusFilter(value)}
+                options={[{ value: "", label: "Issue Assigned To" }, ...contactOptions]}
+                placeholder="Issue Assigned To"
+                onChange={(value) => setAssignedToFilter(value)}
                 defaultValue=""
-                className="!bg-[#F3F3F5] border-gray-200"
+                className="!bg-[#F3F3F5] dark:!bg-white/5 border-gray-200 dark:border-white/10"
               />
             </div>
-            <Button
-              variant="outline"
-              onClick={handleExport}
-              className="bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-white/10 hover:bg-gray-100 dark:hover:bg-gray-800 w-full max-w-[10%] min-h-[44px] !leading-[44px]"
-            >
-              <ExportIcon />
-              Export
-            </Button>
+            <div className="w-full sm:w-auto min-w-[150px]">
+              <Select
+                options={[{ value: "", label: "Labels" }, ...labelOptions]}
+                placeholder="Labels"
+                onChange={(value) => setLabelFilter(value)}
+                defaultValue=""
+                className="!bg-[#F3F3F5] dark:!bg-white/5 border-gray-200 dark:border-white/10"
+              />
+            </div>
+          
+            {activeFiltersCount > 0 && (
+              <Button
+                variant="primary"
+                size="sm"
+                className="min-h-[44px] !leading-[44px]"
+              >
+                <svg
+                  className="w-4 h-4 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
+                  />
+                </svg>
+                {activeFiltersCount} Filter{activeFiltersCount !== 1 ? 's' : ''}
+              </Button>
+            )}
           </div>
         </form>
 
@@ -332,15 +436,15 @@ export default function WorkOrdersList() {
                 <div className="text-center">
                   <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-brand-500"></div>
                   <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                    Loading work orders...
+                    Loading issues...
                   </p>
                 </div>
               </div>
-            ) : workOrders.length === 0 ? (
+            ) : issues.length === 0 ? (
               <div className="flex items-center justify-center py-12">
                 <div className="text-center">
                   <p className="text-gray-600 dark:text-gray-400">
-                    No work orders found
+                    No issues found
                   </p>
                 </div>
               </div>
@@ -353,37 +457,55 @@ export default function WorkOrdersList() {
                         isHeader
                         className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                       >
-                        Work Order ID
+                        Priority
                       </TableCell>
                       <TableCell
                         isHeader
                         className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                       >
-                        Vehicle
+                        Name
                       </TableCell>
                       <TableCell
                         isHeader
                         className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                       >
-                        Status
+                        Type
                       </TableCell>
                       <TableCell
                         isHeader
                         className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                       >
-                        Issue Date
+                        Issue
                       </TableCell>
                       <TableCell
                         isHeader
                         className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                       >
-                        Assigned To
+                        Summary
                       </TableCell>
                       <TableCell
                         isHeader
                         className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                       >
-                        Invoice/PO
+                        Issue Status
+                      </TableCell>
+                      <TableCell
+                        isHeader
+                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                      >
+                        Source
+                      </TableCell>
+                      <TableCell
+                        isHeader
+                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                      >
+                        Reported Date
+                      </TableCell>
+                      <TableCell
+                        isHeader
+                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                      >
+                        Assigned
                       </TableCell>
                       <TableCell
                         isHeader
@@ -395,107 +517,100 @@ export default function WorkOrdersList() {
                   </TableHeader>
 
                   <TableBody className="divide-y divide-gray-100 dark:divide-white/5">
-                    {workOrders.map((workOrder) => (
-                      <TableRow key={workOrder.id}>
-                        <TableCell className="px-5 py-4 sm:px-6 text-start">
-                          <div className="flex items-center gap-3">
-                            <div>
-                              <span className="block font-medium text-gray-800 text-theme-sm dark:text-white/90">
-                                WO-{workOrder.id}
-                              </span>
-                              {workOrder.repair_priority_class && (
-                                <span className="block text-gray-500 text-theme-xs dark:text-gray-400">
-                                  {workOrder.repair_priority_class}
-                                </span>
-                              )}
-                            </div>
+                    {issues.map((issue) => (
+                      <TableRow key={issue.id}>
+                        <TableCell className="px-4 py-3 text-start">
+                          {issue.priority && issue.priority !== "" ? (
+                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${getPriorityColor(issue.priority)}`}>
+                              {issue.priority}
+                            </span>
+                          ) : (
+                            <span className="text-gray-400 text-sm">—</span>
+                          )}
+                        </TableCell>
+                        <TableCell className="px-4 py-3 text-start">
+                          <div className="text-brand-600 dark:text-brand-400 text-theme-sm font-medium">
+                            {issue.vehicle?.vehicle_name || "—"}
                           </div>
                         </TableCell>
                         <TableCell className="px-4 py-3 text-start">
                           <div className="text-gray-800 text-theme-sm dark:text-white/90">
-                            {workOrder.vehicle?.vehicle_name || "N/A"}
+                            Vehicle
+                          </div>
+                        </TableCell>
+                        <TableCell className="px-4 py-3 text-start">
+                          <div className="text-brand-600 dark:text-brand-400 text-theme-sm font-medium">
+                            #{issue.id}
+                          </div>
+                        </TableCell>
+                        <TableCell className="px-4 py-3 text-start">
+                          <div className="text-gray-800 text-theme-sm dark:text-white/90">
+                            {issue.summary || issue.issued_by || "—"}
                           </div>
                         </TableCell>
                         <TableCell className="px-4 py-3 text-start">
                           <Badge
                             size="sm"
-                            color={getStatusColor(workOrder.status)}
+                            color={getStatusColor(issue.status)}
                           >
-                            {workOrder.status || "Open"}
+                            {issue.status || "Open"}
                           </Badge>
                         </TableCell>
                         <TableCell className="px-4 py-3 text-start">
                           <div className="text-gray-800 text-theme-sm dark:text-white/90">
-                            {formatDate(workOrder.issue_date)}
+                            {issue.source || "—"}
                           </div>
-                          {workOrder.issued_by && (
-                            <div className="text-gray-500 text-theme-xs dark:text-gray-400">
-                              By: {workOrder.issued_by}
-                            </div>
-                          )}
                         </TableCell>
                         <TableCell className="px-4 py-3 text-start">
-                          {workOrder.assigned_to ? (
+                          <div className="text-gray-800 text-theme-sm dark:text-white/90">
+                            {formatDate(issue.reported_date || issue.issue_date)}
+                          </div>
+                        </TableCell>
+                        <TableCell className="px-4 py-3 text-start">
+                          {issue.assigned_to ? (
                             <div className="text-gray-800 text-theme-sm dark:text-white/90">
-                              {`${workOrder.assigned_to.first_name || ""} ${workOrder.assigned_to.last_name || ""}`.trim() || "N/A"}
+                              {`${issue.assigned_to.first_name || ""} ${issue.assigned_to.last_name || ""}`.trim() || "—"}
                             </div>
                           ) : (
-                            <div className="text-gray-500 text-theme-sm dark:text-gray-400">
-                              N/A
+                            <div className="text-gray-400 text-theme-sm">
+                              —
                             </div>
                           )}
                         </TableCell>
-                        <TableCell className="px-4 py-3 text-start">
-                          <div className="space-y-1">
-                            {workOrder.invoice_number && (
-                              <div className="text-gray-800 text-theme-sm dark:text-white/90">
-                                Invoice: {workOrder.invoice_number}
-                              </div>
-                            )}
-                            {workOrder.po_number && (
-                              <div className="text-gray-500 text-theme-xs dark:text-gray-400">
-                                PO: {workOrder.po_number}
-                              </div>
-                            )}
-                            {!workOrder.invoice_number && !workOrder.po_number && (
-                              <div className="text-gray-500 text-theme-sm dark:text-gray-400">
-                                N/A
-                              </div>
-                            )}
-                          </div>
-                        </TableCell>
-                        <TableCell className="px-4 py-3 text-start">
+
+                         <TableCell className="px-4 py-3 text-start">
                           <div className="flex items-center gap-2">
                             <Button
                               variant="none"
                               size="sm"
-                              onClick={() => handleView(workOrder.id)}
+                              onClick={() => handleView(issue.id)}
                               className="view-button hover:scale-105 transition-all duration-300"
                               startIcon={<EyeIcon />}
                             >
-                              {""}
+                             {""}
                             </Button>
                             <Button
                               variant="none"
                               size="sm"
-                              onClick={() => handleEdit(workOrder.id)}
+                              onClick={() => handleEdit(issue.id)}
                               className="edit-button hover:scale-105 transition-all duration-300"
                               startIcon={<PencilIcon />}
                             >
-                              {""}
+                             {""}
                             </Button>
                             <Button
                               variant="none"
                               size="sm"
-                              onClick={() => handleDelete(workOrder.id)}
-                              disabled={deletingId === workOrder.id}
+                              onClick={() => handleDelete(issue.id)}
+                              disabled={deletingId === issue.id}
                               className="delete-button hover:scale-105 transition-all duration-300"
                               startIcon={<TrashBinIcon />}
                             >
-                              {""}
+                             {""}
                             </Button>
                           </div>
                         </TableCell>
+
                       </TableRow>
                     ))}
                   </TableBody>
@@ -509,4 +624,3 @@ export default function WorkOrdersList() {
     </>
   );
 }
-

@@ -33,7 +33,7 @@ api.interceptors.response.use(
       // localStorage.removeItem('auth_token');
       // localStorage.removeItem('auth_user');
       // localStorage.removeItem('auth_permissions');
-      // window.location.href = '/signin';
+      // window.location.href = '/login';
     }
     return Promise.reject(error);
   }

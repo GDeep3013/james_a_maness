@@ -59,5 +59,10 @@ class WorkOrder extends Model
     {
         return $this->belongsTo(Vendor::class, 'vendor_id', 'id');
     }
+
+    public function issues()
+    {
+        return $this->hasMany(Issue::class, 'work_order_id', 'id');
+    }
 }
 

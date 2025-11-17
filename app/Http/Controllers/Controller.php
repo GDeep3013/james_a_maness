@@ -44,4 +44,32 @@ class Controller extends BaseController
             'error' => $errors,
         ], $statusCode);
     }
+
+    public function convertToBoolean($value, $default = false)
+    {
+        if ($value === null || $value === '') {
+            return $default;
+        }
+
+        if (is_bool($value)) {
+            return $value;
+        }
+
+        if (is_string($value)) {
+            $lowerValue = strtolower(trim($value));
+            if (in_array($lowerValue, ['true', '1', 'yes', 'on'])) {
+                return true;
+            }
+            if (in_array($lowerValue, ['false', '0', 'no', 'off', ''])) {
+                return false;
+            }
+        }
+
+        if (is_numeric($value)) {
+            return (bool) $value;
+        }
+
+        return $default;
+    }
+
 }

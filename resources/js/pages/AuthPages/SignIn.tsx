@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router";
-import PageMeta from "../../components/common/PageMeta";
-import AuthLayout from "./AuthPageLayout";
-import SignInForm from "../../components/auth/SignInForm";
+// import PageMeta from "../../components/common/PageMeta";
+// import AuthLayout from "./AuthPageLayout";
+// import SignInForm from "../../components/auth/SignInForm";
 import { useAuth } from "../../context/AuthContext";
 
 export default function SignIn() {
@@ -28,14 +28,14 @@ export default function SignIn() {
   }
 
   return (
-    <>
-      <PageMeta
+    <> 
+      {/* <PageMeta
         title="Sign In | KAV EXPEDITING"
         description="Sign in to your account"
       />
       <AuthLayout>
         <SignInForm />
-      </AuthLayout>
+      </AuthLayout> */}
     </>
   );
 }
