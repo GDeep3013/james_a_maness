@@ -64,7 +64,7 @@ export default function IssueDetails() {
     try {
       const response = await issueService.getById(issueId);
       const data = response.data as { status: boolean; issue?: Issue };
-      
+
       if (data.status && data.issue) {
         setIssue(data.issue);
       } else {
@@ -104,10 +104,23 @@ export default function IssueDetails() {
     if (!dateString) return "—";
     try {
       const date = new Date(dateString);
-      return date.toLocaleDateString('en-US', { 
-        month: '2-digit', 
-        day: '2-digit', 
-        year: 'numeric' 
+      return date.toLocaleDateString('en-US', {
+        month: '2-digit',
+        day: '2-digit',
+        year: 'numeric'
+      });
+    } catch {
+      return dateString;
+    }
+  };
+
+  const formatDateShort = (dateString?: string) => {
+    if (!dateString) return "—";
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric'
       });
     } catch {
       return dateString;
@@ -118,15 +131,15 @@ export default function IssueDetails() {
     if (!dateString) return "—";
     try {
       const date = new Date(dateString);
-      const dateStr = date.toLocaleDateString('en-US', { 
-        month: '2-digit', 
-        day: '2-digit', 
-        year: 'numeric' 
+      const dateStr = date.toLocaleDateString('en-US', {
+        month: '2-digit',
+        day: '2-digit',
+        year: 'numeric'
       });
-      const timeStr = date.toLocaleTimeString('en-US', { 
-        hour: 'numeric', 
+      const timeStr = date.toLocaleTimeString('en-US', {
+        hour: 'numeric',
         minute: '2-digit',
-        hour12: true 
+        hour12: true
       });
       return `${dateStr} ${timeStr}`;
     } catch {
@@ -138,15 +151,15 @@ export default function IssueDetails() {
     if (!dateString) return "—";
     try {
       const date = new Date(dateString);
-      const dateStr = date.toLocaleDateString('en-US', { 
-        month: '2-digit', 
-        day: '2-digit', 
-        year: 'numeric' 
+      const dateStr = date.toLocaleDateString('en-US', {
+        month: '2-digit',
+        day: '2-digit',
+        year: 'numeric'
       });
-      const timeStr = date.toLocaleTimeString('en-US', { 
-        hour: 'numeric', 
+      const timeStr = date.toLocaleTimeString('en-US', {
+        hour: 'numeric',
         minute: '2-digit',
-        hour12: true 
+        hour12: true
       });
       return `${dateStr} at ${timeStr}`;
     } catch {
@@ -250,7 +263,7 @@ export default function IssueDetails() {
   }
 
   const isClosed = issue.status === "Closed";
-  const assignedToName = issue.assignedTo 
+  const assignedToName = issue.assignedTo
     ? `${issue.assignedTo.first_name || ""} ${issue.assignedTo.last_name || ""}`.trim()
     : null;
   const closedByName = issue.closedBy?.name || null;
@@ -258,17 +271,17 @@ export default function IssueDetails() {
   return (
     <>
       <PageMeta title={`${issue.summary || "Issue"} - Details`} description="View issue details" />
-      
+
       <div className="space-y-6">
         <div className="flex items-start justify-between mb-6">
-          <div className="flex items-center gap-3 flex-wrap">
+          <div className="flex items-center gap-3">
             <Button
-              variant="outline"
+              variant="primary"
+              size="sm"
+              className="py-2"
               onClick={() => navigate("/issues")}
-              startIcon={<ChevronLeftIcon />}
-              className="height-[34px] !inline-block py-3"
             >
-              {''}
+              <ChevronLeftIcon className="size-5" />
             </Button>
             <div>
               <h1 className="text-lg font-medium text-gray-500 dark:text-gray-400 mb-1">Issues</h1>
@@ -281,22 +294,19 @@ export default function IssueDetails() {
             {isClosed && (
               <Button
                 variant="primary"
-                size="md"
+                size="sm"
                 onClick={handleReopen}
                 disabled={isReopening}
                 className="min-height-[40px] !leading-[40px]"
+                startIcon={
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                }
               >
                 {isReopening ? "Reopening..." : "Reopen"}
               </Button>
             )}
-            <Button
-              variant="outline"
-              onClick={handleEdit}
-              startIcon={<PencilIcon />}
-              className="min-height-[40px] !leading-[40px]"
-            >
-              Edit
-            </Button>
           </div>
         </div>
 
@@ -305,7 +315,7 @@ export default function IssueDetails() {
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Details</h3>
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">All Fields</p>
           </div>
-          
+
           <div className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
@@ -321,16 +331,18 @@ export default function IssueDetails() {
                 </label>
                 <div className="flex flex-col gap-1">
                   {issue.priority && issue.priority !== "" ? (
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize w-fit ${getPriorityColor(issue.priority)}`}>
-                      {issue.priority}
-                    </span>
+                    <>
+                      <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium capitalize w-fit ${getPriorityColor(issue.priority)}`}>
+                        {issue.priority}
+                      </span>
+                      {getPriorityDescription(issue.priority) && (
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                          {getPriorityDescription(issue.priority)}
+                        </p>
+                      )}
+                    </>
                   ) : (
                     <span className="text-sm text-gray-400">—</span>
-                  )}
-                  {issue.priority && getPriorityDescription(issue.priority) && (
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                      {getPriorityDescription(issue.priority)}
-                    </p>
                   )}
                 </div>
               </div>
@@ -348,12 +360,9 @@ export default function IssueDetails() {
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Status
                 </label>
-                <Badge
-                  size="sm"
-                  color={getStatusColor(issue.status)}
-                >
+                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-200 text-gray-700">
                   {issue.status || "Open"}
-                </Badge>
+                </span>
               </div>
 
               <div>
@@ -363,12 +372,12 @@ export default function IssueDetails() {
                 <div className="flex items-center gap-2 flex-wrap">
                   {issue.vehicle?.vehicle_name ? (
                     <>
-                      <Badge size="sm" color="primary">
+                      <span className="text-sm text-blue-600 font-medium">
                         {issue.vehicle.vehicle_name}
-                      </Badge>
-                      <Badge size="sm" color="light">
+                      </span>
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-200 text-gray-700">
                         Sample
-                      </Badge>
+                      </span>
                     </>
                   ) : (
                     <span className="text-sm text-gray-400">—</span>
@@ -449,90 +458,89 @@ export default function IssueDetails() {
           </div>
         </div>
 
-        {isClosed && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="bg-white dark:bg-white/5 rounded-lg border border-gray-200 dark:border-white/10">
             <div className="p-6 border-b border-gray-200 dark:border-white/10">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Closed Details</h3>
+              <h3 className="text-lg font-normal text-gray-900 dark:text-white">Closed Details</h3>
             </div>
-            
-            <div className="p-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Closed Date
-                  </label>
-                  <p className="text-sm text-gray-900 dark:text-white">
-                    {formatDateWithTime(issue.closed_date || issue.updated_at)}
-                  </p>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Closed By
-                  </label>
-                  {closedByName ? (
-                    <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-full bg-brand-500 flex items-center justify-center text-white text-xs font-medium">
-                        {getInitials(closedByName)}
-                      </div>
-                      <span className="text-sm text-brand-600 dark:text-brand-400 font-medium">
-                        {closedByName}
-                      </span>
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
+                  Closed Date
+                </label>
+                <p className="text-sm text-gray-900 dark:text-white">
+                  {isClosed && (issue.closed_date || issue.updated_at)
+                    ? formatDateWithTime(issue.closed_date || issue.updated_at)
+                    : "—"}
+                </p>
+              </div>
+              <div>
+                <label className="block text-xs text-gray-600 dark:text-gray-400 mb-2">
+                  Closed By
+                </label>
+                {isClosed && closedByName ? (
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-full bg-[#5321B1] flex items-center justify-center text-white text-xs font-medium">
+                      {getInitials(closedByName)}
                     </div>
-                  ) : (
-                    <p className="text-sm text-gray-400">—</p>
-                  )}
-                </div>
-
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Note
-                  </label>
-                  <p className="text-sm text-gray-900 dark:text-white">
-                    {issue.closed_note || "—"}
-                  </p>
-                </div>
+                    <span className="text-sm text-[#5321B1] font-medium">
+                      {closedByName}
+                    </span>
+                  </div>
+                ) : (
+                  <p className="text-sm text-gray-400">—</p>
+                )}
+              </div>
+              <div>
+                <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
+                  Note
+                </label>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  {isClosed && issue.closed_note ? issue.closed_note : "—"}
+                </p>
               </div>
             </div>
           </div>
-        )}
 
-        <div className="bg-white dark:bg-white/5 rounded-lg border border-gray-200 dark:border-white/10">
-          <div className="p-6 border-b border-gray-200 dark:border-white/10">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Timeline</h3>
-          </div>
-          
-          <div className="p-6">
-            <div className="space-y-4">
-              {isClosed && closedByName && (
+          <div className="bg-white dark:bg-white/5 rounded-lg border border-gray-200 dark:border-white/10">
+            <div className="p-6 border-b border-gray-200 dark:border-white/10">
+              <h3 className="text-lg font-normal text-gray-900 dark:text-white">Timeline</h3>
+            </div>
+            <div className="p-6">
+              <div className="space-y-4 relative">
+                {isClosed && closedByName && (
+                  <div className="flex items-start gap-4 relative">
+                    <div className="relative flex-shrink-0">
+                      <div className="w-8 h-8 rounded-full bg-[#5321B1] flex items-center justify-center text-white text-xs font-medium">
+                        {getInitials(closedByName)}
+                      </div>
+                      <div className="absolute left-1/2 top-8 w-0.5 h-6 bg-gray-200 transform -translate-x-1/2"></div>
+                    </div>
+                    <div className="flex-1 pb-6">
+                      <p className="text-sm text-gray-900 dark:text-white">
+                        <span className="font-medium">{closedByName}</span> closed this issue
+                      </p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        {formatDateShort(issue.closed_date || issue.updated_at)}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
                 <div className="flex items-start gap-4">
-                  <div className="w-8 h-8 rounded-full bg-brand-500 flex items-center justify-center text-white text-xs font-medium flex-shrink-0">
-                    {getInitials(closedByName)}
+                  <div className="w-8 h-8 rounded-full bg-orange-500 flex items-center justify-center text-white flex-shrink-0">
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+                    </svg>
                   </div>
                   <div className="flex-1">
                     <p className="text-sm text-gray-900 dark:text-white">
-                      <span className="font-medium">{closedByName}</span> closed this issue
+                      Issue Opened
                     </p>
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      {formatDate(issue.closed_date || issue.updated_at)}
+                      {formatDateShort(issue.reported_date || issue.created_at)}
                     </p>
                   </div>
-                </div>
-              )}
-              
-              <div className="flex items-start gap-4">
-                <div className="w-8 h-8 rounded-full bg-orange-500 flex items-center justify-center text-white flex-shrink-0">
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
-                  </svg>
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm text-gray-900 dark:text-white">
-                    Issue Opened
-                  </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    {formatDate(issue.reported_date || issue.created_at)}
-                  </p>
                 </div>
               </div>
             </div>

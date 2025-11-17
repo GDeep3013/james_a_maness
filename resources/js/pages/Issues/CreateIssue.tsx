@@ -6,7 +6,7 @@ import Select from "../../components/form/Select";
 import DatePicker from "../../components/form/date-picker";
 import Button from "../../components/ui/button/Button";
 import PageMeta from "../../components/common/PageMeta";
-import { TimeIcon } from "../../icons";
+import { ChevronLeftIcon, TimeIcon } from "../../icons";
 import { contactService } from "../../services/contactService";
 import { issueService } from "../../services/issueService";
 import { vehicleService } from "../../services/vehicleService";
@@ -308,11 +308,22 @@ export default function CreateIssue() {
 
       <div className="space-y-6">
         <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+          <Button
+              variant="primary"
+              size="sm"
+              className="py-2"
+              onClick={() => navigate("/issues")}
+            >
+              <ChevronLeftIcon className="size-5" />
+            </Button>
           <h1 className="text-2xl font-semibold text-gray-800 dark:text-white/90">
             {isEditMode ? "Edit Issue" : "Create Issue"}
           </h1>
+          </div>
           <Button
             variant="outline"
+            size="sm"
             onClick={() => navigate("/issues")}
           >
             Cancel
@@ -543,12 +554,14 @@ export default function CreateIssue() {
             <div className="mt-6 flex items-center justify-end gap-3 border-t border-gray-200 dark:border-white/10 pt-6">
                 <Button
                 variant="outline"
+                size="sm"
                 onClick={() => navigate("/issues")}
                 disabled={isSubmitting}
                 >
                 Cancel
                 </Button>
                 <Button
+                size="sm"
                 variant="primary"
                 type="submit"
                 disabled={isSubmitting}
