@@ -18,6 +18,8 @@ interface WorkOrderData {
   vendor_id?: number;
   invoice_number?: string;
   po_number?: string;
+  service_items?: unknown[];
+  parts?: unknown[];
 }
 
 export const workOrderService = {
@@ -37,6 +39,10 @@ export const workOrderService = {
     const formData = new FormData();
     
     Object.keys(data).forEach((key) => {
+      if (key === 'service_items' || key === 'parts') {
+        return;
+      }
+      
       const value = data[key as keyof WorkOrderData];
       if (value !== null && value !== undefined && value !== '') {
         if (Array.isArray(value)) {
@@ -48,6 +54,13 @@ export const workOrderService = {
         }
       }
     });
+
+    if (data.service_items !== undefined) {
+      formData.append('service_items', JSON.stringify(data.service_items || []));
+    }
+    if (data.parts !== undefined) {
+      formData.append('parts', JSON.stringify(data.parts || []));
+    }
 
     const token = localStorage.getItem('auth_token');
     const headers: Record<string, string> = {};
@@ -64,6 +77,10 @@ export const workOrderService = {
     const formData = new FormData();
     
     Object.keys(data).forEach((key) => {
+      if (key === 'service_items' || key === 'parts') {
+        return;
+      }
+      
       const value = data[key as keyof WorkOrderData];
       if (value !== null && value !== undefined && value !== '') {
         if (Array.isArray(value)) {
@@ -75,6 +92,13 @@ export const workOrderService = {
         }
       }
     });
+
+    if (data.service_items !== undefined) {
+      formData.append('service_items', JSON.stringify(data.service_items || []));
+    }
+    if (data.parts !== undefined) {
+      formData.append('parts', JSON.stringify(data.parts || []));
+    }
 
     formData.append('_method', 'PUT');
 

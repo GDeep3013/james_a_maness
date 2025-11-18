@@ -8,6 +8,7 @@ use App\Http\Controllers\VehicleController;
 use App\Http\Controllers\WorkOrderController;
 use App\Http\Controllers\IssueController;
 use App\Http\Controllers\ServiceTaskController;
+use App\Http\Controllers\PartController;
 // use App\Http\Controllers\Apps\LoginController;
 // use App\Http\Controllers\Apps\ContactApiController;
 // use App\Http\Controllers\Apps\RoutesApiController;
@@ -46,6 +47,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/service-tasks/available-subtasks', [ServiceTaskController::class, 'getAvailableSubtasks']);
     Route::apiResource('service-tasks', ServiceTaskController::class);
     Route::get('/service-tasks/{id}/edit', [ServiceTaskController::class, 'edit'])->where('id', '[0-9]+');
+
+    Route::apiResource('parts', PartController::class);
+    Route::get('/parts/{id}/edit', [PartController::class, 'edit'])->where('id', '[0-9]+');
    
 });
 

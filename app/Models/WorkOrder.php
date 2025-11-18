@@ -27,6 +27,8 @@ class WorkOrder extends Model
         'vendor_id',
         'invoice_number',
         'po_number',
+        'service_items',
+        'parts',
     ];
 
     protected $casts = [
@@ -38,6 +40,8 @@ class WorkOrder extends Model
         'send_scheduled_start_date_reminder' => 'boolean',
         'use_start_odometer_for_completion_meter' => 'boolean',
         'labels' => 'array',
+        'service_items' => 'array',
+        'parts' => 'array',
     ];
 
     public function user()
