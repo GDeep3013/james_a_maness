@@ -13,7 +13,7 @@ import Button from "../../components/ui/button/Button";
 import PageMeta from "../../components/common/PageMeta";
 import { vehicleService } from "../../services/vehicleService";
 import { PencilIcon, TrashBinIcon, ExportIcon, EyeIcon } from "../../icons";
-import { formatVehicleIdentifier, formatMileage, formatDate } from "../../utils";
+import { formatVehicleIdentifier, formatDate } from "../../utils";
 
 interface Vehicle {
   id: number;

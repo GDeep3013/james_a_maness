@@ -277,7 +277,7 @@ export default function WorkOrdersList() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-semibold text-gray-800 dark:text-white/90">Work Orders</h1>
+            <h1 className="text-2xl font-semibold text-gray-800">Work Orders</h1>
           </div>
           <Button
             variant="primary"
@@ -288,7 +288,7 @@ export default function WorkOrdersList() {
           </Button>
         </div>
 
-        <form onSubmit={handleSearch} className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl p-4">
+        <form onSubmit={handleSearch} className="bg-white border border-gray-200 rounded-xl p-4">
           <div className="flex flex-wrap items-center gap-4">
             <div className="flex-1 max-w-[50%]">
               <Input
@@ -311,7 +311,7 @@ export default function WorkOrdersList() {
             <Button
               variant="outline"
               onClick={handleExport}
-              className="bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-white/10 hover:bg-gray-100 dark:hover:bg-gray-800 w-full max-w-[10%] min-h-[44px] !leading-[44px]"
+              className="bg-gray-50 border-gray-200 hover:bg-gray-100 w-full max-w-[10%] min-h-[44px] !leading-[44px]"
             >
               <ExportIcon />
               Export
@@ -320,18 +320,18 @@ export default function WorkOrdersList() {
         </form>
 
         {error && (
-          <div className="p-4 bg-error-50 dark:bg-error-900/20 border border-error-200 dark:border-error-800 rounded-lg">
-            <p className="text-sm text-error-600 dark:text-error-400">{error}</p>
+          <div className="p-4 bg-error-50 border border-error-200 rounded-lg">
+            <p className="text-sm text-error-600">{error}</p>
           </div>
         )}
 
-        <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/5 dark:bg-white/3">
+        <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
           <div className="max-w-full overflow-x-auto">
             {loading ? (
               <div className="flex items-center justify-center py-12">
                 <div className="text-center">
                   <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-brand-500"></div>
-                  <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                  <p className="mt-2 text-sm text-gray-600">
                     Loading work orders...
                   </p>
                 </div>
@@ -339,7 +339,7 @@ export default function WorkOrdersList() {
             ) : workOrders.length === 0 ? (
               <div className="flex items-center justify-center py-12">
                 <div className="text-center">
-                  <p className="text-gray-600 dark:text-gray-400">
+                  <p className="text-gray-600">
                     No work orders found
                   </p>
                 </div>
@@ -347,64 +347,64 @@ export default function WorkOrdersList() {
             ) : (
               <>
                 <Table>
-                  <TableHeader className="border-b border-gray-100 dark:border-white/5">
+                  <TableHeader className="border-b border-gray-100">
                     <TableRow>
                       <TableCell
                         isHeader
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs"
                       >
                         Work Order ID
                       </TableCell>
                       <TableCell
                         isHeader
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs"
                       >
                         Vehicle
                       </TableCell>
                       <TableCell
                         isHeader
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs"
                       >
                         Status
                       </TableCell>
                       <TableCell
                         isHeader
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs"
                       >
                         Issue Date
                       </TableCell>
                       <TableCell
                         isHeader
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs"
                       >
                         Assigned To
                       </TableCell>
                       <TableCell
                         isHeader
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs"
                       >
                         Invoice/PO
                       </TableCell>
                       <TableCell
                         isHeader
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400 w-[10%]"
+                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs w-[10%]"
                       >
                         Actions
                       </TableCell>
                     </TableRow>
                   </TableHeader>
 
-                  <TableBody className="divide-y divide-gray-100 dark:divide-white/5">
+                  <TableBody className="divide-y divide-gray-100">
                     {workOrders.map((workOrder) => (
                       <TableRow key={workOrder.id}>
                         <TableCell className="px-5 py-4 sm:px-6 text-start">
                           <div className="flex items-center gap-3">
                             <div>
-                              <span className="block font-medium text-gray-800 text-theme-sm dark:text-white/90">
+                              <span className="block font-medium text-gray-800 text-theme-sm">
                                 WO-{workOrder.id}
                               </span>
                               {workOrder.repair_priority_class && (
-                                <span className="block text-gray-500 text-theme-xs dark:text-gray-400">
+                                <span className="block text-gray-500 text-theme-xs">
                                   {workOrder.repair_priority_class}
                                 </span>
                               )}
@@ -412,7 +412,7 @@ export default function WorkOrdersList() {
                           </div>
                         </TableCell>
                         <TableCell className="px-4 py-3 text-start">
-                          <div className="text-gray-800 text-theme-sm dark:text-white/90">
+                          <div className="text-gray-800 text-theme-sm">
                             {workOrder.vehicle?.vehicle_name || "N/A"}
                           </div>
                         </TableCell>
@@ -425,22 +425,22 @@ export default function WorkOrdersList() {
                           </Badge>
                         </TableCell>
                         <TableCell className="px-4 py-3 text-start">
-                          <div className="text-gray-800 text-theme-sm dark:text-white/90">
+                          <div className="text-gray-800 text-theme-sm">
                             {formatDate(workOrder.issue_date)}
                           </div>
                           {workOrder.issued_by && (
-                            <div className="text-gray-500 text-theme-xs dark:text-gray-400">
+                            <div className="text-gray-500 text-theme-xs">
                               By: {workOrder.issued_by}
                             </div>
                           )}
                         </TableCell>
                         <TableCell className="px-4 py-3 text-start">
                           {workOrder.assigned_to ? (
-                            <div className="text-gray-800 text-theme-sm dark:text-white/90">
+                            <div className="text-gray-800 text-theme-sm">
                               {`${workOrder.assigned_to.first_name || ""} ${workOrder.assigned_to.last_name || ""}`.trim() || "N/A"}
                             </div>
                           ) : (
-                            <div className="text-gray-500 text-theme-sm dark:text-gray-400">
+                            <div className="text-gray-500 text-theme-sm">
                               N/A
                             </div>
                           )}
@@ -448,17 +448,17 @@ export default function WorkOrdersList() {
                         <TableCell className="px-4 py-3 text-start">
                           <div className="space-y-1">
                             {workOrder.invoice_number && (
-                              <div className="text-gray-800 text-theme-sm dark:text-white/90">
+                              <div className="text-gray-800 text-theme-sm">
                                 Invoice: {workOrder.invoice_number}
                               </div>
                             )}
                             {workOrder.po_number && (
-                              <div className="text-gray-500 text-theme-xs dark:text-gray-400">
+                              <div className="text-gray-500 text-theme-xs">
                                 PO: {workOrder.po_number}
                               </div>
                             )}
                             {!workOrder.invoice_number && !workOrder.po_number && (
-                              <div className="text-gray-500 text-theme-sm dark:text-gray-400">
+                              <div className="text-gray-500 text-theme-sm">
                                 N/A
                               </div>
                             )}
