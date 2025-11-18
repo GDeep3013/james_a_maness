@@ -21,8 +21,8 @@ Route::middleware(['page.access'])->group(function () {
     Route::get('/vehicles/{id}', [HomeController::class, 'index'])->where('id', '[0-9]+');
     Route::get('/vehicles/{id}/edit', [HomeController::class, 'index'])->where('id', '[0-9]+');
     Route::get('/vehicles/{id}/VehicleDetail', [HomeController::class, 'index'])->where('id', '[0-9]+');
-    
-    
+
+
     Route::get('/contacts', [HomeController::class, 'index']);
     Route::get('/contacts/create', [HomeController::class, 'index']);
     Route::get('/contacts/{id}', [HomeController::class, 'index'])->where('id', '[0-9]+');
@@ -50,6 +50,6 @@ Route::middleware(['page.access'])->group(function () {
     Route::get('/vendors/{id}', [HomeController::class, 'index'])->where('id', '[0-9]+');
     Route::get('/vendors/{id}/edit', [HomeController::class, 'index'])->where('id', '[0-9]+');
 
-    
+
     Route::get('profile', [HomeController::class, 'index']);
 });

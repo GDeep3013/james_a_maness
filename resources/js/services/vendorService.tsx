@@ -4,7 +4,6 @@ interface VendorFormData {
   name: string;
   phone?: string;
   website?: string;
-  labels?: string;
   street_address?: string;
   address_line_2?: string;
   city?: string;
@@ -22,11 +21,10 @@ interface VendorFormData {
 }
 
 interface VendorData {
-  first_name: string;
-  company_contact?: string;
+  name: string;
+  phone?: string;
   email?: string;
   website?: string;
-  labels?: string;
   address?: string;
   city?: string;
   state?: string;
@@ -56,19 +54,21 @@ export const vendorService = {
     return api.get(`/vendors${queryString ? `?${queryString}` : ''}`);
   },
 
-  getById: (id: number) =>
-    api.get(`/vendors/${id}`),
+  getById: (id: number) => api.get(`/vendors/${id}`),
 
   create: (data: VendorFormData) => {
     const vendorData: VendorData = {
-      first_name: data.name,
-      company_contact: data.phone || data.contact_phone || '',
+      name: data.name,
+      phone: data.phone || data.contact_phone || '',
       email: data.contact_email || '',
       website: data.website || undefined,
-      labels: data.labels || undefined,
-      address: data.street_address 
-        ? (data.address_line_2 ? `${data.street_address}, ${data.address_line_2}` : data.street_address)
+
+      address: data.street_address
+        ? (data.address_line_2
+            ? `${data.street_address}, ${data.address_line_2}`
+            : data.street_address)
         : undefined,
+
       city: data.city || undefined,
       state: data.state || undefined,
       country: data.country || undefined,
@@ -77,10 +77,10 @@ export const vendorService = {
       contact_name: data.contact_name || undefined,
       contact_phone: data.contact_phone || undefined,
       contact_email: data.contact_email || undefined,
-      charging: data.charging || undefined,
-      fuel: data.fuel || undefined,
-      service: data.service || undefined,
-      vehicle: data.vehicle || undefined,
+      charging: data.charging || false,
+      fuel: data.fuel || false,
+      service: data.service || false,
+      vehicle: data.vehicle || false,
     };
 
     return api.post('/vendors', vendorData);
@@ -88,17 +88,18 @@ export const vendorService = {
 
   update: (id: number, data: Partial<VendorFormData>) => {
     const vendorData: Partial<VendorData> = {};
-    
-    if (data.name) vendorData.first_name = data.name;
-    if (data.phone || data.contact_phone) vendorData.company_contact = data.phone || data.contact_phone;
+
+    if (data.name) vendorData.name = data.name;
+    if (data.phone || data.contact_phone) vendorData.phone = data.phone || data.contact_phone;
     if (data.contact_email) vendorData.email = data.contact_email;
     if (data.website !== undefined) vendorData.website = data.website;
-    if (data.labels !== undefined) vendorData.labels = data.labels;
+
     if (data.street_address) {
-      vendorData.address = data.address_line_2 
+      vendorData.address = data.address_line_2
         ? `${data.street_address}, ${data.address_line_2}`
         : data.street_address;
     }
+
     if (data.city) vendorData.city = data.city;
     if (data.state) vendorData.state = data.state;
     if (data.country) vendorData.country = data.country;
@@ -115,10 +116,7 @@ export const vendorService = {
     return api.put(`/vendors/${id}`, vendorData);
   },
 
-  delete: (id: number) =>
-    api.delete(`/vendors/${id}`),
+  delete: (id: number) => api.delete(`/vendors/${id}`),
 
-  getForEdit: (id: number) =>
-    api.get(`/vendors/${id}/edit`),
+  getForEdit: (id: number) => api.get(`/vendors/${id}/edit`),
 };
-

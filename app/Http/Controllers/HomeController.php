@@ -7,7 +7,7 @@ use Auth;
 
 class HomeController extends Controller
 {
-    
+
 
     /**
      * Show the application dashboard.
@@ -32,7 +32,7 @@ class HomeController extends Controller
         $permissions = [
             'routes'          => 'routes',
             'main-routes'     => 'routes',
-            'vendor'         => 'vendors',
+            'vendors'         => 'vendors',
             'sub-contractor' => 'scontractor',
             'employees'      => 'drivers',
             'location'       => 'location',

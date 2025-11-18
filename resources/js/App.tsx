@@ -34,6 +34,7 @@ import ViewServiceTask from "./pages/ServiceTasks/ViewServiceTask";
 import IssuesList from "./pages/Issues/IssuesList";
 import CreateIssue from "./pages/Issues/CreateIssue";
 import IssueDetails from "./pages/Issues/IssueDetails";
+import Vendors from "./pages/vendor/index";
 import CreateVendor from "./pages/vendor/CreateVendor";
 
 export default function App() {
@@ -214,7 +215,7 @@ export default function App() {
               path="/vendors"
               element={
                 <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
-                  <CreateVendor />
+                  <Vendors />
                 </ProtectedRoute>
               }
             />
@@ -242,7 +243,7 @@ export default function App() {
                 </ProtectedRoute>
               }
             />
-            
+
 
 
 
@@ -267,7 +268,7 @@ export default function App() {
             <Route path="/videos" element={<Videos />} />
             <Route path="/line-chart" element={<LineChart />} />
             <Route path="/bar-chart" element={<BarChart />} /> */}
-            
+
           </Route>
 
           {/* Fallback Route */}

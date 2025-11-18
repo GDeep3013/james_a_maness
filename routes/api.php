@@ -8,6 +8,8 @@ use App\Http\Controllers\VehicleController;
 use App\Http\Controllers\WorkOrderController;
 use App\Http\Controllers\IssueController;
 use App\Http\Controllers\ServiceTaskController;
+use App\Http\Controllers\VendorController;
+
 // use App\Http\Controllers\Apps\LoginController;
 // use App\Http\Controllers\Apps\ContactApiController;
 // use App\Http\Controllers\Apps\RoutesApiController;
@@ -37,6 +39,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('vehicles', VehicleController::class);
     Route::get('/vehicles/{id}/edit', [VehicleController::class, 'edit'])->where('id', '[0-9]+');
 
+
     Route::apiResource('work-orders', WorkOrderController::class);
     Route::get('/work-orders/{id}/edit', [WorkOrderController::class, 'edit'])->where('id', '[0-9]+');
 
@@ -46,7 +49,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/service-tasks/available-subtasks', [ServiceTaskController::class, 'getAvailableSubtasks']);
     Route::apiResource('service-tasks', ServiceTaskController::class);
     Route::get('/service-tasks/{id}/edit', [ServiceTaskController::class, 'edit'])->where('id', '[0-9]+');
-   
+
+    Route::apiResource('vendors', VendorController::class);
+    Route::get('/vendors/{id}/edit', [VendorController::class, 'edit'])->where('id', '[0-9]+');
+
 });
 
 // Route::prefix('mobileApps')->group(function () {

@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\File;
 use Auth;
 use Exception;
 use Illuminate\Support\Facades\Schema;
-
+use Illuminate\Support\Facades\Log;
 class VendorController extends Controller
 {
     /**
@@ -40,16 +40,16 @@ class VendorController extends Controller
                     if (!in_array($column, ['created_at', 'updated_at'])) {
                         $q->orWhere($column, 'LIKE', '%' . $searchTerm . '%');
                     }
-                    
+
                 }
             });
         }
 
-        // Sort alphabetically by first_name
-        $query->orderBy('first_name', 'asc');
+        // Sort alphabetically by name
+        $query->orderBy('name', 'asc');
 
         if (!empty($request->page)) {
-            
+
             $vendors = $query->paginate(20);
             if (!empty($vendors)) {
                 return response()->json(['status' => true, 'vendor' => $vendors]);
@@ -101,18 +101,17 @@ class VendorController extends Controller
         // return response()->json(['status' => 'error', 'message' => ['email' =>'Data saved successfully']]);
         try {
             $validatedData = $request->validate([
-                'first_name' => 'required',
-                'address' => 'nullable',
+                'name' => 'required',
+                'phone'=> 'required',
                 'longitude' => 'nullable',
                 'latitude' => 'nullable',
+                'address' => 'nullable',
                 'city' => 'nullable',
                 'state' => 'nullable',
                 'country' => 'nullable',
                 'zip' => 'nullable',
                 'email' => 'required|email|max:255|unique:vendors,email',
-                'company_contact' => 'required|unique:vendors',
                 'website' => 'nullable|url|max:255',
-                'labels' => 'nullable|string|max:255',
                 'notes' => 'nullable|string',
                 'contact_name' => 'nullable|string|max:255',
                 'contact_phone' => 'nullable|string|max:20',
@@ -124,18 +123,17 @@ class VendorController extends Controller
             ]);
             $vendor = new Vendor;
             $vendor->user_id = Auth::user()->id;
-            $vendor->first_name = $validatedData['first_name'] ? $validatedData['first_name'] : '';
-            $vendor->company_contact = $validatedData['company_contact'] ? $validatedData['company_contact'] : '';
-            $vendor->email = $validatedData['email'] ? $validatedData['email'] : '';
+            $vendor->name = $validatedData['name']?? null;
+            $vendor->phone = $validatedData['phone'] ?? null;
+            $vendor->email = $validatedData['email'] ?? null;
             $vendor->website = $validatedData['website'] ?? null;
-            $vendor->labels = $validatedData['labels'] ?? null;
-            $vendor->address = $validatedData['address'] ? $validatedData['address'] : '';
-            $vendor->latitude = $validatedData['latitude'] ? $validatedData['latitude'] : "";
-            $vendor->longitude = $validatedData['longitude'] ? $validatedData['longitude'] : "";
-            $vendor->city = $validatedData['city'] ? $validatedData['city'] : '';
-            $vendor->state = $validatedData['state'] ? $validatedData['state'] : '';
-            $vendor->country = $validatedData['country'] ? $validatedData['country'] : '';
-            $vendor->zip = $validatedData['zip'] ? $validatedData['zip'] : '';
+            $vendor->address = $validatedData['address'] ?? null;
+            $vendor->latitude = $validatedData['latitude']?? null;
+            $vendor->longitude = $validatedData['longitude'] ?? null;
+            $vendor->city = $validatedData['city'] ?? null;
+            $vendor->state = $validatedData['state'] ?? null;
+            $vendor->country = $validatedData['country'] ?? null;
+            $vendor->zip = $validatedData['zip'] ?? null;
             $vendor->notes = $validatedData['notes'] ?? null;
             $vendor->contact_name = $validatedData['contact_name'] ?? null;
             $vendor->contact_phone = $validatedData['contact_phone'] ?? null;
@@ -178,7 +176,19 @@ class VendorController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id) {}
+    public function edit($id) {
+
+        if ($id) {
+            $data = Vendor::where('id', $id)->first();
+            if ($data) {
+                return response()->json(['status' => true, 'data' => $data]);
+            } else {
+                return response()->json(['status' => false, 'message' => 'Vendor not found']);
+            }
+        } else {
+            return response()->json(['status' => false, 'message' => 'Vendor ID is required']);
+        }
+    }
 
     /**
      * Update the specified resource in storage.
@@ -192,7 +202,8 @@ class VendorController extends Controller
         // dd($request->all());
         try {
             $validatedData = $request->validate([
-                'first_name' => 'required',
+                'name' => 'required',
+                'phone'=> 'required',
                 'address' => 'nullable',
                 'longitude' => 'nullable',
                 'latitude' => 'nullable',
@@ -201,9 +212,7 @@ class VendorController extends Controller
                 'country' => 'nullable',
                 'zip' => 'nullable',
                 'email' => 'required|email|max:255|unique:vendors,email,' . $id,
-                'company_contact' => 'required|unique:vendors,company_contact,' . $id,
                 'website' => 'nullable|url|max:255',
-                'labels' => 'nullable|string|max:255',
                 'notes' => 'nullable|string',
                 'contact_name' => 'nullable|string|max:255',
                 'contact_phone' => 'nullable|string|max:20',
@@ -219,18 +228,17 @@ class VendorController extends Controller
                 return response()->json(['status' => false, 'message' => 'Vendor not found']);
             }
             $vendor->user_id = Auth::user()->id;
-            $vendor->first_name = $validatedData['first_name'] ? $validatedData['first_name'] : '';
-            $vendor->company_contact = $validatedData['company_contact'] ? $validatedData['company_contact'] : '';
+            $vendor->name = $validatedData['name'] ?? null;
+            $vendor->phone = $validatedData['phone'] ? $validatedData['phone'] : '';
             $vendor->email = $validatedData['email'] ? $validatedData['email'] : '';
             $vendor->website = $validatedData['website'] ?? null;
-            $vendor->labels = $validatedData['labels'] ?? null;
-            $vendor->address = $validatedData['address'] ? $validatedData['address'] : '';
-            $vendor->latitude = $validatedData['latitude'] ? $validatedData['latitude'] : "";
-            $vendor->longitude = $validatedData['longitude'] ? $validatedData['longitude'] : "";
-            $vendor->city = $validatedData['city'] ? $validatedData['city'] : '';
-            $vendor->state = $validatedData['state'] ? $validatedData['state'] : '';
-            $vendor->country = $validatedData['country'] ? $validatedData['country'] : '';
-            $vendor->zip = $validatedData['zip'] ? $validatedData['zip'] : '';
+            $vendor->address = $validatedData['address'] ?? null;
+            $vendor->latitude = $validatedData['latitude'] ?? null;
+            $vendor->longitude = $validatedData['longitude'] ?? null;
+            $vendor->city = $validatedData['city'] ?? null;
+            $vendor->state = $validatedData['state'] ?? null;
+            $vendor->country = $validatedData['country'] ?? null;
+            $vendor->zip = $validatedData['zip'] ?? null;
             $vendor->notes = $validatedData['notes'] ?? null;
             $vendor->contact_name = $validatedData['contact_name'] ?? null;
             $vendor->contact_phone = $validatedData['contact_phone'] ?? null;

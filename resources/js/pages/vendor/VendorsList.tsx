@@ -7,27 +7,30 @@ import {
   TableHeader,
   TableRow,
 } from "../../components/ui/table";
-import Badge from "../../components/ui/badge/Badge";
 import Input from "../../components/form/input/InputField";
 import Button from "../../components/ui/button/Button";
 import PageMeta from "../../components/common/PageMeta";
-import { contactService } from "../../services/contactService";
+import { vendorService } from "../../services/vendorService";
 import { PencilIcon, TrashBinIcon, ExportIcon, EyeIcon } from "../../icons";
-import Select from "../../components/form/Select";
 
-interface Contact {
+interface Vendor {
   id: number;
-  first_name: string;
-  last_name?: string;
-  email: string;
+  name: string;
   phone: string;
-  license_no?: string;
-  license_class?: string;
-  status?: string;
-  user: {
-    profile_picture: string;
-  };
-  designation?: string;
+  email: string;
+  website?: string;
+  address?: string;
+  city?: string;
+  state?: string;
+  country?: string;
+  zip?: string;
+  contact_name?: string;
+  contact_phone?: string;
+  contact_email?: string;
+  charging?: boolean;
+  fuel?: boolean;
+  service?: boolean;
+  vehicle?: boolean;
   created_at?: string;
 }
 
@@ -38,10 +41,10 @@ interface PaginationData {
   total: number;
 }
 
-interface ContactsResponse {
+interface VendorsResponse {
   status: boolean;
-  contact: {
-    data: Contact[];
+  vendor: {
+    data: Vendor[];
     current_page: number;
     last_page: number;
     per_page: number;
@@ -49,13 +52,12 @@ interface ContactsResponse {
   };
 }
 
-export default function ContactsList() {
+export default function VendorsList() {
   const navigate = useNavigate();
-  const [contacts, setContacts] = useState<Contact[]>([]);
+  const [vendors, setVendors] = useState<Vendor[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>("");
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [pagination, setPagination] = useState<PaginationData>({
     current_page: 1,
@@ -65,80 +67,79 @@ export default function ContactsList() {
   });
   const [deletingId, setDeletingId] = useState<number | null>(null);
 
-  const fetchContacts = useCallback(async (page: number = 1, search: string = "" , status: string = "") => {
+  const fetchVendors = useCallback(async (page: number = 1, search: string = "") => {
     setLoading(true);
     setError("");
     try {
-      const response = await contactService.getAll({ page, search, status });
-      const data = response.data as ContactsResponse;
+      const response = await vendorService.getAll({ page, search });
+      const data = response.data as VendorsResponse;
 
-      if (data.status && data.contact) {
-        setContacts(data.contact.data || []);
+      if (data.status && data.vendor) {
+        setVendors(data.vendor.data || []);
         setPagination({
-          current_page: data.contact.current_page,
-          last_page: data.contact.last_page,
-          per_page: data.contact.per_page,
-          total: data.contact.total,
+          current_page: data.vendor.current_page,
+          last_page: data.vendor.last_page,
+          per_page: data.vendor.per_page,
+          total: data.vendor.total,
         });
       } else {
-        setError("Failed to load contacts");
-        setContacts([]);
+        setError("Failed to load vendors");
+        setVendors([]);
       }
     } catch {
-      setError("An error occurred while loading contacts");
-      setContacts([]);
+      setError("An error occurred while loading vendors");
+      setVendors([]);
     } finally {
       setLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    fetchContacts(currentPage, searchTerm, statusFilter);
-  }, [currentPage, searchTerm, statusFilter, fetchContacts]);
+    fetchVendors(currentPage, searchTerm);
+  }, [currentPage, searchTerm, fetchVendors]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setCurrentPage(1);
-    fetchContacts(1, searchTerm, statusFilter);
+    fetchVendors(1, searchTerm);
   };
 
   const handleDelete = async (id: number) => {
-    if (!window.confirm("Are you sure you want to delete this contact?")) {
+    if (!window.confirm("Are you sure you want to delete this vendor?")) {
       return;
     }
 
     setDeletingId(id);
     try {
-      await contactService.delete(id);
-      fetchContacts(currentPage, searchTerm , statusFilter);
+      await vendorService.delete(id);
+      fetchVendors(currentPage, searchTerm);
     } catch {
-      alert("Failed to delete contact. Please try again.");
+      alert("Failed to delete vendor. Please try again.");
     } finally {
       setDeletingId(null);
     }
   };
 
   const handleEdit = (id: number) => {
-    navigate(`/contacts/${id}`);
+    navigate(`/vendors/${id}`);
   };
 
   const handleView = (id: number) => {
-    navigate(`/contacts/${id}`);
+    navigate(`/vendors/${id}`);
   };
 
   const handleExport = () => {
-
+    // TODO: Implement export functionality
   };
 
-  const getFullName = (contact: Contact) => {
-    return `${contact.first_name} ${contact.last_name || ""}`.trim();
+  const getClassifications = (vendor: Vendor) => {
+    const classifications: string[] = [];
+    if (vendor.charging) classifications.push("Charging");
+    if (vendor.fuel) classifications.push("Fuel");
+    if (vendor.service) classifications.push("Service");
+    if (vendor.vehicle) classifications.push("Vehicle");
+    return classifications.length > 0 ? classifications.join(", ") : "N/A";
   };
-
-  const statusOptions = [
-    { value: "", label: "All Status" },
-    { value: "Active", label: "Active" },
-    { value: "Inactive", label: "Inactive" },
-  ];
 
   const renderPagination = () => {
     const pages: number[] = [];
@@ -178,7 +179,7 @@ export default function ContactsList() {
         </div>
         <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
           <div>
-            <p className="text-sm text-gray-700">
+            <p className="text-sm text-gray-700 dark:text-gray-400">
               Showing{" "}
               <span className="font-medium">
                 {pagination.total === 0
@@ -237,29 +238,20 @@ export default function ContactsList() {
   return (
     <>
       <PageMeta
-        title="Contacts List"
-        description="Manage and view all contacts"
+        title="Vendors List"
+        description="Manage and view all vendors"
       />
 
       <div className="space-y-6">
         <form onSubmit={handleSearch} className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl p-4">
           <div className="flex flex-wrap items-center gap-4">
-            <div className="w-full max-w-full md:max-w-[50%]">
+            <div className="w-full max-w-full md:max-w-[70%]">
               <Input
                 type="text"
-                placeholder="Search by name, email, phone, or license..."
+                placeholder="Search by name, email, phone, or location..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="!bg-[#F3F3F5] max-w-full border-none !rounded-[8px]"
-              />
-            </div>
-            <div className="w-full max-w-[50%] md:max-w-[20%]">
-              <Select
-                options={statusOptions}
-                placeholder="All Status"
-                onChange={(value) => setStatusFilter(value)}
-                defaultValue=""
-                className="!bg-[#F3F3F5] border-gray-200"
               />
             </div>
             <Button
@@ -286,23 +278,29 @@ export default function ContactsList() {
                 <div className="text-center">
                   <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-brand-500"></div>
                   <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                    Loading contacts...
+                    Loading vendors...
                   </p>
                 </div>
               </div>
-            ) : contacts.length === 0 ? (
+            ) : vendors.length === 0 ? (
               <div className="flex items-center justify-center py-12">
                 <div className="text-center">
                   <p className="text-gray-600 dark:text-gray-400">
-                    No contacts found
+                    No vendors found
                   </p>
                 </div>
               </div>
             ) : (
               <>
                 <Table>
-                    <TableHeader className="border-b border-gray-100 dark:border-white/5">
+                  <TableHeader className="border-b border-gray-100 dark:border-white/5">
                     <TableRow>
+                      <TableCell
+                        isHeader
+                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                      >
+                        Vendor
+                      </TableCell>
                       <TableCell
                         isHeader
                         className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
@@ -313,25 +311,13 @@ export default function ContactsList() {
                         isHeader
                         className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                       >
-                        Email/Phone
+                        Location
                       </TableCell>
                       <TableCell
                         isHeader
                         className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                       >
-                        License
-                      </TableCell>
-                      <TableCell
-                        isHeader
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-                      >
-                        Designation
-                      </TableCell>
-                      <TableCell
-                        isHeader
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-                      >
-                        Status
+                        Classifications
                       </TableCell>
                       <TableCell
                         isHeader
@@ -343,65 +329,70 @@ export default function ContactsList() {
                   </TableHeader>
 
                   <TableBody className="divide-y divide-gray-100 dark:divide-white/5">
-                    {contacts.map((contact) => (
-                      <TableRow key={contact.id}>
+                    {vendors.map((vendor) => (
+                      <TableRow key={vendor.id}>
                         <TableCell className="px-5 py-4 sm:px-6 text-start">
-                          <div className="flex items-center gap-3">
-                            <div>
-                              <span className="block font-medium text-gray-800 text-theme-sm dark:text-white/90">
-                                {getFullName(contact)}
-                              </span>
-                              <span className="block text-gray-500 text-theme-xs dark:text-gray-400">
-                                ID: {contact.id}
-                              </span>
-                            </div>
+                          <div className="space-y-1">
+                            <span className="block font-medium text-gray-800 text-theme-sm dark:text-white/90">
+                              {vendor.name}
+                            </span>
+                            <span className="block text-gray-500 text-theme-xs dark:text-gray-400">
+                              ID: {vendor.id}
+                            </span>
+                            {vendor.website && (
+                              <a
+                                href={vendor.website}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="block text-brand-500 text-theme-xs hover:underline"
+                              >
+                                {vendor.website}
+                              </a>
+                            )}
                           </div>
                         </TableCell>
                         <TableCell className="px-4 py-3 text-start">
                           <div className="space-y-1">
                             <div className="text-gray-800 text-theme-sm dark:text-white/90">
-                              {contact.email}
+                              {vendor.email}
                             </div>
                             <div className="text-gray-500 text-theme-xs dark:text-gray-400">
-                              {contact.phone}
+                              {vendor.phone}
                             </div>
+                            {vendor.contact_name && (
+                              <div className="text-gray-500 text-theme-xs dark:text-gray-400">
+                                ContactName: {vendor.contact_name}
+                              </div>
+                            )}
                           </div>
                         </TableCell>
                         <TableCell className="px-4 py-3 text-start">
                           <div className="space-y-1">
-                            <div className="text-gray-800 text-theme-sm dark:text-white/90">
-                              {contact.license_no || "N/A"}
-                            </div>
-                            {contact.license_class && (
+                            {vendor.city && vendor.state ? (
+                              <div className="text-gray-800 text-theme-sm dark:text-white/90">
+                                {vendor.city}, {vendor.state}
+                              </div>
+                            ) : (
+                              <div className="text-gray-500 text-theme-sm dark:text-gray-400">
+                                N/A
+                              </div>
+                            )}
+                            {vendor.country && (
                               <div className="text-gray-500 text-theme-xs dark:text-gray-400">
-                                {contact.license_class}
+                                {vendor.country}
                               </div>
                             )}
                           </div>
                         </TableCell>
                         <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                          {contact.designation || "N/A"}
-                        </TableCell>
-                        <TableCell className="px-4 py-3 text-start">
-                          <Badge
-                            size="sm"
-                            color={
-                              contact.status === "Active"
-                                ? "success"
-                                : contact.status === "Inactive"
-                                ? "error"
-                                : "warning"
-                            }
-                          >
-                            {contact.status || "Inactive"}
-                          </Badge>
+                          {getClassifications(vendor)}
                         </TableCell>
                         <TableCell className="px-4 py-3 text-start">
                           <div className="flex items-center gap-2">
                             <Button
                               variant="none"
                               size="sm"
-                              onClick={() => handleView(contact.id)}
+                              onClick={() => handleView(vendor.id)}
                               className="view-button hover:scale-105 transition-all duration-300"
                               startIcon={<EyeIcon />}
                             >
@@ -410,7 +401,7 @@ export default function ContactsList() {
                             <Button
                               variant="none"
                               size="sm"
-                              onClick={() => handleEdit(contact.id)}
+                              onClick={() => handleEdit(vendor.id)}
                               className="edit-button hover:scale-105 transition-all duration-300"
                               startIcon={<PencilIcon />}
                             >
@@ -419,8 +410,8 @@ export default function ContactsList() {
                             <Button
                               variant="none"
                               size="sm"
-                              onClick={() => handleDelete(contact.id)}
-                              disabled={deletingId === contact.id}
+                              onClick={() => handleDelete(vendor.id)}
+                              disabled={deletingId === vendor.id}
                               className="delete-button hover:scale-105 transition-all duration-300"
                               startIcon={<TrashBinIcon />}
                             >

@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router";
+import React, { useState ,useEffect} from "react";
+import { useNavigate, useParams } from "react-router";
 import Label from "../../components/form/Label";
 import Input from "../../components/form/input/InputField";
 import Select from "../../components/form/Select";
@@ -13,7 +13,7 @@ export interface VendorFormData {
     name: string;
     phone: string;
     website: string;
-    street_address: string;
+    address: string;
     address_line_2: string;
     city: string;
     state: string;
@@ -31,11 +31,14 @@ export interface VendorFormData {
 
 export default function CreateVendor() {
     const navigate = useNavigate();
+    const { id } = useParams<{ id?: string }>();
+    const isEditMode = !!id;
+    const [isLoading, setIsLoading] = useState(false);
     const [formData, setFormData] = useState<VendorFormData>({
         name: "",
         phone: "",
         website: "",
-        street_address: "",
+        address: "",
         address_line_2: "",
         city: "",
         state: "",
@@ -54,6 +57,54 @@ export default function CreateVendor() {
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [saveAndAddAnother, setSaveAndAddAnother] = useState(false);
+
+    useEffect(() => {
+        if (isEditMode && id) {
+            fetchVendorData(parseInt(id));
+        }
+    }, [isEditMode, id]);
+
+    const fetchVendorData = async (vendorId: number) => {
+        setIsLoading(true);
+        setErrors({});
+        try {
+            const response = await vendorService.getForEdit(vendorId);
+            const data = response.data as { status: boolean; data?: Record<string, unknown> };
+
+            if (data.status && data.data) {
+                const vendor = data.data;
+
+                // Parse address back into street_address and address_line_2
+                // const addressStr = String(vendor.address || "");
+                // const addressParts = addressStr.split(", ");
+
+                setFormData({
+                    name: String(vendor.name || ""),
+                    phone: String(vendor.phone || ""),
+                    website: String(vendor.website || ""),
+                    address: String(vendor.address) || "",
+                    address_line_2:String(vendor.address_line_2)  || "",
+                    city: String(vendor.city || ""),
+                    state: String(vendor.state || ""),
+                    zip: String(vendor.zip || ""),
+                    country: String(vendor.country || ""),
+                    notes: String(vendor.notes || ""),
+                    contact_name: String(vendor.contact_name || ""),
+                    contact_phone: String(vendor.contact_phone || ""),
+                    contact_email: String(vendor.contact_email || ""),
+                    charging: Boolean(vendor.charging),
+                    fuel: Boolean(vendor.fuel),
+                    service: Boolean(vendor.service),
+                    vehicle: Boolean(vendor.vehicle),
+                });
+            }
+        } catch (error) {
+            console.error("Failed to load vendor data:", error);
+            setErrors({ general: "Failed to load vendor data. Please try again." });
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     const handleInputChange = (name: keyof VendorFormData, value: string | boolean) => {
         setFormData((prev) => ({ ...prev, [name]: value }));
@@ -105,7 +156,7 @@ export default function CreateVendor() {
                 name: formData.name,
                 phone: formData.phone || undefined,
                 website: formData.website || undefined,
-                street_address: formData.street_address || undefined,
+                address: formData.address || undefined,
                 address_line_2: formData.address_line_2 || undefined,
                 city: formData.city || undefined,
                 state: formData.state || undefined,
@@ -121,15 +172,18 @@ export default function CreateVendor() {
                 vehicle: formData.vehicle || undefined,
             };
 
-            const response = await vendorService.create(vendorData);
+            // const response = await vendorService.create(vendorData);
+            const response = isEditMode && id
+                ? await vendorService.update(parseInt(id), vendorData)
+                : await vendorService.create(vendorData);
 
             if (response.data?.status === true || response.status === 200 || response.status === 201) {
-                if (saveAndAddAnother) {
+                if (saveAndAddAnother && !isEditMode) {
                     setFormData({
                         name: "",
                         phone: "",
                         website: "",
-                        street_address: "",
+                        address: "",
                         address_line_2: "",
                         city: "",
                         state: "",
@@ -146,7 +200,7 @@ export default function CreateVendor() {
                     });
                     setErrors({});
                 } else {
-                    navigate("/vendors");
+                    navigate("/vendors", { replace: true });
                 }
             } else {
                 throw new Error(response.data?.message || "Failed to save vendor");
@@ -163,7 +217,7 @@ export default function CreateVendor() {
                 });
                 setErrors(validationErrors);
             } else {
-                setErrors({ general: err.response?.data?.message || "Failed to save vendor. Please try again." });
+                setErrors({ general: err.response?.data?.message || `Failed to ${isEditMode ? 'update' : 'save'} vendor. Please try again.` });
             }
         } finally {
             setIsSubmitting(false);
@@ -179,8 +233,8 @@ export default function CreateVendor() {
     return (
         <>
             <PageMeta
-                title="Create New Vendor"
-                description="Create a new vendor"
+                title={isEditMode ? "Edit Vendor" : "Create New Vendor"}
+                description={isEditMode ? "Edit vendor details" : "Create a new vendor"}
             />
 
             <div className="space-y-6">
@@ -193,7 +247,7 @@ export default function CreateVendor() {
                             <ChevronLeftIcon className="w-5 h-5 text-gray-600 dark:text-gray-400" />
                         </button>
                         <h1 className="text-2xl font-semibold text-gray-800 dark:text-white/90">
-                            New Vendor
+                            {isEditMode ? "Edit Vendor" : "New Vendor"}
                         </h1>
                     </div>
                 </div>
@@ -209,7 +263,7 @@ export default function CreateVendor() {
 
                         <div className="flex-1">
                             <div className="flex flex-col gap-6">
-                                
+
                                     <div className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl p-6 lg:p-8">
                                         <h3 className="text-2xl font-semibold text-gray-800 dark:text-white/90 mb-6">
                                             Details
@@ -263,12 +317,12 @@ export default function CreateVendor() {
 
 
                                             <div className="lg:col-span-2">
-                                                <Label htmlFor="street_address">Address</Label>
+                                                <Label htmlFor="address">Address</Label>
                                                 <Input
                                                     type="text"
-                                                    id="street_address"
-                                                    value={formData.street_address}
-                                                    onChange={(e) => handleInputChange("street_address", e.target.value)}
+                                                    id="address"
+                                                    value={formData.address}
+                                                    onChange={(e) => handleInputChange("address", e.target.value)}
                                                     placeholder="Street address, P.O. box, etc."
                                                 />
                                             </div>
@@ -462,7 +516,7 @@ export default function CreateVendor() {
                                             </label>
                                         </div>
                                     </div>
-                                  
+
 
                                     <div className="mt-8 flex items-center justify-end gap-3 border-t border-gray-200 dark:border-white/10 pt-6">
                                         <Button
@@ -487,11 +541,11 @@ export default function CreateVendor() {
                                             size="sm"
                                             disabled={isSubmitting}
                                         >
-                                            {isSubmitting ? "Saving..." : "Save Vendor"}
+                                            {isSubmitting ? (isEditMode ? "Updating..." : "Saving...") : (isEditMode ? "Update Vendor" : "Save Vendor")}
                                         </Button>
                                     </div>
                             </div>
-                           
+
                         </div>
                     </form>
                 </div>

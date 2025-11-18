@@ -124,7 +124,7 @@ export default function CreateContact() {
     try {
       const response = await contactService.getForEdit(contactId);
       const data = response.data as { status: boolean; data?: Record<string, unknown> };
-      
+
       if (data.status && data.data) {
         const contact = data.data;
         setFormData({
@@ -213,7 +213,7 @@ export default function CreateContact() {
     // } else if (formData.password.trim() && formData.password.length < 6) {
     //   newErrors.password = "Password must be at least 6 characters";
     // }
-    
+
     if (!formData.license_no.trim()) {
       newErrors.license_no = "License number is required";
     } else if (formData.license_no.length < 10) {
@@ -235,7 +235,7 @@ export default function CreateContact() {
     }
 
     setIsSubmitting(true);
-  
+
 
     try {
       const baseContactData = {
@@ -416,7 +416,7 @@ export default function CreateContact() {
         </div>
       </div>
 
-      
+
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <div>
@@ -534,7 +534,7 @@ export default function CreateContact() {
 
   const renderLicenseSection = () => (
     <div className="space-y-6">
-     
+
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
 
       <div>
@@ -752,9 +752,9 @@ export default function CreateContact() {
           placeholder="Enter emergency contact number"
         />
       </div>
-      
+
       </div>
-     
+
 
       <div>
         <Label htmlFor="emergency_contact_address">Emergency Contact Address</Label>
@@ -839,7 +839,7 @@ export default function CreateContact() {
 
   const renderSettingsSection = () => (
     <div className="space-y-6">
-     
+
       <div>
         <Label htmlFor="status">Status</Label>
         <Select
@@ -879,10 +879,10 @@ export default function CreateContact() {
         description={isEditMode ? "Edit contact profile" : "Create a new contact profile"}
       />
       <PageBreadcrumb pageTitle={isEditMode ? "Edit Contact" : "Create Contact"} />
-      
+
       <div className="flex flex-col lg:flex-row gap-6 justify-center">
         <form onSubmit={handleSubmit}>
-      
+
           <div className="flex-1">
             {isLoading ? (
               <div className="flex items-center justify-center py-12">
@@ -909,7 +909,7 @@ export default function CreateContact() {
                    {item.content}
                  </div>
                 ))}
-               
+
 
                 <div className="mt-6 flex justify-end gap-4">
                   <Button
@@ -957,11 +957,11 @@ export default function CreateContact() {
               </div>
             )}
           </div>
-          
+
         </form>
       </div>
 
-      
+
     </>
   );
 }
