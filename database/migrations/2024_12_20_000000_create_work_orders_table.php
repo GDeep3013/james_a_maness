@@ -27,6 +27,8 @@ return new class extends Migration
             $table->bigInteger('vendor_id')->nullable();
             $table->string('invoice_number')->nullable();
             $table->string('po_number')->nullable();
+            $table->json('service_items')->nullable();
+            $table->json('parts')->nullable();
             $table->timestamps();
         });
     }

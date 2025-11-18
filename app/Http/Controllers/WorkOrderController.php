@@ -12,13 +12,30 @@ use Auth;
 
 class WorkOrderController extends Controller
 {
+    private function prepareRequestData(Request $request)
+    {
+        $data = $request->all();
+        
+        if ($request->has('service_items') && is_string($request->service_items)) {
+            $decoded = json_decode($request->service_items, true);
+            $data['service_items'] = $decoded !== null ? $decoded : [];
+        }
+        
+        if ($request->has('parts') && is_string($request->parts)) {
+            $decoded = json_decode($request->parts, true);
+            $data['parts'] = $decoded !== null ? $decoded : [];
+        }
+        
+        $request->merge($data);
+    }
+
     public function index(Request $request)
     {
         $tableColumns = Schema::getColumnListing('work_orders');
         $query = WorkOrder::with([
             'vehicle:id,vehicle_name',
             'assignedTo:id,first_name,last_name',
-            'vendor:id,first_name,company_contact',
+            'vendor:id,name',
             'user:id,name'
         ])->orderBy('id', 'desc');
         
@@ -31,7 +48,7 @@ class WorkOrderController extends Controller
         if (!empty($searchTerm)) {
             $query->where(function ($query) use ($tableColumns, $searchTerm) {
                 foreach ($tableColumns as $column) {
-                    if ($column !== 'created_at' && $column !== 'updated_at' && $column !== 'labels') {
+                    if ($column !== 'created_at' && $column !== 'updated_at' && $column !== 'labels' && $column !== 'service_items' && $column !== 'parts') {
                         $query->orWhere($column, 'LIKE', '%' . $searchTerm . '%');
                     }
                 }
@@ -59,6 +76,8 @@ class WorkOrderController extends Controller
     public function store(Request $request)
     {
         try {
+            $this->prepareRequestData($request);
+            
             $validatedData = $request->validate([
                 'vehicle_id' => 'nullable|exists:vehicals,id',
                 'status' => 'nullable|string|max:255',
@@ -76,6 +95,8 @@ class WorkOrderController extends Controller
                 //'vendor_id' => 'nullable|exists:vendors,id',
                 'invoice_number' => 'nullable|string|max:255',
                 'po_number' => 'nullable|string|max:255',
+                'service_items' => 'nullable|array',
+                'parts' => 'nullable|array',
             ]);
 
             DB::beginTransaction();
@@ -106,6 +127,22 @@ class WorkOrderController extends Controller
             $workOrder->vendor_id = $request->vendor_id ?? null;
             $workOrder->invoice_number = $request->invoice_number ?? null;
             $workOrder->po_number = $request->po_number ?? null;
+            
+            $serviceItems = $request->service_items;
+            if (is_string($serviceItems)) {
+                $decodedServiceItems = json_decode($serviceItems, true);
+                $workOrder->service_items = $decodedServiceItems !== null ? $decodedServiceItems : [];
+            } else {
+                $workOrder->service_items = $serviceItems ?? [];
+            }
+            
+            $parts = $request->parts;
+            if (is_string($parts)) {
+                $decodedParts = json_decode($parts, true);
+                $workOrder->parts = $decodedParts !== null ? $decodedParts : [];
+            } else {
+                $workOrder->parts = $parts ?? [];
+            }
 
             if ($workOrder->save()) {
                 DB::commit();
@@ -178,8 +215,8 @@ class WorkOrderController extends Controller
 
         $workOrder = WorkOrder::with([
             'vehicle:id,vehicle_name',
-            'assignedTo:id,first_name,last_name',
-            'vendor:id,first_name,company_contact',
+            // 'assignedTo:id,first_name,last_name',
+            'vendor:id,name',
             'user:id,name'
         ])->where('id', $id)->first();
 
@@ -215,6 +252,8 @@ class WorkOrderController extends Controller
         }
 
         try {
+            $this->prepareRequestData($request);
+            
             $validatedData = $request->validate([
                 'vehicle_id' => 'nullable|exists:vehicals,id',
                 'status' => 'nullable|string|max:255',
@@ -232,6 +271,8 @@ class WorkOrderController extends Controller
                 'vendor_id' => 'nullable|exists:vendors,id',
                 'invoice_number' => 'nullable|string|max:255',
                 'po_number' => 'nullable|string|max:255',
+                'service_items' => 'nullable|array',
+                'parts' => 'nullable|array',
             ]);
 
             DB::beginTransaction();
@@ -289,6 +330,24 @@ class WorkOrderController extends Controller
             }
             if ($request->has('po_number')) {
                 $workOrder->po_number = $request->po_number;
+            }
+            if ($request->has('service_items')) {
+                $serviceItems = $request->service_items;
+                if (is_string($serviceItems)) {
+                    $decodedServiceItems = json_decode($serviceItems, true);
+                    $workOrder->service_items = $decodedServiceItems !== null ? $decodedServiceItems : [];
+                } else {
+                    $workOrder->service_items = $serviceItems ?? [];
+                }
+            }
+            if ($request->has('parts')) {
+                $parts = $request->parts;
+                if (is_string($parts)) {
+                    $decodedParts = json_decode($parts, true);
+                    $workOrder->parts = $decodedParts !== null ? $decodedParts : [];
+                } else {
+                    $workOrder->parts = $parts ?? [];
+                }
             }
 
             if ($workOrder->save()) {

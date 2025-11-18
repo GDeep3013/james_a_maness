@@ -36,6 +36,9 @@ import CreateIssue from "./pages/Issues/CreateIssue";
 import IssueDetails from "./pages/Issues/IssueDetails";
 import Vendors from "./pages/vendor/index";
 import CreateVendor from "./pages/vendor/CreateVendor";
+import CreatePart from "./pages/Parts/CreatePart";
+import PartsList from "./pages/Parts/PartsList";
+import EditPart from "./pages/Parts/EditPart";
 
 export default function App() {
   return (
@@ -244,6 +247,31 @@ export default function App() {
               }
             />
 
+          <Route
+            path="/parts"
+            element={
+              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                <PartsList />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/parts/create"
+            element={
+              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                <CreatePart />
+              </ProtectedRoute>
+            }
+          />
+
+            <Route
+            path="/parts/:id/edit"
+            element={
+              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                <EditPart />
+              </ProtectedRoute>
+            }
+          />
 
 
 

@@ -14,6 +14,14 @@ import { contactService } from "../../services/contactService";
 import Issues from "./Issues";
 import LineItems from "./LineItems";
 import { WORK_ORDER_STATUS_OPTIONS, REPAIR_PRIORITY_CLASS_OPTIONS } from "../../constants/selectOptions";
+import {
+  ServiceItem,
+  Part,
+  Vehicle,
+  Contact,
+  Vendor,
+  WorkOrderFormData,
+} from "../../types/workOrderTypes";
 
 interface SidebarItem {
   key: string;
@@ -21,24 +29,8 @@ interface SidebarItem {
   content: React.ReactNode;
 }
 
-interface Vehicle {
-  id: number;
-  vehicle_name: string;
-}
-
-interface Contact {
-  id: number;
-  first_name: string;
-  last_name: string;
-}
-
-interface Vendor {
-  id: number;
-  first_name: string;
-  company_contact?: string;
-}
-
 export default function CreateWorkOrder() {
+
   const navigate = useNavigate();
   const { id } = useParams<{ id?: string }>();
   const isEditMode = !!id;
@@ -49,7 +41,7 @@ export default function CreateWorkOrder() {
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [vendors] = useState<Vendor[]>([]);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<WorkOrderFormData>({
     vehicle_id: "",
     status: "Open",
     repair_priority_class: "",
@@ -65,6 +57,8 @@ export default function CreateWorkOrder() {
     vendor_id: "",
     invoice_number: "",
     po_number: "",
+    service_items: [],
+    parts: [],
   });
 
   useEffect(() => {
@@ -123,6 +117,12 @@ export default function CreateWorkOrder() {
           vendor_id: String(workOrder.vendor_id || ""),
           invoice_number: String(workOrder.invoice_number || ""),
           po_number: String(workOrder.po_number || ""),
+          service_items: Array.isArray(workOrder.service_items)
+            ? (workOrder.service_items as ServiceItem[])
+            : [] as ServiceItem[],
+          parts: Array.isArray(workOrder.parts)
+            ? (workOrder.parts as Part[])
+            : [] as Part[],
         });
       }
     } catch {
@@ -223,7 +223,16 @@ export default function CreateWorkOrder() {
         vendor_id: formData.vendor_id ? parseInt(formData.vendor_id) : undefined,
         invoice_number: formData.invoice_number || undefined,
         po_number: formData.po_number || undefined,
+        service_items: formData.service_items,
+        parts: formData.parts,
       };
+
+      // console.log(typeof workOrderData.service_items);
+      // console.log(typeof workOrderData.parts);
+
+      // console.log(workOrderData);
+      // return;
+
 
       const response = isEditMode && id
         ? await workOrderService.update(parseInt(id), workOrderData)
@@ -271,7 +280,6 @@ export default function CreateWorkOrder() {
     }
   };
 
-
   const vehicleOptions = vehicles.map((vehicle) => ({
     value: vehicle.id.toString(),
     label: vehicle.vehicle_name,
@@ -284,7 +292,7 @@ export default function CreateWorkOrder() {
 
   const vendorOptions = vendors.map((vendor) => ({
     value: vendor.id.toString(),
-    label: vendor.company_contact || `${vendor.first_name}`.trim(),
+    label: vendor.name
   }));
 
   const renderDetailsSection = () => (
@@ -515,10 +523,9 @@ export default function CreateWorkOrder() {
 
   const renderLineItemsSection = () => (
     <LineItems
-      workOrderId={id ? parseInt(id) : undefined}
-      lineItems={[]}
-      onAddLineItem={() => {}}
-      onEditLineItem={() => {}}
+      serviceItems={formData.service_items}
+      parts={formData.parts}
+      setFormData={setFormData}
       onDeleteLineItem={() => {}}
     />
   );
@@ -571,16 +578,17 @@ export default function CreateWorkOrder() {
                 <div className="mt-6 flex justify-end gap-4">
                   <Button
                     variant="outline"
-                    size="md"
+                    size="sm"
                     onClick={() => navigate("/work-orders")}
                     disabled={isSubmitting}
                   >
                     Cancel
                   </Button>
-                  <button
+                  <Button
+                    variant="primary"
                     type="submit"
+                    size="sm"
                     disabled={isSubmitting}
-                    className="inline-flex items-center justify-center gap-2 rounded-lg transition px-3 py-3 text-sm bg-brand-500 text-white shadow-theme-xs hover:bg-brand-600 disabled:bg-brand-300 disabled:cursor-not-allowed"
                   >
                     {isSubmitting ? (
                       <>
@@ -609,7 +617,7 @@ export default function CreateWorkOrder() {
                     ) : (
                       isEditMode ? "Update Work Order" : "Save Work Order"
                     )}
-                  </button>
+                  </Button>
                 </div>
               </div>
             )}

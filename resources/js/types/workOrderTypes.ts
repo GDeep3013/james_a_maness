@@ -1,0 +1,82 @@
+export interface ServiceItem {
+  id: number;
+  name: string;
+  description?: string;
+  type: "Service Tasks" | "Parts";
+  quantity?: number;
+  unit_price?: number;
+  total?: number;
+  created_at?: string;
+  label?: string;
+  value?: string;
+}
+
+export interface Part {
+  id: number;
+  part_name: string;
+  part_code?: string;
+  description?: string;
+  quantity?: number;
+  unit_price?: number;
+  purchase_price?: number;
+  total?: number;
+  value?: string;
+  label?: string;
+  created_at?: string;
+}
+
+export interface WorkOrderFormData {
+  vehicle_id: string;
+  status: string;
+  repair_priority_class: string;
+  issue_date: string;
+  issued_by: string;
+  scheduled_start_date: string;
+  send_scheduled_start_date_reminder: boolean;
+  actual_start_date: string;
+  expected_completion_date: string;
+  actual_completion_date: string;
+  use_start_odometer_for_completion_meter: boolean;
+  assigned_to: string;
+  vendor_id: string;
+  invoice_number: string;
+  po_number: string;
+  service_items: ServiceItem[];
+  parts: Part[];
+}
+
+export interface Vehicle {
+  id: number;
+  vehicle_name: string;
+}
+
+export interface Contact {
+  id: number;
+  first_name: string;
+  last_name: string;
+}
+
+export interface Vendor {
+  id: number;
+  name: string;
+  company_contact?: string;
+}
+
+export interface LineItemsProps {
+  setFormData?: React.Dispatch<React.SetStateAction<WorkOrderFormData>>;
+  serviceItems?: ServiceItem[];
+  parts?: Part[];
+  onDeleteLineItem?: (lineItemId: number) => void;
+}
+
+export interface ServiceTasksProps {
+  selectedTasks: ServiceItem[];
+  setSelectedTasks: (tasks: ServiceItem[]) => void;
+  onDeleteTask?: (taskId: number) => void;
+}
+
+export interface PartsProps {
+  selectedParts: Part[];
+  setSelectedParts: (parts: Part[]) => void;
+  onDeletePart?: (partId: number) => void;
+}
