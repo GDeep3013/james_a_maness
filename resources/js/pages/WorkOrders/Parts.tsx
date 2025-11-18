@@ -1,33 +1,12 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Select from "react-select";
 import { partService } from "../../services/partService";
-
-interface Part {
-  id: number;
-  part_name: string;
-  part_code?: string;
-  description?: string;
-  type: "Service Tasks" | "Parts";
-  value?: string;
-  label?: string;
-  quantity?: number;
-  unit_price?: number;
-  purchase_price?: number;
-  total?: number;
-  created_at?: string;
-}
-
-interface PartsProps {
-  selectedParts: Part[];
-  setSelectedParts: (parts: Part[]) => void;
-  onEditPart?: (partId: number) => void;
-  onDeletePart?: (partId: number) => void;
-}
+import { Part, PartsProps } from "../../types/workOrderTypes";
+import { TrashBinIcon } from "../../icons";
 
 export default function Parts({
   selectedParts,
   setSelectedParts,
-  onEditPart,
   onDeletePart,
 }: PartsProps) {
   const [partOptions, setPartOptions] = useState<Array<{ value: string; label: string; id?: number; [key: string]: unknown }>>([]);
@@ -78,7 +57,6 @@ export default function Parts({
           id: partId,
           part_name: (option.part_name as string) || option.label,
           part_code: (option.part_code as string) || undefined,
-          type: "Parts",
           value: option.value,
           label: option.label,
           description: (option.description as string) || undefined,
@@ -163,13 +141,14 @@ export default function Parts({
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <h3 className="text-sm font-semibold text-gray-800 mb-1">
-                      {item.part_name}
+                      {item.part_name} {" "} 
+                      {item.part_code && (
+                        <span className="!text-xs text-gray-500">
+                          ({item.part_code})
+                        </span>
+                      )}
                     </h3>
-                    {item.part_code && (
-                      <p className="text-xs text-gray-500 mb-1">
-                        Code: {item.part_code}
-                      </p>
-                    )}
+                    
                     {item.description && (
                       <p className="text-sm text-gray-600 mb-2">
                         {item.description}
@@ -192,19 +171,12 @@ export default function Parts({
                     </div>
                   </div>
                   <div className="flex items-center gap-2 ml-4">
-                    {onEditPart && (
-                      <button
-                        onClick={() => onEditPart(item.id)}
-                        className="text-sm text-brand-600 hover:text-brand-700"
-                      >
-                        Edit
-                      </button>
-                    )}
                     <button
                       onClick={() => handleDeletePart(item.id)}
-                      className="text-sm text-error-600 hover:text-error-700"
+                      className="p-2 text-error-600 hover:text-error-700 hover:bg-error-50 rounded transition-colors"
+                      title="Delete"
                     >
-                      Delete
+                      <TrashBinIcon className="w-4 h-4" />
                     </button>
                   </div>
                 </div>

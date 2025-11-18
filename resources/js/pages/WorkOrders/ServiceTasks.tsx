@@ -1,31 +1,12 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Select from "react-select";
 import { serviceTaskService } from "../../services/serviceTaskService";
-
-interface ServiceTask {
-  id: number;
-  name: string;
-  description?: string;
-  type: "Service Tasks" | "Parts";
-  value?: string;
-  label?: string;
-  quantity?: number;
-  unit_price?: number;
-  total?: number;
-  created_at?: string;
-}
-
-interface ServiceTasksProps {
-  selectedTasks: ServiceTask[];
-  setSelectedTasks: (tasks: ServiceTask[]) => void;
-  onEditTask?: (taskId: number) => void;
-  onDeleteTask?: (taskId: number) => void;
-}
+import { ServiceItem, ServiceTasksProps } from "../../types/workOrderTypes";
+import { TrashBinIcon } from "../../icons";
 
 export default function ServiceTasks({
   selectedTasks,
   setSelectedTasks,
-  onEditTask,
   onDeleteTask,
 }: ServiceTasksProps) {
   const [serviceTaskOptions, setServiceTaskOptions] = useState<Array<{ value: string; label: string; id?: number; [key: string]: unknown }>>([]);
@@ -67,7 +48,7 @@ export default function ServiceTasks({
     }
 
     const existingIds = new Set(selectedTasks.map((task) => task.id));
-    const newTasks: ServiceTask[] = [];
+    const newTasks: ServiceItem[] = [];
     
     selectedOptions.forEach((option) => {
       const taskId = (option.id as number) || parseInt(option.value);
@@ -175,19 +156,12 @@ export default function ServiceTasks({
                     </div>
                   </div>
                   <div className="flex items-center gap-2 ml-4">
-                    {onEditTask && (
-                      <button
-                        onClick={() => onEditTask(item.id)}
-                        className="text-sm text-brand-600 hover:text-brand-700 dark:text-brand-400 dark:hover:text-brand-300"
-                      >
-                        Edit
-                      </button>
-                    )}
                     <button
                       onClick={() => handleDeleteTask(item.id)}
-                      className="text-sm text-error-600 hover:text-error-700 dark:text-error-400 dark:hover:text-error-300"
+                      className="p-2 text-error-600 hover:text-error-700 dark:text-error-400 dark:hover:text-error-300 hover:bg-error-50 dark:hover:bg-error-900/20 rounded transition-colors"
+                      title="Delete"
                     >
-                      Delete
+                      <TrashBinIcon className="w-4 h-4" />
                     </button>
                   </div>
                 </div>

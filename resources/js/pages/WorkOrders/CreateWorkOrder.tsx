@@ -14,56 +14,19 @@ import { contactService } from "../../services/contactService";
 import Issues from "./Issues";
 import LineItems from "./LineItems";
 import { WORK_ORDER_STATUS_OPTIONS, REPAIR_PRIORITY_CLASS_OPTIONS } from "../../constants/selectOptions";
+import {
+  ServiceItem,
+  Part,
+  Vehicle,
+  Contact,
+  Vendor,
+  WorkOrderFormData,
+} from "../../types/workOrderTypes";
 
 interface SidebarItem {
   key: string;
   label: string;
   content: React.ReactNode;
-}
-
-interface Vehicle {
-  id: number;
-  vehicle_name: string;
-}
-
-interface Contact {
-  id: number;
-  first_name: string;
-  last_name: string;
-}
-
-interface Vendor {
-  id: number;
-  first_name: string;
-  company_contact?: string;
-}
-
-interface ServiceItem {
-  id: number;
-  name: string;
-  description?: string;
-  type: "Service Tasks" | "Parts";
-  quantity?: number;
-  unit_price?: number;
-  total?: number;
-  created_at?: string;
-  label?: string;
-  value?: string;
-}
-
-interface Part {
-  id: number;
-  part_name: string;
-  part_code?: string;
-  description?: string;
-  type: "Service Tasks" | "Parts";
-  quantity?: number;
-  unit_price?: number;
-  purchase_price?: number;
-  total?: number;
-  value?: string;
-  label?: string;
-  created_at?: string;
 }
 
 export default function CreateWorkOrder() {
@@ -78,7 +41,7 @@ export default function CreateWorkOrder() {
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [vendors] = useState<Vendor[]>([]);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<WorkOrderFormData>({
     vehicle_id: "",
     status: "Open",
     repair_priority_class: "",
@@ -94,8 +57,8 @@ export default function CreateWorkOrder() {
     vendor_id: "",
     invoice_number: "",
     po_number: "",
-    service_items: [] as ServiceItem[],
-    parts: [] as Part[],
+    service_items: [],
+    parts: [],
   });
 
   useEffect(() => {
@@ -329,7 +292,7 @@ export default function CreateWorkOrder() {
 
   const vendorOptions = vendors.map((vendor) => ({
     value: vendor.id.toString(),
-    label: vendor.company_contact || `${vendor.first_name}`.trim(),
+    label: vendor.name
   }));
 
   const renderDetailsSection = () => (
@@ -563,7 +526,6 @@ export default function CreateWorkOrder() {
       serviceItems={formData.service_items}
       parts={formData.parts}
       setFormData={setFormData}
-      onEditLineItem={() => {}}
       onDeleteLineItem={() => {}}
     />
   );

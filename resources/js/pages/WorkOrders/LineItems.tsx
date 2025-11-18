@@ -1,65 +1,16 @@
 import { useState, useEffect } from "react";
 import ServiceTasks from "./ServiceTasks";
 import Parts from "./Parts";
-
-interface ServiceItem {
-  id: number;
-  name: string;
-  description?: string;
-  type: "Service Tasks" | "Parts";
-  quantity?: number;
-  unit_price?: number;
-  total?: number;
-  created_at?: string;
-  label?: string;
-  value?: string;
-}
-
-interface Part {
-  id: number;
-  part_name: string;
-  part_code?: string;
-  description?: string;
-  quantity?: number;
-  unit_price?: number;
-  value?: string;
-  label?: string;
-}
-
-interface WorkOrderFormData {
-  vehicle_id: string;
-  status: string;
-  repair_priority_class: string;
-  issue_date: string;
-  issued_by: string;
-  scheduled_start_date: string;
-  send_scheduled_start_date_reminder: boolean;
-  actual_start_date: string;
-  expected_completion_date: string;
-  actual_completion_date: string;
-  use_start_odometer_for_completion_meter: boolean;
-  assigned_to: string;
-  vendor_id: string;
-  invoice_number: string;
-  po_number: string;
-  service_items: ServiceItem[];
-  parts: Part[];
-}
-
-interface LineItemsProps {
-  setFormData?: React.Dispatch<React.SetStateAction<WorkOrderFormData>>;
-  serviceItems?: ServiceItem[];
-  parts?: Part[];
-  onAddLineItem?: (type: "Service Tasks" | "Parts") => void;
-  onEditLineItem?: (lineItemId: number) => void;
-  onDeleteLineItem?: (lineItemId: number) => void;
-}
+import {
+  ServiceItem,
+  Part,
+  LineItemsProps,
+} from "../../types/workOrderTypes";
 
 export default function LineItems({
   serviceItems,
   parts,
   setFormData,
-  onEditLineItem,
   onDeleteLineItem,
 }: LineItemsProps) {
 
@@ -132,7 +83,6 @@ export default function LineItems({
         <ServiceTasks
           selectedTasks={selectedTasks}
           setSelectedTasks={setSelectedTasks}
-          onEditTask={onEditLineItem}
           onDeleteTask={onDeleteLineItem}
         />
       )}
@@ -141,7 +91,6 @@ export default function LineItems({
         <Parts
           selectedParts={selectedParts}
           setSelectedParts={setSelectedParts}
-          onEditPart={onEditLineItem}
           onDeletePart={onDeleteLineItem}
         />
       )}
