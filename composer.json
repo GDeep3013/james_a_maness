@@ -7,11 +7,8 @@
     "require": {
         "php": "^8.0.2",
         "barryvdh/laravel-dompdf": "^2.2",
-        "darkaonline/l5-swagger": "^8.5",
         "dompdf/dompdf": "^2.0",
-        "google/apiclient": "^2.18",
         "guzzlehttp/guzzle": "^7.2",
-        "kreait/laravel-firebase": "^5.10",
         "laravel/framework": "^9.19",
         "laravel/sanctum": "^3.0",
         "laravel/tinker": "^2.7",

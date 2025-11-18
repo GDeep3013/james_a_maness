@@ -12,6 +12,11 @@ use Auth;
 
 class IssueController extends Controller
 {
+    private function isAdminOrManager($user)
+    {
+        return in_array($user->type, ['Admin', 'Manager']);
+    }
+
     public function index(Request $request)
     {
         $user = Auth::user();
@@ -30,17 +35,16 @@ class IssueController extends Controller
             'workOrder:id,status'
         ])->orderBy('id', 'desc');
         
-        // Filter issues: user can only see issues they reported or are assigned to them
-        $userContact = \App\Models\Contact::where('user_id', $user->id)->first();
-        $query->where(function ($q) use ($user, $userContact) {
-            // Issues reported by the user (reported_by matches user's name)
-            $q->where('reported_by', $user->id);
-            
-            // Issues assigned to the user (if user has a contact record)
-            if ($userContact) {
-                $q->orWhere('assigned_to', $userContact->id);
-            }
-        });
+        if (!$this->isAdminOrManager($user)) {
+            $userContact = \App\Models\Contact::where('user_id', $user->id)->first();
+            $query->where(function ($q) use ($user, $userContact) {
+                $q->where('reported_by', $user->id);
+                
+                if ($userContact) {
+                    $q->orWhere('assigned_to', $userContact->id);
+                }
+            });
+        }
         
         $searchTerm = $request->search;
 
@@ -181,25 +185,24 @@ class IssueController extends Controller
             ], 404);
         }
 
-        // Check if user has permission to view this issue
-        $userContact = \App\Models\Contact::where('user_id', $user->id)->first();
-        $canView = false;
-        
-        // User can view if they reported it
-        if ($issue->reported_by == $user->id) {
-            $canView = true;
-        }
-        
-        // User can view if it's assigned to them
-        if ($userContact && $issue->assigned_to == $userContact->id) {
-            $canView = true;
-        }
+        if (!$this->isAdminOrManager($user)) {
+            $userContact = \App\Models\Contact::where('user_id', $user->id)->first();
+            $canView = false;
+            
+            if ($issue->reported_by == $user->id) {
+                $canView = true;
+            }
+            
+            if ($userContact && $issue->assigned_to == $userContact->id) {
+                $canView = true;
+            }
 
-        if (!$canView) {
-            return response()->json([
-                'status' => false, 
-                'message' => 'You do not have permission to view this issue'
-            ], 403);
+            if (!$canView) {
+                return response()->json([
+                    'status' => false, 
+                    'message' => 'You do not have permission to view this issue'
+                ], 403);
+            }
         }
 
         return response()->json([
@@ -240,25 +243,24 @@ class IssueController extends Controller
             ], 404);
         }
 
-        // Check if user has permission to edit this issue
-        $userContact = \App\Models\Contact::where('user_id', $user->id)->first();
-        $canEdit = false;
-        
-        // User can edit if they reported it
-        if ($issue->reported_by == $user->id) {
-            $canEdit = true;
-        }
-        
-        // User can edit if it's assigned to them
-        if ($userContact && $issue->assigned_to == $userContact->id) {
-            $canEdit = true;
-        }
+        if (!$this->isAdminOrManager($user)) {
+            $userContact = \App\Models\Contact::where('user_id', $user->id)->first();
+            $canEdit = false;
+            
+            if ($issue->reported_by == $user->id) {
+                $canEdit = true;
+            }
+            
+            if ($userContact && $issue->assigned_to == $userContact->id) {
+                $canEdit = true;
+            }
 
-        if (!$canEdit) {
-            return response()->json([
-                'status' => false, 
-                'message' => 'You do not have permission to edit this issue'
-            ], 403);
+            if (!$canEdit) {
+                return response()->json([
+                    'status' => false, 
+                    'message' => 'You do not have permission to edit this issue'
+                ], 403);
+            }
         }
 
         return response()->json([
@@ -294,25 +296,24 @@ class IssueController extends Controller
             ], 404);
         }
 
-        // Check if user has permission to update this issue
-        $userContact = \App\Models\Contact::where('user_id', $user->id)->first();
-        $canUpdate = false;
-        
-        // User can update if they reported it
-        if ($issue->reported_by == $user->id) {
-            $canUpdate = true;
-        }
-        
-        // User can update if it's assigned to them
-        if ($userContact && $issue->assigned_to == $userContact->id) {
-            $canUpdate = true;
-        }
+        if (!$this->isAdminOrManager($user)) {
+            $userContact = \App\Models\Contact::where('user_id', $user->id)->first();
+            $canUpdate = false;
+            
+            if ($issue->reported_by == $user->id) {
+                $canUpdate = true;
+            }
+            
+            if ($userContact && $issue->assigned_to == $userContact->id) {
+                $canUpdate = true;
+            }
 
-        if (!$canUpdate) {
-            return response()->json([
-                'status' => false, 
-                'message' => 'You do not have permission to update this issue'
-            ], 403);
+            if (!$canUpdate) {
+                return response()->json([
+                    'status' => false, 
+                    'message' => 'You do not have permission to update this issue'
+                ], 403);
+            }
         }
 
         try {
@@ -444,25 +445,24 @@ class IssueController extends Controller
             ], 404);
         }
 
-        // Check if user has permission to delete this issue
-        $userContact = \App\Models\Contact::where('user_id', $user->id)->first();
-        $canDelete = false;
-        
-        // User can delete if they reported it
-        if ($issue->reported_by == $user->id) {
-            $canDelete = true;
-        }
-        
-        // // User can delete if it's assigned to them
-        // if ($userContact && $issue->assigned_to == $userContact->id) {
-        //     $canDelete = true;
-        // }
+        if (!$this->isAdminOrManager($user)) {
+            $userContact = \App\Models\Contact::where('user_id', $user->id)->first();
+            $canDelete = false;
+            
+            if ($issue->reported_by == $user->id) {
+                $canDelete = true;
+            }
 
-        if (!$canDelete) {
-            return response()->json([
-                'status' => false, 
-                'message' => 'You do not have permission to delete this issue'
-            ], 403);
+            if ($userContact && $issue->assigned_to == $userContact->id) {
+                $canDelete = true;
+            }
+
+            if (!$canDelete) {
+                return response()->json([
+                    'status' => false, 
+                    'message' => 'You do not have permission to delete this issue'
+                ], 403);
+            }
         }
 
         if ($issue->delete()) {

@@ -62,7 +62,6 @@ export default function CreateWorkOrder() {
     actual_completion_date: "",
     use_start_odometer_for_completion_meter: true,
     assigned_to: "",
-    labels: [] as string[],
     vendor_id: "",
     invoice_number: "",
     po_number: "",
@@ -121,7 +120,6 @@ export default function CreateWorkOrder() {
           actual_completion_date: String(workOrder.actual_completion_date || ""),
           use_start_odometer_for_completion_meter: Boolean(workOrder.use_start_odometer_for_completion_meter !== false),
           assigned_to: String(workOrder.assigned_to || ""),
-          labels: Array.isArray(workOrder.labels) ? workOrder.labels as string[] : [],
           vendor_id: String(workOrder.vendor_id || ""),
           invoice_number: String(workOrder.invoice_number || ""),
           po_number: String(workOrder.po_number || ""),
@@ -222,7 +220,6 @@ export default function CreateWorkOrder() {
         actual_completion_date: formData.actual_completion_date || undefined,
         use_start_odometer_for_completion_meter: Boolean(formData.use_start_odometer_for_completion_meter),
         assigned_to: formData.assigned_to ? parseInt(formData.assigned_to) : undefined,
-        labels: formData.labels.length > 0 ? formData.labels : undefined,
         vendor_id: formData.vendor_id ? parseInt(formData.vendor_id) : undefined,
         invoice_number: formData.invoice_number || undefined,
         po_number: formData.po_number || undefined,
@@ -462,16 +459,6 @@ export default function CreateWorkOrder() {
           placeholder="Please select"
           onChange={handleSelectChange("assigned_to")}
           defaultValue={formData.assigned_to}
-        />
-      </div>
-
-      <div>
-        <Label htmlFor="labels">Labels</Label>
-        <Select
-          options={[]}
-          placeholder="Please select"
-          onChange={handleSelectChange("labels")}
-          defaultValue=""
         />
       </div>
 
