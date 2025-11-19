@@ -8,6 +8,7 @@ use App\Http\Controllers\VehicleController;
 use App\Http\Controllers\WorkOrderController;
 use App\Http\Controllers\IssueController;
 use App\Http\Controllers\ServiceTaskController;
+use App\Http\Controllers\ServiceReminderController;
 use App\Http\Controllers\VendorController;
 
 use App\Http\Controllers\PartController;
@@ -50,6 +51,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/service-tasks/available-subtasks', [ServiceTaskController::class, 'getAvailableSubtasks']);
     Route::apiResource('service-tasks', ServiceTaskController::class);
     Route::get('/service-tasks/{id}/edit', [ServiceTaskController::class, 'edit'])->where('id', '[0-9]+');
+
+    Route::get('/service-reminders/check-logged', [ServiceReminderController::class, 'checkServiceTaskLogged']);
+    Route::apiResource('service-reminders', ServiceReminderController::class);
+    Route::get('/service-reminders/{id}/edit', [ServiceReminderController::class, 'edit'])->where('id', '[0-9]+');
 
     Route::apiResource('vendors', VendorController::class);
     Route::get('/vendors/{id}/edit', [VendorController::class, 'edit'])->where('id', '[0-9]+');

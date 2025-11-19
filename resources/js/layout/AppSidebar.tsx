@@ -63,7 +63,7 @@ const navItems: NavItem[] = [
     allowedRoles: ["Admin", "Manager"],
     subItems: [
       { name: "Work Orders", path: "/work-orders", pro: false, allowedRoles: ["Admin", "Manager"] },
-      { name: "Service Reminders", path: "/maintenance-reminders", pro: false, allowedRoles: ["Admin", "Manager"] },
+      { name: "Service Reminders", path: "/service-reminders", pro: false, allowedRoles: ["Admin", "Manager"] },
       { name: "Services", path: "/maintenance-services", pro: false, allowedRoles: ["Admin", "Manager"] },
       { name: "Service Tasks", path: "/service-tasks", pro: false, allowedRoles: ["Admin", "Manager"] },
       { name: "Issues", path: "/issues", pro: false, allowedRoles: ["Admin", "Manager"] },

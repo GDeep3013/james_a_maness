@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Select from "react-select";
 import { serviceTaskService } from "../../services/serviceTaskService";
 import { ServiceItem, ServiceTasksProps } from "../../types/workOrderTypes";
@@ -124,29 +124,29 @@ export default function ServiceTasks({
         />
       </div>
 
-      <div className="min-h-[200px] border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg p-2">
+      <div className="min-h-[200px] border-2 border-dashed border-gray-300 rounded-lg p-2">
         {selectedTasks.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12">
-            <p className="text-gray-500 dark:text-gray-400 text-center mb-4">No Service Task line items added</p>
+            <p className="text-gray-500 text-center mb-4">No Service Task line items added</p>
           </div>
         ) : (
           <div className="space-y-4">
             {selectedTasks.map((item) => (
               <div
                 key={item.id}
-                className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors bg-white dark:bg-gray-900"
+                className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors bg-white"
               >
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
-                    <h3 className="text-sm font-semibold text-gray-800 dark:text-white/90 mb-1">
+                    <h3 className="text-sm font-semibold text-gray-800 mb-1">
                       {item.name}
                     </h3>
                     {item.description && (
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                      <p className="text-sm text-gray-600 mb-2">
                         {item.description}
                       </p>
                     )}
-                    <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-500">
+                    <div className="flex items-center gap-4 text-xs text-gray-500">
                       <span>Qty: 6</span>
                       <span>Unit Price: 33.00</span>
                       <span className="font-semibold">Total: 12.00</span>
@@ -158,7 +158,7 @@ export default function ServiceTasks({
                   <div className="flex items-center gap-2 ml-4">
                     <button
                       onClick={() => handleDeleteTask(item.id)}
-                      className="p-2 text-error-600 hover:text-error-700 dark:text-error-400 dark:hover:text-error-300 hover:bg-error-50 dark:hover:bg-error-900/20 rounded transition-colors"
+                      className="p-2 text-error-600 hover:text-error-700 hover:bg-error-50 rounded transition-colors"
                       title="Delete"
                     >
                       <TrashBinIcon className="w-4 h-4" />
@@ -173,4 +173,3 @@ export default function ServiceTasks({
     </>
   );
 }
-

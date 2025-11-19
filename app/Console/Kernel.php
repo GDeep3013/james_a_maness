@@ -28,6 +28,9 @@ class Kernel extends ConsoleKernel
         $schedule->command('track:cron')->everyTwoMinutes();
         $schedule->command('reminder:cron')->daily();
 
+        $schedule->command('service-reminder:send-time-based')->dailyAt('07:00');
+        $schedule->command('service-reminder:send-meter-based')->dailyAt('07:00');
+
     }
 
     /**
