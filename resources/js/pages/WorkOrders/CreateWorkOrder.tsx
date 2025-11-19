@@ -13,6 +13,7 @@ import { vehicleService } from "../../services/vehicleService";
 import { contactService } from "../../services/contactService";
 import Issues from "./Issues";
 import LineItems from "./LineItems";
+import Notes from "./Notes";
 import { WORK_ORDER_STATUS_OPTIONS, REPAIR_PRIORITY_CLASS_OPTIONS } from "../../constants/selectOptions";
 import {
   ServiceItem,
@@ -22,6 +23,7 @@ import {
   Vendor,
   WorkOrderFormData,
 } from "../../types/workOrderTypes";
+
 
 interface SidebarItem {
   key: string;
@@ -59,6 +61,11 @@ export default function CreateWorkOrder() {
     po_number: "",
     service_items: [],
     parts: [],
+    notes: "",
+    discount_type: "percentage",
+    discount_value: 0,
+    tax_type: "percentage",
+    tax_value: 0,
   });
 
   useEffect(() => {
@@ -123,6 +130,11 @@ export default function CreateWorkOrder() {
           parts: Array.isArray(workOrder.parts)
             ? (workOrder.parts as Part[])
             : [] as Part[],
+          notes: String(workOrder.notes || ""),
+          discount_type: (workOrder.discount_type as "percentage" | "fixed") || "percentage",
+          discount_value: Number(workOrder.discount_value || 0),
+          tax_type: (workOrder.tax_type as "percentage" | "fixed") || "percentage",
+          tax_value: Number(workOrder.tax_value || 0),
         });
       }
     } catch {
@@ -225,6 +237,11 @@ export default function CreateWorkOrder() {
         po_number: formData.po_number || undefined,
         service_items: formData.service_items,
         parts: formData.parts,
+        notes: formData.notes || undefined,
+        discount_type: formData.discount_type || undefined,
+        discount_value: formData.discount_value || undefined,
+        tax_type: formData.tax_type || undefined,
+        tax_value: formData.tax_value || undefined,
       };
 
       // console.log(typeof workOrderData.service_items);
@@ -419,7 +436,7 @@ export default function CreateWorkOrder() {
           <DateTimePicker
             id="expected_completion_date"
             label=""
-            placeholder="Select expected completion date and time"
+            placeholder="Select expected date and time"
             onChange={handleDateTimeChange("expected_completion_date")}
             defaultDate={formData.expected_completion_date || undefined}
           />
@@ -430,7 +447,7 @@ export default function CreateWorkOrder() {
           <DateTimePicker
             id="actual_completion_date"
             label=""
-            placeholder="Select actual completion date and time"
+            placeholder="Select actual date and time"
             onChange={handleDateTimeChange("actual_completion_date")}
             defaultDate={formData.actual_completion_date || undefined}
           />
@@ -530,11 +547,29 @@ export default function CreateWorkOrder() {
     />
   );
 
+  const renderNotesSection = () => (
+    <Notes
+      notes={formData.notes}
+      setNotes={(notes) => setFormData((prev) => ({ ...prev, notes: notes }))}
+      serviceItems={formData.service_items}
+      parts={formData.parts}
+      discountType={formData.discount_type}
+      discountValue={formData.discount_value}
+      taxType={formData.tax_type}
+      taxValue={formData.tax_value}
+      setDiscountType={(type) => setFormData((prev) => ({ ...prev, discount_type: type }))}
+      setDiscountValue={(value) => setFormData((prev) => ({ ...prev, discount_value: value }))}
+      setTaxType={(type) => setFormData((prev) => ({ ...prev, tax_type: type }))}
+      setTaxValue={(value) => setFormData((prev) => ({ ...prev, tax_value: value }))}
+    />
+  );
+
   const sidebarItems: SidebarItem[] = [
     { key: "details", label: "Details", content: renderDetailsSection() },
     { key: "assignment", label: "Assignment", content: renderAssignmentSection() },
     { key: "issues", label: "", content: renderIssuesSection() },
     { key: "lineItems", label: "", content: renderLineItemsSection() },
+    { key: "notes", label: "", content: renderNotesSection() },
   ];
 
   return (
@@ -558,7 +593,7 @@ export default function CreateWorkOrder() {
                 </div>
               </div>
             ) : (
-              <div className="flex flex-col gap-6">
+              <div className="flex flex-col gap-6 max-w-5xl mx-auto">
                 {generalError && (
                   <div className="mb-6 p-4 bg-error-50 dark:bg-error-900/20 border border-error-200 dark:border-error-800 rounded-lg">
                     <p className="text-sm text-error-600 dark:text-error-400">{generalError}</p>

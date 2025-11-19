@@ -3,6 +3,7 @@ import Button from "../../components/ui/button/Button";
 import { useModal } from "../../hooks/useModal";
 import { issueService } from "../../services/issueService";
 const AddIssue = lazy(() => import("./AddIssue"));
+import { PencilIcon, TrashBinIcon } from "../../icons";
 
 interface Issue {
   id: number;
@@ -227,13 +228,13 @@ export default function Issues({
                       onClick={(e) => {e.preventDefault(); handleEditIssue(issue.id)}}
                       className="text-sm text-brand-600 hover:text-brand-700"
                     >
-                      Edit
+                      <PencilIcon className="w-4 h-4" />
                     </button>
                     <button
                       onClick={(e) => {e.preventDefault(); handleDeleteIssue(issue.id)}}
                       className="text-sm text-red-600 hover:text-red-700"
                     >
-                      Delete
+                      <TrashBinIcon className="w-4 h-4" />
                     </button>
                   </div>
                 </div>

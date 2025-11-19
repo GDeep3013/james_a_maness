@@ -310,14 +310,14 @@ export default function CreateIssue() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
           <Button
-              variant="primary"
+              variant="outline"
               size="sm"
               className="py-2"
               onClick={() => navigate("/issues")}
             >
               <ChevronLeftIcon className="size-5" />
             </Button>
-          <h1 className="text-2xl font-semibold text-gray-800 dark:text-white/90">
+          <h1 className="text-2xl font-medium text-gray-600 dark:text-white/90">
             {isEditMode ? "Edit Issue" : "Create Issue"}
           </h1>
           </div>
