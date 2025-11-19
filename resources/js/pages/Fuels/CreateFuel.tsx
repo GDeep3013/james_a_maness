@@ -353,7 +353,6 @@ export default function CreateFuel() {
                     </Label>
                     <DatePicker
                         id="date"
-                        label="Select Date"
                         placeholder="Select date"
                         onChange={handleDateChange("date")}
                     />
