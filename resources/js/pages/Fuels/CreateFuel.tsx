@@ -24,6 +24,19 @@ export interface FuelFormData {
     date: string;
 }
 
+// Add this new interface for API payload
+interface FuelApiPayload {
+    vehicle_id: number;
+    vendor_id: number;
+    fuel_type: string;
+    unit_type: string;
+    units: number;
+    price_per_volume_unit: number;
+    vehicle_meter: string;
+    notes?: string;
+    date: string;
+}
+
 export default function CreateFuel() {
     const navigate = useNavigate();
     const { id } = useParams<{ id?: string }>();
@@ -210,7 +223,7 @@ export default function CreateFuel() {
         setIsSubmitting(true);
 
         try {
-            const fuelData = {
+            const fuelData: FuelApiPayload = {
                 vehicle_id: parseInt(formData.vehicle_id),
                 vendor_id: parseInt(formData.vendor_id),
                 fuel_type: formData.fuel_type,
@@ -223,8 +236,8 @@ export default function CreateFuel() {
             };
             console.log(fuelData, "fuel")
             const response = isEditMode && id
-                ? await fuelService.update(parseInt(id), fuelData)
-                : await fuelService.create(fuelData);
+                ? await fuelService.update(parseInt(id), fuelData as any)
+                : await fuelService.create(fuelData as any);
 
             if (response.data?.status === true || response.status === 200 || response.status === 201) {
                 if (saveAndAddAnother && !isEditMode) {
