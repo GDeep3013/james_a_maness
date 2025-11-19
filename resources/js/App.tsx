@@ -36,11 +36,15 @@ import CreateIssue from "./pages/Issues/CreateIssue";
 import IssueDetails from "./pages/Issues/IssueDetails";
 import Vendors from "./pages/vendor/index";
 import CreateVendor from "./pages/vendor/CreateVendor";
+// import Fuels from "./pages/Fuels/index";
+// import CreateFuel from "./pages/Fuels/CreateFuel";
 import CreatePart from "./pages/Parts/CreatePart";
 import PartsList from "./pages/Parts/PartsList";
 import EditPart from "./pages/Parts/EditPart";
 import CreateServiceReminder from "./pages/ServiceReminders/CreateServiceReminder";
 import ServiceReminderList from "./pages/ServiceReminders/ServiceReminderList";
+import Fuels from "./pages/Fuels";
+import CreateFuel from "./pages/Fuels/CreateFuel";
 
 export default function App() {
   return (
@@ -248,6 +252,39 @@ export default function App() {
               </ProtectedRoute>
             }
           />
+
+            <Route
+              path="/fuels"
+              element={
+                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                  <Fuels/>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/fuels/create"
+              element={
+                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                  <CreateFuel/>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/fuels/:id"
+              element={
+                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                  <CreateFuel />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/fuels/:id/edit"
+              element={
+                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                  <CreateFuel />
+                </ProtectedRoute>
+              }
+            />
 
           <Route
             path="/parts"
