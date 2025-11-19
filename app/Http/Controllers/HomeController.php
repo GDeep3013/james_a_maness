@@ -16,12 +16,12 @@ class HomeController extends Controller
      */
     public function index(Request $request)
     {
-       // if (Auth::user()->status === 1) {
-           // if (Auth::user()->dashboard == 1) {
-                return view('home');
-           // } else {
-           //     return $this->redirectToFirstAllowedPage();
-           // }
+        // if (Auth::user()->status === 1) {
+        // if (Auth::user()->dashboard == 1) {
+        return view('home');
+        // } else {
+        //     return $this->redirectToFirstAllowedPage();
+        // }
         // } else {
         //     Auth::logout(); // Logs out the user
         //     return redirect()->to('/login'); // Redirects to login page
@@ -33,6 +33,7 @@ class HomeController extends Controller
             'routes'          => 'routes',
             'main-routes'     => 'routes',
             'vendors'         => 'vendors',
+            'fuels'           => 'fuels',
             'sub-contractor' => 'scontractor',
             'employees'      => 'drivers',
             'location'       => 'location',

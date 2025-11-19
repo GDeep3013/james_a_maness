@@ -85,7 +85,7 @@ const navItems: NavItem[] = [
     {
       icon: <GasStationIcon className="svg-no-fill"/>,
       name: "Fuel & Gas Stations",
-      path: "/fuel",
+      path: "/fuels",
       allowedRoles: ["Admin", "Manager"],
     },
     {
@@ -236,7 +236,7 @@ const AppSidebar: React.FC = () => {
     <ul className="flex flex-col gap-4 px-4">
       {filteredItems.map((nav, index) => {
         const isOthersItem = nav.name === "Others";
-        
+
         return (
         <li key={nav.name} className={isOthersItem ? "menu-item-others-wrapper" : ""}>
           {nav.subItems ? (

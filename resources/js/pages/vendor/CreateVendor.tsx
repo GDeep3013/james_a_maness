@@ -1,4 +1,4 @@
-import React, { useState ,useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router";
 import Label from "../../components/form/Label";
 import Input from "../../components/form/input/InputField";
@@ -83,7 +83,7 @@ export default function CreateVendor() {
                     phone: String(vendor.phone || ""),
                     website: String(vendor.website || ""),
                     address: String(vendor.address) || "",
-                    address_line_2:String(vendor.address_line_2)  || "",
+                    address_line_2: String(vendor.address_line_2) || "",
                     city: String(vendor.city || ""),
                     state: String(vendor.state || ""),
                     zip: String(vendor.zip || ""),
@@ -262,7 +262,17 @@ export default function CreateVendor() {
                     <form onSubmit={handleSubmit} className="w-full max-w-5xl">
 
                         <div className="flex-1">
-                            <div className="flex flex-col gap-6">
+                            {isLoading ? (
+                                <div className="flex items-center justify-center py-12">
+                                    <div className="text-center">
+                                        <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-brand-500"></div>
+                                        <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                                            Loading contact data...
+                                        </p>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="flex flex-col gap-6">
 
                                     <div className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl p-6 lg:p-8">
                                         <h3 className="text-2xl font-semibold text-gray-800 dark:text-white/90 mb-6">
@@ -544,14 +554,11 @@ export default function CreateVendor() {
                                             {isSubmitting ? (isEditMode ? "Updating..." : "Saving...") : (isEditMode ? "Update Vendor" : "Save Vendor")}
                                         </Button>
                                     </div>
-                            </div>
-
+                                </div>
+                            )}
                         </div>
                     </form>
                 </div>
-
-
-
             </div>
         </>
     );
