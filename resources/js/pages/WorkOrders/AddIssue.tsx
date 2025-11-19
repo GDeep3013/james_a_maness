@@ -559,19 +559,20 @@ export default function AddIssue({
           <div className="mt-6 flex items-center justify-end gap-3 border-t border-gray-200 pt-6">
             <Button
               variant="outline"
+              size="sm"
               onClick={onClose}
               disabled={isSubmitting}
             >
               Cancel
             </Button>
-            <button
+            <Button
               type="button"
-              className="inline-flex items-center justify-center rounded-lg bg-brand-500 px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-brand-600 focus:outline-hidden focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              size="sm"
               disabled={isSubmitting}
               onClick={(e) => {e.preventDefault(); handleSubmit(e);}}
             >
               {isSubmitting ? (isEditMode ? "Updating..." : "Saving...") : (isEditMode ? "Update Issue" : "Save Issue")}
-            </button>
+            </Button>
           </div>
         </div>
       </div>

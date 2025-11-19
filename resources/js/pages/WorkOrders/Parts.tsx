@@ -11,6 +11,7 @@ export default function Parts({
 }: PartsProps) {
   const [partOptions, setPartOptions] = useState<Array<{ value: string; label: string; id?: number; [key: string]: unknown }>>([]);
   const [isLoadingParts, setIsLoadingParts] = useState(false);
+  const [editingPrice, setEditingPrice] = useState<{ [key: number]: { labor?: string; parts?: string } }>({});
 
   const fetchParts = useCallback(async (search: string = "") => {
     setIsLoadingParts(true);
@@ -79,6 +80,101 @@ export default function Parts({
     }
   };
 
+  const formatCurrency = (value: number | undefined): string => {
+    if (value === undefined || value === null || isNaN(value)) {
+      return '0.00';
+    }
+    return parseFloat(String(value)).toFixed(2);
+  };
+
+  const getLaborPrice = (part: Part): number => {
+    return (part as Part & { labor_price?: number }).labor_price || 0;
+  };
+
+  const getPartsPrice = (part: Part): number => {
+    const unitPrice = part.unit_price || 0;
+    const quantity = part.quantity || 1;
+    return unitPrice * quantity;
+  };
+
+  const getSubtotal = (part: Part): number => {
+    return getLaborPrice(part) + getPartsPrice(part);
+  };
+
+  const handleQuantityChange = (partId: number, value: string) => {
+    const numericValue = value.replace(/[^0-9]/g, '');
+    const quantity = numericValue === '' ? undefined : parseInt(numericValue);
+    
+    const updatedParts = selectedParts.map((part) => {
+      if (part.id === partId) {
+        const updatedPart = { ...part, quantity: isNaN(quantity as number) ? undefined : quantity } as Part & { labor_price?: number };
+        const laborPrice = getLaborPrice(updatedPart);
+        const partsPrice = getPartsPrice(updatedPart);
+        return { ...updatedPart, total: laborPrice + partsPrice };
+      }
+      return part;
+    });
+    setSelectedParts(updatedParts);
+  };
+
+  const handleLaborChange = (partId: number, value: string) => {
+    setEditingPrice({ ...editingPrice, [partId]: { ...editingPrice[partId], labor: value } });
+    const numericValue = value.replace(/[^0-9.]/g, '');
+    const price = numericValue === '' ? 0 : parseFloat(numericValue);
+    
+    const updatedParts = selectedParts.map((part) => {
+      if (part.id === partId) {
+        const laborPrice = isNaN(price) ? 0 : price;
+        const partsPrice = getPartsPrice(part);
+        return { ...part, labor_price: laborPrice, total: laborPrice + partsPrice } as Part & { labor_price?: number };
+      }
+      return part;
+    });
+    setSelectedParts(updatedParts);
+  };
+
+  const handlePartsChange = (partId: number, value: string) => {
+    setEditingPrice({ ...editingPrice, [partId]: { ...editingPrice[partId], parts: value } });
+    const numericValue = value.replace(/[^0-9.]/g, '');
+    const price = numericValue === '' ? 0 : parseFloat(numericValue);
+    
+    const updatedParts = selectedParts.map((part) => {
+      if (part.id === partId) {
+        const laborPrice = getLaborPrice(part);
+        const partsPrice = isNaN(price) ? 0 : price;
+        return { ...part, unit_price: partsPrice, total: laborPrice + partsPrice } as Part & { labor_price?: number };
+      }
+      return part;
+    });
+    setSelectedParts(updatedParts);
+  };
+
+  const handleLaborFocus = (partId: number) => {
+    const part = selectedParts.find((p) => p.id === partId) as Part & { labor_price?: number };
+    const rawValue = part?.labor_price ? String(part.labor_price) : '';
+    setEditingPrice({ ...editingPrice, [partId]: { ...editingPrice[partId], labor: rawValue } });
+  };
+
+  const handlePartsFocus = (partId: number) => {
+    const part = selectedParts.find((p) => p.id === partId);
+    const rawValue = part?.unit_price ? String(part.unit_price) : '';
+    setEditingPrice({ ...editingPrice, [partId]: { ...editingPrice[partId], parts: rawValue } });
+  };
+
+  const handlePriceBlur = (partId: number, field: 'labor' | 'parts') => {
+    const current = editingPrice[partId];
+    if (current) {
+      const updated = { ...current };
+      delete updated[field];
+      if (Object.keys(updated).length === 0) {
+        const { [partId]: _, ...rest } = editingPrice;
+        setEditingPrice(rest);
+      } else {
+        setEditingPrice({ ...editingPrice, [partId]: updated });
+      }
+    }
+  };
+
   return (
     <>
       <div className="mb-6">
@@ -126,62 +222,88 @@ export default function Parts({
         />
       </div>
 
-      <div className="min-h-[200px] border-2 border-dashed border-gray-300 rounded-lg p-2">
+      <div className="min-h-[200px] border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg p-2">
         {selectedParts.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12">
-            <p className="text-gray-500 text-center mb-4">No Parts line items added</p>
+            <p className="text-gray-500 dark:text-gray-400 text-center mb-4">No Parts line items added</p>
           </div>
         ) : (
-          <div className="space-y-4">
-            {selectedParts.map((item) => (
-              <div
-                key={item.id}
-                className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors bg-white"
-              >
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <h3 className="text-sm font-semibold text-gray-800 mb-1">
-                      {item.part_name} {" "} 
-                      {item.part_code && (
-                        <span className="!text-xs text-gray-500">
-                          ({item.part_code})
-                        </span>
-                      )}
-                    </h3>
-                    
-                    {item.description && (
-                      <p className="text-sm text-gray-600 mb-2">
-                        {item.description}
-                      </p>
-                    )}
-                    <div className="flex items-center gap-4 text-xs text-gray-500">
-                      {item.quantity && <span>Qty: {item.quantity}</span>}
-                      {item.unit_price !== undefined && item.unit_price !== null && (
-                        <span>Unit Price: ${parseFloat(String(item.unit_price)).toFixed(2)}</span>
-                      )}
-                      {item.purchase_price !== undefined && item.purchase_price !== null && (
-                        <span>Purchase Price: ${parseFloat(String(item.purchase_price)).toFixed(2)}</span>
-                      )}
-                      {item.total !== undefined && item.total !== null && (
-                        <span className="font-semibold">Total: ${parseFloat(String(item.total)).toFixed(2)}</span>
-                      )}
-                      {item.created_at && (
-                        <span>Created: {new Date(item.created_at).toLocaleDateString()}</span>
-                      )}
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2 ml-4">
-                    <button
-                      onClick={() => handleDeletePart(item.id)}
-                      className="p-2 text-error-600 hover:text-error-700 hover:bg-error-50 rounded transition-colors"
-                      title="Delete"
-                    >
-                      <TrashBinIcon className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-gray-200 dark:border-gray-700">
+                  <th className="text-left py-3 px-4 text-xs font-semibold text-gray-700 dark:text-gray-300 w-[50%]">Parts</th>
+                  <th className="text-left py-3 px-4 text-xs font-semibold text-gray-700 dark:text-gray-300 min-w-[100px]">Qty</th>
+                  <th className="text-left py-3 px-4 text-xs font-semibold text-gray-700 dark:text-gray-300 min-w-[120px]">Unit Price</th>
+                  <th className="text-left py-3 px-4 text-xs font-semibold text-gray-700 dark:text-gray-300 min-w-[120px]">Subtotal</th>
+                  <th className="text-right py-3 px-4 text-xs font-semibold text-gray-700 dark:text-gray-300 min-w-[50px]"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {selectedParts.map((item) => (
+                  <tr
+                    key={item.id}
+                    className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors bg-white dark:bg-gray-900"
+                  >
+                    <td className="py-3 px-4">
+                      <div>
+                        <h3 className="text-sm font-semibold text-gray-800 dark:text-white/90 mb-1">
+                          {item.part_name}
+                          {item.part_code && (
+                            <span className="!text-xs text-gray-500 dark:text-gray-400 ml-1">
+                              ({item.part_code})
+                            </span>
+                          )}
+                        </h3>
+                        {item.description && (
+                          <p className="text-xs text-gray-600 dark:text-gray-400">
+                            {item.description}
+                          </p>
+                        )}
+                      </div>
+                    </td>
+                    <td className="py-3 px-4">
+                      <input
+                        type="text"
+                        value={item.quantity || '1'}
+                        onChange={(e) => handleQuantityChange(item.id, e.target.value)}
+                        className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder="0"
+                      />
+                    </td>
+                    <td className="py-3 px-4">
+                      <input
+                        type="text"
+                        value={editingPrice[item.id]?.parts !== undefined ? editingPrice[item.id].parts! : `$${formatCurrency(item.unit_price || 0)}`}
+                        onChange={(e) => handlePartsChange(item.id, e.target.value)}
+                        onFocus={() => handlePartsFocus(item.id)}
+                        onBlur={() => handlePriceBlur(item.id, 'parts')}
+                        className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder="$0.00"
+                      />
+                    </td>
+                    <td className="py-3 px-4">
+                      <input
+                        type="text"
+                        value={`$${formatCurrency(getSubtotal(item))}`}
+                        readOnly
+                        className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-gray-800/50 text-gray-900 dark:text-white cursor-not-allowed"
+                        placeholder="$0.00"
+                      />
+                    </td>
+                    <td className="py-3 px-4 text-right">
+                      <button
+                        onClick={() => handleDeletePart(item.id)}
+                        className="p-2 text-error-600 hover:text-error-700 dark:text-error-400 dark:hover:text-error-300 hover:bg-error-50 dark:hover:bg-error-900/20 rounded transition-colors"
+                        title="Delete"
+                      >
+                        <TrashBinIcon className="w-4 h-4" />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         )}
       </div>
