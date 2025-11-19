@@ -4,8 +4,8 @@ export interface ServiceItem {
   description?: string;
   type: "Service Tasks" | "Parts";
   quantity?: number;
-  unit_price?: number;
   total?: number;
+  labor_cost?: number;
   created_at?: string;
   label?: string;
   value?: string;
@@ -43,6 +43,11 @@ export interface WorkOrderFormData {
   po_number: string;
   service_items: ServiceItem[];
   parts: Part[];
+  notes?: string;
+  discount_type?: "percentage" | "fixed";
+  discount_value?: number;
+  tax_type?: "percentage" | "fixed";
+  tax_value?: number;
 }
 
 export interface Vehicle {
@@ -79,4 +84,19 @@ export interface PartsProps {
   selectedParts: Part[];
   setSelectedParts: (parts: Part[]) => void;
   onDeletePart?: (partId: number) => void;
+}
+
+export interface NotesProps {
+  notes?: string;
+  setNotes?: (notes: string) => void;
+  serviceItems?: ServiceItem[];
+  parts?: Part[];
+  discountType?: "percentage" | "fixed";
+  discountValue?: number;
+  taxType?: "percentage" | "fixed";
+  taxValue?: number;
+  setDiscountType?: (type: "percentage" | "fixed") => void;
+  setDiscountValue?: (value: number) => void;
+  setTaxType?: (type: "percentage" | "fixed") => void;
+  setTaxValue?: (value: number) => void;
 }

@@ -59,7 +59,6 @@ const navItems: NavItem[] = [
   {
     icon: <MaintenanceIcon className="svg-no-fill"/>,
     name: "Maintenance",
-    path: "/maintenance",
     allowedRoles: ["Admin", "Manager"],
     subItems: [
       { name: "Work Orders", path: "/work-orders", pro: false, allowedRoles: ["Admin", "Manager"] },
@@ -160,7 +159,6 @@ const AppSidebar: React.FC = () => {
   );
 
   useEffect(() => {
-    let submenuMatched = false;
     ["main", "others"].forEach((menuType) => {
       const items = menuType === "main" ? navItems : othersItems;
       items.forEach((nav, index) => {
@@ -171,17 +169,12 @@ const AppSidebar: React.FC = () => {
                 type: menuType as "main" | "others",
                 index,
               });
-              submenuMatched = true;
             }
           });
         }
       });
     });
-
-    if (!submenuMatched) {
-      setOpenSubmenu(null);
-    }
-  }, [location, isActive]);
+  }, [location.pathname]);
 
   useEffect(() => {
     if (openSubmenu !== null) {
@@ -197,6 +190,17 @@ const AppSidebar: React.FC = () => {
 
   const handleSubmenuToggle = (index: number, menuType: "main" | "others") => {
     setOpenSubmenu((prevOpenSubmenu) => {
+      const items = menuType === "main" ? navItems : othersItems;
+      const nav = items[index];
+      
+      if (nav.subItems) {
+        const hasActiveSubItem = nav.subItems.some((subItem) => isActive(subItem.path));
+        
+        if (hasActiveSubItem) {
+          return { type: menuType, index };
+        }
+      }
+      
       if (
         prevOpenSubmenu &&
         prevOpenSubmenu.type === menuType &&
@@ -241,7 +245,12 @@ const AppSidebar: React.FC = () => {
         <li key={nav.name} className={isOthersItem ? "menu-item-others-wrapper" : ""}>
           {nav.subItems ? (
             <button
-              onClick={() => handleSubmenuToggle(index, menuType)}
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                handleSubmenuToggle(index, menuType);
+              }}
               className={`menu-item group text-base font-medium text-white hover:bg-[#2C0A77] ${
                 openSubmenu?.type === menuType && openSubmenu?.index === index
                   ? "menu-item-active bg-[#2C0A77]"
@@ -316,6 +325,9 @@ const AppSidebar: React.FC = () => {
                   <li key={subItem.name}>
                     <Link
                       to={subItem.path}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                      }}
                       className={`menu-dropdown-item text-sm text-white hover:bg-[#2C0A77] ${
                         isActive(subItem.path)
                           ? "menu-dropdown-item-active bg-[#2C0A77]"

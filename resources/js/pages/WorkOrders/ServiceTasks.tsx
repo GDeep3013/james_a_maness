@@ -11,6 +11,7 @@ export default function ServiceTasks({
 }: ServiceTasksProps) {
   const [serviceTaskOptions, setServiceTaskOptions] = useState<Array<{ value: string; label: string; id?: number; [key: string]: unknown }>>([]);
   const [isLoadingTasks, setIsLoadingTasks] = useState(false);
+  const [editingPrice, setEditingPrice] = useState<{ [key: number]: { labor?: string } }>({});
 
   const fetchServiceTasks = useCallback(async (search: string = "") => {
     setIsLoadingTasks(true);
@@ -59,6 +60,7 @@ export default function ServiceTasks({
           type: "Service Tasks",
           value: option.value,
           label: option.label,
+          labor_cost: (option.labor_cost as number) || undefined,
           description: (option.description as string) || undefined,
         });
       }
@@ -76,6 +78,47 @@ export default function ServiceTasks({
       onDeleteTask(taskId);
     }
   };
+
+  const handleLaborChange = (taskId: number, value: string) => {
+    setEditingPrice({ ...editingPrice, [taskId]: { ...editingPrice[taskId], labor: value } });
+    const numericValue = value.replace(/[^0-9.]/g, '');
+    const price = numericValue === '' ? 0 : parseFloat(numericValue);
+    const updatedTasks = selectedTasks.map((task) => {
+      if (task.id === taskId) {
+        const laborPrice = isNaN(price) ? 0 : price;
+        return { ...task, labor_cost: laborPrice };
+      }
+      return task;
+    });
+    setSelectedTasks(updatedTasks);
+  };
+
+  const handleLaborFocus = (taskId: number) => {
+    const task = selectedTasks.find((t) => t.id === taskId);
+
+    const rawValue = task?.labor_cost ? String(task.labor_cost) : '';
+    setEditingPrice({ ...editingPrice, [taskId]: { ...editingPrice[taskId], labor: rawValue } });
+  };
+
+  const handlePriceBlur = (taskId: number) => {
+    const rest = { ...editingPrice };
+    delete rest[taskId];
+    setEditingPrice(rest);
+  };
+
+
+  const formatCurrency = (value: number | undefined): string => {
+    if (value === undefined || value === null || isNaN(value)) {
+      return '0.00';
+    }
+    return parseFloat(String(value)).toFixed(2);
+  };
+
+  const getLaborPrice = (task: ServiceItem): number => {
+    return task.labor_cost || 0;
+  };
+
+
 
   return (
     <>
@@ -130,43 +173,60 @@ export default function ServiceTasks({
             <p className="text-gray-500 text-center mb-4">No Service Task line items added</p>
           </div>
         ) : (
-          <div className="space-y-4">
-            {selectedTasks.map((item) => (
-              <div
-                key={item.id}
-                className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors bg-white"
-              >
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <h3 className="text-sm font-semibold text-gray-800 mb-1">
-                      {item.name}
-                    </h3>
-                    {item.description && (
-                      <p className="text-sm text-gray-600 mb-2">
-                        {item.description}
-                      </p>
-                    )}
-                    <div className="flex items-center gap-4 text-xs text-gray-500">
-                      <span>Qty: 6</span>
-                      <span>Unit Price: 33.00</span>
-                      <span className="font-semibold">Total: 12.00</span>
-                      {item.created_at && (
-                        <span>Created: {new Date(item.created_at).toLocaleDateString()}</span>
-                      )}
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2 ml-4">
-                    <button
-                      onClick={() => handleDeleteTask(item.id)}
-                      className="p-2 text-error-600 hover:text-error-700 hover:bg-error-50 rounded transition-colors"
-                      title="Delete"
-                    >
-                      <TrashBinIcon className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-gray-200 dark:border-gray-700">
+                  <th className="text-left py-3 px-4 text-xs font-semibold text-gray-700 dark:text-gray-300 w-[70%]">Service Task</th>
+                  <th className="text-left py-3 px-4 text-xs font-semibold text-gray-700 dark:text-gray-300 min-w-[80px]">Labor</th>
+                  <th className="text-right py-3 px-4 text-xs font-semibold text-gray-700 dark:text-gray-300 min-w-[50px]"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {selectedTasks.map((item) => (
+                  <tr
+                    key={item.id}
+                    className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors bg-white dark:bg-gray-900"
+                  >
+                    <td className="py-3 px-4">
+                      <div>
+                        <h3 className="text-sm font-semibold text-gray-800 dark:text-white/90 mb-1">
+                          {item.name}
+                        </h3>
+                        {item.description && (
+                          <p className="text-xs text-gray-600 dark:text-gray-400">
+                            {item.description}
+                          </p>
+                        )}
+                      </div>
+                    </td>
+                    <td className="py-3 px-4">
+                      <input
+                        name="labor_cost_"
+                        type="number"
+                        value={editingPrice[item.id]?.labor !== undefined ? editingPrice[item.id].labor! : ''}
+                        onChange={(e) => handleLaborChange(item.id, e.target.value)}
+                        onFocus={() => handleLaborFocus(item.id)}
+                        onBlur={() => handlePriceBlur(item.id)}
+                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md bg-white text-gray-900"
+                        placeholder={`$${formatCurrency(getLaborPrice(item))}`}
+                        min={0.00}
+                        step={0.10}
+                      />
+                    </td>
+                    <td className="py-3 px-4 text-right">
+                      <button
+                        onClick={() => handleDeleteTask(item.id)}
+                        className="p-2 text-error-600 hover:text-error-700 dark:text-error-400 dark:hover:text-error-300 hover:bg-error-50 dark:hover:bg-error-900/20 rounded transition-colors"
+                        title="Delete"
+                      >
+                        <TrashBinIcon className="w-4 h-4" />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         )}
       </div>

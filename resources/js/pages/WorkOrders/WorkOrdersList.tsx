@@ -281,7 +281,7 @@ export default function WorkOrdersList() {
           </div>
           <Button
             variant="primary"
-            size="md"
+            size="sm"
             onClick={handleCreate}
           >
             + Create Work Order
