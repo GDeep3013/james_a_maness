@@ -18,7 +18,6 @@ export default function LineItems({
   const [selectedTasks, setSelectedTasks] = useState<ServiceItem[]>([]);
   const [selectedParts, setSelectedParts] = useState<Part[]>([]);
 
-
   useEffect(() => {
     if (serviceItems) {
       setSelectedTasks(serviceItems);
@@ -43,10 +42,9 @@ export default function LineItems({
 
 
   return (
-    <div className="">
+    <div>
       <div className="mb-4">
         <h2 className="text-2xl font-semibold text-gray-800 mb-6">Line Items</h2>
-        
         <div className="border-b border-gray-200 mb-6">
           <nav className="flex space-x-8" aria-label="Tabs">
             <button

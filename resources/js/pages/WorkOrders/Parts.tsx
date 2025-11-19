@@ -117,22 +117,6 @@ export default function Parts({
     setSelectedParts(updatedParts);
   };
 
-  const handleLaborChange = (partId: number, value: string) => {
-    setEditingPrice({ ...editingPrice, [partId]: { ...editingPrice[partId], labor: value } });
-    const numericValue = value.replace(/[^0-9.]/g, '');
-    const price = numericValue === '' ? 0 : parseFloat(numericValue);
-    
-    const updatedParts = selectedParts.map((part) => {
-      if (part.id === partId) {
-        const laborPrice = isNaN(price) ? 0 : price;
-        const partsPrice = getPartsPrice(part);
-        return { ...part, labor_price: laborPrice, total: laborPrice + partsPrice } as Part & { labor_price?: number };
-      }
-      return part;
-    });
-    setSelectedParts(updatedParts);
-  };
-
   const handlePartsChange = (partId: number, value: string) => {
     setEditingPrice({ ...editingPrice, [partId]: { ...editingPrice[partId], parts: value } });
     const numericValue = value.replace(/[^0-9.]/g, '');
@@ -149,12 +133,6 @@ export default function Parts({
     setSelectedParts(updatedParts);
   };
 
-  const handleLaborFocus = (partId: number) => {
-    const part = selectedParts.find((p) => p.id === partId) as Part & { labor_price?: number };
-    const rawValue = part?.labor_price ? String(part.labor_price) : '';
-    setEditingPrice({ ...editingPrice, [partId]: { ...editingPrice[partId], labor: rawValue } });
-  };
-
   const handlePartsFocus = (partId: number) => {
     const part = selectedParts.find((p) => p.id === partId);
     const rawValue = part?.unit_price ? String(part.unit_price) : '';
@@ -162,15 +140,22 @@ export default function Parts({
   };
 
   const handlePriceBlur = (partId: number, field: 'labor' | 'parts') => {
-    const current = editingPrice[partId];
-    if (current) {
-      const updated = { ...current };
-      delete updated[field];
-      if (Object.keys(updated).length === 0) {
-        const { [partId]: _, ...rest } = editingPrice;
-        setEditingPrice(rest);
-      } else {
-        setEditingPrice({ ...editingPrice, [partId]: updated });
+    if (field === 'parts') {
+      const rest = { ...editingPrice };
+      delete rest[partId];
+      setEditingPrice(rest);
+    } else {
+      const current = editingPrice[partId];
+      if (current) {
+        const updated = { ...current };
+        delete updated[field];
+        if (Object.keys(updated).length === 0) {
+          const rest = { ...editingPrice };
+          delete rest[partId];
+          setEditingPrice(rest);
+        } else {
+          setEditingPrice({ ...editingPrice, [partId]: updated });
+        }
       }
     }
   };
@@ -264,22 +249,24 @@ export default function Parts({
                     </td>
                     <td className="py-3 px-4">
                       <input
-                        type="text"
+                        type="number"
                         value={item.quantity || '1'}
                         onChange={(e) => handleQuantityChange(item.id, e.target.value)}
-                        className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md bg-white text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         placeholder="0"
                       />
                     </td>
                     <td className="py-3 px-4">
                       <input
-                        type="text"
-                        value={editingPrice[item.id]?.parts !== undefined ? editingPrice[item.id].parts! : `$${formatCurrency(item.unit_price || 0)}`}
+                        type="number"
+                        value={editingPrice[item.id]?.parts !== undefined ? editingPrice[item.id].parts! : ''}
                         onChange={(e) => handlePartsChange(item.id, e.target.value)}
                         onFocus={() => handlePartsFocus(item.id)}
                         onBlur={() => handlePriceBlur(item.id, 'parts')}
-                        className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="$0.00"
+                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md bg-white text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder={`$${formatCurrency(item.unit_price || 0)}`}
+                        min={0.00}
+                        step={0.10}
                       />
                     </td>
                     <td className="py-3 px-4">

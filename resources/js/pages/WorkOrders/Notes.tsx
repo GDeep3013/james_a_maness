@@ -34,14 +34,14 @@ export default function Notes({
 
   const getLaborPrice = (item: ServiceItem | Part): number => {
     if ('name' in item) {
-      return (item as ServiceItem).unit_price || 0;
+      return (item as ServiceItem).labor_cost || 0;
     }
-    return (item as Part & { labor_price?: number }).labor_price || 0;
+    return (item as Part & { unit_price?: number }).unit_price || 0;
   };
 
   const getPartsPrice = (item: ServiceItem | Part): number => {
     if ('name' in item) {
-      return (item as ServiceItem & { parts_price?: number }).parts_price || 0;
+      return (item as ServiceItem & { unit_price?: number }).unit_price || 0;
     }
     const part = item as Part;
     const unitPrice = part.unit_price || 0;
@@ -55,16 +55,13 @@ export default function Notes({
 
     serviceItems.forEach((item) => {
       laborTotal += getLaborPrice(item);
-      partsTotal += getPartsPrice(item);
     });
 
     parts.forEach((item) => {
-      laborTotal += getLaborPrice(item);
       partsTotal += getPartsPrice(item);
     });
 
     const subtotal = laborTotal + partsTotal;
-
     let discountAmount = 0;
     if (discountValue > 0) {
       if (discountType === "percentage") {
@@ -140,43 +137,43 @@ export default function Notes({
     <h2 className="text-2xl font-semibold text-gray-800 mb-6">Notes</h2>
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
       <div className="min-h-[200px]">
-        <label className="block text-sm font-semibold text-gray-800 dark:text-white/90 mb-3">
+        {/* <label className="block text-sm font-semibold text-gray-800 /90 mb-3">
           Description
-        </label>
+        </label> */}
         <textarea
           value={localNotes}
           onChange={(e) => handleNotesChange(e.target.value)}
           placeholder="Add notes or additional details"
           rows={8}
-          className="w-full px-4 py-3 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-y min-h-[150px]"
+          className="w-full px-4 py-3 text-sm border border-gray-300  rounded-md bg-white  text-gray-900  placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-y min-h-[150px]"
         />
       </div>
 
       <div className="min-h-[200px]">
-        <label className="block text-sm font-semibold text-gray-800 dark:text-white/90 mb-3">
+        <label className="block text-sm font-semibold text-gray-800 /90 mb-3">
           Cost Summary
         </label>
         <div className="space-y-3">
           <div className="flex justify-between items-center text-sm">
-            <span className="text-gray-700 dark:text-gray-300">Subtotal</span>
-            <span className="text-gray-900 dark:text-white font-medium">{formatCurrency(calculateTotals.subtotal)}</span>
+            <span className="text-gray-700 0">Subtotal</span>
+            <span className="text-gray-900  font-medium">{formatCurrency(calculateTotals.subtotal)}</span>
           </div>
           <div className="flex justify-between items-center text-sm">
-            <span className="text-gray-700 dark:text-gray-300">Labor</span>
-            <span className="text-gray-900 dark:text-white font-medium">{formatCurrency(calculateTotals.laborTotal)}</span>
+            <span className="text-gray-700 0">Labor</span>
+            <span className="text-gray-900  font-medium">{formatCurrency(calculateTotals.laborTotal)}</span>
           </div>
           <div className="flex justify-between items-center text-sm">
-            <span className="text-gray-700 dark:text-gray-300">Unit Price</span>
-            <span className="text-gray-900 dark:text-white font-medium">{formatCurrency(calculateTotals.partsTotal)}</span>
+            <span className="text-gray-700 0">Unit Price</span>
+            <span className="text-gray-900  font-medium">{formatCurrency(calculateTotals.partsTotal)}</span>
           </div>
 
           <div className="flex justify-between items-center text-sm gap-2">
             <div className="flex items-center gap-2 flex-1">
-              <span className="text-gray-700 dark:text-gray-300 whitespace-nowrap">Discount</span>
+              <span className="text-gray-700 0 whitespace-nowrap">Discount</span>
               <select
                 value={discountType}
                 onChange={(e) => setDiscountType?.(e.target.value as "percentage" | "fixed")}
-                className="px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="px-2 py-1 text-xs border border-gray-300  rounded bg-white  text-gray-900  focus:outline-none focus:ring-1 focus:ring-blue-500"
               >
                 <option value="percentage">%</option>
                 <option value="fixed">$</option>
@@ -187,20 +184,20 @@ export default function Notes({
                 onChange={(e) => handleDiscountChange(e.target.value)}
                 onFocus={handleDiscountFocus}
                 onBlur={handleDiscountBlur}
-                className="w-16 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-16 px-2 py-1 text-xs border border-gray-300  rounded bg-white  text-gray-900  focus:outline-none focus:ring-1 focus:ring-blue-500"
                 placeholder="0"
               />
             </div>
-            <span className="text-gray-900 dark:text-white font-medium">{formatCurrency(calculateTotals.discountAmount)}</span>
+            <span className="text-gray-900  font-medium">{formatCurrency(calculateTotals.discountAmount)}</span>
           </div>
 
           <div className="flex justify-between items-center text-sm gap-2">
             <div className="flex items-center gap-2 flex-1">
-              <span className="text-gray-700 dark:text-gray-300 whitespace-nowrap">Tax</span>
+              <span className="text-gray-700 0 whitespace-nowrap">Tax</span>
               <select
                 value={taxType}
                 onChange={(e) => setTaxType?.(e.target.value as "percentage" | "fixed")}
-                className="px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="px-2 py-1 text-xs border border-gray-300  rounded bg-white  text-gray-900  focus:outline-none focus:ring-1 focus:ring-blue-500"
               >
                 <option value="percentage">%</option>
                 <option value="fixed">$</option>
@@ -211,17 +208,17 @@ export default function Notes({
                 onChange={(e) => handleTaxChange(e.target.value)}
                 onFocus={handleTaxFocus}
                 onBlur={handleTaxBlur}
-                className="w-16 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-16 px-2 py-1 text-xs border border-gray-300  rounded bg-white  text-gray-900  focus:outline-none focus:ring-1 focus:ring-blue-500"
                 placeholder="0"
               />
             </div>
-            <span className="text-gray-900 dark:text-white font-medium">{formatCurrency(calculateTotals.taxAmount)}</span>
+            <span className="text-gray-900  font-medium">{formatCurrency(calculateTotals.taxAmount)}</span>
           </div>
 
-          <div className="border-t border-gray-200 dark:border-gray-700 pt-3 mt-3">
+          <div className="border-t border-gray-200  pt-3 mt-3">
             <div className="flex justify-between items-center">
-              <span className="text-sm font-semibold text-gray-900 dark:text-white">Total</span>
-              <span className="text-sm font-semibold text-gray-900 dark:text-white">{formatCurrency(calculateTotals.total)}</span>
+              <span className="text-sm font-semibold text-gray-900 ">Total</span>
+              <span className="text-sm font-semibold text-gray-900 ">{formatCurrency(calculateTotals.total)}</span>
             </div>
           </div>
         </div>

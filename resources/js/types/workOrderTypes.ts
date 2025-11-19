@@ -4,8 +4,8 @@ export interface ServiceItem {
   description?: string;
   type: "Service Tasks" | "Parts";
   quantity?: number;
-  unit_price?: number;
   total?: number;
+  labor_cost?: number;
   created_at?: string;
   label?: string;
   value?: string;

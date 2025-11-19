@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Select from "react-select";
 import { serviceTaskService } from "../../services/serviceTaskService";
 import { ServiceItem, ServiceTasksProps } from "../../types/workOrderTypes";
@@ -11,7 +11,7 @@ export default function ServiceTasks({
 }: ServiceTasksProps) {
   const [serviceTaskOptions, setServiceTaskOptions] = useState<Array<{ value: string; label: string; id?: number; [key: string]: unknown }>>([]);
   const [isLoadingTasks, setIsLoadingTasks] = useState(false);
-  const [editingPrice, setEditingPrice] = useState<{ [key: number]: { labor?: string; parts?: string } }>({});
+  const [editingPrice, setEditingPrice] = useState<{ [key: number]: { labor?: string } }>({});
 
   const fetchServiceTasks = useCallback(async (search: string = "") => {
     setIsLoadingTasks(true);
@@ -60,6 +60,7 @@ export default function ServiceTasks({
           type: "Service Tasks",
           value: option.value,
           label: option.label,
+          labor_cost: (option.labor_cost as number) || undefined,
           description: (option.description as string) || undefined,
         });
       }
@@ -82,28 +83,10 @@ export default function ServiceTasks({
     setEditingPrice({ ...editingPrice, [taskId]: { ...editingPrice[taskId], labor: value } });
     const numericValue = value.replace(/[^0-9.]/g, '');
     const price = numericValue === '' ? 0 : parseFloat(numericValue);
-    
     const updatedTasks = selectedTasks.map((task) => {
       if (task.id === taskId) {
         const laborPrice = isNaN(price) ? 0 : price;
-        const partsPrice = (task as ServiceItem & { parts_price?: number }).parts_price || 0;
-        return { ...task, unit_price: laborPrice, total: laborPrice + partsPrice } as ServiceItem & { parts_price?: number };
-      }
-      return task;
-    });
-    setSelectedTasks(updatedTasks);
-  };
-
-  const handlePartsChange = (taskId: number, value: string) => {
-    setEditingPrice({ ...editingPrice, [taskId]: { ...editingPrice[taskId], parts: value } });
-    const numericValue = value.replace(/[^0-9.]/g, '');
-    const price = numericValue === '' ? 0 : parseFloat(numericValue);
-    
-    const updatedTasks = selectedTasks.map((task) => {
-      if (task.id === taskId) {
-        const laborPrice = task.unit_price || 0;
-        const partsPrice = isNaN(price) ? 0 : price;
-        return { ...task, parts_price: partsPrice, total: laborPrice + partsPrice } as ServiceItem & { parts_price?: number };
+        return { ...task, labor_cost: laborPrice };
       }
       return task;
     });
@@ -112,29 +95,17 @@ export default function ServiceTasks({
 
   const handleLaborFocus = (taskId: number) => {
     const task = selectedTasks.find((t) => t.id === taskId);
-    const rawValue = task?.unit_price ? String(task.unit_price) : '';
+
+    const rawValue = task?.labor_cost ? String(task.labor_cost) : '';
     setEditingPrice({ ...editingPrice, [taskId]: { ...editingPrice[taskId], labor: rawValue } });
   };
 
-  const handlePartsFocus = (taskId: number) => {
-    const task = selectedTasks.find((t) => t.id === taskId) as ServiceItem & { parts_price?: number };
-    const rawValue = task?.parts_price ? String(task.parts_price) : '';
-    setEditingPrice({ ...editingPrice, [taskId]: { ...editingPrice[taskId], parts: rawValue } });
+  const handlePriceBlur = (taskId: number) => {
+    const rest = { ...editingPrice };
+    delete rest[taskId];
+    setEditingPrice(rest);
   };
 
-  const handlePriceBlur = (taskId: number, field: 'labor' | 'parts') => {
-    const current = editingPrice[taskId];
-    if (current) {
-      const updated = { ...current };
-      delete updated[field];
-      if (Object.keys(updated).length === 0) {
-        const { [taskId]: _, ...rest } = editingPrice;
-        setEditingPrice(rest);
-      } else {
-        setEditingPrice({ ...editingPrice, [taskId]: updated });
-      }
-    }
-  };
 
   const formatCurrency = (value: number | undefined): string => {
     if (value === undefined || value === null || isNaN(value)) {
@@ -144,16 +115,10 @@ export default function ServiceTasks({
   };
 
   const getLaborPrice = (task: ServiceItem): number => {
-    return task.unit_price || 0;
+    return task.labor_cost || 0;
   };
 
-  const getPartsPrice = (task: ServiceItem): number => {
-    return (task as ServiceItem & { parts_price?: number }).parts_price || 0;
-  };
 
-  const getSubtotal = (task: ServiceItem): number => {
-    return getLaborPrice(task) + getPartsPrice(task);
-  };
 
   return (
     <>
@@ -202,20 +167,18 @@ export default function ServiceTasks({
         />
       </div>
 
-      <div className="min-h-[200px] border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg p-2">
+      <div className="min-h-[200px] border-2 border-dashed border-gray-300 rounded-lg p-2">
         {selectedTasks.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12">
-            <p className="text-gray-500 dark:text-gray-400 text-center mb-4">No Service Task line items added</p>
+            <p className="text-gray-500 text-center mb-4">No Service Task line items added</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="border-b border-gray-200 dark:border-gray-700">
-                  <th className="text-left py-3 px-4 text-xs font-semibold text-gray-700 dark:text-gray-300 w-[50%]">Service Task</th>
-                  <th className="text-left py-3 px-4 text-xs font-semibold text-gray-700 dark:text-gray-300 min-w-[120px]">Labor</th>
-                  <th className="text-left py-3 px-4 text-xs font-semibold text-gray-700 dark:text-gray-300 min-w-[120px]">Unit Price</th>
-                  <th className="text-left py-3 px-4 text-xs font-semibold text-gray-700 dark:text-gray-300 min-w-[120px]">Subtotal</th>
+                  <th className="text-left py-3 px-4 text-xs font-semibold text-gray-700 dark:text-gray-300 w-[70%]">Service Task</th>
+                  <th className="text-left py-3 px-4 text-xs font-semibold text-gray-700 dark:text-gray-300 min-w-[80px]">Labor</th>
                   <th className="text-right py-3 px-4 text-xs font-semibold text-gray-700 dark:text-gray-300 min-w-[50px]"></th>
                 </tr>
               </thead>
@@ -239,33 +202,16 @@ export default function ServiceTasks({
                     </td>
                     <td className="py-3 px-4">
                       <input
-                        type="text"
-                        value={editingPrice[item.id]?.labor !== undefined ? editingPrice[item.id].labor! : `$${formatCurrency(getLaborPrice(item))}`}
+                        name="labor_cost_"
+                        type="number"
+                        value={editingPrice[item.id]?.labor !== undefined ? editingPrice[item.id].labor! : ''}
                         onChange={(e) => handleLaborChange(item.id, e.target.value)}
                         onFocus={() => handleLaborFocus(item.id)}
-                        onBlur={() => handlePriceBlur(item.id, 'labor')}
-                        className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="$0.00"
-                      />
-                    </td>
-                    <td className="py-3 px-4">
-                      <input
-                        type="text"
-                        value={editingPrice[item.id]?.parts !== undefined ? editingPrice[item.id].parts! : `$${formatCurrency(getPartsPrice(item))}`}
-                        onChange={(e) => handlePartsChange(item.id, e.target.value)}
-                        onFocus={() => handlePartsFocus(item.id)}
-                        onBlur={() => handlePriceBlur(item.id, 'parts')}
-                        className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="$0.00"
-                      />
-                    </td>
-                    <td className="py-3 px-4">
-                      <input
-                        type="text"
-                        value={`$${formatCurrency(getSubtotal(item))}`}
-                        readOnly
-                        className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-gray-800/50 text-gray-900 dark:text-white cursor-not-allowed"
-                        placeholder="$0.00"
+                        onBlur={() => handlePriceBlur(item.id)}
+                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md bg-white text-gray-900"
+                        placeholder={`$${formatCurrency(getLaborPrice(item))}`}
+                        min={0.00}
+                        step={0.10}
                       />
                     </td>
                     <td className="py-3 px-4 text-right">
@@ -287,4 +233,3 @@ export default function ServiceTasks({
     </>
   );
 }
-
