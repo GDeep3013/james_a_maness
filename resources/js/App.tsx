@@ -48,6 +48,7 @@ import Fuels from "./pages/Fuels";
 import CreateFuel from "./pages/Fuels/CreateFuel";
 import CreateService from "./pages/Services/CreateService";
 import ServiceList from "./pages/Services/ServiceList";
+import FuelDetail from "./pages/Fuels/FuelDetail";
 
 export default function App() {
   return (

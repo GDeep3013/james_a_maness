@@ -153,7 +153,7 @@ export default function ContactDetail() {
         );
     }
 
-  return (
+    return (
         <>
             <PageMeta title={`${getFullName()} - Contact Details`} description="View contact details" />
 
@@ -186,216 +186,251 @@ export default function ContactDetail() {
                     </div>
                 </div>
 
-                <div className="bg-white dark:bg-white/5 rounded-lg border border-gray-200 dark:border-white/10">
-                    <div className="p-6 border-b border-gray-200 dark:border-white/10">
-                        <div className="flex items-center gap-6">
+
+                <div className="flex md:flex-nowrap flex-wrap gap-6 mt-6">
+                    <div className="max-w-[767px]:max-w-full lg:max-w-[387px] max-w-full w-full">
+                        <div className="bg-white rounded-lg lg:p-6 p-3 border border-gray-200">
+                            <div className="flex items-center gap-6">
                                 <div className="w-24 h-24 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center border-2 border-gray-200 dark:border-white/10">
                                     <span className="text-2xl font-semibold text-gray-600 dark:text-gray-400">
                                         {contact.first_name?.charAt(0).toUpperCase() || "C"}
                                     </span>
                                 </div>
-                            <div>
-                                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{getFullName()}</h3>
-                                {contact.designation && (
-                                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{contact.designation}</p>
-                                )}
-                                {contact.status && (
-                                    <div className="mt-2">
-                                        <Badge
-                                            color={contact.status === 'Active' ? 'success' : 'error'}
-                                        >
-                                            {contact.status}
-                                        </Badge>
+                                <div>
+                                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{getFullName()}</h3>
+                                    {contact.designation && (
+                                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{contact.designation}</p>
+                                    )}
+                                    {contact.status && (
+                                        <div className="mt-2">
+                                            <Badge
+                                                color={contact.status === 'Active' ? 'success' : 'error'}
+                                            >
+                                                {contact.status}
+                                            </Badge>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                                <div>
+                                    <label className="text-sm font-medium text-gray-500 dark:text-gray-400">First Name</label>
+                                    <p className="mt-1 text-sm text-gray-900 dark:text-white">{contact.first_name || "—"}</p>
+                                </div>
+                                <div>
+                                    <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Last Name</label>
+                                    <p className="mt-1 text-sm text-gray-900 dark:text-white">{contact.last_name || "—"}</p>
+                                </div>
+                                {contact.gender && (
+                                    <div>
+                                        <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Gender</label>
+                                        <p className="mt-1 text-sm text-gray-900 dark:text-white capitalize">{contact.gender || "—"}</p>
                                     </div>
                                 )}
+                                {(contact.dob || contact.date_of_birth) && (
+                                    <div>
+                                        <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Date of Birth</label>
+                                        <p className="mt-1 text-sm text-gray-900 dark:text-white">
+                                            {formatDate(contact.dob || contact.date_of_birth)}
+                                        </p>
+                                    </div>
+                                )}
+                                <div>
+                                    <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Phone</label>
+                                    <p className="mt-1 text-sm text-gray-900 dark:text-white">{contact.phone || "—"}</p>
+                                </div>
+                                <div>
+                                    <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Email</label>
+                                    <p className="mt-1 text-sm text-gray-900 dark:text-white">{contact.email || "—"}</p>
+                                </div>
+                                {contact.sin_no && (
+                                    <div>
+                                        <label className="text-sm font-medium text-gray-500 dark:text-gray-400">SIN Number</label>
+                                        <p className="mt-1 text-sm text-gray-900 dark:text-white">{contact.sin_no}</p>
+                                    </div>
+                                )}
+                                <div>
+                                    <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Address</label>
+                                    <p className="mt-1 text-sm text-gray-900 dark:text-white"> Times Square </p>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div className="bg-white rounded-lg lg:p-6 p-3 border border-gray-200 mt-4">
+                            <h2 className="text-lg font-semibold text-gray-800 dark:text-white/90 mb-3">Classification</h2>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Classification</label>
+                                    <p className="mt-1 text-sm text-gray-900 dark:text-white">{contact.classification}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="bg-white rounded-lg lg:p-6 p-3 border border-gray-200 mt-4">
+                            <h2 className="text-lg font-semibold text-gray-800 dark:text-white/90 mb-3">License</h2>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                {(contact.license_no || contact.license_number) && (
+                                    <div>
+                                        <label className="text-sm font-medium text-gray-500 dark:text-gray-400">License Number</label>
+                                        <p className="mt-1 text-sm text-gray-900 dark:text-white">{contact.license_no || contact.license_number}</p>
+                                    </div>
+                                )}
+                                {contact.license_class && (
+                                    <div>
+                                        <label className="text-sm font-medium text-gray-500 dark:text-gray-400">License Class</label>
+                                        <p className="mt-1 text-sm text-gray-900 dark:text-white">{contact.license_class}</p>
+                                    </div>
+                                )}
+                                <div>
+                                    <label className="text-sm font-medium text-gray-500 dark:text-gray-400">License Country</label>
+                                    <p className="mt-1 text-sm text-gray-900 dark:text-white">{contact.license_issue_country}</p>
+                                </div>
+                                <div>
+                                    <label className="text-sm font-medium text-gray-500 dark:text-gray-400">License State/Province</label>
+                                    <p className="mt-1 text-sm text-gray-900 dark:text-white">{contact.license_issue_state}</p>
+                                </div>
+                                <div>
+                                    <label className="text-sm font-medium text-gray-500 dark:text-gray-400">License Date</label>
+                                    <p className="mt-1 text-sm text-gray-900 dark:text-white">{formatDate(contact.license_issue_date)}</p>
+                                </div>
+                                <div>
+                                    <label className="text-sm font-medium text-gray-500 dark:text-gray-400">License Expiry Date</label>
+                                    <p className="mt-1 text-sm text-gray-900 dark:text-white"> {formatDate(contact.license_expire_date)}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="bg-white rounded-lg lg:p-6 p-3 border border-gray-200 mt-4">
+                            <h2 className="text-lg font-semibold text-gray-800 dark:text-white/90 mb-3">Immigration</h2>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Status in Country</label>
+                                    <p className="mt-1 text-sm text-gray-900 dark:text-white"> {contact.status_in_country}</p>
+                                </div>
+                                <div>
+                                    <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Immigration Status</label>
+                                    <p className="mt-1 text-sm text-gray-900 dark:text-white"> {contact.immigration_status}</p>
+                                </div>
+                                <div>
+                                    <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Document Expiry Date</label>
+                                    <p className="mt-1 text-sm text-gray-900 dark:text-white"> {formatDate(contact.doc_expiry_date)}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="bg-white rounded-lg lg:p-6 p-3 border border-gray-200 mt-4">
+                            <h2 className="text-lg font-semibold text-gray-800 dark:text-white/90 mb-3">Employment</h2>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Job Title</label>
+                                    <p className="mt-1 text-sm text-gray-900 dark:text-white"> {contact.job_title}</p>
+                                </div>
+                                <div>
+                                    <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Employee Number</label>
+                                    <p className="mt-1 text-sm text-gray-900 dark:text-white"> {contact.employee_number}</p>
+                                </div>
+                                <div>
+                                    <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Job Join Date</label>
+                                    <p className="mt-1 text-sm text-gray-900 dark:text-white"> {formatDate(contact.job_join_date)}</p>
+                                </div>
+                                <div>
+                                    <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Job Leave Date</label>
+                                    <p className="mt-1 text-sm text-gray-900 dark:text-white"> {formatDate(contact.job_leave_date)}</p>
+                                </div>
+                                <div>
+                                    <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Hourly Labor Rate</label>
+                                    <p className="mt-1 text-sm text-gray-900 dark:text-white"> {contact.hourly_labor_rate}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="bg-white rounded-lg lg:p-6 p-3 border border-gray-200 mt-4">
+                            <h2 className="text-lg font-semibold text-gray-800 dark:text-white/90 mb-3">Emergency Contact</h2>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Contact Name</label>
+                                    <p className="mt-1 text-sm text-gray-900 dark:text-white"> {contact.emergency_contact_name}</p>
+                                </div>
+                                <div>
+                                    <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Contact Number</label>
+                                    <p className="mt-1 text-sm text-gray-900 dark:text-white"> {contact.emergency_contact_no}</p>
+                                </div>
+                                <div>
+                                    <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Contact Address</label>
+                                    <p className="mt-1 text-sm text-gray-900 dark:text-white"> {contact.emergency_contact_address}</p>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div className="p-6">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label className="text-sm font-medium text-gray-500 dark:text-gray-400">First Name</label>
-                                <p className="mt-1 text-sm text-gray-900 dark:text-white">{contact.first_name || "—"}</p>
+                    <div className="w-full">
+                        <div className="bg-white rounded-lg lg:p-6 p-3 border border-gray-200">
+                            <div className="flex justify-between items-center mb-2">
+                                <h2 className="text-lg font-semibold text-gray-800 dark:text-white/90 mb-3">
+                                    No currently active vehicle assignments.
+                                </h2>
+                                <div className="flex gap-3">
+                                    <button className="text-sm text-primary-600 font-medium hover:underline">
+                                        + Add Vehicle Assignment
+                                    </button>
+                                    <button className="text-sm text-primary-600 font-medium hover:underline">
+                                        View All
+                                    </button>
+                                </div>
                             </div>
-                            <div>
-                                <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Last Name</label>
-                                <p className="mt-1 text-sm text-gray-900 dark:text-white">{contact.last_name || "—"}</p>
+                            <div className="flex flex-col items-center py-6">
+                                <span className="text-gray-400 text-sm">
+                                    No currently active vehicle assignments.
+                                </span>
                             </div>
-                            <div>
-                                <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Email</label>
-                                <p className="mt-1 text-sm text-gray-900 dark:text-white">{contact.email || "—"}</p>
+                        </div>
+                        <div className="bg-white rounded-lg lg:p-6 p-3 border border-gray-200 mt-4">
+                            <div className="flex justify-between items-center mb-2">
+                                <h2 className="text-lg font-semibold text-gray-800 dark:text-white/90 mb-3">
+                                    Incomplete Work Order Assignments
+                                </h2>
+
                             </div>
-                            <div>
-                                <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Phone</label>
-                                <p className="mt-1 text-sm text-gray-900 dark:text-white">{contact.phone || "—"}</p>
+                            <div className="flex flex-col items-center py-6">
+                                <span className="text-gray-400 text-sm">
+                                    Contact must have technican crassification to the assigned to work anders
+                                </span>
                             </div>
-                            {contact.gender && (
-                                <div>
-                                    <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Gender</label>
-                                    <p className="mt-1 text-sm text-gray-900 dark:text-white capitalize">{contact.gender || "—"}</p>
+                        </div>
+                        <div className="bg-white rounded-lg lg:p-6 p-3 border border-gray-200 mt-4">
+                            <div className="flex justify-between items-center mb-2">
+                                <h2 className="text-lg font-semibold text-gray-800 dark:text-white/90 mb-3">
+                                    Open Issue Assignments
+                                </h2>
+                                <div className="flex gap-3">
+                                    <button className="text-sm text-primary-600 font-medium hover:underline">
+                                        View All
+                                    </button>
                                 </div>
-                            )}
-                            {(contact.dob || contact.date_of_birth) && (
-                                <div>
-                                    <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Date of Birth</label>
-                                    <p className="mt-1 text-sm text-gray-900 dark:text-white">
-                                        {formatDate(contact.dob || contact.date_of_birth)}
-                                    </p>
+                            </div>
+                            <div className="flex flex-col items-center py-6">
+                                <span className="text-gray-400 text-sm">
+                                    No open uns currently assigned
+                                </span>
+                            </div>
+                        </div>
+                        <div className="bg-white rounded-lg lg:p-6 p-3 border border-gray-200 mt-4">
+                            <div className="flex justify-between items-center mb-2">
+                                <h2 className="text-lg font-semibold text-gray-800 dark:text-white/90 mb-3">
+                                    Service Reminder Assignments
+                                </h2>
+                                <div className="flex gap-3">
+                                    <button className="text-sm text-primary-600 font-medium hover:underline">
+                                        View All
+                                    </button>
                                 </div>
-                            )}
-                            {contact.sin_no && (
-                                <div>
-                                    <label className="text-sm font-medium text-gray-500 dark:text-gray-400">SIN Number</label>
-                                    <p className="mt-1 text-sm text-gray-900 dark:text-white">{contact.sin_no}</p>
-                                </div>
-                            )}
-                            {contact.employee_number && (
-                                <div>
-                                    <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Employee Number</label>
-                                    <p className="mt-1 text-sm text-gray-900 dark:text-white">{contact.employee_number}</p>
-                                </div>
-                            )}
-                            {contact.address && (
-                                <div className="md:col-span-2">
-                                    <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Address</label>
-                                    <p className="mt-1 text-sm text-gray-900 dark:text-white">{contact.address}</p>
-                                </div>
-                            )}
-                            {contact.city && (
-                                <div>
-                                    <label className="text-sm font-medium text-gray-500 dark:text-gray-400">City</label>
-                                    <p className="mt-1 text-sm text-gray-900 dark:text-white">{contact.city}</p>
-                                </div>
-                            )}
-                            {contact.state && (
-                                <div>
-                                    <label className="text-sm font-medium text-gray-500 dark:text-gray-400">State</label>
-                                    <p className="mt-1 text-sm text-gray-900 dark:text-white">{contact.state}</p>
-                                </div>
-                            )}
-                            {(contact.zip || contact.zip_code) && (
-                                <div>
-                                    <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Zip Code</label>
-                                    <p className="mt-1 text-sm text-gray-900 dark:text-white">{contact.zip || contact.zip_code}</p>
-                                </div>
-                            )}
-                            {contact.country && (
-                                <div>
-                                    <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Country</label>
-                                    <p className="mt-1 text-sm text-gray-900 dark:text-white">{contact.country}</p>
-                                </div>
-                            )}
-                            {(contact.license_no || contact.license_number) && (
-                                <div>
-                                    <label className="text-sm font-medium text-gray-500 dark:text-gray-400">License Number</label>
-                                    <p className="mt-1 text-sm text-gray-900 dark:text-white">{contact.license_no || contact.license_number}</p>
-                                </div>
-                            )}
-                            {contact.license_class && (
-                                <div>
-                                    <label className="text-sm font-medium text-gray-500 dark:text-gray-400">License Class</label>
-                                    <p className="mt-1 text-sm text-gray-900 dark:text-white">{contact.license_class}</p>
-                                </div>
-                            )}
-                            {contact.license_issue_date && (
-                                <div>
-                                    <label className="text-sm font-medium text-gray-500 dark:text-gray-400">License Issue Date</label>
-                                    <p className="mt-1 text-sm text-gray-900 dark:text-white">{formatDate(contact.license_issue_date)}</p>
-                                </div>
-                            )}
-                            {contact.license_expire_date && (
-                                <div>
-                                    <label className="text-sm font-medium text-gray-500 dark:text-gray-400">License Expiry Date</label>
-                                    <p className="mt-1 text-sm text-gray-900 dark:text-white">{formatDate(contact.license_expire_date)}</p>
-                                </div>
-                            )}
-                            {contact.license_issue_country && (
-                                <div>
-                                    <label className="text-sm font-medium text-gray-500 dark:text-gray-400">License Issue Country</label>
-                                    <p className="mt-1 text-sm text-gray-900 dark:text-white">{contact.license_issue_country}</p>
-                                </div>
-                            )}
-                            {contact.license_issue_state && (
-                                <div>
-                                    <label className="text-sm font-medium text-gray-500 dark:text-gray-400">License Issue State</label>
-                                    <p className="mt-1 text-sm text-gray-900 dark:text-white">{contact.license_issue_state}</p>
-                                </div>
-                            )}
-                            {contact.status_in_country && (
-                                <div>
-                                    <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Status in Country</label>
-                                    <p className="mt-1 text-sm text-gray-900 dark:text-white capitalize">{contact.status_in_country}</p>
-                                </div>
-                            )}
-                            {contact.immigration_status && (
-                                <div>
-                                    <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Immigration Status</label>
-                                    <p className="mt-1 text-sm text-gray-900 dark:text-white">{contact.immigration_status}</p>
-                                </div>
-                            )}
-                            {contact.doc_expiry_date && (
-                                <div>
-                                    <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Document Expiry Date</label>
-                                    <p className="mt-1 text-sm text-gray-900 dark:text-white">{formatDate(contact.doc_expiry_date)}</p>
-                                </div>
-                            )}
-                            {contact.job_join_date && (
-                                <div>
-                                    <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Job Join Date</label>
-                                    <p className="mt-1 text-sm text-gray-900 dark:text-white">{formatDate(contact.job_join_date)}</p>
-                                </div>
-                            )}
-                            {contact.job_leave_date && (
-                                <div>
-                                    <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Job Leave Date</label>
-                                    <p className="mt-1 text-sm text-gray-900 dark:text-white">{formatDate(contact.job_leave_date)}</p>
-                                </div>
-                            )}
-                            {contact.start_date && (
-                                <div>
-                                    <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Start Date</label>
-                                    <p className="mt-1 text-sm text-gray-900 dark:text-white">{formatDate(contact.start_date)}</p>
-                                </div>
-                            )}
-                            {contact.end_date && (
-                                <div>
-                                    <label className="text-sm font-medium text-gray-500 dark:text-gray-400">End Date</label>
-                                    <p className="mt-1 text-sm text-gray-900 dark:text-white">{formatDate(contact.end_date)}</p>
-                                </div>
-                            )}
-                            {contact.hourly_labor_rate && (
-                                <div>
-                                    <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Hourly Labor Rate</label>
-                                    <p className="mt-1 text-sm text-gray-900 dark:text-white">${Number(contact.hourly_labor_rate).toFixed(2)}</p>
-                                </div>
-                            )}
-                            {contact.emergency_contact_name && (
-                                <div>
-                                    <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Emergency Contact Name</label>
-                                    <p className="mt-1 text-sm text-gray-900 dark:text-white">{contact.emergency_contact_name}</p>
-                                </div>
-                            )}
-                            {contact.emergency_contact_no && (
-                                <div>
-                                    <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Emergency Contact Number</label>
-                                    <p className="mt-1 text-sm text-gray-900 dark:text-white">{contact.emergency_contact_no}</p>
-                                </div>
-                            )}
-                            {contact.emergency_contact_address && (
-                                <div className="md:col-span-2">
-                                    <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Emergency Contact Address</label>
-                                    <p className="mt-1 text-sm text-gray-900 dark:text-white">{contact.emergency_contact_address}</p>
-                                </div>
-                            )}
-                            {contact.comment && (
-                                <div className="md:col-span-2">
-                                    <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Comments</label>
-                                    <p className="mt-1 text-sm text-gray-900 dark:text-white whitespace-pre-wrap">{contact.comment}</p>
-                                </div>
-                            )}
+                            </div>
+                            <div className="flex flex-col items-center py-6">
+                                <span className="text-gray-400 text-sm">
+                                    No service reminders currently assigned
+                                </span>
+                            </div>
                         </div>
                     </div>
                 </div>
+
+
+
             </div>
         </>
     );

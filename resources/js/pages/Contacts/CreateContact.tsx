@@ -914,16 +914,17 @@ export default function CreateContact() {
                 <div className="mt-6 flex justify-end gap-4">
                   <Button
                     variant="outline"
-                    size="md"
+                    size="sm"
                     onClick={() => navigate("/contacts")}
                     disabled={isSubmitting}
                   >
                     Cancel
                   </Button>
-                  <button
+                  <Button
+                    variant="primary"
+                    size="sm"
                     type="submit"
                     disabled={isSubmitting}
-                    className="inline-flex items-center justify-center gap-2 rounded-lg transition px-3 py-3 text-sm bg-brand-500 text-white shadow-theme-xs hover:bg-brand-600 disabled:bg-brand-300 disabled:cursor-not-allowed"
                   >
                     {isSubmitting ? (
                       <>
@@ -952,7 +953,7 @@ export default function CreateContact() {
                     ) : (
                       isEditMode ? "Update Contact" : "Save Contact"
                     )}
-                  </button>
+                  </Button>
                 </div>
               </div>
             )}
