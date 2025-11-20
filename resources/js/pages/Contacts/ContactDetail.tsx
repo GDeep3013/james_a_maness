@@ -9,7 +9,7 @@ import Badge from "../../components/ui/badge/Badge";
 interface Contact {
     id: number;
     user_id?: number;
-    profile_picture?: string;
+    job_title?: string;
     first_name: string;
     last_name?: string;
     gender?: string;
@@ -50,6 +50,7 @@ interface Contact {
         id: number;
         profile_picture?: string;
     };
+    classification: string;
     created_at?: string;
     updated_at?: string;
 }

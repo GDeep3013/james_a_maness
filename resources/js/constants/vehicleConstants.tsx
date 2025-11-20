@@ -144,4 +144,3 @@ export const defaultVehicleFormData: VehicleFormData = {
   assigned_driver: '',
   department: '',
 };
-
