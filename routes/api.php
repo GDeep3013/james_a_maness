@@ -11,6 +11,7 @@ use App\Http\Controllers\IssueController;
 use App\Http\Controllers\ServiceTaskController;
 use App\Http\Controllers\ServiceReminderController;
 use App\Http\Controllers\VendorController;
+use App\Http\Controllers\ServiceController;
 
 use App\Http\Controllers\PartController;
 // use App\Http\Controllers\Apps\LoginController;
@@ -64,6 +65,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::apiResource('parts', PartController::class);
     Route::get('/parts/{id}/edit', [PartController::class, 'edit'])->where('id', '[0-9]+');
+
+    Route::apiResource('services', ServiceController::class);
+    Route::get('/services/{id}/edit', [ServiceController::class, 'edit'])->where('id', '[0-9]+');
 
 });
 
