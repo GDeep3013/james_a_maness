@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router';
+import { useParams, useNavigate, Link } from 'react-router';
 import { vehicleService } from '../../services/vehicleService';
 import PageMeta from '../../components/common/PageMeta';
 import Button from '../../components/ui/button/Button';
@@ -440,9 +440,25 @@ export default function VehicleDetail() {
                         <h3 className="text-[18px] font-medium text-[#1D2939] mb-4">Current Assignment</h3>
                         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-6">
                             <div className="flex-1">
+                                <span className="block text-sm text-[#595959] mb-1">Vendor</span>
+                                <span className="block text-base text-[#1D2939]">
+                                    {vehicle.vendor?.id ? (
+                                        <Link to={`/vendors/${vehicle.vendor.id}`} className="text-blue-500 hover:text-blue-700">
+                                            { capitalizeFirst(vehicle.vendor?.name) }
+                                        </Link>
+                                    ) : 'N/A'}
+                                </span>
+                            </div>
+                            <div className="flex-1">
                                 <span className="block text-sm text-[#595959] mb-1">Assigned Driver</span>
                                 <span className="block text-base text-[#1D2939]">
-                                    { capitalizeFirst(vehicle.assigned_driver) || 'Not Assigned'}
+                                    {vehicle.contact?.id ? (
+                                            <Link to={`/contacts/${vehicle.contact.id}`} className="text-blue-500 hover:text-blue-700">
+                                                { capitalizeFirst(vehicle.contact?.first_name) + ' ' + capitalizeFirst(vehicle.contact?.last_name) }
+                                            </Link>
+                                        ) : 'N/A'
+                                    }
+                                    
                                 </span>
                             </div>
                             <div className="flex-1">

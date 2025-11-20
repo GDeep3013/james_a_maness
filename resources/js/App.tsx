@@ -46,6 +46,7 @@ import CreateServiceReminder from "./pages/ServiceReminders/CreateServiceReminde
 import ServiceReminderList from "./pages/ServiceReminders/ServiceReminderList";
 import Fuels from "./pages/Fuels";
 import CreateFuel from "./pages/Fuels/CreateFuel";
+import FuelDetail from "./pages/Fuels/FuelDetail";
 import CreateService from "./pages/Services/CreateService";
 import ServiceList from "./pages/Services/ServiceList";
 import FuelDetail from "./pages/Fuels/FuelDetail";

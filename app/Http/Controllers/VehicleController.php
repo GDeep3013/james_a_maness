@@ -23,7 +23,7 @@ class VehicleController extends Controller
     public function index(Request $request)
     {
         $tableColumns = Schema::getColumnListing('vehicals');
-        $query = Vehical::with(['driver:id,first_name,last_name'])->orderBy('id', 'desc');
+        $query = Vehical::with(['driver:id,first_name,last_name', 'vendor:id,name'])->orderBy('id', 'desc');
         $searchTerm = $request->search;
 
 
@@ -51,7 +51,7 @@ class VehicleController extends Controller
             }
         } else {
 
-            $vehicle = Vehical::get();
+            $vehicle = Vehical::with(['driver:id,first_name,last_name', 'vendor:id,name'])->get();
             if (!empty($vehicle)) {
                 return response()->json(['status' => true, 'vehical' => $vehicle]);
             } else {
@@ -87,6 +87,7 @@ class VehicleController extends Controller
                 'current_mileage' => 'nullable|string|max:255',
                 'purchase_price' => 'nullable|string|max:255',
                 'initial_status' => 'nullable|in:available,assigned,maintenance,inactive',
+                'vendor_id' => 'nullable|integer|exists:vendors,id',
                 'primary_location' => 'nullable|string|max:255',
                 'notes' => 'nullable|string',
                 'assigned_driver' => 'nullable|integer',
@@ -109,6 +110,7 @@ class VehicleController extends Controller
             $vehicle->current_mileage = $request->current_mileage ?? null;
             $vehicle->purchase_price = $request->purchase_price ?? null;
             $vehicle->initial_status = $request->initial_status ?? 'available';
+            $vehicle->vendor_id = $request->vendor_id ?? null;
             $vehicle->primary_location = $request->primary_location ?? null;
             $vehicle->notes = $request->notes ?? null;
             $vehicle->assigned_driver = $request->assigned_driver ?? null;
@@ -147,7 +149,7 @@ class VehicleController extends Controller
     public function show($id)
     {
         if ($id) {
-            $data = Vehical::where('id', $id)->first();
+            $data = Vehical::with(['contact:id,first_name,last_name', 'vendor:id,name'])->where('id', $id)->first();
             return response()->json(['status' => true, 'vehicle' => $data]);
         } else {
             return response()->json(['status' => false, 'message' => 'Vehicle not found']);
@@ -226,6 +228,7 @@ class VehicleController extends Controller
                 'current_mileage' => 'nullable|string|max:255',
                 'purchase_price' => 'nullable|string|max:255',
                 'initial_status' => 'nullable|in:available,assigned,maintenance,inactive',
+                'vendor_id' => 'nullable|integer|exists:vendors,id',
                 'primary_location' => 'nullable|string|max:255',
                 'notes' => 'nullable|string',
                 'assigned_driver' => 'nullable|integer',
@@ -247,6 +250,7 @@ class VehicleController extends Controller
             $vehicle->current_mileage = $request->current_mileage ?? null;
             $vehicle->purchase_price = $request->purchase_price ?? null;
             $vehicle->initial_status = $request->initial_status ?? $vehicle->initial_status;
+            $vehicle->vendor_id = $request->vendor_id ?? $vehicle->vendor_id;
             $vehicle->primary_location = $request->primary_location ?? null;
             $vehicle->notes = $request->notes ?? null;
             $vehicle->assigned_driver = $request->assigned_driver ?? null;

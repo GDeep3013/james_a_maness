@@ -9,11 +9,17 @@ import TextArea from '../../components/form/input/TextArea';
 import { typeOptions, fuelTypeOptions, transmissionOptions, statusOptions, addVehicleSteps, defaultVehicleFormData, VehicleFormData } from '../../constants/vehicleConstants';
 import { vehicleService } from '../../services/vehicleService';
 import { contactService } from '../../services/contactService';
+import { vendorService } from '../../services/vendorService';
 
 interface Contact {
   id: number;
   first_name: string;
   last_name?: string;
+}
+
+interface Vendor {
+  id: number;
+  name: string;
 }
 
 export default function EditVehicle() {
@@ -27,6 +33,8 @@ export default function EditVehicle() {
   const [generalError, setGeneralError] = useState<string>("");
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [isLoadingContacts, setIsLoadingContacts] = useState(false);
+  const [vendors, setVendors] = useState<Vendor[]>([]);
+  const [isLoadingVendors, setIsLoadingVendors] = useState(false);
 
   const fetchContacts = async () => {
     setIsLoadingContacts(true);
@@ -42,8 +50,23 @@ export default function EditVehicle() {
     }
   };
 
+  const fetchVendors = async () => {
+    setIsLoadingVendors(true);
+    try {
+      const response = await vendorService.getAll({ page: 1 });
+      if (response.data?.status && response.data?.vendor?.data) {
+        setVendors(response.data.vendor.data);
+      }
+    } catch (error) {
+      console.error("Error fetching vendors:", error);
+    } finally {
+      setIsLoadingVendors(false);
+    }
+  };
+
   useEffect(() => {
     fetchContacts();
+    fetchVendors();
     const fetchVehicleData = async () => {
       if (!id) {
         setGeneralError("Vehicle ID is required");
@@ -73,6 +96,7 @@ export default function EditVehicle() {
             current_mileage: vehicle.current_mileage || '',
             purchase_price: vehicle.purchase_price || '',
             initial_status: vehicle.initial_status || 'available',
+            vendor_id: vehicle.vendor_id?.toString() || '',
             primary_location: vehicle.primary_location || '',
             notes: vehicle.notes || '',
             assigned_driver: vehicle.assigned_driver?.toString() || '',
@@ -204,13 +228,14 @@ export default function EditVehicle() {
         current_mileage: formData.current_mileage || undefined,
         purchase_price: formData.purchase_price || undefined,
         initial_status: formData.initial_status || undefined,
+        vendor_id: formData.vendor_id ? Number(formData.vendor_id) : undefined,
         primary_location: formData.primary_location || undefined,
         notes: formData.notes || undefined,
         assigned_driver: formData.assigned_driver ? Number(formData.assigned_driver) : undefined,
-        department: formData.department ? Number(formData.department) : undefined,
+        department: formData.department || undefined,
       };
 
-      const response = await vehicleService.update(Number(id), vehicleData as any);
+      const response = await vehicleService.update(Number(id), vehicleData);
 
       if (response.data?.status === true || response.status === 200 || response.status === 201) {
         navigate("/vehicles", { replace: true });
@@ -290,7 +315,7 @@ export default function EditVehicle() {
                 d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
               ></path>
             </svg>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Loading vehicle data...</p>
+            <p className="text-sm text-gray-600">Loading vehicle data...</p>
           </div>
         </div>
       </>
@@ -304,16 +329,16 @@ export default function EditVehicle() {
       <div className="space-y-6">
         <div className="flex items-start justify-between">
           <div>
-            <h1 className="text-2xl font-semibold text-gray-900 dark:text-white mb-2">
+            <h1 className="text-2xl font-semibold text-gray-900 mb-2">
               Edit Vehicle
             </h1>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+            <p className="text-sm text-gray-600">
               Update vehicle details in your fleet
             </p>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl p-6">
+        <div className="bg-white border border-gray-200 rounded-xl p-6">
           <div className="mb-8">
             <div className="flex items-center justify-between">
               {addVehicleSteps.map((step, index) => (
@@ -338,13 +363,13 @@ export default function EditVehicle() {
                       <p
                         className={`text-sm font-semibold ${
                           currentStep >= step.number
-                            ? 'text-gray-900 dark:text-white'
-                            : 'text-gray-600 dark:text-gray-400'
+                            ? 'text-gray-900'
+                            : 'text-gray-600'
                         }`}
                       >
                         {step.title}
                       </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                      <p className="text-xs text-gray-500 mt-1">
                         {step.description}
                       </p>
                     </div>
@@ -354,7 +379,7 @@ export default function EditVehicle() {
                       className={`flex-1 h-0.5 mx-4 mt-[-20px] ${
                         currentStep > step.number
                           ? 'bg-[#00A63E]'
-                          : 'bg-gray-200 dark:bg-gray-700'
+                          : 'bg-gray-200'
                       }`}
                     />
                   )}
@@ -365,14 +390,14 @@ export default function EditVehicle() {
 
           <form onSubmit={handleSubmit}>
             {generalError && (
-              <div className="mb-6 p-4 bg-error-50 dark:bg-error-900/20 border border-error-200 dark:border-error-800 rounded-lg">
-                <p className="text-sm text-error-600 dark:text-error-400">{generalError}</p>
+              <div className="mb-6 p-4 bg-error-50 border border-error-200 rounded-lg">
+                <p className="text-sm text-error-600">{generalError}</p>
               </div>
             )}
 
             {currentStep === 1 && (
               <div className="space-y-6">
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                <h2 className="text-lg font-semibold text-gray-900 mb-4">
                   Basic Information
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -510,7 +535,7 @@ export default function EditVehicle() {
 
             {currentStep === 2 && (
               <div className="space-y-6">
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                <h2 className="text-lg font-semibold text-gray-900 mb-4">
                   Technical Specifications
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -602,10 +627,10 @@ export default function EditVehicle() {
 
             {currentStep === 3 && (
               <div className="space-y-6">
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                <h2 className="text-lg font-semibold text-gray-900 mb-4">
                   Assignment & Location
                 </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div>
                     <Label htmlFor="initial_status">Initial Status</Label>
                     <Select
@@ -616,6 +641,25 @@ export default function EditVehicle() {
                     />
                     {errors.initial_status && (
                       <p className="mt-1 text-xs text-error-500">{errors.initial_status}</p>
+                    )}
+                  </div>
+
+                  <div>
+                    <Label htmlFor="vendor">Vendor</Label>
+                    <Select
+                      options={[
+                        { value: "", label: "Select vendor (optional)" },
+                        ...vendors.map(vendor => ({
+                          value: vendor.id.toString(),
+                          label: vendor.name
+                        }))
+                      ]}
+                      placeholder={isLoadingVendors ? "Loading vendors..." : "Select vendor (optional)"}
+                      onChange={handleSelectChange('vendor_id')}
+                      defaultValue={formData.vendor_id}
+                    />
+                    {errors.vendor && (
+                      <p className="mt-1 text-xs text-error-500">{errors.vendor}</p>
                     )}
                   </div>
 
@@ -638,7 +682,7 @@ export default function EditVehicle() {
                     )}
                   </div>
 
-                  <div>
+                  <div className="md:col-span-3">
                     <Label htmlFor="primary_location">Primary Location</Label>
                     <Input
                       type="text"
@@ -653,7 +697,7 @@ export default function EditVehicle() {
                     )}
                   </div>
 
-                  <div>
+                  <div className="md:col-span-3">
                     <Label htmlFor="department">Department</Label>
                     <Input
                       type="text"
@@ -684,18 +728,18 @@ export default function EditVehicle() {
               </div>
             )}
 
-            <div className="flex items-center justify-between mt-8 pt-6 border-t border-gray-200 dark:border-white/10">
+            <div className="flex items-center justify-between mt-8 pt-6 border-t border-gray-200">
               <button
                 type="button"
                 onClick={handlePrevious}
                 disabled={currentStep === 1 || isSubmitting}
-                className="inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition bg-white text-gray-700 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-gray-800 dark:text-gray-400 dark:ring-gray-700 dark:hover:bg-white/3 dark:hover:text-gray-300"
+                className="inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition bg-white text-gray-700 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <ChevronLeftIcon />
                 Previous
               </button>
 
-              <span className="text-sm text-gray-500 dark:text-gray-400">
+              <span className="text-sm text-gray-500">
                 Step {currentStep} of {addVehicleSteps.length}
               </span>
 

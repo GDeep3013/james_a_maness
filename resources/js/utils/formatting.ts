@@ -1,3 +1,8 @@
+export const uppercase = (text: string | null | undefined): string => {
+    if (!text) return '';
+    return text.toUpperCase();
+};
+
 export const capitalize = (text: string | null | undefined): string => {
     if (!text) return '';
     return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();

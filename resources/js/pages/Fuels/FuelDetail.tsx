@@ -76,37 +76,37 @@ export default function FuelDetail() {
                         <div className="flex flex-col">
                             <span className="text-sm text-gray-600 dark:text-gray-400">Fuel Type</span>
                             <span className="text-sm font-medium text-gray-900 dark:text-white">
-                            {fuel?.fuel_type || `Fuel Type #${fuel?.fuel_type_id}`}
+                            {fuel?.fuel_type || `--`}
                             </span>
                         </div>
                         <div className="flex flex-col">
                             <span className="text-sm text-gray-600 dark:text-gray-400">Date</span>
                             <span className="text-sm font-medium text-gray-900 dark:text-white">
-                            {fuel?.date || `Date #${fuel?.date_id}`}
+                            {fuel?.date || `--`}
                             </span>
                         </div>
                         <div className="flex flex-col">
                             <span className="text-sm text-gray-600 dark:text-gray-400">Unit Type</span>
                             <span className="text-sm font-medium text-gray-900 dark:text-white">
-                            {fuel?.unit_type || `Unit Type #${fuel?.unit_type_id}`}
+                            {fuel?.unit_type || `--`}
                             </span>
                         </div>
                         <div className="flex flex-col">
                             <span className="text-sm text-gray-600 dark:text-gray-400">Units</span>
                             <span className="text-sm font-medium text-gray-900 dark:text-white">
-                            {fuel?.units || `Units #${fuel?.units_id}`}
+                            {fuel?.units || `--`}
                             </span>
                         </div>
                         <div className="flex flex-col">
                             <span className="text-sm text-gray-600 dark:text-gray-400">Price Per Unit</span>
                             <span className="text-sm font-medium text-gray-900 dark:text-white">
-                            {fuel?.price_per_volume_unit || `Price Per Unit #${fuel?.price_per_volume_unit_id}`}
+                            {fuel?.price_per_volume_unit || `--`}
                             </span>
                         </div>
                         <div className="flex flex-col">
                             <span className="text-sm text-gray-600 dark:text-gray-400">Vehicle Meter Reading</span>
                             <span className="text-sm font-medium text-gray-900 dark:text-white">
-                            {fuel?.vehicle_meter || `Vehicle Meter Reading #${fuel?.vehicle_meter_id}`}
+                                {fuel?.vehicle_meter || `--`}
                             </span>
                         </div>
                         <div className="flex flex-col">

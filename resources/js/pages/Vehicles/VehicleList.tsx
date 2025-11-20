@@ -13,7 +13,7 @@ import Button from "../../components/ui/button/Button";
 import PageMeta from "../../components/common/PageMeta";
 import { vehicleService } from "../../services/vehicleService";
 import { PencilIcon, TrashBinIcon, ExportIcon, EyeIcon } from "../../icons";
-import { formatVehicleIdentifier, formatDate } from "../../utils";
+import { formatVehicleIdentifier, formatDate, uppercase , capitalize } from "../../utils";
 
 interface Vehicle {
   id: number;
@@ -33,6 +33,10 @@ interface Vehicle {
     id?: number;
     first_name?: string;
     last_name?: string;
+  };
+  vendor?: {
+    id?: number;
+    name?: string;
   };
   next_service_date?: string;
   created_at?: string;
@@ -344,6 +348,12 @@ export default function VehicleList() {
                         isHeader
                         className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                       >
+                        Vendor
+                      </TableCell>
+                      <TableCell
+                        isHeader
+                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                      >
                         Driver
                       </TableCell>
                       <TableCell
@@ -381,7 +391,7 @@ export default function VehicleList() {
                           <TableCell className="px-5 py-4 text-start">
                             <div>
                               <div className="font-semibold text-gray-900 dark:text-white text-sm">
-                                { vehicle.license_plate}
+                                {  uppercase(vehicle.license_plate)}
                               </div>
                               {
                                 <div className="text-gray-500 dark:text-gray-400 text-xs mt-0.5">
@@ -419,12 +429,17 @@ export default function VehicleList() {
                           </TableCell>
                           <TableCell className="px-5 py-4 text-start">
                             <div className="text-gray-800 text-theme-sm dark:text-white/90">
-                              {vehicle.driver ? `${vehicle.driver.first_name || ""} ${vehicle.driver.last_name || ""}`.trim() : "—"}
+                              {capitalize(vehicle.vendor?.name) || "—"}
                             </div>
                           </TableCell>
                           <TableCell className="px-5 py-4 text-start">
                             <div className="text-gray-800 text-theme-sm dark:text-white/90">
-                              {vehicle.primary_location || "—"}
+                              {vehicle.driver ? `${capitalize(vehicle.driver.first_name) || ""} ${capitalize(vehicle.driver.last_name) || ""}`.trim() : "—"}
+                            </div>
+                          </TableCell>
+                          <TableCell className="px-5 py-4 text-start">
+                            <div className="text-gray-800 text-theme-sm dark:text-white/90">
+                              {capitalize(vehicle.primary_location) || "—"}
                             </div>
                           </TableCell>
                           <TableCell className="px-5 py-4 text-start">
