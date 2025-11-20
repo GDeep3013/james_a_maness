@@ -9,11 +9,17 @@ import TextArea from '../../components/form/input/TextArea';
 import { typeOptions, fuelTypeOptions, transmissionOptions, statusOptions, addVehicleSteps, defaultVehicleFormData, VehicleFormData } from '../../constants/vehicleConstants';
 import { vehicleService } from '../../services/vehicleService';
 import { contactService } from '../../services/contactService';
+import { vendorService } from '../../services/vendorService';
 
 interface Contact {
   id: number;
   first_name: string;
   last_name?: string;
+}
+
+interface Vendor {
+  id: number;
+  name: string;
 }
 
 export default function EditVehicle() {
@@ -27,6 +33,8 @@ export default function EditVehicle() {
   const [generalError, setGeneralError] = useState<string>("");
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [isLoadingContacts, setIsLoadingContacts] = useState(false);
+  const [vendors, setVendors] = useState<Vendor[]>([]);
+  const [isLoadingVendors, setIsLoadingVendors] = useState(false);
 
   const fetchContacts = async () => {
     setIsLoadingContacts(true);
@@ -42,8 +50,23 @@ export default function EditVehicle() {
     }
   };
 
+  const fetchVendors = async () => {
+    setIsLoadingVendors(true);
+    try {
+      const response = await vendorService.getAll({ page: 1 });
+      if (response.data?.status && response.data?.vendor?.data) {
+        setVendors(response.data.vendor.data);
+      }
+    } catch (error) {
+      console.error("Error fetching vendors:", error);
+    } finally {
+      setIsLoadingVendors(false);
+    }
+  };
+
   useEffect(() => {
     fetchContacts();
+    fetchVendors();
     const fetchVehicleData = async () => {
       if (!id) {
         setGeneralError("Vehicle ID is required");
@@ -73,6 +96,7 @@ export default function EditVehicle() {
             current_mileage: vehicle.current_mileage || '',
             purchase_price: vehicle.purchase_price || '',
             initial_status: vehicle.initial_status || 'available',
+            vendor_id: vehicle.vendor_id?.toString() || '',
             primary_location: vehicle.primary_location || '',
             notes: vehicle.notes || '',
             assigned_driver: vehicle.assigned_driver?.toString() || '',
@@ -204,13 +228,14 @@ export default function EditVehicle() {
         current_mileage: formData.current_mileage || undefined,
         purchase_price: formData.purchase_price || undefined,
         initial_status: formData.initial_status || undefined,
+        vendor_id: formData.vendor_id ? Number(formData.vendor_id) : undefined,
         primary_location: formData.primary_location || undefined,
         notes: formData.notes || undefined,
         assigned_driver: formData.assigned_driver ? Number(formData.assigned_driver) : undefined,
-        department: formData.department ? Number(formData.department) : undefined,
+        department: formData.department || undefined,
       };
 
-      const response = await vehicleService.update(Number(id), vehicleData as any);
+      const response = await vehicleService.update(Number(id), vehicleData);
 
       if (response.data?.status === true || response.status === 200 || response.status === 201) {
         navigate("/vehicles", { replace: true });
@@ -605,7 +630,7 @@ export default function EditVehicle() {
                 <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
                   Assignment & Location
                 </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div>
                     <Label htmlFor="initial_status">Initial Status</Label>
                     <Select
@@ -616,6 +641,25 @@ export default function EditVehicle() {
                     />
                     {errors.initial_status && (
                       <p className="mt-1 text-xs text-error-500">{errors.initial_status}</p>
+                    )}
+                  </div>
+
+                  <div>
+                    <Label htmlFor="vendor">Vendor</Label>
+                    <Select
+                      options={[
+                        { value: "", label: "Select vendor (optional)" },
+                        ...vendors.map(vendor => ({
+                          value: vendor.id.toString(),
+                          label: vendor.name
+                        }))
+                      ]}
+                      placeholder={isLoadingVendors ? "Loading vendors..." : "Select vendor (optional)"}
+                      onChange={handleSelectChange('vendor')}
+                      defaultValue={formData.vendor_id}
+                    />
+                    {errors.vendor && (
+                      <p className="mt-1 text-xs text-error-500">{errors.vendor}</p>
                     )}
                   </div>
 
@@ -638,7 +682,7 @@ export default function EditVehicle() {
                     )}
                   </div>
 
-                  <div>
+                  <div className="md:col-span-3">
                     <Label htmlFor="primary_location">Primary Location</Label>
                     <Input
                       type="text"
@@ -653,7 +697,7 @@ export default function EditVehicle() {
                     )}
                   </div>
 
-                  <div>
+                  <div className="md:col-span-3">
                     <Label htmlFor="department">Department</Label>
                     <Input
                       type="text"

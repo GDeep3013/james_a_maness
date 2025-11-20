@@ -91,6 +91,15 @@ export interface VehicleFormData {
   id?: number | undefined;
   vehicle_name: string;
   type: string;
+  contact?: {
+    id?: number;
+    first_name?: string;
+    last_name?: string;
+  },
+  vendor?: {
+    id?: number;
+    name?: string;
+  };
   make: string;
   model: string;
   year: string;
@@ -104,6 +113,7 @@ export interface VehicleFormData {
   current_mileage: string;
   purchase_price: string;
   initial_status: string;
+  vendor_id: string;
   primary_location: string;
   notes: string;
   assigned_driver: string;
@@ -128,6 +138,7 @@ export const defaultVehicleFormData: VehicleFormData = {
   current_mileage: '',
   purchase_price: '',
   initial_status: 'available',
+  vendor_id: "",
   primary_location: '',
   notes: '',
   assigned_driver: '',

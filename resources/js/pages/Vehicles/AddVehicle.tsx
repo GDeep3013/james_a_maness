@@ -9,11 +9,17 @@ import TextArea from '../../components/form/input/TextArea';
 import { typeOptions, fuelTypeOptions, transmissionOptions, statusOptions, addVehicleSteps, defaultVehicleFormData, VehicleFormData } from '../../constants/vehicleConstants';
 import { vehicleService } from '../../services/vehicleService';
 import { contactService } from '../../services/contactService';
+import { vendorService } from '../../services/vendorService';
 
 interface Contact {
   id: number;
   first_name: string;
   last_name?: string;
+}
+
+interface Vendor {
+  id: number;
+  name: string;
 }
 
 export default function AddVehicle() {
@@ -25,6 +31,8 @@ export default function AddVehicle() {
   const [generalError, setGeneralError] = useState<string>("");
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [isLoadingContacts, setIsLoadingContacts] = useState(false);
+  const [vendors, setVendors] = useState<Vendor[]>([]);
+  const [isLoadingVendors, setIsLoadingVendors] = useState(false);
 
   const handleInputChange = (name: string, value: string) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -47,6 +55,7 @@ export default function AddVehicle() {
 
   useEffect(() => {
     fetchContacts();
+    fetchVendors();
   }, []);
 
   const fetchContacts = async () => {
@@ -60,6 +69,20 @@ export default function AddVehicle() {
       console.error("Error fetching contacts:", error);
     } finally {
       setIsLoadingContacts(false);
+    }
+  };
+
+  const fetchVendors = async () => {
+    setIsLoadingVendors(true);
+    try {
+      const response = await vendorService.getAll({ page: 1 });
+      if (response.data?.status && response.data?.vendor?.data) {
+        setVendors(response.data.vendor.data);
+      }
+    } catch (error) {
+      console.error("Error fetching vendors:", error);
+    } finally {
+      setIsLoadingVendors(false);
     }
   };
 
@@ -136,6 +159,7 @@ export default function AddVehicle() {
         current_mileage: formData.current_mileage || undefined,
         purchase_price: formData.purchase_price || undefined,
         initial_status: formData.initial_status || undefined,
+        vendor_id: formData.vendor_id ? Number(formData.vendor_id) : undefined,
         primary_location: formData.primary_location || undefined,
         notes: formData.notes || undefined,
         assigned_driver: formData.assigned_driver ? Number(formData.assigned_driver) : undefined,
@@ -498,7 +522,7 @@ export default function AddVehicle() {
                 <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
                   Assignment & Location
                 </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div>
                     <Label htmlFor="initial_status">Initial Status</Label>
                     <Select
@@ -506,6 +530,22 @@ export default function AddVehicle() {
                       placeholder="Select status"
                       onChange={handleSelectChange('initial_status')}
                       defaultValue={formData.initial_status}
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="vendor">Vendor</Label>
+                    <Select
+                      options={[
+                        { value: "", label: "Select vendor (optional)" },
+                        ...vendors.map(vendor => ({
+                          value: vendor.id.toString(),
+                          label: vendor.name
+                        }))
+                      ]}
+                      placeholder={isLoadingVendors ? "Loading vendors..." : "Select vendor (optional)"}
+                      onChange={handleSelectChange('vendor')}
+                      defaultValue={formData.vendor_id}
                     />
                   </div>
 
@@ -525,7 +565,7 @@ export default function AddVehicle() {
                     />
                   </div>
 
-                  <div>
+                  <div className="md:col-span-3">
                     <Label htmlFor="primary_location">Primary Location</Label>
                     <Input
                       type="text"
@@ -537,7 +577,7 @@ export default function AddVehicle() {
                     />
                   </div>
 
-                  <div>
+                  <div className="md:col-span-3">
                     <Label htmlFor="department">Department</Label>
                     <Input
                       type="text"
