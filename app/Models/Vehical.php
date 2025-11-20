@@ -37,6 +37,11 @@ class Vehical extends Model
         return $this->belongsTo(Contact::class, 'assigned_driver', 'id')->select('id', 'first_name', 'last_name');
     }
 
+    public function driver()
+    {
+        return $this->belongsTo(Contact::class, 'assigned_driver', 'id')->select('id', 'first_name', 'last_name');
+    }
+
     public function vendor()
     {
         return $this->belongsTo(Vendor::class, 'vendor_id', 'id')->select('id', 'name');
