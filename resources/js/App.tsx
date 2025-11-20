@@ -22,6 +22,7 @@ import Home from "./pages/Dashboard/Home";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import Contacts from "./pages/Contacts/index";
 import CreateContacts from "./pages/Contacts/CreateContact";
+import ContactDetail from "./pages/Contacts/ContactDetail";
 import Vehicles from "./pages/Vehicles/index";
 import VehicleDetail from "./pages/Vehicles/VehicleDetail";
 import AddVehicle from "./pages/Vehicles/AddVehicle";
@@ -45,6 +46,7 @@ import CreateServiceReminder from "./pages/ServiceReminders/CreateServiceReminde
 import ServiceReminderList from "./pages/ServiceReminders/ServiceReminderList";
 import Fuels from "./pages/Fuels";
 import CreateFuel from "./pages/Fuels/CreateFuel";
+import FuelDetail from "./pages/Fuels/FuelDetail";
 
 export default function App() {
   return (
@@ -84,6 +86,14 @@ export default function App() {
             element={
               <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
                 <CreateContacts />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/contacts/:id/ContactDetail"
+            element={
+              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                <ContactDetail />
               </ProtectedRoute>
             }
           />
@@ -274,6 +284,14 @@ export default function App() {
               element={
                 <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
                   <CreateFuel />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/fuels/:id/FuelDetail"
+              element={
+                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                  <FuelDetail />
                 </ProtectedRoute>
               }
             />

@@ -28,6 +28,7 @@ Route::middleware(['auth','page.access'])->group(function () {
     Route::get('/contacts', [HomeController::class, 'index']);
     Route::get('/contacts/create', [HomeController::class, 'index']);
     Route::get('/contacts/{id}', [HomeController::class, 'index'])->where('id', '[0-9]+');
+    Route::get('/contacts/{id}/ContactDetail', [HomeController::class, 'index'])->where('id', '[0-9]+');
     Route::get('/contacts/{id}/edit', [HomeController::class, 'index'])->where('id', '[0-9]+');
 
     //
@@ -55,6 +56,7 @@ Route::middleware(['auth','page.access'])->group(function () {
     Route::get('/fuels', [HomeController::class, 'index']);
     Route::get('/fuels/create', [HomeController::class, 'index']);
     Route::get('/fuels/{id}', [HomeController::class, 'index'])->where('id', '[0-9]+');
+    Route::get('/fuels/{id}/FuelDetail', [HomeController::class, 'index'])->where('id', '[0-9]+');
     Route::get('/fuels/{id}/edit', [HomeController::class, 'index'])->where('id', '[0-9]+');
 
     Route::get('/parts', [HomeController::class, 'index']);

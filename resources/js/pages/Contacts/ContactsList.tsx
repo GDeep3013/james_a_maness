@@ -123,7 +123,7 @@ export default function ContactsList() {
   };
 
   const handleView = (id: number) => {
-    navigate(`/contacts/${id}`);
+    navigate(`/contacts/${id}/ContactDetail`);
   };
 
   const handleExport = () => {

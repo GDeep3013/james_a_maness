@@ -76,15 +76,20 @@ class FuelController extends Controller
 
     public function show($id)
     {
-        if ($id) {
-            $data = Fuel::with(['vehicals', 'vendor'])->where('id', $id)->first();
-            if ($data) {
-                return response()->json(['status' => true, 'data' => $data]);
+        try {
+            if ($id) {
+                $data = Fuel::with(['vehicle', 'vendor'])->where('id', $id)->first();
+                if ($data) {
+                    return response()->json(['status' => true, 'fuel' => $data, 'data' => $data]);
+                } else {
+                    return response()->json(['status' => false, 'message' => 'Fuel entry not found']);
+                }
             } else {
-                return response()->json(['status' => false, 'message' => 'Fuel entry not found']);
+                return response()->json(['status' => false, 'message' => 'Fuel ID is required']);
             }
-        } else {
-            return response()->json(['status' => false, 'message' => 'Fuel ID is required']);
+        } catch (\Exception $e) {
+            \Log::error('Fuel show error: ' . $e->getMessage());
+            return response()->json(['status' => false, 'message' => 'Error loading fuel entry: ' . $e->getMessage()], 500);
         }
     }
 

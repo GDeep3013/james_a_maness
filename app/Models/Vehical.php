@@ -38,4 +38,9 @@ class Vehical extends Model
         return $this->belongsTo(Contact::class, 'assigned_driver', 'id');
     }
 
+    public function getNameAttribute()
+    {
+        return $this->vehicle_name;
+    }
+
 }
