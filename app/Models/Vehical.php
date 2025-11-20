@@ -42,4 +42,9 @@ class Vehical extends Model
         return $this->belongsTo(Vendor::class, 'vendor_id', 'id')->select('id', 'name');
     }
 
+    public function getNameAttribute()
+    {
+        return $this->vehicle_name;
+    }
+
 }

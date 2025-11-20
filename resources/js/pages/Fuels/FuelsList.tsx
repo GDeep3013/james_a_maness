@@ -126,11 +126,11 @@ export default function FuelsList() {
     };
 
     const handleEdit = (id: number) => {
-        navigate(`/fuels/${id}`);
+        navigate(`/fuels/${id}/edit`);
     };
 
     const handleView = (id: number) => {
-        navigate(`/fuels/${id}`);
+        navigate(`/fuels/${id}/FuelDetail`);
     };
 
     const handleExport = () => {
