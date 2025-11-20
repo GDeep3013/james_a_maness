@@ -46,7 +46,8 @@ import CreateServiceReminder from "./pages/ServiceReminders/CreateServiceReminde
 import ServiceReminderList from "./pages/ServiceReminders/ServiceReminderList";
 import Fuels from "./pages/Fuels";
 import CreateFuel from "./pages/Fuels/CreateFuel";
-import FuelDetail from "./pages/Fuels/FuelDetail";
+import CreateService from "./pages/Services/CreateService";
+import ServiceList from "./pages/Services/ServiceList";
 
 export default function App() {
   return (
@@ -364,6 +365,38 @@ export default function App() {
             }
           />
 
+          <Route
+            path="/services"
+            element={
+              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                <ServiceList />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/services/create"
+            element={
+              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                <CreateService />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/services/:id"
+            element={
+              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                <CreateService />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/services/:id/edit"
+            element={
+              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                <CreateService />
+              </ProtectedRoute>
+            }
+          />
           <Route
               path="/profile"
               element={

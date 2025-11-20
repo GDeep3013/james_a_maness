@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate, useParams } from "react-router";
 import PageBreadcrumb from "../../components/common/PageBreadCrumb";
 import PageMeta from "../../components/common/PageMeta";
@@ -8,23 +8,20 @@ import Select from "../../components/form/Select";
 import DateTimePicker from "../../components/form/date-time-picker";
 import Checkbox from "../../components/form/input/Checkbox";
 import Button from "../../components/ui/button/Button";
-import { workOrderService } from "../../services/workOrderService";
+import { serviceService } from "../../services/serviceService";
 import { vehicleService } from "../../services/vehicleService";
-import { contactService } from "../../services/contactService";
-import Issues from "./Issues";
-import LineItems from "./LineItems";
-import Notes from "./Notes";
-import { WORK_ORDER_STATUS_OPTIONS, REPAIR_PRIORITY_CLASS_OPTIONS } from "../../constants/selectOptions";
+import { vendorService } from "../../services/vendorService";
+import Issues from "../WorkOrders/Issues";
+import LineItems from "../WorkOrders/LineItems";
+import Notes from "../WorkOrders/Notes";
+import { REPAIR_PRIORITY_CLASS_OPTIONS } from "../../constants/selectOptions";
 import {
   ServiceItem,
   Part,
   Vehicle,
-  Contact,
   Vendor,
-  WorkOrderFormData,
 } from "../../types/workOrderTypes";
-import { vendorService } from "../../services/vendorService";
-
+import { ServiceFormData } from "../../types/serviceTypes";
 
 interface SidebarItem {
   key: string;
@@ -32,8 +29,7 @@ interface SidebarItem {
   content: React.ReactNode;
 }
 
-export default function CreateWorkOrder() {
-
+export default function CreateService() {
   const navigate = useNavigate();
   const { id } = useParams<{ id?: string }>();
   const isEditMode = !!id;
@@ -42,24 +38,15 @@ export default function CreateWorkOrder() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [generalError, setGeneralError] = useState<string>("");
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
-  const [contacts, setContacts] = useState<Contact[]>([]);
   const [vendors, setVendors] = useState<Vendor[]>([]);
-  const [formData, setFormData] = useState<WorkOrderFormData>({
+  const [formData, setFormData] = useState<ServiceFormData>({
     vehicle_id: "",
-    status: "Open",
     repair_priority_class: "",
-    issue_date: "",
-    issued_by: "",
-    scheduled_start_date: "",
-    send_scheduled_start_date_reminder: false,
-    actual_start_date: "",
-    expected_completion_date: "",
-    actual_completion_date: "",
-    use_start_odometer_for_completion_meter: true,
-    assigned_to: "",
+    hour_meter: "",
+    completion_date: "",
+    set_start_date: false,
+    start_date: "",
     vendor_id: "",
-    invoice_number: "",
-    po_number: "",
     service_items: [],
     parts: [],
     notes: "",
@@ -72,24 +59,19 @@ export default function CreateWorkOrder() {
   useEffect(() => {
     fetchDropdownData();
     if (isEditMode && id) {
-      fetchWorkOrderData(parseInt(id));
+      fetchServiceData(parseInt(id));
     }
   }, [isEditMode, id]);
 
   const fetchDropdownData = async () => {
     try {
-      const [vehiclesRes, contactsRes,vendorsRes] = await Promise.all([
+      const [vehiclesRes, vendorsRes] = await Promise.all([
         vehicleService.getAll({ page: 1 }),
-        contactService.getAll({ page: 1 }),
         vendorService.getAll({ page: 1 }),
       ]);
 
       if (vehiclesRes.data?.status && vehiclesRes.data?.vehical?.data) {
         setVehicles(vehiclesRes.data.vehical.data);
-      }
-
-      if (contactsRes.data?.status && contactsRes.data?.contact?.data) {
-        setContacts(contactsRes.data.contact.data);
       }
 
       if (vendorsRes.data?.status && vendorsRes.data?.vendor?.data) {
@@ -100,46 +82,38 @@ export default function CreateWorkOrder() {
     }
   };
 
-  const fetchWorkOrderData = async (workOrderId: number) => {
+  const fetchServiceData = async (serviceId: number) => {
     setIsLoading(true);
     setGeneralError("");
     try {
-      const response = await workOrderService.getForEdit(workOrderId);
+      const response = await serviceService.getForEdit(serviceId);
       const data = response.data as { status: boolean; data?: Record<string, unknown> };
       
       if (data.status && data.data) {
-        const workOrder = data.data;
+        const service = data.data;
         setFormData({
-          vehicle_id: String(workOrder.vehicle_id || ""),
-          status: String(workOrder.status || "Open"),
-          repair_priority_class: String(workOrder.repair_priority_class || ""),
-          issue_date: String(workOrder.issue_date || ""),
-          issued_by: String(workOrder.issued_by || ""),
-          scheduled_start_date: String(workOrder.scheduled_start_date || ""),
-          send_scheduled_start_date_reminder: Boolean(workOrder.send_scheduled_start_date_reminder || false),
-          actual_start_date: String(workOrder.actual_start_date || ""),
-          expected_completion_date: String(workOrder.expected_completion_date || ""),
-          actual_completion_date: String(workOrder.actual_completion_date || ""),
-          use_start_odometer_for_completion_meter: Boolean(workOrder.use_start_odometer_for_completion_meter !== false),
-          assigned_to: String(workOrder.assigned_to || ""),
-          vendor_id: String(workOrder.vendor_id || ""),
-          invoice_number: String(workOrder.invoice_number || ""),
-          po_number: String(workOrder.po_number || ""),
-          service_items: Array.isArray(workOrder.service_items)
-            ? (workOrder.service_items as ServiceItem[])
+          vehicle_id: String(service.vehicle_id || ""),
+          repair_priority_class: String(service.repair_priority_class || ""),
+          hour_meter: String(service.hour_meter || ""),
+          completion_date: String(service.completion_date || ""),
+          set_start_date: Boolean(service.set_start_date || false),
+          start_date: String(service.start_date || ""),
+          vendor_id: String(service.vendor_id || ""),
+          service_items: Array.isArray(service.service_items)
+            ? (service.service_items as ServiceItem[])
             : [] as ServiceItem[],
-          parts: Array.isArray(workOrder.parts)
-            ? (workOrder.parts as Part[])
+          parts: Array.isArray(service.parts)
+            ? (service.parts as Part[])
             : [] as Part[],
-          notes: String(workOrder.notes || ""),
-          discount_type: (workOrder.discount_type as "percentage" | "fixed") || "percentage",
-          discount_value: Number(workOrder.discount_value || 0),
-          tax_type: (workOrder.tax_type as "percentage" | "fixed") || "percentage",
-          tax_value: Number(workOrder.tax_value || 0),
+          notes: String(service.notes || ""),
+          discount_type: (service.discount_type as "percentage" | "fixed") || "percentage",
+          discount_value: Number(service.discount_value || 0),
+          tax_type: (service.tax_type as "percentage" | "fixed") || "percentage",
+          tax_value: Number(service.tax_value || 0),
         });
       }
     } catch {
-      setGeneralError("Failed to load work order data. Please try again.");
+      setGeneralError("Failed to load service data. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -167,15 +141,15 @@ export default function CreateWorkOrder() {
     }
   };
 
-  const handleDateTimeChange = (name: string) => (_dates: unknown, dateString: string) => {
+  const handleDateTimeChange = (name: string) => (_selectedDates: Date[], dateString: string) => {
     setFormData((prev) => ({ ...prev, [name]: dateString }));
-    // if (errors[name]) {
-    //   setErrors((prev) => {
-    //     const newErrors = { ...prev };
-    //     delete newErrors[name];
-    //     return newErrors;
-    //   });
-    // }
+    if (errors[name]) {
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[name];
+        return newErrors;
+      });
+    }
   };
 
   const handleCheckboxChange = (name: string) => (checked: boolean) => {
@@ -196,12 +170,12 @@ export default function CreateWorkOrder() {
       newErrors.vehicle_id = "Vehicle is required";
     }
 
-    if (!formData.status.trim()) {
-      newErrors.status = "Status is required";
+    if (!formData.hour_meter.trim()) {
+      newErrors.hour_meter = "Hour Meter is required";
     }
 
-    if (!formData.issue_date.trim()) {
-      newErrors.issue_date = "Issue date is required";
+    if (!formData.completion_date.trim()) {
+      newErrors.completion_date = "Completion Date is required";
     }
 
     setErrors(newErrors);
@@ -220,46 +194,31 @@ export default function CreateWorkOrder() {
     setIsSubmitting(true);
 
     try {
-      const workOrderData = {
+      const serviceData = {
         vehicle_id: formData.vehicle_id ? parseInt(formData.vehicle_id) : undefined,
-        status: formData.status || undefined,
         repair_priority_class: formData.repair_priority_class || undefined,
-        issue_date: formData.issue_date || undefined,
-        issued_by: formData.issued_by || undefined,
-        scheduled_start_date: formData.scheduled_start_date || undefined,
-        send_scheduled_start_date_reminder: Boolean(formData.send_scheduled_start_date_reminder),
-        actual_start_date: formData.actual_start_date || undefined,
-        expected_completion_date: formData.expected_completion_date || undefined,
-        actual_completion_date: formData.actual_completion_date || undefined,
-        use_start_odometer_for_completion_meter: Boolean(formData.use_start_odometer_for_completion_meter),
-        assigned_to: formData.assigned_to ? parseInt(formData.assigned_to) : undefined,
+        hour_meter: formData.hour_meter ? parseFloat(formData.hour_meter) : undefined,
+        completion_date: formData.completion_date || undefined,
+        set_start_date: Boolean(formData.set_start_date),
+        start_date: formData.set_start_date && formData.start_date ? formData.start_date : undefined,
         vendor_id: formData.vendor_id ? parseInt(formData.vendor_id) : undefined,
-        invoice_number: formData.invoice_number || undefined,
-        po_number: formData.po_number || undefined,
-        service_items: formData.service_items,
-        parts: formData.parts,
         notes: formData.notes || undefined,
         discount_type: formData.discount_type || undefined,
         discount_value: formData.discount_value || undefined,
         tax_type: formData.tax_type || undefined,
         tax_value: formData.tax_value || undefined,
+        service_items: formData.service_items,
+        parts: formData.parts,
       };
 
-      // console.log(typeof workOrderData.service_items);
-      // console.log(typeof workOrderData.parts);
-
-      // console.log(workOrderData);
-      // return;
-
-
       const response = isEditMode && id
-        ? await workOrderService.update(parseInt(id), workOrderData)
-        : await workOrderService.create(workOrderData);
+        ? await serviceService.update(parseInt(id), serviceData)
+        : await serviceService.create(serviceData);
 
       if (response.data?.status === true || response.status === 200 || response.status === 201) {
-        navigate("/work-orders", { replace: true });
+        navigate("/services", { replace: true });
       } else {
-        setGeneralError(response.data?.message || `Failed to ${isEditMode ? 'update' : 'create'} work order. Please try again.`);
+        setGeneralError(response.data?.message || `Failed to ${isEditMode ? 'update' : 'create'} service. Please try again.`);
       }
     } catch (error: unknown) {
       if (error && typeof error === "object" && "response" in error) {
@@ -287,7 +246,7 @@ export default function CreateWorkOrder() {
           setGeneralError(
             axiosError.response?.data?.message ||
             axiosError.response?.data?.error ||
-            `An error occurred while ${isEditMode ? 'updating' : 'creating'} the work order. Please try again.`
+            `An error occurred while ${isEditMode ? 'updating' : 'creating'} the service. Please try again.`
           );
         }
       } else {
@@ -301,11 +260,6 @@ export default function CreateWorkOrder() {
   const vehicleOptions = vehicles.map((vehicle) => ({
     value: vehicle.id.toString(),
     label: vehicle.vehicle_name,
-  }));
-
-  const contactOptions = contacts.map((contact) => ({
-    value: contact.id.toString(),
-    label: `${contact.first_name} ${contact.last_name}`.trim(),
   }));
 
   const vendorOptions = vendors.map((vendor) => ({
@@ -330,20 +284,14 @@ export default function CreateWorkOrder() {
             <p className="mt-1 text-sm text-error-500">{errors.vehicle_id}</p>
           )}
         </div>
-
         <div>
-          <Label htmlFor="status">
-            Status <span className="text-error-500">*</span>
-          </Label>
+          <Label htmlFor="vendor_id">Vendor</Label>
           <Select
-            options={WORK_ORDER_STATUS_OPTIONS}
+            options={vendorOptions}
             placeholder="Please select"
-            onChange={handleSelectChange("status")}
-            defaultValue={formData.status}
+            onChange={handleSelectChange("vendor_id")}
+            defaultValue={formData.vendor_id}
           />
-          {errors.status && (
-            <p className="mt-1 text-sm text-error-500">{errors.status}</p>
-          )}
         </div>
       </div>
 
@@ -360,172 +308,73 @@ export default function CreateWorkOrder() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <div>
-          <Label htmlFor="issue_date">
-            Issue Date <span className="text-error-500">*</span>
+          <Label htmlFor="hour_meter">
+            Hour Meter <span className="text-error-500">*</span>
           </Label>
-          <DateTimePicker
-            id="issue_date"
-            label=""
-            placeholder="Select issue date and time"
-            onChange={handleDateTimeChange("issue_date")}
-            defaultDate={formData.issue_date || undefined}
-          />
-          {errors.issue_date && (
-            <p className="mt-1 text-sm text-error-500">{errors.issue_date}</p>
+          <div className="flex items-center gap-2">
+            <Input
+              type="number"
+              id="hour_meter"
+              name="hour_meter"
+              value={formData.hour_meter}
+              onChange={(e) => handleInputChange("hour_meter", e.target.value)}
+              placeholder="Enter hour meter"
+              className="flex-1"
+            />
+            <span className="text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap">hr</span>
+          </div>
+          {errors.hour_meter && (
+            <p className="mt-1 text-sm text-error-500">{errors.hour_meter}</p>
           )}
         </div>
 
         <div>
-          <Label htmlFor="scheduled_start_date">Scheduled Start Date</Label>
+          <Label htmlFor="completion_date">
+            Completion Date <span className="text-error-500">*</span>
+          </Label>
           <DateTimePicker
-            id="scheduled_start_date"
+            id="completion_date"
             label=""
-            placeholder="Select scheduled start date and time"
-            onChange={handleDateTimeChange("scheduled_start_date")}
-            defaultDate={formData.scheduled_start_date || undefined}
+            placeholder="Select completion date and time"
+            onChange={handleDateTimeChange("completion_date")}
+            defaultDate={formData.completion_date ? new Date(formData.completion_date) : undefined}
           />
-        </div>
-
-        <div>
-          <Label htmlFor="issued_by">Issued By</Label>
-          <Input
-            type="text"
-            id="issued_by"
-            name="issued_by"
-            value={formData.issued_by}
-            onChange={(e) => handleInputChange("issued_by", e.target.value)}
-            placeholder="Enter issued by"
-          />
+          {errors.completion_date && (
+            <p className="mt-1 text-sm text-error-500">{errors.completion_date}</p>
+          )}
         </div>
       </div>
 
       <div className="flex items-start gap-3">
         <Checkbox
-          id="send_scheduled_start_date_reminder"
-          checked={formData.send_scheduled_start_date_reminder}
-          onChange={handleCheckboxChange("send_scheduled_start_date_reminder")}
+          id="set_start_date"
+          checked={formData.set_start_date}
+          onChange={handleCheckboxChange("set_start_date")}
         />
         <div className="flex-1">
           <label
-            htmlFor="send_scheduled_start_date_reminder"
+            htmlFor="set_start_date"
             className="block text-sm font-semibold text-gray-800 dark:text-gray-200 mb-1 cursor-pointer"
           >
-            Send a Scheduled Start Date Reminder
+            Set Start Date
           </label>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            Check if you would like to send selected users a Scheduled Start Date reminder notification
-          </p>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-        <div>
-          <Label htmlFor="actual_start_date">Actual Start Date</Label>
+      {formData.set_start_date && (
+        <div key="start_date_picker">
+          <Label htmlFor="start_date">Start Date</Label>
           <DateTimePicker
-            id="actual_start_date"
+            id="start_date"
             label=""
-            placeholder="Select actual start date and time"
-            onChange={handleDateTimeChange("actual_start_date")}
-            defaultDate={formData.actual_start_date || undefined}
+            placeholder="Select start date and time"
+            onChange={handleDateTimeChange("start_date")}
+            defaultDate={formData.start_date ? new Date(formData.start_date) : undefined}
           />
         </div>
-
-        <div>
-          <Label htmlFor="expected_completion_date">Expected Completion Date</Label>
-          <DateTimePicker
-            id="expected_completion_date"
-            label=""
-            placeholder="Select expected date and time"
-            onChange={handleDateTimeChange("expected_completion_date")}
-            defaultDate={formData.expected_completion_date || undefined}
-          />
-        </div>
-
-        <div>
-          <Label htmlFor="actual_completion_date">Actual Completion Date</Label>
-          <DateTimePicker
-            id="actual_completion_date"
-            label=""
-            placeholder="Select actual date and time"
-            onChange={handleDateTimeChange("actual_completion_date")}
-            defaultDate={formData.actual_completion_date || undefined}
-          />
-        </div>
-      </div>
-
-      <div className="flex items-start gap-3">
-        <Checkbox
-          id="use_start_odometer_for_completion_meter"
-          checked={formData.use_start_odometer_for_completion_meter}
-          onChange={handleCheckboxChange("use_start_odometer_for_completion_meter")}
-        />
-        <div className="flex-1">
-          <label
-            htmlFor="use_start_odometer_for_completion_meter"
-            className="block text-sm font-semibold text-gray-800 dark:text-gray-200 mb-1 cursor-pointer"
-          >
-            Use start odometer for completion meter
-          </label>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            Uncheck if meter usage has increased since work order start date
-          </p>
-        </div>
-      </div>
-    </div>
-  );
-
-  const renderAssignmentSection = () => (
-    <div className="space-y-6">
-
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-        <div>
-          <Label htmlFor="assigned_to">Assigned To</Label>
-          <Select
-            options={contactOptions}
-            placeholder="Please select"
-            onChange={handleSelectChange("assigned_to")}
-            defaultValue={formData.assigned_to}
-          />
-        </div>
-
-        <div>
-          <Label htmlFor="vendor_id">Vendor</Label>
-          <Select
-            options={vendorOptions}
-            placeholder="Please select"
-            onChange={handleSelectChange("vendor_id")}
-            defaultValue={formData.vendor_id}
-          />
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-        <div>
-          <Label htmlFor="invoice_number">Invoice Number</Label>
-          <Input
-            type="text"
-            id="invoice_number"
-            name="invoice_number"
-            value={formData.invoice_number}
-            onChange={(e) => handleInputChange("invoice_number", e.target.value)}
-            placeholder="Enter invoice number"
-          />
-        </div>
-
-        <div>
-          <Label htmlFor="po_number">PO Number</Label>
-          <Input
-            type="text"
-            id="po_number"
-            name="po_number"
-            value={formData.po_number}
-            onChange={(e) => handleInputChange("po_number", e.target.value)}
-            placeholder="Enter PO number"
-          />
-        </div>
-      </div>
+      )}
     </div>
   );
 
@@ -535,18 +384,25 @@ export default function CreateWorkOrder() {
     );
     return (
       <Issues
-        workOrderId={id ? parseInt(id) : undefined}
         vehicleId={selectedVehicle?.id}
         vehicleName={selectedVehicle?.vehicle_name}
       />
     );
   };
 
+  const handleFormDataUpdate = useCallback((updater: (prev: { service_items: ServiceItem[]; parts: Part[] }) => { service_items: ServiceItem[]; parts: Part[] }) => {
+    setFormData((prev) => {
+      const updated = updater({ service_items: prev.service_items, parts: prev.parts });
+      return { ...prev, service_items: updated.service_items, parts: updated.parts };
+    });
+  }, []);
+
   const renderLineItemsSection = () => (
     <LineItems
       serviceItems={formData.service_items}
       parts={formData.parts}
-      setFormData={setFormData}
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      setFormData={handleFormDataUpdate as any}
       onDeleteLineItem={() => {}}
     />
   );
@@ -570,7 +426,6 @@ export default function CreateWorkOrder() {
 
   const sidebarItems: SidebarItem[] = [
     { key: "details", label: "Details", content: renderDetailsSection() },
-    { key: "assignment", label: "Assignment", content: renderAssignmentSection() },
     { key: "issues", label: "", content: renderIssuesSection() },
     { key: "lineItems", label: "", content: renderLineItemsSection() },
     { key: "notes", label: "", content: renderNotesSection() },
@@ -579,10 +434,10 @@ export default function CreateWorkOrder() {
   return (
     <>
       <PageMeta
-        title={isEditMode ? "Edit Work Order" : "Create Work Order"}
-        description={isEditMode ? "Edit work order" : "Create a new work order"}
+        title={isEditMode ? "Edit Service" : "Create Service"}
+        description={isEditMode ? "Edit service" : "Create a new service"}
       />
-      <PageBreadcrumb pageTitle={isEditMode ? "Edit Work Order" : "Create Work Order"} />
+      <PageBreadcrumb pageTitle={isEditMode ? "Edit Service" : "Create Service"} />
       
       <div className="flex flex-col gap-6 justify-center max-w-5xl mx-auto">
         <form onSubmit={handleSubmit}>
@@ -592,24 +447,25 @@ export default function CreateWorkOrder() {
                 <div className="text-center">
                   <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-brand-500"></div>
                   <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                    Loading work order data...
+                    Loading service data...
                   </p>
                 </div>
               </div>
             ) : (
               <div className="flex flex-col gap-6 max-w-5xl mx-auto">
                 {generalError && (
-                  <div className="mb-6 p-4 bg-error-50 dark:bg-error-900/20 border border-error-200 dark:border-error-800 rounded-lg">
-                    <p className="text-sm text-error-600 dark:text-error-400">{generalError}</p>
+                  <div className="mb-6 p-4 bg-error-50 border border-error-200 rounded-lg">
+                    <p className="text-sm text-error-600">{generalError}</p>
                   </div>
                 )}
 
                 {sidebarItems.map((item) => (
-                  <div key={item.key} className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-6">
-                    {item.label && <h2 className="text-2xl font-semibold text-gray-800 dark:text-white/90 mb-6">
+                  <div key={item.key} className="bg-white  rounded-lg border border-gray-200 p-6">
+                    {item.label && (
+                      <h2 className="text-2xl font-semibold text-gray-800 dark:text-white/90 mb-6">
                         {item.label}
                       </h2>
-                    }
+                    )}
                     {item.content}
                   </div>
                 ))}
@@ -618,7 +474,7 @@ export default function CreateWorkOrder() {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => navigate("/work-orders")}
+                    onClick={() => navigate("/services")}
                     disabled={isSubmitting}
                   >
                     Cancel
@@ -654,7 +510,7 @@ export default function CreateWorkOrder() {
                         {isEditMode ? "Updating..." : "Saving..."}
                       </>
                     ) : (
-                      isEditMode ? "Update Work Order" : "Save Work Order"
+                      isEditMode ? "Update Service" : "Save Service"
                     )}
                   </Button>
                 </div>
@@ -666,4 +522,3 @@ export default function CreateWorkOrder() {
     </>
   );
 }
-
