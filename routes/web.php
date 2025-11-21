@@ -13,7 +13,7 @@ Route::middleware(['guest'])->group(function () {
 });
 
 Route::middleware(['auth','page.access'])->group(function () {
-    
+
     Route::get('/logout', [LoginController::class, 'logout'])->name('logout');
     Route::get('/', [HomeController::class, 'index'])->name('home');
     Route::get('/home', [HomeController::class, 'index'])->name('home');
@@ -67,12 +67,23 @@ Route::middleware(['auth','page.access'])->group(function () {
     Route::get('/fuels/{id}/FuelDetail', [HomeController::class, 'index'])->where('id', '[0-9]+');
     Route::get('/fuels/{id}/edit', [HomeController::class, 'index'])->where('id', '[0-9]+');
 
-    // Meters
-    Route::get('/fuels', [HomeController::class, 'index']);
-    Route::get('/fuels/create', [HomeController::class, 'index']);
-    Route::get('/fuels/{id}', [HomeController::class, 'index'])->where('id', '[0-9]+');
-    Route::get('/fuels/{id}/FuelDetail', [HomeController::class, 'index'])->where('id', '[0-9]+');
-    Route::get('/fuels/{id}/edit', [HomeController::class, 'index'])->where('id', '[0-9]+');
+    // MeterReadings
+    Route::get('/meter-history', [HomeController::class, 'index']);
+    Route::get('/meter-history/create', [HomeController::class, 'index']);
+    Route::get('/meter-history/{id}', [HomeController::class, 'index'])->where('id', '[0-9]+');
+    Route::get('/meter-history/{id}/FuelDetail', [HomeController::class, 'index'])->where('id', '[0-9]+');
+    Route::get('/meter-history/{id}/edit', [HomeController::class, 'index'])->where('id', '[0-9]+');
+    Route::get('/meter-history/:id/MeterReadingDetail', [HomeController::class, 'index'])->where('id', '[0-9]+');
+
+     // ExpenseHistory
+    Route::get('/expense-history', [HomeController::class, 'index']);
+    Route::get('/expense-history/create', [HomeController::class, 'index']);
+    Route::get('/expense-history/{id}', [HomeController::class, 'index'])->where('id', '[0-9]+');
+    Route::get('/expense-history/{id}/FuelDetail', [HomeController::class, 'index'])->where('id', '[0-9]+');
+    Route::get('/expense-history/{id}/edit', [HomeController::class, 'index'])->where('id', '[0-9]+');
+    Route::get('/expense-history/:id/ExpenseHistoryDetail', [HomeController::class, 'index'])->where('id', '[0-9]+');
+
+
     // Parts
     Route::get('/parts', [HomeController::class, 'index']);
     Route::get('/parts/create', [HomeController::class, 'index']);
@@ -95,6 +106,6 @@ Route::middleware(['auth','page.access'])->group(function () {
     Route::get('/calendar', [HomeController::class, 'index']);
     Route::get('/vehicle-assignments', [HomeController::class, 'index']);
 
-    
+
     Route::get('profile', [HomeController::class, 'index']);
 });

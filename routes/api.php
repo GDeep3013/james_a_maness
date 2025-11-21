@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\ExpenseHistoryController;
 use App\Http\Controllers\FuelController;
 use App\Http\Controllers\VehicleController;
 use App\Http\Controllers\WorkOrderController;
@@ -12,6 +13,7 @@ use App\Http\Controllers\ServiceTaskController;
 use App\Http\Controllers\ServiceReminderController;
 use App\Http\Controllers\VendorController;
 use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\MeterReadingController;
 use App\Http\Controllers\VehicleAssignmentController;
 
 use App\Http\Controllers\PartController;
@@ -46,6 +48,12 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::apiResource('fuels', FuelController::class);
     Route::get('/fuels/{id}/edit', [FuelController::class, 'edit'])->where('id', '[0-9]+');
+
+    Route::apiResource('meter-history', MeterReadingController::class);
+    Route::get('/meter-history/{id}/edit', [MeterReadingController::class, 'edit'])->where('id', '[0-9]+');
+
+    Route::apiResource('expense-history', ExpenseHistoryController::class);
+    Route::get('/expense-history/{id}/edit', [ExpenseHistoryController::class, 'edit'])->where('id', '[0-9]+');
 
     Route::apiResource('work-orders', WorkOrderController::class);
     Route::get('/work-orders/{id}/edit', [WorkOrderController::class, 'edit'])->where('id', '[0-9]+');
