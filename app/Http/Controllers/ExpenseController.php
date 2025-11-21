@@ -75,6 +75,7 @@ class ExpenseController extends Controller
             }
         }
     }
+    
     public function getExpenseData(Request $request)
     {
         $input = $request->all();
@@ -108,6 +109,7 @@ class ExpenseController extends Controller
                 ? response()->json(['status' => true, 'expense' => $finalArray])
                 : response()->json(['status' => false, 'message' => 'Expense not found']);
         } else {
+
             $expense = Expense::with('expense_items')
                 ->whereYear('created_at', $currentYear)
                 ->whereMonth('created_at', $currentMonth)
