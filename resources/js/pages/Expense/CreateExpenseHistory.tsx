@@ -390,7 +390,7 @@ export default function CreateExpenseHistory() {
                     )}
                 </div>
 
-                <div>
+                {/* <div>
                     <Label htmlFor="frequency">
                         Frequency <span className="text-error-500">*</span>
                     </Label>
@@ -403,7 +403,54 @@ export default function CreateExpenseHistory() {
                     {errors.frequency && (
                         <p className="mt-1 text-sm text-error-500">{errors.frequency}</p>
                     )}
+                </div> */}
+                <div>
+                    <Label htmlFor="frequency">
+                        Frequency <span className="text-error-500">*</span>
+                    </Label>
+
+                    <div className="flex items-start gap-10 mt-2">
+
+                        {/* Single Expense */}
+                        <label className="flex items-start gap-3 cursor-pointer">
+                            <input
+                                type="radio"
+                                name="frequency"
+                                value="single"
+                                checked={formData.frequency === "single"}
+                                onChange={(e) => handleInputChange("frequency", e.target.value)}
+                                className="mt-1 h-5 w-5 text-brand-600 border-gray-300 focus:ring-brand-500"
+                            />
+
+                            <div>
+                                <p className="font-medium text-gray-800">Single Expense</p>
+                                <p className="text-sm text-gray-500">A single entry that does not repeat</p>
+                            </div>
+                        </label>
+
+                        {/* Recurring Expense */}
+                        <label className="flex items-start gap-3 cursor-pointer">
+                            <input
+                                type="radio"
+                                name="frequency"
+                                value="recurring"
+                                checked={formData.frequency === "recurring"}
+                                onChange={(e) => handleInputChange("frequency", e.target.value)}
+                                className="mt-1 h-5 w-5 text-brand-600 border-gray-300 focus:ring-brand-500"
+                            />
+
+                            <div>
+                                <p className="font-medium text-gray-800">Recurring Expense</p>
+                                <p className="text-sm text-gray-500">Repeats on a monthly or annual basis</p>
+                            </div>
+                        </label>
+                    </div>
+
+                    {errors.frequency && (
+                        <p className="mt-1 text-sm text-error-500">{errors.frequency}</p>
+                    )}
                 </div>
+
             </div>
 
             {formData.frequency === 'recurring' && (
