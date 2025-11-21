@@ -34,6 +34,8 @@ class HomeController extends Controller
             'main-routes'     => 'routes',
             'vendors'         => 'vendors',
             'fuels'           => 'fuels',
+            'meter-history' =>  'meter-history',
+            'expense-history' => 'expense-history',
             'sub-contractor' => 'scontractor',
             'employees'      => 'drivers',
             'location'       => 'location',

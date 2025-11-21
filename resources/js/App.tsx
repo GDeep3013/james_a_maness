@@ -37,8 +37,6 @@ import CreateIssue from "./pages/Issues/CreateIssue";
 import IssueDetails from "./pages/Issues/IssueDetails";
 import Vendors from "./pages/vendor/index";
 import CreateVendor from "./pages/vendor/CreateVendor";
-// import Fuels from "./pages/Fuels/index";
-// import CreateFuel from "./pages/Fuels/CreateFuel";
 import CreatePart from "./pages/Parts/CreatePart";
 import PartsList from "./pages/Parts/PartsList";
 import EditPart from "./pages/Parts/EditPart";
@@ -49,6 +47,12 @@ import CreateFuel from "./pages/Fuels/CreateFuel";
 import FuelDetail from "./pages/Fuels/FuelDetail";
 import CreateService from "./pages/Services/CreateService";
 import ServiceList from "./pages/Services/ServiceList";
+import Meters from "./pages/Meters";
+import CreateMeterReading from "./pages/Meters/CreateMeterReading";
+import MeterReadingDetail from "./pages/Meters/MeterReadingDetail";
+import Expense from "./pages/Expense";
+import CreateExpenseHistory from "./pages/Expense/CreateExpenseHistory";
+import ExpenseHistoryDetail from "./pages/Expense/ExpenseHistoryDetail";
 
 export default function App() {
   return (
@@ -266,6 +270,88 @@ export default function App() {
           />
 
             <Route
+            path="/meter-history"
+            element={
+              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                <Meters />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/meter-history/create"
+            element={
+              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                <CreateMeterReading />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/meter-history/:id"
+            element={
+              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                <CreateMeterReading />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/meter-history/:id/edit"
+            element={
+              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                <CreateMeterReading />
+              </ProtectedRoute>
+            }
+            />
+            <Route
+              path="/meter-history/:id/MeterReadingDetail"
+              element={
+                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                  <MeterReadingDetail />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+            path="/expense-history"
+            element={
+              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                <Expense />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/expense-history/create"
+            element={
+              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                <CreateExpenseHistory />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/expense-history/:id"
+            element={
+              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                <CreateExpenseHistory />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/expense-history/:id/edit"
+            element={
+              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                <CreateExpenseHistory />
+              </ProtectedRoute>
+            }
+            />
+            <Route
+              path="/expense-history/:id/ExpenseHistoryDetail"
+              element={
+                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                  <ExpenseHistoryDetail />
+                </ProtectedRoute>
+              }
+          />
+
+            <Route
               path="/fuels"
               element={
                 <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
@@ -418,7 +504,7 @@ export default function App() {
             <Route path="/images" element={<Images />} />
             <Route path="/videos" element={<Videos />} />
             <Route path="/line-chart" element={<LineChart />} />
-            <Route path="/bar-chart" element={<BarChart />} /> 
+            <Route path="/bar-chart" element={<BarChart />} />
           */}
 
           </Route>
