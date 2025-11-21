@@ -113,7 +113,6 @@ export default function ContactDetail() {
         return `${contact.first_name} ${contact.last_name || ""}`.trim();
     };
 
-
     if (loading) {
         return (
             <>
