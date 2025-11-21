@@ -36,6 +36,7 @@ class HomeController extends Controller
             'fuels'           => 'fuels',
             'meter-history' =>  'meter-history',
             'expense-history' => 'expense-history',
+            'meters'         => 'meters',
             'sub-contractor' => 'scontractor',
             'employees'      => 'drivers',
             'location'       => 'location',

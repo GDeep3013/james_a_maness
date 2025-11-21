@@ -12,7 +12,7 @@ import UserProfiles from "./pages/UserProfiles";
 // import Buttons from "./pages/UiElements/Buttons";
 // import LineChart from "./pages/Charts/LineChart";
 // import BarChart from "./pages/Charts/BarChart";
-// import Calendar from "./pages/Calendar";
+import Calendar from "./pages/Calendar";
 // import BasicTables from "./pages/Tables/BasicTables";
 // import FormElements from "./pages/Forms/FormElements";
 // import Blank from "./pages/Blank";
@@ -53,6 +53,7 @@ import MeterReadingDetail from "./pages/Meters/MeterReadingDetail";
 import Expense from "./pages/Expense";
 import CreateExpenseHistory from "./pages/Expense/CreateExpenseHistory";
 import ExpenseHistoryDetail from "./pages/Expense/ExpenseHistoryDetail";
+import CreateAssignment from "./pages/VehicleAssignments/CreateAssignment";
 
 export default function App() {
   return (
@@ -493,7 +494,10 @@ export default function App() {
               }
           />
 
-          {/* <Route path="/calendar" element={<Calendar />} />
+          <Route path="/calendar" element={<Calendar />} />
+          <Route path="/vehicle-assignments" element={<CreateAssignment />} />
+
+          {/*
             <Route path="/blank" element={<Blank />} />
             <Route path="/form-elements" element={<FormElements />} />
             <Route path="/basic-tables" element={<BasicTables />} />

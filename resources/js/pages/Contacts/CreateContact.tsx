@@ -233,10 +233,8 @@ export default function CreateContact() {
     if (!validateForm()) {
       return;
     }
-
     setIsSubmitting(true);
-
-
+    
     try {
       const baseContactData = {
         first_name: formData.first_name,

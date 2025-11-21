@@ -83,6 +83,7 @@ Route::middleware(['auth','page.access'])->group(function () {
     Route::get('/expense-history/{id}/edit', [HomeController::class, 'index'])->where('id', '[0-9]+');
     Route::get('/expense-history/:id/ExpenseHistoryDetail', [HomeController::class, 'index'])->where('id', '[0-9]+');
 
+
     // Parts
     Route::get('/parts', [HomeController::class, 'index']);
     Route::get('/parts/create', [HomeController::class, 'index']);
@@ -101,6 +102,9 @@ Route::middleware(['auth','page.access'])->group(function () {
     Route::get('/services/{id}', [HomeController::class, 'index'])->where('id', '[0-9]+');
     Route::get('/services/{id}/edit', [HomeController::class, 'index'])->where('id', '[0-9]+');
 
+    // Calendar
+    Route::get('/calendar', [HomeController::class, 'index']);
+    Route::get('/vehicle-assignments', [HomeController::class, 'index']);
 
 
     Route::get('profile', [HomeController::class, 'index']);

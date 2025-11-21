@@ -14,6 +14,7 @@ use App\Http\Controllers\ServiceReminderController;
 use App\Http\Controllers\VendorController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\MeterReadingController;
+use App\Http\Controllers\VehicleAssignmentController;
 
 use App\Http\Controllers\PartController;
 // use App\Http\Controllers\Apps\LoginController;
@@ -76,6 +77,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::apiResource('services', ServiceController::class);
     Route::get('/services/{id}/edit', [ServiceController::class, 'edit'])->where('id', '[0-9]+');
+
+    Route::apiResource('vehicle-assignments', VehicleAssignmentController::class);
+    Route::get('/vehicle-assignments/{id}/edit', [VehicleAssignmentController::class, 'edit'])->where('id', '[0-9]+');
 
 });
 

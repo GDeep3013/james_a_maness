@@ -12,6 +12,17 @@ import { fuelService } from "../../services/fuelService";
 import { vehicleService } from "../../services/vehicleService";
 import { vendorService } from "../../services/vendorService";
 
+
+
+interface Vehicle {
+    id: number;
+    name: string;
+}
+interface Vendor {
+    id: number;
+    name: string;
+}
+
 export interface FuelFormData {
     vehicle_id: string;
     vendor_id: string;
@@ -91,13 +102,13 @@ export default function CreateFuel() {
                 vendorService.getAll(),
             ]);
             // Transform vehicles data for Select component
-            const vehicleOptions = (vehiclesRes.data.vehical || vehiclesRes.data.vehical || []).map((vehicle: any) => ({
+            const vehicleOptions = (vehiclesRes.data.vehical || vehiclesRes.data.vehical || []).map((vehicle: Vehicle) => ({
                 value: String(vehicle.id),
                 label: vehicle.name || `Vehicle #${vehicle.id}`,
             }));
 
             // Transform vendors data for Select component
-            const vendorOptions = (vendorsRes.data.vendor || vendorsRes.data.vendors || []).map((vendor: any) => ({
+            const vendorOptions = (vendorsRes.data.vendor || vendorsRes.data.vendors || []).map((vendor: Vendor) => ({
                 value: String(vendor.id),
                 label: vendor.name || `Vendor #${vendor.id}`,
             }));
