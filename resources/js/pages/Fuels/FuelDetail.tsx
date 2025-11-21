@@ -60,7 +60,7 @@ export default function FuelDetail() {
                 <div className="bg-white rounded-lg lg:p-6 p-3 border border-gray-200 max-w-[767px]:max-w-full lg:max-w-[387px] max-w-full w-full">
                     <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Details</h2>
                     <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-4">All Details</h3>
-                    <div className="space-y-4" key={fuel?.id}>
+                    <div className="space-y-4 grid grid-cols-1 sm:grid-cols-2 gap-4 md:block" key={fuel?.id}>
                         <div className="flex flex-col">
                             <span className="text-sm text-gray-600 dark:text-gray-400">Vehicle</span>
                             <span className="text-sm font-medium text-gray-900 dark:text-white">
