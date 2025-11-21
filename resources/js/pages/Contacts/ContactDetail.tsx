@@ -361,7 +361,7 @@ export default function ContactDetail() {
                     </div>
                     <div className="w-full">
                         <div className="bg-white rounded-lg lg:p-6 p-3 border border-gray-200">
-                            <div className="flex justify-between items-center mb-2">
+                            <div className="flex flex-wrap sm:flex-nowrap justify-between items-center mb-2">
                                 <h2 className="text-lg font-semibold text-gray-800 dark:text-white/90 mb-3">
                                     No currently active vehicle assignments.
                                 </h2>
@@ -381,11 +381,10 @@ export default function ContactDetail() {
                             </div>
                         </div>
                         <div className="bg-white rounded-lg lg:p-6 p-3 border border-gray-200 mt-4">
-                            <div className="flex justify-between items-center mb-2">
+                            <div className="flex flex-wrap sm:flex-nowrap justify-between items-center mb-2">
                                 <h2 className="text-lg font-semibold text-gray-800 dark:text-white/90 mb-3">
                                     Incomplete Work Order Assignments
                                 </h2>
-
                             </div>
                             <div className="flex flex-col items-center py-6">
                                 <span className="text-gray-400 text-sm">
@@ -394,7 +393,7 @@ export default function ContactDetail() {
                             </div>
                         </div>
                         <div className="bg-white rounded-lg lg:p-6 p-3 border border-gray-200 mt-4">
-                            <div className="flex justify-between items-center mb-2">
+                            <div className="flex flex-wrap sm:flex-nowrap justify-between items-center mb-2">
                                 <h2 className="text-lg font-semibold text-gray-800 dark:text-white/90 mb-3">
                                     Open Issue Assignments
                                 </h2>
@@ -411,7 +410,7 @@ export default function ContactDetail() {
                             </div>
                         </div>
                         <div className="bg-white rounded-lg lg:p-6 p-3 border border-gray-200 mt-4">
-                            <div className="flex justify-between items-center mb-2">
+                            <div className="flex flex-wrap sm:flex-nowrap justify-between items-center mb-2">
                                 <h2 className="text-lg font-semibold text-gray-800 dark:text-white/90 mb-3">
                                     Service Reminder Assignments
                                 </h2>
