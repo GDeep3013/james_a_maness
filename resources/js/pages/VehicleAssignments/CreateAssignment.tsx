@@ -644,7 +644,7 @@ const CreateAssignment: React.FC = () => {
                     return (
                       <div
                         key={event.id}
-                        className={`p-3 rounded-lg border border-gray-200 cursor-pointer hover:shadow-md transition-shadow ${colorClass}`}
+                        className={`p-3 rounded-lg border border-gray-200 cursor-pointer hover:shadow-md transition-shadow event-fc-color ${colorClass}`}
                         onClick={async () => {
                           // Fetch full event details and open modal
                           if (event.id) {
@@ -671,7 +671,8 @@ const CreateAssignment: React.FC = () => {
                       >
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
-                            <h5 className="font-medium text-gray-800 mb-1">{event.title}</h5>
+                            <h5 className="font-medium text-sm text-gray-800 mb-1">{event.title}</h5>
+
                             {startDate && (
                               <p className="text-xs font-medium text-gray-700 mb-1">
                                 {startDate.toLocaleDateString('en-US', { 
@@ -680,19 +681,22 @@ const CreateAssignment: React.FC = () => {
                                   day: 'numeric',
                                   year: 'numeric'
                                 })}
+                                {' at '}
+                                <span className="text-xs text-gray-600">{timeStr}</span>
                               </p>
                             )}
-                            <p className="text-xs text-gray-600">{timeStr}</p>
+                            <div className="flex items-center gap-x-2 mt-1">
                             {vehicle && (
-                              <p className="text-xs text-gray-500 mt-1">
-                                Vehicle: {vehicle.vehicle_name}
+                              <p className="text-xs text-gray-500">
+                                <span className="font-medium text-gray-800">Vehicle:</span> {vehicle.vehicle_name}
                               </p>
                             )}
                             {contact && (
                               <p className="text-xs text-gray-500">
-                                Contact: {contact.first_name} {contact.last_name || ''}
-                              </p>
-                            )}
+                                  <span className="font-medium text-gray-800">Contact:</span> {contact.first_name} {contact.last_name || ''}
+                                </p>
+                              )}
+                            </div>
                           </div>
                           <span className={`inline-block w-2 h-2 rounded-full ml-2 ${
                             event.extendedProps.calendar === 'Danger' ? 'bg-red-500' :
@@ -1018,7 +1022,7 @@ const renderEventContent = (eventInfo: AssignmentEvent) => {
     >
       <div className="fc-daygrid-event-dot"></div>
       <div className="fc-event-time text-blue-500">{eventInfo.timeText}</div>
-      <div className="fc-event-title">{eventInfo.event.title}</div>
+      <div className="fc-event-title" title={eventInfo.event.title}>{eventInfo.event.title}</div>
     </div>
   );
 };

@@ -57,6 +57,43 @@ body {
 .menu-item-others-icon {
     opacity: 0.9;
 }
+.fc-daygrid-event-harness .fc-daygrid-event.fc-event-start {
+    margin-left: 0px !important;
+}
+.fc-daygrid-event-harness .fc-daygrid-event.fc-event-start {
+    margin: 2px 3px !IMPORTANT;
+}
+.fc-daygrid-event-harness .fc-daygrid-event.fc-event-start .event-fc-color {
+    padding: 1px 5px;
+    overflow: hidden;
+}
+.fc-daygrid-event-harness .fc-daygrid-event.fc-event .event-fc-color .fc-event-title, .fc-event-main .fc-event-title, .fc-daygrid-event-harness .fc-daygrid-event.fc-event .event-fc-color .fc-event-time {
+    font-size: 12px !important;
+}
+.fc-event .fc-event-main .fc-event-title {
+    font-size: 12px;
+    max-width: 100%;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    margin-left: 2px;
+}
+.fc-timegrid-col-events .fc-timegrid-event-harness a.fc-event{
+    min-height: max-content;
+}
+.fc-event-main .fc-daygrid-event-dot {
+    margin-right: 4px;
+}
+.custom-calendar button.fc-addEventButton-button, .custom-calendar .fc-button.fc-button-active {
+    background-color: #5321B1 !important;
+    color: #fff !important;
+}
+.custom-calendar button.fc-addEventButton-button:hover {
+    background-color: #E06B04 !important;
+}
+
+
+
 
 @media (max-width: 1023px) {
     .toggle-sidebar-icon svg,
