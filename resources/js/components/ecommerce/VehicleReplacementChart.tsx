@@ -25,7 +25,9 @@ export default function VehicleReplacementChart({ formData }: VehicleReplacement
   };
 
   const chartData = useMemo(() => {
-    const years = [1, 2, 3, 4, 5, 6, 7, 8];
+    const vehicleLifeMonths = parseFloat(formData.estimatedVehicleLife) || 96;
+    const numberOfYears = Math.max(1, Math.ceil(vehicleLifeMonths / 12));
+    const years = Array.from({ length: numberOfYears }, (_, i) => i + 1);
     const purchasePrice = parseFloat(formData.purchasePrice) || 0;
     const disposalCost = parseFloat(formData.estimatedDisposalCost) || 0;
     const salvageValuePercent = parseFloat(formData.estimatedSalvageValue) || 0;
@@ -66,29 +68,36 @@ export default function VehicleReplacementChart({ formData }: VehicleReplacement
       }
     };
     const depreciationCosts = years.map((year) => {
-      const totalYears = Math.ceil(parseFloat(formData.estimatedVehicleLife) / 12) || 8;
-      return calculateAnnualDepreciation(year, totalYears);
+      return calculateAnnualDepreciation(year, numberOfYears);
     });
+    
     const serviceCosts = years.map((year) => {
       const yearKey = `year${year}`;
+      // Service costs from form are annual costs, convert to per-mile
       return parseFloat(formData.serviceCostEstimates[yearKey] || '0');
     });
+
+    const gallonsNeeded = annualUsage / fuelEfficiency;
     const fuelCosts = years.map((year) => {
       const yearKey = `year${year}`;
-      const fuelPricePerLiter = parseFloat(formData.fuelCostEstimates[yearKey]?.value || '0');
-      const mpgToKmPerLiter = fuelEfficiency * 0.425144;
-      const litersPerKm = 1 / mpgToKmPerLiter;
-      const annualFuelCost = annualUsage * litersPerKm * fuelPricePerLiter;
+      const fuelPricePerGallon = parseFloat(formData.fuelCostEstimates[yearKey]?.value || '0');
+      // Annual usage is in miles, fuel efficiency is in mpg (miles per gallon)
+      // Calculate gallons needed: miles / mpg = gallons
+    
+      // Annual fuel cost = gallons needed * price per gallon
+      const annualFuelCost = gallonsNeeded * fuelPricePerGallon;
+  
       return annualFuelCost;
     });
     const totalCosts = years.map((_, index) => {
       return depreciationCosts[index] + serviceCosts[index] + fuelCosts[index];
     });
-    const costPerKm = totalCosts.map((total) => total / annualUsage);
-    const minCostIndex = costPerKm.indexOf(Math.min(...costPerKm));
+
+    const costPerMi = totalCosts.map((total) => total / annualUsage);
+    const minCostIndex = costPerMi.indexOf(Math.min(...costPerMi));
     const optimalReplacementYear = minCostIndex + 1;
-    const minCostPerKm = Math.min(...costPerKm);
-    const estimatedReplacementYear = Math.ceil(parseFloat(formData.estimatedVehicleLife) / 12) || 8;
+    const minCostPerMi = Math.min(...costPerMi);
+    const estimatedReplacementYear = numberOfYears;
 
     return {
       years,
@@ -96,9 +105,9 @@ export default function VehicleReplacementChart({ formData }: VehicleReplacement
       serviceCosts,
       fuelCosts,
       totalCosts,
-      costPerKm,
+      costPerMi,
       optimalReplacementYear,
-      minCostPerKm,
+      minCostPerMi,
       estimatedReplacementYear,
     };
   }, [formData]);
@@ -149,10 +158,12 @@ export default function VehicleReplacementChart({ formData }: VehicleReplacement
       intersect: false,
       custom: function({ dataPointIndex }: { dataPointIndex: number }) {
         const annualUsage = parseFloat(formData.estimatedAnnualUsage) || 1;
+        
         const fixedCost = (chartData.depreciationCosts[dataPointIndex] / annualUsage).toFixed(2);
+        // serviceCosts are already per-mile (divided by annualUsage in calculation)
         const serviceCost = (chartData.serviceCosts[dataPointIndex] / annualUsage).toFixed(2);
         const fuelCost = (chartData.fuelCosts[dataPointIndex] / annualUsage).toFixed(2);
-        const totalCost = (chartData.costPerKm[dataPointIndex]).toFixed(2);
+        const totalCost = (chartData.costPerMi[dataPointIndex]).toFixed(2);
         const year = dataPointIndex + 1;
         
         return `
@@ -160,19 +171,19 @@ export default function VehicleReplacementChart({ formData }: VehicleReplacement
           <div class="apexcharts-tooltip-series-group" style="order: 1; display: flex; flex-direction: column; padding: 4px 8px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
               <span style="color: #0D9488;">Fixed Costs:</span>
-              <span style="font-weight: 600; margin-left: 8px;">$${fixedCost}/km</span>
+              <span style="font-weight: 600; margin-left: 8px;">$${fixedCost}/mi</span>
             </div>
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
               <span style="color: #14B8A6;">Service Costs:</span>
-              <span style="font-weight: 600; margin-left: 8px;">$${serviceCost}/km</span>
+              <span style="font-weight: 600; margin-left: 8px;">$${serviceCost}/mi</span>
             </div>
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
               <span style="color: #5EEAD4;">Fuel Costs:</span>
-              <span style="font-weight: 600; margin-left: 8px;">$${fuelCost}/km</span>
+              <span style="font-weight: 600; margin-left: 8px;">$${fuelCost}/mi</span>
             </div>
             <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px; padding-top: 4px; border-top: 1px solid #e5e7eb;">
               <span style="color: #0D9488; font-weight: 600;">Total Costs:</span>
-              <span style="font-weight: 600; margin-left: 8px;">$${totalCost}/km</span>
+              <span style="font-weight: 600; margin-left: 8px;">$${totalCost}/mi</span>
             </div>
           </div>
         `;
@@ -197,7 +208,7 @@ export default function VehicleReplacementChart({ formData }: VehicleReplacement
     },
     yaxis: {
       title: {
-        text: 'Annual Cost per Kilometer',
+        text: 'Annual Cost per Mile',
         style: {
           fontSize: '14px',
           fontWeight: 600,
@@ -206,7 +217,7 @@ export default function VehicleReplacementChart({ formData }: VehicleReplacement
       },
       labels: {
         formatter: (val: number) => {
-          return `$${val.toFixed(2)}/km`;
+          return `$${val.toFixed(2)}/mi`;
         },
         style: {
           fontSize: '12px',
@@ -214,7 +225,7 @@ export default function VehicleReplacementChart({ formData }: VehicleReplacement
         },
       },
       min: 0,
-      max: Math.max(...chartData.costPerKm) * 1.2,
+      max: Math.max(...chartData.costPerMi) * 1.2,
     },
     legend: {
       position: 'top',
@@ -224,7 +235,7 @@ export default function VehicleReplacementChart({ formData }: VehicleReplacement
     annotations: {
       yaxis: [
         {
-          y: chartData.minCostPerKm,
+          y: chartData.minCostPerMi,
           borderColor: '#14B8A6',
           borderWidth: 2,
           strokeDashArray: 5,
@@ -241,7 +252,7 @@ export default function VehicleReplacementChart({ formData }: VehicleReplacement
       ],
       xaxis: [
         {
-          x: chartData.optimalReplacementYear - 1,
+          x: `Year ${chartData.optimalReplacementYear}`,
           borderColor: '#F97316',
           borderWidth: 2,
           strokeDashArray: 5,
@@ -258,7 +269,7 @@ export default function VehicleReplacementChart({ formData }: VehicleReplacement
           },
         },
         // {
-        //   x: chartData.estimatedReplacementYear - 1,
+        //   x: `Year ${chartData.estimatedReplacementYear}`,
         //   borderColor: '#9CA3AF',
         //   borderWidth: 2,
         //   strokeDashArray: 5,
@@ -278,7 +289,8 @@ export default function VehicleReplacementChart({ formData }: VehicleReplacement
       points: [
         {
           x: chartData.optimalReplacementYear - 1,
-          y: chartData.costPerKm[chartData.optimalReplacementYear - 1],
+          y: chartData.costPerMi[chartData.optimalReplacementYear - 1],
+          seriesIndex: 3,
           marker: {
             size: 6,
             fillColor: '#F97316',
@@ -290,31 +302,31 @@ export default function VehicleReplacementChart({ formData }: VehicleReplacement
     },
   };
 
-  const depreciationPerKm = chartData.depreciationCosts.map((cost) => cost / parseFloat(formData.estimatedAnnualUsage || '1'));
-  const servicePerKm = chartData.serviceCosts.map((cost) => cost / parseFloat(formData.estimatedAnnualUsage || '1'));
-  const fuelPerKm = chartData.fuelCosts.map((cost) => cost / parseFloat(formData.estimatedAnnualUsage || '1'));
-  const cumulativeService = servicePerKm.map((val, idx) => depreciationPerKm[idx] + val);
+  const depreciationPerMi = chartData.depreciationCosts.map((cost) => cost / parseFloat(formData.estimatedAnnualUsage || '1'));
+  const servicePerMi = chartData.serviceCosts.map((cost) => cost / parseFloat(formData.estimatedAnnualUsage || '1'));
+  const fuelPerMi = chartData.fuelCosts.map((cost) => cost / parseFloat(formData.estimatedAnnualUsage || '1'));
+  const cumulativeService = servicePerMi.map((val, idx) => depreciationPerMi[idx] + val);
 
   const series = [
     {
       name: 'Fixed Costs',
       type: 'area',
-      data: depreciationPerKm,
+      data: depreciationPerMi,
     },
     {
       name: 'Service',
       type: 'area',
-      data: servicePerKm.map((val, idx) => depreciationPerKm[idx] + val),
+      data: servicePerMi.map((val, idx) => depreciationPerMi[idx] + val),
     },
     {
       name: 'Fuel',
       type: 'area',
-      data: fuelPerKm.map((val, idx) => cumulativeService[idx] + val),
+      data: fuelPerMi.map((val, idx) => cumulativeService[idx] + val),
     },
     {
       name: 'Total Cost',
       type: 'line',
-      data: chartData.costPerKm,
+      data: chartData.costPerMi,
     },
   ];
 

@@ -116,38 +116,37 @@ export default function VehicleReplacement() {
         const replacement = response.data.vehicle_replacement;
         setReplacementId(replacement.id);
         
+        const vehicleLife = String(replacement.estimated_vehicle_life || '96');
+        const numYears = getNumberOfYears(vehicleLife);
+        const savedServiceCosts = replacement.service_cost_estimates || {};
+        const savedFuelCosts = replacement.fuel_cost_estimates || {};
+        
+        // Initialize cost estimates based on number of years, using saved values if available
+        const serviceCosts: Record<string, string> = {};
+        const fuelCosts: Record<string, { value: string }> = {};
+        for (let i = 1; i <= numYears; i++) {
+          const yearKey = `year${i}`;
+          serviceCosts[yearKey] = savedServiceCosts[yearKey] || '0';
+          fuelCosts[yearKey] = savedFuelCosts[yearKey] || { value: '0' };
+        }
+        
         setFormData({
           vehicleId: String(replacement.vehicle_id),
-          estimatedVehicleLife: String(replacement.estimated_vehicle_life || ''),
+          estimatedVehicleLife: vehicleLife,
           estimatedAnnualUsage: String(replacement.estimated_annual_usage || ''),
           estimatedFuelEfficiency: String(replacement.estimated_fuel_efficiency || ''),
           purchasePrice: String(replacement.purchase_price || ''),
           estimatedDisposalCost: String(replacement.estimated_disposal_cost || ''),
           estimatedSalvageValue: String(replacement.estimated_salvage_value || ''),
           methodOfDepreciation: replacement.method_of_depreciation || 'Sum of Years',
-          serviceCostEstimates: replacement.service_cost_estimates || {
-            year1: '1500',
-            year2: '1500',
-            year3: '1500',
-            year4: '300',
-            year5: '1350',
-            year6: '2500',
-            year7: '2000',
-            year8: '10000',
-          },
-          fuelCostEstimates: replacement.fuel_cost_estimates || {
-            year1: { value: '1.5'},
-            year2: { value: '1.6' },
-            year3: { value: '1.75' },
-            year4: { value: '1.9' },
-            year5: { value: '2' },
-            year6: { value: '2.1' },
-            year7: { value: '2.3' },
-            year8: { value: '2.5' },
-          },
+          serviceCostEstimates: serviceCosts,
+          fuelCostEstimates: fuelCosts,
         });
       } else {
         setReplacementId(null);
+        const numYears = getNumberOfYears('96');
+        const { serviceCosts, fuelCosts } = initializeCostEstimates(numYears, formData);
+        
         setFormData({
           vehicleId: vehicleId,
           estimatedVehicleLife: '96',
@@ -157,26 +156,8 @@ export default function VehicleReplacement() {
           estimatedDisposalCost: '1000',
           estimatedSalvageValue: '20',
           methodOfDepreciation: 'Sum of Years',
-          serviceCostEstimates: {
-            year1: '1500',
-            year2: '1500',
-            year3: '1500',
-            year4: '300',
-            year5: '1350',
-            year6: '2500',
-            year7: '2000',
-            year8: '10000',
-          },
-          fuelCostEstimates: {
-            year1: { value: '1.5' },
-            year2: { value: '1.6' },
-            year3: { value: '1.75' },
-            year4: { value: '1.9' },
-            year5: { value: '2' },
-            year6: { value: '2.1' },
-            year7: { value: '2.3' },
-            year8: { value: '2.5' },
-          },
+          serviceCostEstimates: serviceCosts,
+          fuelCostEstimates: fuelCosts,
         });
       }
     } catch {
@@ -186,11 +167,45 @@ export default function VehicleReplacement() {
     }
   };
 
+  const getNumberOfYears = (vehicleLifeMonths: string): number => {
+    const months = parseFloat(vehicleLifeMonths) || 0;
+    return Math.max(1, Math.ceil(months / 12));
+  };
+
+  const initializeCostEstimates = (numYears: number, currentFormData: FormData) => {
+    const serviceCosts: Record<string, string> = {};
+    const fuelCosts: Record<string, { value: string }> = {};
+    
+    for (let i = 1; i <= numYears; i++) {
+      const yearKey = `year${i}`;
+      // Use existing value if available, otherwise use default
+      serviceCosts[yearKey] = currentFormData.serviceCostEstimates[yearKey] || '0';
+      fuelCosts[yearKey] = currentFormData.fuelCostEstimates[yearKey] || { value: '0' };
+    }
+    
+    return { serviceCosts, fuelCosts };
+  };
+
   const handleInputChange = (field: string, value: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
+    if (field === 'estimatedVehicleLife') {
+      setFormData((prev) => {
+        const numYears = getNumberOfYears(value);
+        const { serviceCosts, fuelCosts } = initializeCostEstimates(numYears, prev);
+        
+        return {
+          ...prev,
+          [field]: value,
+          serviceCostEstimates: serviceCosts,
+          fuelCostEstimates: fuelCosts,
+        };
+      });
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [field]: value,
+      }));
+    }
+    
     if (errors[field]) {
       setErrors((prev) => {
         const newErrors = { ...prev };
@@ -346,7 +361,8 @@ export default function VehicleReplacement() {
     }
   };
 
-  const years = Array.from({ length: 8 }, (_, i) => i + 1);
+  const numberOfYears = getNumberOfYears(formData.estimatedVehicleLife);
+  const years = Array.from({ length: numberOfYears }, (_, i) => i + 1);
 
   return (
     <>
