@@ -54,6 +54,7 @@ import Expense from "./pages/Expense";
 import CreateExpenseHistory from "./pages/Expense/CreateExpenseHistory";
 import ExpenseHistoryDetail from "./pages/Expense/ExpenseHistoryDetail";
 import CreateAssignment from "./pages/VehicleAssignments/CreateAssignment";
+import VehicleReplacement from "./pages/VehicleReplacementAnalysis/VehicleReplacement";
 
 export default function App() {
   return (
@@ -343,7 +344,7 @@ export default function App() {
               </ProtectedRoute>
             }
             />
-            <Route
+          <Route
               path="/expense-history/:id/ExpenseHistoryDetail"
               element={
                 <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
@@ -351,6 +352,16 @@ export default function App() {
                 </ProtectedRoute>
               }
           />
+
+          <Route
+              path="/vehicle-replacement-analysis"
+              element={
+                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                  <VehicleReplacement />
+                </ProtectedRoute>
+              }
+          />
+
 
             <Route
               path="/fuels"

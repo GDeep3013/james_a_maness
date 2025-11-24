@@ -106,6 +106,9 @@ Route::middleware(['auth','page.access'])->group(function () {
     Route::get('/calendar', [HomeController::class, 'index']);
     Route::get('/vehicle-assignments', [HomeController::class, 'index']);
 
+    // Vehicle Replacement Analysis
+    Route::get('/vehicle-replacement-analysis', [HomeController::class, 'index']);
+
 
     Route::get('profile', [HomeController::class, 'index']);
 });

@@ -32,7 +32,7 @@ export const AdminMenus : NavItem[] = [
         { name: "Vehicle Assignments", path: "/vehicle-assignments", pro: false, allowedRoles: ["Admin", "Manager"] },
         { name: "Meter History", path: "/meter-history", pro: false, allowedRoles: ["Admin", "Manager"] },
         { name: "Expense History", path: "/expense-history", pro: false, allowedRoles: ["Admin", "Manager"] },
-        { name: "Replacement Analysis", path: "/replacement-analysis", pro: false, allowedRoles: ["Admin", "Manager"] },
+        { name: "Replacement Analysis", path: "/vehicle-replacement-analysis", pro: false, allowedRoles: ["Admin", "Manager"] },
       ],
     },
     {

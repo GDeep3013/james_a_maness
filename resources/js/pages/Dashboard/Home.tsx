@@ -1,10 +1,9 @@
-import React from "react";
-import EcommerceMetrics from "../../components/ecommerce/EcommerceMetrics";
-import MonthlySalesChart from "../../components/ecommerce/MonthlySalesChart";
-import StatisticsChart from "../../components/ecommerce/StatisticsChart";
-import MonthlyTarget from "../../components/ecommerce/MonthlyTarget";
+// import React from "react";
+// import EcommerceMetrics from "../../components/ecommerce/EcommerceMetrics";
+// import MonthlySalesChart from "../../components/ecommerce/MonthlySalesChart";
+// import StatisticsChart from "../../components/ecommerce/StatisticsChart";
+// import MonthlyTarget from "../../components/ecommerce/MonthlyTarget";
 import RecentOrders from "../../components/ecommerce/RecentOrders";
-import DemographicCard from "../../components/ecommerce/DemographicCard";
 import PageMeta from "../../components/common/PageMeta";
 import TotalCostMap from "../../components/ecommerce/TotalCostMap";
 import FleetPerformanceChart from "../../components/ecommerce/FleetPerformanceChart";
@@ -12,9 +11,6 @@ import MaintenanceCostChart from "../../components/ecommerce/MaintenanceCostChar
 import VehiclesInfoCard from "../../components/ecommerce/VehiclesInfoCard";
 import ReminderList from "../../components/ecommerce/ReminderList";
 import IncompleteWorkOrder from "../../components/ecommerce/IncompleteWorkOrder";
-
-
-
 
 export default function Home() {
   return (
