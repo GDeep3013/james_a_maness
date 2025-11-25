@@ -581,9 +581,9 @@ export default function VehicleDetail() {
                     </div>
 
                     <div className="flex md:flex-nowrap flex-wrap gap-6">
-                        <div className="bg-white rounded-lg lg:p-6 p-3 border border-gray-200 max-w-[767px]:max-w-full lg:max-w-[387px] max-w-full w-full">
+                        <div className="bg-white rounded-lg lg:p-6 p-3 border border-gray-200  w-full">
                             <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Vehicle Information</h2>
-                            <div className="space-y-4">
+                            <div className="space-y-4 flex item-center justify-between">
                                 <div className="flex flex-col">
                                     <span className="text-sm text-gray-600 dark:text-gray-400">Status </span>
                                     <span className="inline-block">
@@ -641,7 +641,9 @@ export default function VehicleDetail() {
                             </div>
                         </div>
 
-                        <div className="bg-white rounded-lg border border-gray-200 w-full">
+
+                    </div>
+                     <div className="bg-white rounded-lg border border-gray-200 w-full mt-4">
                             <div className="lg:p-6 p-3">
                                 <nav className="flex bg-[#ECECF0] md:mb-8 mb-4 rounded-[32px] p-1">
                                     {/* <button
@@ -794,7 +796,7 @@ export default function VehicleDetail() {
                                                             </div> */}
 
                                                         </div>
-                                                        <div className="grid grid-cols-4 gap-4">
+                                                        <div className=" grid grid-cols-5 gap-2 ">
                                                             <div>
                                                                 <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Vehicle Name</p>
                                                                 <p className="text-sm font-semibold text-gray-900 dark:text-white">
@@ -948,7 +950,7 @@ export default function VehicleDetail() {
                                                                 {record.priority || "N/A"}
                                                             </Badge>
                                                         </div>
-                                                        <div className="grid grid-cols-4 gap-4">
+                                                        <div className=" grid grid-cols-5 gap-2">
                                                             <div>
                                                                 <p className="text-xs text-gray-500 mb-1">Vehicle</p>
                                                                 <p className="text-sm font-semibold text-gray-900">
@@ -1030,7 +1032,7 @@ export default function VehicleDetail() {
                                                         </div>
 
                                                         {/* GRID CONTENT */}
-                                                        <div className="grid grid-cols-4 gap-4">
+                                                        <div className="grid grid-cols-6 gap-2">
 
                                                             {/* Vehicle Name */}
                                                             <div>
@@ -1201,7 +1203,6 @@ export default function VehicleDetail() {
                                 )}
                             </div>
                         </div>
-                    </div>
 
                     <div className='current-assignment mt-6'>
                         <div className="bg-white rounded-lg px-6 py-4 border border-gray-200 shadow-sm">
