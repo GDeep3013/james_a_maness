@@ -1072,7 +1072,7 @@ export default function VehicleDetail() {
                                                                 <TableCell className="px-4 py-3 text-start">
                                                                     <div className="text-theme-xs">
                                                                         {record.repair_priority_class && (
-                                                                            <Badge color={getStatusBadgeColor(record.repair_priority_class)}>
+                                                                            <Badge size="sm" color={getStatusBadgeColor(record.repair_priority_class)}>
                                                                                 {record.repair_priority_class}
                                                                             </Badge>
                                                                         )}
@@ -1405,7 +1405,7 @@ export default function VehicleDetail() {
                                                         {serviceRecords.map((record) => (
                                                             <TableRow key={record.id}>
                                                                 <TableCell className="px-4 py-3 text-start">
-                                                                    <Badge color={getStatusBadgeColor(record.repair_priority_class)}>
+                                                                    <Badge size="sm"color={getStatusBadgeColor(record.repair_priority_class)}>
                                                                         {record.repair_priority_class || "N/A"}
                                                                     </Badge>
                                                                 </TableCell>
