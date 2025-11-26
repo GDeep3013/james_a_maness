@@ -18,6 +18,9 @@ use App\Http\Controllers\VehicleAssignmentController;
 use App\Http\Controllers\VehicleReplacementController;
 
 use App\Http\Controllers\PartController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ReminderController;
+
 // use App\Http\Controllers\Apps\LoginController;
 // use App\Http\Controllers\Apps\ContactApiController;
 // use App\Http\Controllers\Apps\RoutesApiController;
@@ -40,6 +43,10 @@ Route::prefix('auth')->group(function () {
 
 
 Route::middleware('auth:sanctum')->group(function () {
+
+    Route::get('/get-dashboard-workorder', [DashboardController::class, 'getDashboardWorkOrder']);
+
+    Route::get('/get-reminder-service', [DashboardController::class, 'getDashboardReminders']);
 
     Route::apiResource('con', ContactController::class);
     Route::get('/con/{id}/edit', [ContactController::class, 'edit'])->where('id', '[0-9]+');
@@ -84,7 +91,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::apiResource('vehicle-replacements', VehicleReplacementController::class);
     Route::get('/vehicle-replacements/{id}/edit', [VehicleReplacementController::class, 'edit'])->where('id', '[0-9]+');
-
 });
 
 // Route::prefix('mobileApps')->group(function () {

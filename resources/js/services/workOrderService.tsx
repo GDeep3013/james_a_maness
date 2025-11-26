@@ -23,100 +23,101 @@ interface WorkOrderData {
 }
 
 export const workOrderService = {
-  getAll: (params?: { search?: string; page?: number; status?: string }) => {
-    const queryParams = new URLSearchParams();
-    if (params?.search) queryParams.append('search', params.search);
-    if (params?.page) queryParams.append('page', params.page.toString());
-    if (params?.status) queryParams.append('status', params.status);
-    const queryString = queryParams.toString();
-    return api.get(`/work-orders${queryString ? `?${queryString}` : ''}`);
-  },
+    getAll: (params?: { search?: string; page?: number; status?: string }) => {
+        const queryParams = new URLSearchParams();
+        if (params?.search) queryParams.append('search', params.search);
+        if (params?.page) queryParams.append('page', params.page.toString());
+        if (params?.status) queryParams.append('status', params.status);
+        const queryString = queryParams.toString();
+        return api.get(`/work-orders${queryString ? `?${queryString}` : ''}`);
+    },
 
-  getById: (id: number) =>
-    api.get(`/work-orders/${id}`),
+    getById: (id: number) =>
+        api.get(`/work-orders/${id}`),
 
-  create: (data: WorkOrderData) => {
-    const formData = new FormData();
-    
-    Object.keys(data).forEach((key) => {
-      if (key === 'service_items' || key === 'parts') {
-        return;
-      }
-      
-      const value = data[key as keyof WorkOrderData];
-      if (value !== null && value !== undefined && value !== '') {
-        if (Array.isArray(value)) {
-          formData.append(key, JSON.stringify(value));
-        } else if (typeof value === 'object' && value !== null) {
-          formData.append(key, JSON.stringify(value));
-        } else {
-          formData.append(key, String(value));
+    create: (data: WorkOrderData) => {
+        const formData = new FormData();
+
+        Object.keys(data).forEach((key) => {
+            if (key === 'service_items' || key === 'parts') {
+                return;
+            }
+
+            const value = data[key as keyof WorkOrderData];
+            if (value !== null && value !== undefined && value !== '') {
+                if (Array.isArray(value)) {
+                    formData.append(key, JSON.stringify(value));
+                } else if (typeof value === 'object' && value !== null) {
+                    formData.append(key, JSON.stringify(value));
+                } else {
+                    formData.append(key, String(value));
+                }
+            }
+        });
+
+        if (data.service_items !== undefined) {
+            formData.append('service_items', JSON.stringify(data.service_items || []));
         }
-      }
-    });
-
-    if (data.service_items !== undefined) {
-      formData.append('service_items', JSON.stringify(data.service_items || []));
-    }
-    if (data.parts !== undefined) {
-      formData.append('parts', JSON.stringify(data.parts || []));
-    }
-
-    const token = localStorage.getItem('auth_token');
-    const headers: Record<string, string> = {};
-    if (token) {
-      headers.Authorization = `Bearer ${token}`;
-    }
-
-    return api.post('/work-orders', formData, {
-      headers,
-    });
-  },
-
-  update: (id: number, data: Partial<WorkOrderData>) => {
-    const formData = new FormData();
-    
-    Object.keys(data).forEach((key) => {
-      if (key === 'service_items' || key === 'parts') {
-        return;
-      }
-      
-      const value = data[key as keyof WorkOrderData];
-      if (value !== null && value !== undefined && value !== '') {
-        if (Array.isArray(value)) {
-          formData.append(key, JSON.stringify(value));
-        } else if (typeof value === 'object' && value !== null) {
-          formData.append(key, JSON.stringify(value));
-        } else {
-          formData.append(key, String(value));
+        if (data.parts !== undefined) {
+            formData.append('parts', JSON.stringify(data.parts || []));
         }
-      }
-    });
 
-    if (data.service_items !== undefined) {
-      formData.append('service_items', JSON.stringify(data.service_items || []));
-    }
-    if (data.parts !== undefined) {
-      formData.append('parts', JSON.stringify(data.parts || []));
-    }
+        const token = localStorage.getItem('auth_token');
+        const headers: Record<string, string> = {};
+        if (token) {
+            headers.Authorization = `Bearer ${token}`;
+        }
 
-    formData.append('_method', 'PUT');
+        return api.post('/work-orders', formData, {
+            headers,
+        });
+    },
 
-    const token = localStorage.getItem('auth_token');
-    const headers: Record<string, string> = {};
-    if (token) {
-      headers.Authorization = `Bearer ${token}`;
-    }
+    update: (id: number, data: Partial<WorkOrderData>) => {
+        const formData = new FormData();
 
-    return api.post(`/work-orders/${id}`, formData, {
-      headers,
-    });
-  },
+        Object.keys(data).forEach((key) => {
+            if (key === 'service_items' || key === 'parts') {
+                return;
+            }
 
-  delete: (id: number) =>
-    api.delete(`/work-orders/${id}`),
+            const value = data[key as keyof WorkOrderData];
+            if (value !== null && value !== undefined && value !== '') {
+                if (Array.isArray(value)) {
+                    formData.append(key, JSON.stringify(value));
+                } else if (typeof value === 'object' && value !== null) {
+                    formData.append(key, JSON.stringify(value));
+                } else {
+                    formData.append(key, String(value));
+                }
+            }
+        });
 
-  getForEdit: (id: number) =>
-    api.get(`/work-orders/${id}/edit`),
+        if (data.service_items !== undefined) {
+            formData.append('service_items', JSON.stringify(data.service_items || []));
+        }
+        if (data.parts !== undefined) {
+            formData.append('parts', JSON.stringify(data.parts || []));
+        }
+
+        formData.append('_method', 'PUT');
+
+        const token = localStorage.getItem('auth_token');
+        const headers: Record<string, string> = {};
+        if (token) {
+            headers.Authorization = `Bearer ${token}`;
+        }
+
+        return api.post(`/work-orders/${id}`, formData, {
+            headers,
+        });
+    },
+
+    delete: (id: number) =>
+        api.delete(`/work-orders/${id}`),
+
+    getForEdit: (id: number) =>
+        api.get(`/work-orders/${id}/edit`),
+    getAllDashboard: () => { return api.get(`/get-dashboard-workorder`)}
 };
 

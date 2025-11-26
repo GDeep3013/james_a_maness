@@ -31,7 +31,7 @@ export const serviceReminderService = {
 
   create: (data: ServiceReminderData) => {
     const formData = new FormData();
-    
+
     if (data.vehicle_id) {
       formData.append('vehicle_id', data.vehicle_id.toString());
     }
@@ -87,7 +87,7 @@ export const serviceReminderService = {
 
   update: (id: number, data: Partial<ServiceReminderData>) => {
     const formData = new FormData();
-    
+
     if (data.vehicle_id !== undefined) {
       formData.append('vehicle_id', data.vehicle_id.toString());
     }
@@ -152,6 +152,8 @@ export const serviceReminderService = {
     api.get(`/service-reminders/${id}/edit`),
 
   checkServiceTaskLogged: (vehicleId: number, serviceTaskId: number) =>
-    api.get(`/service-reminders/check-logged?vehicle_id=${vehicleId}&service_task_id=${serviceTaskId}`),
+        api.get(`/service-reminders/check-logged?vehicle_id=${vehicleId}&service_task_id=${serviceTaskId}`),
+
+  getAllReminder: () => { return api.get(`/get-reminder-service`)}
 };
 

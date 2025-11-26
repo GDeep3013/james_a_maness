@@ -875,7 +875,7 @@ export default function VehicleDetail() {
                         </div>
                     </div>
 
-                    <div className="bg-white rounded-lg border border-gray-200 w-full mt-4">
+                    <div className="bg-white rounded-lg border border-gray-200 w-full mt-6">
                         <div className="lg:p-6 p-3">
                             <nav className="flex bg-[#ECECF0] md:mb-8 mb-4 rounded-[32px] p-1">
                                 {/* <button
