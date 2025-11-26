@@ -63,13 +63,13 @@ export const formatDate = (
     try {
         const date = typeof dateString === 'string' ? new Date(dateString) : dateString;
         if (isNaN(date.getTime())) return String(dateString);
-        
+
         const defaultOptions: Intl.DateTimeFormatOptions = {
             year: 'numeric',
             month: 'short',
             day: 'numeric',
         };
-        
+
         return date.toLocaleDateString('en-US', options || defaultOptions);
     } catch {
         return String(dateString);
@@ -84,7 +84,7 @@ export const formatDateTime = (
     try {
         const date = typeof dateString === 'string' ? new Date(dateString) : dateString;
         if (isNaN(date.getTime())) return String(dateString);
-        
+
         const defaultOptions: Intl.DateTimeFormatOptions = {
             year: 'numeric',
             month: 'short',
@@ -92,7 +92,7 @@ export const formatDateTime = (
             hour: '2-digit',
             minute: '2-digit',
         };
-        
+
         return date.toLocaleString('en-US', options || defaultOptions);
     } catch {
         return String(dateString);
@@ -107,12 +107,12 @@ export const formatTime = (
     try {
         const date = typeof dateString === 'string' ? new Date(dateString) : dateString;
         if (isNaN(date.getTime())) return String(dateString);
-        
+
         const defaultOptions: Intl.DateTimeFormatOptions = {
             hour: '2-digit',
             minute: '2-digit',
         };
-        
+
         return date.toLocaleTimeString('en-US', options || defaultOptions);
     } catch {
         return String(dateString);
@@ -125,7 +125,10 @@ export const getStatusBadgeColor = (
     if (!status) return 'info';
     switch (status.toLowerCase()) {
         case 'available':
+        case 'in progress':
+        case 'open':
         case 'active':
+        case 'scheduled':
             return 'success';
         case 'maintenance':
         case 'pending':
@@ -133,6 +136,7 @@ export const getStatusBadgeColor = (
         case 'inactive':
         case 'cancelled':
         case 'deleted':
+        case 'closed':
             return 'error';
         default:
             return 'info';

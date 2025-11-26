@@ -8,6 +8,13 @@ import Badge from '../../components/ui/badge/Badge';
 import { ChevronLeftIcon, PencilIcon, TrashBinIcon, CalenderIcon, PurchasePriceIcon, FuelIcon, TotalMileageIcon, FileIcon } from '../../icons';
 import { VehicleFormData } from '../../constants/vehicleConstants';
 import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHeader,
+    TableRow,
+} from "../../components/ui/table";
+import {
     formatCurrency,
     formatMileage,
     formatDate,
@@ -184,37 +191,37 @@ export default function VehicleDetail() {
     const [workPagination, setWorkPagination] = useState<PaginationData>({
         current_page: 1,
         last_page: 1,
-        per_page: 20,
+        per_page: 10,
         total: 0,
     });
     const [fuelPagination, setFuelPagination] = useState<PaginationData>({
         current_page: 1,
         last_page: 1,
-        per_page: 20,
+        per_page: 10,
         total: 0,
     });
     const [servicesPagination, setServicesPagination] = useState<PaginationData>({
         current_page: 1,
         last_page: 1,
-        per_page: 20,
+        per_page: 10,
         total: 0,
     });
     const [issuesPagination, setIssuesPagination] = useState<PaginationData>({
         current_page: 1,
         last_page: 1,
-        per_page: 20,
+        per_page: 10,
         total: 0,
     });
     const [remindersPagination, setRemindersPagination] = useState<PaginationData>({
         current_page: 1,
         last_page: 1,
-        per_page: 20,
+        per_page: 10,
         total: 0,
     });
     const [documentsPagination, setDocumentsPagination] = useState<PaginationData>({
         current_page: 1,
         last_page: 1,
-        per_page: 20,
+        per_page: 10,
         total: 0,
     });
 
@@ -224,7 +231,7 @@ export default function VehicleDetail() {
     const [servicesCurrentPage, setServicesCurrentPage] = useState(1);
     const [issuesCurrentPage, setIssuesCurrentPage] = useState(1);
     const [remindersCurrentPage, setRemindersCurrentPage] = useState(1);
-    const [documentsCurrentPage, setdocumentsCurrentPage] = useState(1);
+    const [documentsCurrentPage, setDocumentsCurrentPage] = useState(1);
 
     // Pagination rendering function (reusable for all tabs)
     const renderPagination = (
@@ -511,14 +518,13 @@ export default function VehicleDetail() {
 
     useEffect(() => {
         const fetchDocumentRecords = async () => {
-            if (!id || activeTab !== 'work') return;
+            if (!id || activeTab !== 'documents') return;
 
             setLoadingDocuments(true);
             try {
                 const response = await vehicleService.getAll({
                     page: documentsCurrentPage,
                     search: '',
-                    // status: '',
                 });
 
                 const data = response.data;
@@ -574,222 +580,6 @@ export default function VehicleDetail() {
         fetchVehicle();
     }, [id]);
 
-
-    // Fetch Work Order Records
-    // useEffect(() => {
-    //     const fetchWorkRecords = async () => {
-    //         if (!id || activeTab !== 'work') return;
-
-    //         setLoadingWork(true);
-    //         try {
-    //             const response = await workOrderService.getAll({
-    //                 page: 1,
-    //                 search: '',
-    //                 status: '',
-    //             });
-
-    //             const data = response.data;
-
-    //             if (data.status && data.work_orders?.data) {
-    //                 setWorkRecords(data.work_orders.data);
-    //             } else {
-    //                 setWorkRecords([]);
-    //             }
-    //         } catch (error) {
-    //             console.error("Failed to load work records:", error);
-    //             setWorkRecords([]);
-    //         } finally {
-    //             setLoadingWork(false);
-    //         }
-    //     };
-
-    //     fetchWorkRecords();
-    // }, [id, activeTab]);
-
-    // Fetch Maintenance Records
-    // useEffect(() => {
-    //     const fetchMaintenanceRecords = async () => {
-    //         if (!id || activeTab !== 'maintenance') return;
-
-    //         setLoadingMaintenance(true);
-    //         try {
-    //             const response = await vehicleService.getAll({
-    //                 page: 1,
-    //                 search: '',
-    //             });
-    //             const data = response.data;
-
-    //             if (data.status && data.maintenance_records) {
-    //                 setMaintenanceRecords(data.maintenance_records);
-    //             } else {
-    //                 setMaintenanceRecords([]);
-    //             }
-    //         } catch (error) {
-    //             console.error('Failed to load maintenance records:', error);
-    //             setMaintenanceRecords([]);
-    //         } finally {
-    //             setLoadingMaintenance(false);
-    //         }
-    //     };
-
-    //     fetchMaintenanceRecords();
-    // }, [id, activeTab]);
-
-    // Fetch Fuel Records
-    // useEffect(() => {
-    //     const fetchFuelRecords = async () => {
-    //         if (!id || activeTab !== 'fuel') return;
-
-    //         setLoadingFuel(true);
-    //         try {
-    //             const response = await fuelService.getAll({
-    //                 page: 1,
-    //                 search: '',
-    //             });
-    //             const data = response.data;
-
-    //             if (data.status && data.fuel && data.fuel.data) {
-    //                 setFuelRecords(data.fuel.data);
-    //             } else {
-    //                 setFuelRecords([]);
-    //             }
-    //         } catch (error) {
-    //             console.error('Failed to load fuel records:', error);
-    //             setFuelRecords([]);
-    //         } finally {
-    //             setLoadingFuel(false);
-    //         }
-    //     };
-
-    //     fetchFuelRecords();
-    // }, [id, activeTab]);
-
-    // Fetch Service Records
-    // useEffect(() => {
-    //     const fetchServiceRecords = async () => {
-    //         if (!id || activeTab !== 'services') return;
-
-    //         setLoadingServices(true);
-    //         try {
-    //             const response = await serviceService.getAll({
-    //                 page: 1,
-    //                 search: '',
-    //             });
-
-    //             const data = response.data;
-
-    //             if (data.status && data.services?.data) {
-    //                 setServiceRecords(data.services.data);
-    //             } else {
-    //                 setServiceRecords([]);
-    //             }
-    //         } catch (error) {
-    //             console.error("Failed to load service records:", error);
-    //             setServiceRecords([]);
-    //         } finally {
-    //             setLoadingServices(false);
-    //         }
-    //     };
-
-    //     fetchServiceRecords();
-    // }, [id, activeTab]);
-
-    // Fetch Issue Records
-    // useEffect(() => {
-    //     const fetchIssueRecords = async () => {
-    //         if (!id || activeTab !== 'issue') return;
-
-    //         setLoadingIssues(true);
-    //         try {
-    //             const response = await issueService.getAll({
-    //                 page: 1,
-    //                 search: '',
-    //                 status: '',
-    //                 vehicle_id: Number(id)
-    //             });
-
-    //             const data = response.data;
-
-    //             if (data.status && data.issues?.data) {
-    //                 setIssueRecords(data.issues.data);
-    //             } else {
-    //                 setIssueRecords([]);
-    //             }
-    //         } catch (error) {
-    //             console.error("Failed to load issue records:", error);
-    //             setIssueRecords([]);
-    //         } finally {
-    //             setLoadingIssues(false);
-    //         }
-    //     };
-
-    //     fetchIssueRecords();
-    // }, [id, activeTab]);
-
-    // Fetch Service Reminders
-    // useEffect(() => {
-    //     const fetchServiceReminders = async () => {
-    //         if (!id || activeTab !== 'reminders') return;
-
-    //         setLoadingReminders(true);
-    //         try {
-    //             const response = await serviceReminderService.getAll({
-    //                 page: 1,
-    //                 search: '',
-    //                 status: '',
-    //             });
-
-    //             const data = response.data;
-
-    //             if (data.status && data.service_reminders?.data) {
-    //                 // Filter by vehicle_id on client side if API doesn't support it
-    //                 const filtered = data.service_reminders.data.filter(
-    //                     (reminder: ServiceReminder) => reminder.vehicle_id === Number(id)
-    //                 );
-    //                 setServiceReminders(filtered);
-    //             } else {
-    //                 setServiceReminders([]);
-    //             }
-    //         } catch (error) {
-    //             console.error("Failed to load service reminders:", error);
-    //             setServiceReminders([]);
-    //         } finally {
-    //             setLoadingReminders(false);
-    //         }
-    //     };
-
-    //     fetchServiceReminders();
-    // }, [id, activeTab]);
-
-    // Fetch Documents
-    // useEffect(() => {
-    //     const fetchDocuments = async () => {
-    //         if (!id || activeTab !== 'documents') return;
-
-    //         setLoadingDocuments(true);
-    //         try {
-    //             const response = await vehicleService.getAll({
-    //                 page: 1,
-    //                 search: '',
-    //             });
-    //             const data = response.data;
-
-    //             if (data.status && data.documents) {
-    //                 setDocuments(data.documents);
-    //             } else {
-    //                 setDocuments([]);
-    //             }
-    //         } catch (error) {
-    //             console.error('Failed to load documents:', error);
-    //             setDocuments([]);
-    //         } finally {
-    //             setLoadingDocuments(false);
-    //         }
-    //     };
-
-    //     fetchDocuments();
-    // }, [id, activeTab]);
-
     const handleEdit = () => {
         if (id) {
             navigate(`/vehicles/${id}/edit`);
@@ -807,6 +597,38 @@ export default function VehicleDetail() {
             navigate('/vehicles');
         } catch {
             alert('Failed to delete vehicle. Please try again.');
+        }
+    };
+
+    const getPriorityColor = (priority?: string) => {
+        switch (priority?.toLowerCase()) {
+            case "critical":
+                return "bg-red-500 text-white";
+            case "high":
+                return "bg-orange-500 text-white";
+            case "medium":
+                return "bg-blue-500 text-white";
+            case "low":
+                return "bg-gray-300 text-gray-800";
+            default:
+                return "bg-gray-200 text-gray-600";
+        }
+    };
+
+    const getStatusColor = (status?: string) => {
+        switch (status) {
+            case "Open":
+                return "error";
+            case "Overdue":
+                return "error";
+            case "In Progress":
+                return "warning";
+            case "Resolved":
+                return "info";
+            case "Closed":
+                return "warning";
+            default:
+                return "warning";
         }
     };
 
@@ -1125,7 +947,7 @@ export default function VehicleDetail() {
                                 </button>
                             </nav>
 
-                            {activeTab === 'maintenance' && (
+                            {/* {activeTab === 'maintenance' && (
                                 <div className="space-y-4">
                                     {loadingMaintenance ? (
                                         <div className="flex items-center justify-center py-8">
@@ -1162,489 +984,543 @@ export default function VehicleDetail() {
                                         ))
                                     )}
                                 </div>
-                            )}
+                            )} */}
 
                             {activeTab === 'work' && (
-                                <>
-                                    <div className="space-y-4">
+                                <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
+                                    <div className="max-w-full overflow-x-auto">
                                         {loadingWork ? (
-                                            <div className="flex items-center justify-center py-8">
+                                            <div className="flex items-center justify-center py-12">
                                                 <div className="text-center">
-                                                    <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-brand-500"></div>
-                                                    <p className="mt-2 text-sm text-gray-600">Loading work records...</p>
+                                                    <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-brand-500"></div>
+                                                    <p className="mt-2 text-sm text-gray-600">Loading work orders...</p>
                                                 </div>
                                             </div>
                                         ) : workRecords.length === 0 ? (
-                                            <div className="text-center py-8">
-                                                <p className="text-gray-500">No work records found</p>
+                                            <div className="flex items-center justify-center py-12">
+                                                <div className="text-center">
+                                                    <p className="text-gray-600">No work orders found</p>
+                                                </div>
                                             </div>
                                         ) : (
-                                            workRecords.map((record) => (
-                                                <Link
-                                                    key={record.id}
-                                                    to={`/work-orders/${record.id}`}
-                                                    className="flex items-center justify-between p-4 bg-[#F9FAFB] rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
-                                                >
-                                                    <div className="flex-1">
-                                                        <div className="flex items-center justify-between mb-3">
+                                            <>
+                                                <Table>
+                                                    <TableHeader className="border-b border-gray-100">
+                                                        <TableRow>
+                                                            <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs">
+                                                                Invoice No
+                                                            </TableCell>
+                                                            <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs">
+                                                                Status
+                                                            </TableCell>
+                                                            <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs">
+                                                                Issue Date
+                                                            </TableCell>
+                                                            <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs">
+                                                                Assigned To
+                                                            </TableCell>
+                                                            <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs">
+                                                                Expected Completion
+                                                            </TableCell>
+                                                            <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs ">
+                                                                Repair Priority Class
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    </TableHeader>
+                                                    <TableBody className="divide-y divide-gray-100">
+                                                        {workRecords.map((record) => (
+                                                            <TableRow key={record.id}>
+                                                                <TableCell className="px-4 py-3 text-start">
+                                                                    <div className="text-gray-800 text-theme-sm">
+                                                                        Invoice:{record.invoice_number || "N/A"}
+                                                                    </div>
+                                                                </TableCell>
+                                                                <TableCell className="px-4 py-3 text-start">
 
-                                                            {/* <h3 className="md:text-base text-sm font-normal text-[#1D2939] dark:text-white">
-                                                                    WO-{record.id}
-                                                                </h3> */}
-                                                            <Badge size="sm" variant="outline">{record.repair_priority_class}</Badge>
-
-
-
-                                                        </div>
-                                                        <div className=" grid grid-cols-6 gap-2 ">
-                                                            <div>
-                                                                <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Vehicle Name</p>
-                                                                <p className="text-sm font-semibold text-gray-900 dark:text-white">
-                                                                    {record.vehicle?.vehicle_name || "N/A"}
-                                                                </p>
-                                                            </div>
-                                                            <div>
-                                                                <p className="text-sm text-gray-600 dark:text-gray-400">Status</p>
-                                                                <span className="inline-block">
-                                                                    <Badge color={getStatusBadgeColor(record.status || "N/A")} size="sm">
-                                                                        {getStatusLabel(record.status || "N/A")}
+                                                                    <Badge
+                                                                        size="sm"
+                                                                        color={getStatusColor(record.status)}
+                                                                    >
+                                                                        {record.status || "Open"}
                                                                     </Badge>
-                                                                </span>
+                                                                </TableCell>
 
-                                                            </div>
-
-                                                            <div>
-                                                                <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Assigned To</p>
-                                                                <p className="text-sm font-semibold text-gray-900 dark:text-white">
-                                                                    {record.assigned_to
-                                                                        ? `${record.assigned_to.first_name} ${record.assigned_to.last_name}`
-                                                                        : "Unassigned"}
-                                                                </p>
-                                                            </div>
-                                                            <div>
-                                                                <p className="text-sm text-gray-600 dark:text-gray-400">Issue Date</p>
-                                                                <p className="text-sm font-semibold">
-                                                                    {record.issue_date
-                                                                        ? new Date(record.issue_date).toLocaleDateString("en-US", {
-                                                                            year: "numeric",
-                                                                            month: "short",
-                                                                            day: "numeric",
-                                                                        })
-                                                                        : "No Date"}
-                                                                </p>
-                                                            </div>
-
-                                                            <div>
-                                                                <p className="text-xs text-gray-500 mb-1">Scheduled Start</p>
-                                                                <p className="text-sm font-semibold">
-                                                                    {record.scheduled_start_date
-                                                                        ? new Date(record.scheduled_start_date).toLocaleDateString()
-                                                                        : "N/A"}
-                                                                </p>
-                                                            </div>
-
-                                                            <div>
-                                                                <p className="text-xs text-gray-500 mb-1">Expected Completion</p>
-                                                                <p className="text-sm font-semibold">
-                                                                    {record.expected_completion_date
-                                                                        ? new Date(record.expected_completion_date).toLocaleDateString()
-                                                                        : "N/A"}
-                                                                </p>
-                                                            </div>
-
-
-                                                        </div>
-                                                    </div>
-                                                </Link>
-                                            ))
+                                                                <TableCell className="px-4 py-3 text-start">
+                                                                    <div className="text-gray-800 text-theme-sm">
+                                                                        {record.issue_date ? formatDate(record.issue_date) : "N/A"}
+                                                                    </div>
+                                                                    {record.issued_by && (
+                                                                        <div className="text-gray-500 text-theme-xs">
+                                                                            By: {record.issued_by}
+                                                                        </div>
+                                                                    )}
+                                                                </TableCell>
+                                                                <TableCell className="px-4 py-3 text-start">
+                                                                    {record.assigned_to ? (
+                                                                        <div className="text-gray-800 text-theme-sm">
+                                                                            {`${record.assigned_to.first_name || ""} ${record.assigned_to.last_name || ""}`.trim() || "N/A"}
+                                                                        </div>
+                                                                    ) : (
+                                                                        <div className="text-gray-500 text-theme-sm">N/A</div>
+                                                                    )}
+                                                                </TableCell>
+                                                                <TableCell className="px-4 py-3 text-start">
+                                                                    <div className="text-gray-800 text-theme-sm">
+                                                                        {record.expected_completion_date ? formatDate(record.expected_completion_date) : "N/A"}
+                                                                    </div>
+                                                                </TableCell>
+                                                                <TableCell className="px-4 py-3 text-start">
+                                                                    <div className="text-theme-xs">
+                                                                        {record.repair_priority_class && (
+                                                                            <Badge color={getStatusBadgeColor(record.repair_priority_class)}>
+                                                                                {record.repair_priority_class}
+                                                                            </Badge>
+                                                                        )}
+                                                                    </div>
+                                                                </TableCell>
+                                                            </TableRow>
+                                                        ))}
+                                                    </TableBody>
+                                                </Table>
+                                                {renderPagination(workPagination, workCurrentPage, setWorkCurrentPage, loadingWork)}
+                                            </>
                                         )}
                                     </div>
-                                    {workRecords.length > 0 && renderPagination(
-                                        workPagination,
-                                        workCurrentPage,
-                                        setWorkCurrentPage,
-                                        loadingWork
-                                    )}
-                                </>
+                                </div>
                             )}
 
                             {activeTab === 'fuel' && (
-                                <>
-                                    <div className="space-y-4">
+                                <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
+                                    <div className="max-w-full overflow-x-auto">
                                         {loadingFuel ? (
-                                            <div className="flex items-center justify-center py-8">
+                                            <div className="flex items-center justify-center py-12">
                                                 <div className="text-center">
-                                                    <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-brand-500"></div>
+                                                    <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-brand-500"></div>
                                                     <p className="mt-2 text-sm text-gray-600">Loading fuel records...</p>
                                                 </div>
                                             </div>
                                         ) : fuelRecords.length === 0 ? (
-                                            <div className="text-center py-8">
-                                                <p className="text-gray-500">No fuel records found</p>
+                                            <div className="flex items-center justify-center py-12">
+                                                <div className="text-center">
+                                                    <p className="text-gray-600">No fuel records found</p>
+                                                </div>
                                             </div>
                                         ) : (
-                                            fuelRecords.map((record) => (
-                                                <Link
-                                                    key={record.id}
-                                                    to={`/fuels/${record.id}/FuelDetail`}
-                                                    className="flex items-center justify-between p-4 bg-[#F9FAFB] rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
-                                                >
-                                                    <div className="flex-1">
-                                                        <div className="flex items-center justify-between mb-3">
-                                                            <div>
-                                                                <h3 className="text-base font-semibold text-gray-900 dark:text-white">
-                                                                    {/* {record.vendor?.name || `Vendor #${record.vendor_id}`} */}
-                                                                </h3>
-                                                                <span className="text-base font-semibold text-gray-900 dark:text-white">
-                                                                    {record.fuel_type ? record.fuel_type.charAt(0).toUpperCase() + record.fuel_type.slice(1) : 'N/A'}
-                                                                </span>
-                                                            </div>
-                                                            <span className="text-sm text-gray-500 dark:text-gray-400">
-                                                                {new Date(record.date).toLocaleDateString('en-US', {
-                                                                    year: 'numeric',
-                                                                    month: 'short',
-                                                                    day: 'numeric',
-                                                                })}
-                                                            </span>
-                                                        </div>
-                                                        <div className="grid grid-cols-4 gap-4">
-                                                            <div>
-                                                                <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Quantity</p>
-                                                                <p className="text-sm font-semibold text-gray-900 dark:text-white">
-                                                                    {record.units} {record.unit_type === 'us_gallons' ? 'gal' : record.unit_type === 'liters' ? 'L' : 'gal (UK)'}
-                                                                </p>
-                                                            </div>
-                                                            <div>
-                                                                <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Price/Unit</p>
-                                                                <p className="text-sm font-semibold text-gray-900 dark:text-white">
-                                                                    ${Number(record.price_per_volume_unit).toFixed(2)}
-                                                                </p>
-                                                            </div>
-                                                            <div>
-                                                                <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Total Cost</p>
-                                                                <p className="text-sm font-semibold text-gray-900 dark:text-white">
-                                                                    ${(record.units * record.price_per_volume_unit).toFixed(2)}
-                                                                </p>
-                                                            </div>
-                                                            <div>
-                                                                <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Odometer</p>
-                                                                <p className="text-sm font-semibold text-gray-900 dark:text-white">
-                                                                    {record.vehicle_meter}
-                                                                </p>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </Link>
-                                            ))
+                                            <>
+                                                <Table>
+                                                    <TableHeader className="border-b border-gray-100">
+                                                        <TableRow>
+                                                            <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs">
+                                                                Fuel Type
+                                                            </TableCell>
+                                                            <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs">
+                                                                Date
+                                                            </TableCell>
+                                                            <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs">
+                                                                Quantity
+                                                            </TableCell>
+                                                            <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs">
+                                                                Price/Unit
+                                                            </TableCell>
+                                                            <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs">
+                                                                Total Cost
+                                                            </TableCell>
+                                                            <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs">
+                                                                Odometer
+                                                            </TableCell>
+
+                                                        </TableRow>
+                                                    </TableHeader>
+                                                    <TableBody className="divide-y divide-gray-100">
+                                                        {fuelRecords.map((record) => (
+                                                            <TableRow key={record.id}>
+                                                                <TableCell className="px-4 py-3 text-start">
+                                                                    <div className="text-gray-800 text-theme-sm">
+                                                                        {capitalizeFirst(record.fuel_type) || 'N/A'}
+                                                                    </div>
+                                                                </TableCell>
+                                                                <TableCell className="px-4 py-3 text-start">
+                                                                    <div className="text-gray-800 text-theme-sm">
+                                                                        {formatDate(record.date)}
+                                                                    </div>
+                                                                </TableCell>
+                                                                <TableCell className="px-4 py-3 text-start">
+                                                                    <div className="text-gray-800 text-theme-sm">
+                                                                        {record.units} {record.unit_type === 'us_gallons' ? 'gal' : record.unit_type === 'liters' ? 'L' : 'gal (UK)'}
+                                                                    </div>
+                                                                </TableCell>
+                                                                <TableCell className="px-4 py-3 text-start">
+                                                                    <div className="text-gray-800 text-theme-sm">
+                                                                        ${Number(record.price_per_volume_unit).toFixed(2)}
+                                                                    </div>
+                                                                </TableCell>
+                                                                <TableCell className="px-4 py-3 text-start">
+                                                                    <div className="text-gray-800 text-theme-sm">
+                                                                        ${(record.units * record.price_per_volume_unit).toFixed(2)}
+                                                                    </div>
+                                                                </TableCell>
+                                                                <TableCell className="px-4 py-3 text-start">
+                                                                    <div className="text-gray-800 text-theme-sm">
+                                                                        {record.vehicle_meter || 'N/A'}
+                                                                    </div>
+                                                                </TableCell>
+                                                            </TableRow>
+                                                        ))}
+                                                    </TableBody>
+                                                </Table>
+                                                {fuelRecords.length > 0 && renderPagination(fuelPagination, fuelCurrentPage, setFuelCurrentPage, loadingFuel)}
+                                            </>
                                         )}
                                     </div>
-                                    {fuelRecords.length > 0 && renderPagination(
-                                        fuelPagination,
-                                        fuelCurrentPage,
-                                        setFuelCurrentPage,
-                                        loadingFuel
-                                    )}
-                                </>
+                                </div>
                             )}
 
                             {activeTab === 'issue' && (
-                                <>
-                                    <div className="space-y-4">
+                                <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
+                                    <div className="max-w-full overflow-x-auto">
                                         {loadingIssues ? (
-                                            <div className="flex items-center justify-center py-8">
+                                            <div className="flex items-center justify-center py-12">
                                                 <div className="text-center">
-                                                    <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-brand-500"></div>
+                                                    <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-brand-500"></div>
                                                     <p className="mt-2 text-sm text-gray-600">Loading issue records...</p>
                                                 </div>
                                             </div>
                                         ) : issueRecords.length === 0 ? (
-                                            <div className="text-center py-8">
-                                                <p className="text-gray-500">No issue records found</p>
+                                            <div className="flex items-center justify-center py-12">
+                                                <div className="text-center">
+                                                    <p className="text-gray-600">No issue records found</p>
+                                                </div>
                                             </div>
                                         ) : (
-                                            issueRecords.map((record) => (
-                                                <Link
-                                                    key={record.id}
-                                                    to={`/issues/${record.id}`}
-                                                    className="flex items-center justify-between p-4 bg-[#F9FAFB] rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
-                                                >
-                                                    <div className="flex-1">
-                                                        <div className="flex items-center justify-between mb-3">
-                                                            {/* <h3 className="md:text-base text-sm font-normal text-[#1D2939]">
-                                                                Issue-{record.id}
-                                                            </h3> */}
-
-                                                            <Badge size="sm" variant="solid"> {record.priority || "N/A"} </Badge>
-                                                        </div>
-                                                        <div className=" grid grid-cols-5 gap-2">
-                                                            <div>
-                                                                <p className="text-xs text-gray-500 mb-1">Vehicle</p>
-                                                                <p className="text-sm font-semibold text-gray-900">
-                                                                    {record.vehicle?.vehicle_name || "N/A"}
-                                                                </p>
-                                                            </div>
-                                                            <div>
-                                                                <p className="text-xs text-gray-500 mb-1">Summary</p>
-                                                                <p className="text-sm font-semibold text-gray-900 truncate">
-                                                                    {record.summary || "N/A"}
-                                                                </p>
-                                                            </div>
-                                                            <div>
-                                                                <p className="text-sm text-gray-600 dark:text-gray-400">Status</p>
-                                                                <span className="light-block">
-                                                                    <Badge color={getStatusBadgeColor(record.status || "N/A")} size="sm">
-                                                                        {getStatusLabel(record.status || "N/A")}
+                                            <>
+                                                <Table>
+                                                    <TableHeader className="border-b border-gray-100">
+                                                        <TableRow>
+                                                            <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs">
+                                                                Priority
+                                                            </TableCell>
+                                                            <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs">
+                                                                Vehicle
+                                                            </TableCell>
+                                                            <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs">
+                                                                Summary
+                                                            </TableCell>
+                                                            <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs">
+                                                                Status
+                                                            </TableCell>
+                                                            <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs">
+                                                                Assigned To
+                                                            </TableCell>
+                                                            <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs">
+                                                                Reported Date
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    </TableHeader>
+                                                    <TableBody className="divide-y divide-gray-100">
+                                                        {issueRecords.map((record) => (
+                                                            <TableRow key={record.id}>
+                                                                <TableCell className="px-4 py-3 text-theme-xs">
+                                                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${getPriorityColor(record.priority)}`}>
+                                                                        {record.priority || "N/A"}
+                                                                    </span>
+                                                                </TableCell>
+                                                                <TableCell className="px-4 py-3 text-start">
+                                                                    <div className="text-gray-800 text-theme-sm">
+                                                                        {record.vehicle?.vehicle_name || "N/A"}
+                                                                    </div>
+                                                                </TableCell>
+                                                                <TableCell className="px-4 py-3 text-start">
+                                                                    <div className="text-gray-800 text-theme-sm truncate max-w-xs">
+                                                                        {record.summary || "N/A"}
+                                                                    </div>
+                                                                </TableCell>
+                                                                <TableCell className="px-4 py-3 text-start">
+                                                                    <Badge
+                                                                        size="sm"
+                                                                        color={getStatusColor(record.status)}
+                                                                    >
+                                                                        {record.status || "Open"}
                                                                     </Badge>
-                                                                </span>
-                                                            </div>
-
-                                                            <div>
-                                                                <p className="text-xs text-gray-500 mb-1">Assigned To</p>
-                                                                <p className="text-sm font-semibold text-gray-900">
-                                                                    {record.assigned_to
-                                                                        ? `${record.assigned_to.first_name} ${record.assigned_to.last_name}`
-                                                                        : "Unassigned"}
-                                                                </p>
-                                                            </div>
-                                                            <div>
-                                                                <p className="text-xs text-gray-500 mb-1">Reported Date</p>
-                                                                <p className="text-sm font-semibold text-gray-900">
-                                                                    {record.reported_date
-                                                                        ? new Date(record.reported_date).toLocaleDateString("en-US", {
-                                                                            year: "numeric",
-                                                                            month: "short",
-                                                                            day: "numeric",
-                                                                        })
-                                                                        : "N/A"}
-                                                                </p>
-                                                            </div>
-
-                                                        </div>
-                                                    </div>
-                                                </Link>
-                                            ))
+                                                                </TableCell>
+                                                                <TableCell className="px-4 py-3 text-start">
+                                                                    <div className="text-gray-800 text-theme-sm">
+                                                                        {record.assigned_to
+                                                                            ? `${record.assigned_to.first_name} ${record.assigned_to.last_name}`
+                                                                            : "Unassigned"}
+                                                                    </div>
+                                                                </TableCell>
+                                                                <TableCell className="px-4 py-3 text-start">
+                                                                    <div className="text-gray-800 text-theme-sm">
+                                                                        {record.reported_date
+                                                                            ? formatDate(record.reported_date)
+                                                                            : "N/A"}
+                                                                    </div>
+                                                                </TableCell>
+                                                            </TableRow>
+                                                        ))}
+                                                    </TableBody>
+                                                </Table>
+                                                {issueRecords.length > 0 && renderPagination(issuesPagination, issuesCurrentPage, setIssuesCurrentPage, loadingIssues)}
+                                            </>
                                         )}
                                     </div>
-                                    {issueRecords.length > 0 && renderPagination(
-                                        issuesPagination,
-                                        issuesCurrentPage,
-                                        setIssuesCurrentPage,
-                                        loadingIssues
-                                    )}
-                                </>
+                                </div>
                             )}
 
                             {activeTab === 'reminders' && (
-                                <>
-                                    <div className="space-y-4">
+                                <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
+                                    <div className="max-w-full overflow-x-auto">
                                         {loadingReminders ? (
-                                            <div className="flex items-center justify-center py-8">
+                                            <div className="flex items-center justify-center py-12">
                                                 <div className="text-center">
-                                                    <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-brand-500"></div>
+                                                    <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-brand-500"></div>
                                                     <p className="mt-2 text-sm text-gray-600">Loading service reminders...</p>
                                                 </div>
                                             </div>
                                         ) : serviceReminders.length === 0 ? (
-                                            <div className="text-center py-8">
-                                                <p className="text-gray-500">No service reminders found</p>
+                                            <div className="flex items-center justify-center py-12">
+                                                <div className="text-center">
+                                                    <p className="text-gray-600">No service reminders found</p>
+                                                </div>
                                             </div>
                                         ) : (
-                                            serviceReminders.map((record) => (
-                                                <Link
-                                                    key={record.id}
-                                                    to={`/service-reminders/${record.id}`}
-                                                    className="flex items-center justify-between p-4 bg-[#F9FAFB] rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
-                                                >
-                                                    <div className="flex-1">
-                                                        <div className="flex items-center justify-between mb-3">
-                                                            {/* <h3 className="md:text-base text-sm font-normal text-[#1D2939]">
-                                                                REM-{record.id}
-                                                            </h3> */}
+                                            <>
+                                                <Table>
+                                                    <TableHeader className="border-b border-gray-100">
+                                                        <TableRow>
 
-                                                            <Badge size="sm" variant="outline">
-                                                                {record.status || "N/A"}
-                                                            </Badge>
-                                                        </div>
+                                                            <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs">
+                                                                Service Task
+                                                            </TableCell>
+                                                            <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs">
+                                                                Time Interval
+                                                            </TableCell>
+                                                            <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs">
+                                                                Meter Interval
+                                                            </TableCell>
+                                                            <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs">
+                                                                Next Due Date
+                                                            </TableCell>
+                                                            <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs">
+                                                                Next Due Meter
+                                                            </TableCell>
+                                                            <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs">
+                                                                Status
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    </TableHeader>
+                                                    <TableBody className="divide-y divide-gray-100">
+                                                        {serviceReminders.map((record) => (
+                                                            <TableRow key={record.id}>
 
-                                                        <div className="grid grid-cols-5 gap-2">
-                                                            {/* <div>
-                                                                <p className="text-xs text-gray-500 mb-1">Vehicle</p>
-                                                                <p className="text-sm font-semibold text-gray-900">
-                                                                    {record.vehicle?.vehicle_name || "N/A"}
-                                                                </p>
-                                                            </div> */}
-                                                            <div>
-                                                                <p className="text-xs text-gray-500 mb-1">Service Task</p>
-                                                                <p className="text-sm font-semibold text-gray-900">
-                                                                    {record.service_task?.name || "N/A"}
-                                                                </p>
-                                                            </div>
-                                                            <div>
-                                                                <p className="text-xs text-gray-500 mb-1">Time Interval</p>
-                                                                <p className="text-sm font-semibold text-gray-900">
-                                                                    {record.time_interval_value
-                                                                        ? `${record.time_interval_value} ${record.time_interval_unit}`
-                                                                        : "N/A"}
-                                                                </p>
-                                                            </div>
-                                                            <div>
-                                                                <p className="text-xs text-gray-500 mb-1">Meter Interval</p>
-                                                                <p className="text-sm font-semibold text-gray-900">
-                                                                    {record.primary_meter_interval_value
-                                                                        ? `${record.primary_meter_interval_value} ${record.primary_meter_interval_unit}`
-                                                                        : "N/A"}
-                                                                </p>
-                                                            </div>
-                                                            <div>
-                                                                <p className="text-xs text-gray-500 mb-1">Next Due Date</p>
-                                                                <p className="text-sm font-semibold text-gray-900">
-                                                                    {record.next_due_date
-                                                                        ? new Date(record.next_due_date).toLocaleDateString("en-US", {
-                                                                            year: "numeric",
-                                                                            month: "short",
-                                                                            day: "numeric",
-                                                                        })
-                                                                        : "N/A"}
-                                                                </p>
-                                                            </div>
-                                                            <div>
-                                                                <p className="text-xs text-gray-500 mb-1">Next Due Meter</p>
-                                                                <p className="text-sm font-semibold text-gray-900">
-                                                                    {record.next_due_meter || "N/A"}
-                                                                </p>
-                                                            </div>
-
-                                                        </div>
-                                                    </div>
-                                                </Link>
-                                            ))
+                                                                <TableCell className="px-4 py-3 text-start">
+                                                                    <div className="text-gray-800 text-theme-sm">
+                                                                        {record.service_task?.name || "N/A"}
+                                                                    </div>
+                                                                </TableCell>
+                                                                <TableCell className="px-4 py-3 text-start">
+                                                                    <div className="text-gray-800 text-theme-sm">
+                                                                        {record.time_interval_value
+                                                                            ? `${record.time_interval_value} ${record.time_interval_unit}`
+                                                                            : "N/A"}
+                                                                    </div>
+                                                                </TableCell>
+                                                                <TableCell className="px-4 py-3 text-start">
+                                                                    <div className="text-gray-800 text-theme-sm">
+                                                                        {record.primary_meter_interval_value
+                                                                            ? `${record.primary_meter_interval_value} ${record.primary_meter_interval_unit}`
+                                                                            : "N/A"}
+                                                                    </div>
+                                                                </TableCell>
+                                                                <TableCell className="px-4 py-3 text-start">
+                                                                    <div className="text-gray-800 text-theme-sm">
+                                                                        {record.next_due_date
+                                                                            ? formatDate(record.next_due_date)
+                                                                            : "N/A"}
+                                                                    </div>
+                                                                </TableCell>
+                                                                <TableCell className="px-4 py-3 text-start">
+                                                                    <div className="text-gray-800 text-theme-sm">
+                                                                        {record.next_due_meter || "N/A"}
+                                                                    </div>
+                                                                </TableCell>
+                                                                <TableCell className="px-4 py-3 text-start">
+                                                                    <Badge size="sm" color={getStatusBadgeColor(record.status)}>
+                                                                        {record.status}
+                                                                    </Badge>
+                                                                </TableCell>
+                                                            </TableRow>
+                                                        ))}
+                                                    </TableBody>
+                                                </Table>
+                                                {serviceReminders.length > 0 && renderPagination(remindersPagination, remindersCurrentPage, setRemindersCurrentPage, loadingReminders)}
+                                            </>
                                         )}
                                     </div>
-                                    {serviceReminders.length > 0 && renderPagination(
-                                        remindersPagination,
-                                        remindersCurrentPage,
-                                        setRemindersCurrentPage,
-                                        loadingReminders
-                                    )}
-                                </>
+                                </div>
                             )}
 
                             {activeTab === 'services' && (
-                                <>
-                                    <div className="space-y-4">
+                                <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
+                                    <div className="max-w-full overflow-x-auto">
                                         {loadingServices ? (
-                                            <div className="flex items-center justify-center py-8">
+                                            <div className="flex items-center justify-center py-12">
                                                 <div className="text-center">
-                                                    <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-brand-500"></div>
+                                                    <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-brand-500"></div>
                                                     <p className="mt-2 text-sm text-gray-600">Loading service records...</p>
                                                 </div>
                                             </div>
                                         ) : serviceRecords.length === 0 ? (
-                                            <div className="text-center py-8">
-                                                <p className="text-gray-500">No service records found</p>
+                                            <div className="flex items-center justify-center py-12">
+                                                <div className="text-center">
+                                                    <p className="text-gray-600">No service records found</p>
+                                                </div>
                                             </div>
                                         ) : (
-                                            serviceRecords.map((record) => (
-                                                <Link
-                                                    key={record.id}
-                                                    to={`/services/${record.id}`}
-                                                    className="flex items-center justify-between p-4 bg-[#F9FAFB] rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
-                                                >
-                                                    <div className="flex-1">
-                                                        <div className="flex items-center justify-between mb-3">
-                                                            {/* <h3 className="md:text-base text-sm font-normal text-[#1D2939] dark:text-white">SVC-{record.id}</h3> */}
-                                                            <Badge size="sm" variant="outline">{record.repair_priority_class}</Badge>
-                                                        </div>
-                                                        <div className="grid grid-cols-4 gap-4">
-                                                            <div>
-                                                                <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Vendor</p>
-                                                                <p className="text-sm font-semibold text-gray-900 dark:text-white">
-                                                                    {record.vendor?.name || "N/A"}
-                                                                </p>
-                                                            </div>
-
-                                                            <div>
-                                                                <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Vehicle</p>
-                                                                <p className="text-sm font-semibold text-gray-900 dark:text-white">
-                                                                    {record.vehicle?.vehicle_name || "N/A"}
-                                                                </p>
-                                                            </div>
-                                                            <div>
-                                                                <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Meter</p>
-                                                                <p className="text-sm font-semibold text-gray-900 dark:text-white">
-                                                                    {record.hour_meter ?? "N/A"}
-                                                                </p>
-                                                            </div>
-                                                            <div>
-                                                                <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Completion Date</p>
-                                                                <p className="text-sm font-semibold text-gray-900 dark:text-white">
-                                                                    {record.completion_date
-                                                                        ? new Date(record.completion_date).toLocaleDateString(
-                                                                            "en-US",
-                                                                            {
-                                                                                year: "numeric",
-                                                                                month: "short",
-                                                                                day: "numeric",
-                                                                            }
-                                                                        )
-                                                                        : "No Date"}
-                                                                </p>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-
-                                                </Link>
-                                            ))
+                                            <>
+                                                <Table>
+                                                    <TableHeader className="border-b border-gray-100">
+                                                        <TableRow>
+                                                            <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs">
+                                                                Repair Priority Class
+                                                            </TableCell>
+                                                            <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs">
+                                                                Vendor
+                                                            </TableCell>
+                                                            <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs">
+                                                                Vehicle
+                                                            </TableCell>
+                                                            <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs">
+                                                                Meter
+                                                            </TableCell>
+                                                            <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs">
+                                                                Start Date
+                                                            </TableCell>
+                                                            <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs">
+                                                                Completion Date
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    </TableHeader>
+                                                    <TableBody className="divide-y divide-gray-100">
+                                                        {serviceRecords.map((record) => (
+                                                            <TableRow key={record.id}>
+                                                                <TableCell className="px-4 py-3 text-start">
+                                                                    <Badge color={getStatusBadgeColor(record.repair_priority_class)}>
+                                                                        {record.repair_priority_class || "N/A"}
+                                                                    </Badge>
+                                                                </TableCell>
+                                                                <TableCell className="px-4 py-3 text-start">
+                                                                    <div className="text-gray-800 text-theme-sm">
+                                                                        {record.vendor?.name || "N/A"}
+                                                                    </div>
+                                                                </TableCell>
+                                                                <TableCell className="px-4 py-3 text-start">
+                                                                    <div className="text-gray-800 text-theme-sm">
+                                                                        {record.vehicle?.vehicle_name || "N/A"}
+                                                                    </div>
+                                                                </TableCell>
+                                                                <TableCell className="px-4 py-3 text-start">
+                                                                    <div className="text-gray-800 text-theme-sm">
+                                                                        {record.hour_meter ?? "N/A"}
+                                                                    </div>
+                                                                </TableCell>
+                                                                <TableCell className="px-4 py-3 text-start">
+                                                                    <div className="text-gray-800 text-theme-sm">
+                                                                        {record.start_date ? formatDate(record.start_date) : "N/A"}
+                                                                    </div>
+                                                                </TableCell>
+                                                                <TableCell className="px-4 py-3 text-start">
+                                                                    <div className="text-gray-800 text-theme-sm">
+                                                                        {record.completion_date ? formatDate(record.completion_date) : "N/A"}
+                                                                    </div>
+                                                                </TableCell>
+                                                            </TableRow>
+                                                        ))}
+                                                    </TableBody>
+                                                </Table>
+                                                {serviceRecords.length > 0 && renderPagination(
+                                                    servicesPagination,
+                                                    servicesCurrentPage,
+                                                    setServicesCurrentPage,
+                                                    loadingServices
+                                                )}
+                                            </>
                                         )}
                                     </div>
-                                    {serviceRecords.length > 0 && renderPagination(
-                                        servicesPagination,
-                                        servicesCurrentPage,
-                                        setServicesCurrentPage,
-                                        loadingServices
-                                    )}
-                                </>
+                                </div>
                             )}
-
                             {activeTab === 'documents' && (
-                                <>
-                                    <div className="space-y-4">
+                                <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
+                                    <div className="max-w-full overflow-x-auto">
                                         {loadingDocuments ? (
-                                            <div className="flex items-center justify-center py-8">
+                                            <div className="flex items-center justify-center py-12">
                                                 <div className="text-center">
-                                                    <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-brand-500"></div>
+                                                    <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-brand-500"></div>
                                                     <p className="mt-2 text-sm text-gray-600">Loading documents...</p>
                                                 </div>
                                             </div>
                                         ) : documents.length === 0 ? (
-                                            <div className="text-center py-8">
-                                                <p className="text-gray-500">No documents found</p>
+                                            <div className="flex items-center justify-center py-12">
+                                                <div className="text-center">
+                                                    <p className="text-gray-600">No documents found</p>
+                                                </div>
                                             </div>
                                         ) : (
-                                            documents.map((document) => (
-                                                <div key={document.id} className="flex items-center gap-4 p-4 bg-[#F9FAFB] border border-gray-200 rounded-lg">
-                                                    <div className="w-10 h-10 rounded-lg bg-white flex items-center justify-center flex-shrink-0">
-                                                        <FileIcon className="w-5 h-5 text-purple-600" />
-                                                    </div>
-                                                    <div className="flex-1">
-                                                        <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-1">{document.title}</h3>
-                                                        <p className="text-sm text-gray-500 dark:text-gray-400">Uploaded: {document.uploadedDate}</p>
-                                                    </div>
-                                                    <div className="text-right">
-                                                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Expires</p>
-                                                        <p className="text-sm font-semibold text-gray-900 dark:text-white">{document.expiresDate}</p>
-                                                    </div>
-                                                </div>
-                                            ))
+                                            <>
+                                                <Table>
+                                                    <TableHeader className="border-b border-gray-100">
+                                                        <TableRow>
+                                                            <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs">
+                                                                Document ID
+                                                            </TableCell>
+                                                            <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs">
+                                                                Title
+                                                            </TableCell>
+                                                            <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs">
+                                                                Uploaded Date
+                                                            </TableCell>
+                                                            <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs">
+                                                                Expires Date
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    </TableHeader>
+                                                    <TableBody className="divide-y divide-gray-100">
+                                                        {documents.map((document) => (
+                                                            <TableRow key={document.id}>
+                                                                <TableCell className="px-5 py-4 sm:px-6 text-start">
+                                                                    <div className="flex items-center gap-3">
+                                                                        <div className="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center flex-shrink-0">
+                                                                            <FileIcon className="w-5 h-5 text-purple-600" />
+                                                                        </div>
+                                                                        <span className="block font-medium text-gray-800 text-theme-sm">
+                                                                            DOC-{document.id}
+                                                                        </span>
+                                                                    </div>
+                                                                </TableCell>
+                                                                <TableCell className="px-4 py-3 text-start">
+                                                                    <div className="text-gray-800 text-theme-sm font-semibold">
+                                                                        {document.title}
+                                                                    </div>
+                                                                </TableCell>
+                                                                <TableCell className="px-4 py-3 text-start">
+                                                                    <div className="text-gray-800 text-theme-sm">
+                                                                        {document.uploadedDate}
+                                                                    </div>
+                                                                </TableCell>
+                                                                <TableCell className="px-4 py-3 text-start">
+                                                                    <div className="text-gray-800 text-theme-sm">
+                                                                        {document.expiresDate}
+                                                                    </div>
+                                                                </TableCell>
+                                                            </TableRow>
+                                                        ))}
+                                                    </TableBody>
+                                                </Table>
+                                                {documents.length > 0 && renderPagination(documentsPagination, documentsCurrentPage, setDocumentsCurrentPage, loadingDocuments)}
+                                            </>
                                         )}
                                     </div>
-                                    {documents.length > 0 && renderPagination(
-                                        documentsPagination,
-                                        documentsCurrentPage,
-                                        setdocumentsCurrentPage,
-                                        loadingDocuments
-                                    )}
-                                </>
+                                </div>
                             )}
                         </div>
 
