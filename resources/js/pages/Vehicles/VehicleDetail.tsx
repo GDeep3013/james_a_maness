@@ -149,6 +149,13 @@ interface Document {
     expiresDate: string;
 }
 
+interface PaginationData {
+    current_page: number;
+    last_page: number;
+    per_page: number;
+    total: number;
+}
+
 export default function VehicleDetail() {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
@@ -173,6 +180,370 @@ export default function VehicleDetail() {
     const [issueRecords, setIssueRecords] = useState<IssueRecord[]>([]);
     const [serviceReminders, setServiceReminders] = useState<ServiceReminder[]>([]);
     const [documents, setDocuments] = useState<Document[]>([]);
+
+    const [workPagination, setWorkPagination] = useState<PaginationData>({
+        current_page: 1,
+        last_page: 1,
+        per_page: 20,
+        total: 0,
+    });
+    const [fuelPagination, setFuelPagination] = useState<PaginationData>({
+        current_page: 1,
+        last_page: 1,
+        per_page: 20,
+        total: 0,
+    });
+    const [servicesPagination, setServicesPagination] = useState<PaginationData>({
+        current_page: 1,
+        last_page: 1,
+        per_page: 20,
+        total: 0,
+    });
+    const [issuesPagination, setIssuesPagination] = useState<PaginationData>({
+        current_page: 1,
+        last_page: 1,
+        per_page: 20,
+        total: 0,
+    });
+    const [remindersPagination, setRemindersPagination] = useState<PaginationData>({
+        current_page: 1,
+        last_page: 1,
+        per_page: 20,
+        total: 0,
+    });
+    const [documentsPagination, setDocumentsPagination] = useState<PaginationData>({
+        current_page: 1,
+        last_page: 1,
+        per_page: 20,
+        total: 0,
+    });
+
+    // Current page states for each tab
+    const [workCurrentPage, setWorkCurrentPage] = useState(1);
+    const [fuelCurrentPage, setFuelCurrentPage] = useState(1);
+    const [servicesCurrentPage, setServicesCurrentPage] = useState(1);
+    const [issuesCurrentPage, setIssuesCurrentPage] = useState(1);
+    const [remindersCurrentPage, setRemindersCurrentPage] = useState(1);
+    const [documentsCurrentPage, setdocumentsCurrentPage] = useState(1);
+
+    // Pagination rendering function (reusable for all tabs)
+    const renderPagination = (
+        pagination: PaginationData,
+        currentPage: number,
+        setCurrentPage: (page: number) => void,
+        loading: boolean
+    ) => {
+        const pages: number[] = [];
+        const maxPages = 5;
+        let startPage = Math.max(1, pagination.current_page - Math.floor(maxPages / 2));
+        const endPage = Math.min(pagination.last_page, startPage + maxPages - 1);
+
+        if (endPage - startPage < maxPages - 1) {
+            startPage = Math.max(1, endPage - maxPages + 1);
+        }
+
+        for (let i = startPage; i <= endPage; i++) {
+            pages.push(i);
+        }
+
+        return (
+            <div className="flex items-center justify-between px-4 py-3 sm:px-6 border-t border-gray-200">
+                <div className="flex flex-1 justify-between sm:hidden">
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setCurrentPage(currentPage - 1)}
+                        disabled={currentPage === 1 || loading}
+                        className="min-height-[34px] !leading-[34px]"
+                    >
+                        Previous
+                    </Button>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setCurrentPage(currentPage + 1)}
+                        disabled={currentPage === pagination.last_page || loading}
+                        className="min-height-[34px] !leading-[34px]"
+                    >
+                        Next
+                    </Button>
+                </div>
+                <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
+                    <div>
+                        <p className="text-sm text-gray-700">
+                            Showing{" "}
+                            <span className="font-medium">
+                                {pagination.total === 0
+                                    ? 0
+                                    : (pagination.current_page - 1) * pagination.per_page + 1}
+                            </span>{" "}
+                            to{" "}
+                            <span className="font-medium">
+                                {Math.min(
+                                    pagination.current_page * pagination.per_page,
+                                    pagination.total
+                                )}
+                            </span>{" "}
+                            of <span className="font-medium">{pagination.total}</span> results
+                        </p>
+                    </div>
+                    <div>
+                        <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setCurrentPage(currentPage - 1)}
+                                disabled={currentPage === 1 || loading}
+                                className="rounded-r-none min-height-[34px] !leading-[34px]"
+                            >
+                                Previous
+                            </Button>
+                            {pages.map((page) => (
+                                <Button
+                                    key={page}
+                                    variant={currentPage === page ? "primary" : "outline"}
+                                    size="sm"
+                                    onClick={() => setCurrentPage(page)}
+                                    disabled={loading}
+                                    className="rounded-none border-l-0 min-height-[34px] !leading-[34px]"
+                                >
+                                    {page}
+                                </Button>
+                            ))}
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setCurrentPage(currentPage + 1)}
+                                disabled={currentPage === pagination.last_page || loading}
+                                className="rounded-l-none border-l-0 min-height-[34px] !leading-[34px]"
+                            >
+                                Next
+                            </Button>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        );
+    };
+
+    // Update fetch functions to handle pagination
+    useEffect(() => {
+        const fetchWorkRecords = async () => {
+            if (!id || activeTab !== 'work') return;
+
+            setLoadingWork(true);
+            try {
+                const response = await workOrderService.getAll({
+                    page: workCurrentPage,
+                    search: '',
+                    status: '',
+                });
+
+                const data = response.data;
+
+                if (data.status && data.work_orders) {
+                    setWorkRecords(data.work_orders.data || []);
+                    setWorkPagination({
+                        current_page: data.work_orders.current_page,
+                        last_page: data.work_orders.last_page,
+                        per_page: data.work_orders.per_page,
+                        total: data.work_orders.total,
+                    });
+                } else {
+                    setWorkRecords([]);
+                }
+            } catch (error) {
+                console.error("Failed to load work records:", error);
+                setWorkRecords([]);
+            } finally {
+                setLoadingWork(false);
+            }
+        };
+
+        fetchWorkRecords();
+    }, [id, activeTab, workCurrentPage]);
+
+    // Similar updates for other fetch functions
+    useEffect(() => {
+        const fetchFuelRecords = async () => {
+            if (!id || activeTab !== 'fuel') return;
+
+            setLoadingFuel(true);
+            try {
+                const response = await fuelService.getAll({
+                    page: fuelCurrentPage,
+                    search: '',
+                });
+                const data = response.data;
+
+                if (data.status && data.fuel) {
+                    setFuelRecords(data.fuel.data || []);
+                    setFuelPagination({
+                        current_page: data.fuel.current_page,
+                        last_page: data.fuel.last_page,
+                        per_page: data.fuel.per_page,
+                        total: data.fuel.total,
+                    });
+                } else {
+                    setFuelRecords([]);
+                }
+            } catch (error) {
+                console.error('Failed to load fuel records:', error);
+                setFuelRecords([]);
+            } finally {
+                setLoadingFuel(false);
+            }
+        };
+
+        fetchFuelRecords();
+    }, [id, activeTab, fuelCurrentPage]);
+
+    useEffect(() => {
+        const fetchServiceRecords = async () => {
+            if (!id || activeTab !== 'services') return;
+
+            setLoadingServices(true);
+            try {
+                const response = await serviceService.getAll({
+                    page: servicesCurrentPage,
+                    search: '',
+                });
+
+                const data = response.data;
+
+                if (data.status && data.services) {
+                    setServiceRecords(data.services.data || []);
+                    setServicesPagination({
+                        current_page: data.services.current_page,
+                        last_page: data.services.last_page,
+                        per_page: data.services.per_page,
+                        total: data.services.total,
+                    });
+                } else {
+                    setServiceRecords([]);
+                }
+            } catch (error) {
+                console.error("Failed to load service records:", error);
+                setServiceRecords([]);
+            } finally {
+                setLoadingServices(false);
+            }
+        };
+
+        fetchServiceRecords();
+    }, [id, activeTab, servicesCurrentPage]);
+
+    useEffect(() => {
+        const fetchIssueRecords = async () => {
+            if (!id || activeTab !== 'issue') return;
+
+            setLoadingIssues(true);
+            try {
+                const response = await issueService.getAll({
+                    page: issuesCurrentPage,
+                    search: '',
+                    status: '',
+                    vehicle_id: Number(id)
+                });
+
+                const data = response.data;
+
+                if (data.status && data.issues) {
+                    setIssueRecords(data.issues.data || []);
+                    setIssuesPagination({
+                        current_page: data.issues.current_page,
+                        last_page: data.issues.last_page,
+                        per_page: data.issues.per_page,
+                        total: data.issues.total,
+                    });
+                } else {
+                    setIssueRecords([]);
+                }
+            } catch (error) {
+                console.error("Failed to load issue records:", error);
+                setIssueRecords([]);
+            } finally {
+                setLoadingIssues(false);
+            }
+        };
+
+        fetchIssueRecords();
+    }, [id, activeTab, issuesCurrentPage]);
+
+    useEffect(() => {
+        const fetchServiceReminders = async () => {
+            if (!id || activeTab !== 'reminders') return;
+
+            setLoadingReminders(true);
+            try {
+                const response = await serviceReminderService.getAll({
+                    page: remindersCurrentPage,
+                    search: '',
+                    status: '',
+                });
+
+                const data = response.data;
+
+                if (data.status && data.service_reminders) {
+                    const filtered = data.service_reminders.data.filter(
+                        (reminder: ServiceReminder) => reminder.vehicle_id === Number(id)
+                    );
+                    setServiceReminders(filtered);
+                    setRemindersPagination({
+                        current_page: data.service_reminders.current_page,
+                        last_page: data.service_reminders.last_page,
+                        per_page: data.service_reminders.per_page,
+                        total: data.service_reminders.total,
+                    });
+                } else {
+                    setServiceReminders([]);
+                }
+            } catch (error) {
+                console.error("Failed to load service reminders:", error);
+                setServiceReminders([]);
+            } finally {
+                setLoadingReminders(false);
+            }
+        };
+
+        fetchServiceReminders();
+    }, [id, activeTab, remindersCurrentPage]);
+
+    useEffect(() => {
+        const fetchDocumentRecords = async () => {
+            if (!id || activeTab !== 'work') return;
+
+            setLoadingDocuments(true);
+            try {
+                const response = await vehicleService.getAll({
+                    page: documentsCurrentPage,
+                    search: '',
+                    // status: '',
+                });
+
+                const data = response.data;
+
+                if (data.status && data.documents) {
+                    setDocuments(data.documents.data || []);
+                    setDocumentsPagination({
+                        current_page: data.documents.current_page,
+                        last_page: data.documents.last_page,
+                        per_page: data.documents.per_page,
+                        total: data.documents.total,
+                    });
+                } else {
+                    setDocuments([]);
+                }
+            } catch (error) {
+                console.error("Failed to load work records:", error);
+                setDocuments([]);
+            } finally {
+                setLoadingDocuments(false);
+            }
+        };
+
+        fetchDocumentRecords();
+    }, [id, activeTab, documentsCurrentPage]);
 
     useEffect(() => {
         const fetchVehicle = async () => {
@@ -205,219 +576,219 @@ export default function VehicleDetail() {
 
 
     // Fetch Work Order Records
-    useEffect(() => {
-        const fetchWorkRecords = async () => {
-            if (!id || activeTab !== 'work') return;
+    // useEffect(() => {
+    //     const fetchWorkRecords = async () => {
+    //         if (!id || activeTab !== 'work') return;
 
-            setLoadingWork(true);
-            try {
-                const response = await workOrderService.getAll({
-                    page: 1,
-                    search: '',
-                    status: '',
-                });
+    //         setLoadingWork(true);
+    //         try {
+    //             const response = await workOrderService.getAll({
+    //                 page: 1,
+    //                 search: '',
+    //                 status: '',
+    //             });
 
-                const data = response.data;
+    //             const data = response.data;
 
-                if (data.status && data.work_orders?.data) {
-                    setWorkRecords(data.work_orders.data);
-                } else {
-                    setWorkRecords([]);
-                }
-            } catch (error) {
-                console.error("Failed to load work records:", error);
-                setWorkRecords([]);
-            } finally {
-                setLoadingWork(false);
-            }
-        };
+    //             if (data.status && data.work_orders?.data) {
+    //                 setWorkRecords(data.work_orders.data);
+    //             } else {
+    //                 setWorkRecords([]);
+    //             }
+    //         } catch (error) {
+    //             console.error("Failed to load work records:", error);
+    //             setWorkRecords([]);
+    //         } finally {
+    //             setLoadingWork(false);
+    //         }
+    //     };
 
-        fetchWorkRecords();
-    }, [id, activeTab]);
+    //     fetchWorkRecords();
+    // }, [id, activeTab]);
 
     // Fetch Maintenance Records
-    useEffect(() => {
-        const fetchMaintenanceRecords = async () => {
-            if (!id || activeTab !== 'maintenance') return;
+    // useEffect(() => {
+    //     const fetchMaintenanceRecords = async () => {
+    //         if (!id || activeTab !== 'maintenance') return;
 
-            setLoadingMaintenance(true);
-            try {
-                const response = await vehicleService.getAll({
-                    page: 1,
-                    search: '',
-                });
-                const data = response.data;
+    //         setLoadingMaintenance(true);
+    //         try {
+    //             const response = await vehicleService.getAll({
+    //                 page: 1,
+    //                 search: '',
+    //             });
+    //             const data = response.data;
 
-                if (data.status && data.maintenance_records) {
-                    setMaintenanceRecords(data.maintenance_records);
-                } else {
-                    setMaintenanceRecords([]);
-                }
-            } catch (error) {
-                console.error('Failed to load maintenance records:', error);
-                setMaintenanceRecords([]);
-            } finally {
-                setLoadingMaintenance(false);
-            }
-        };
+    //             if (data.status && data.maintenance_records) {
+    //                 setMaintenanceRecords(data.maintenance_records);
+    //             } else {
+    //                 setMaintenanceRecords([]);
+    //             }
+    //         } catch (error) {
+    //             console.error('Failed to load maintenance records:', error);
+    //             setMaintenanceRecords([]);
+    //         } finally {
+    //             setLoadingMaintenance(false);
+    //         }
+    //     };
 
-        fetchMaintenanceRecords();
-    }, [id, activeTab]);
+    //     fetchMaintenanceRecords();
+    // }, [id, activeTab]);
 
     // Fetch Fuel Records
-    useEffect(() => {
-        const fetchFuelRecords = async () => {
-            if (!id || activeTab !== 'fuel') return;
+    // useEffect(() => {
+    //     const fetchFuelRecords = async () => {
+    //         if (!id || activeTab !== 'fuel') return;
 
-            setLoadingFuel(true);
-            try {
-                const response = await fuelService.getAll({
-                    page: 1,
-                    search: '',
-                });
-                const data = response.data;
+    //         setLoadingFuel(true);
+    //         try {
+    //             const response = await fuelService.getAll({
+    //                 page: 1,
+    //                 search: '',
+    //             });
+    //             const data = response.data;
 
-                if (data.status && data.fuel && data.fuel.data) {
-                    setFuelRecords(data.fuel.data);
-                } else {
-                    setFuelRecords([]);
-                }
-            } catch (error) {
-                console.error('Failed to load fuel records:', error);
-                setFuelRecords([]);
-            } finally {
-                setLoadingFuel(false);
-            }
-        };
+    //             if (data.status && data.fuel && data.fuel.data) {
+    //                 setFuelRecords(data.fuel.data);
+    //             } else {
+    //                 setFuelRecords([]);
+    //             }
+    //         } catch (error) {
+    //             console.error('Failed to load fuel records:', error);
+    //             setFuelRecords([]);
+    //         } finally {
+    //             setLoadingFuel(false);
+    //         }
+    //     };
 
-        fetchFuelRecords();
-    }, [id, activeTab]);
+    //     fetchFuelRecords();
+    // }, [id, activeTab]);
 
     // Fetch Service Records
-    useEffect(() => {
-        const fetchServiceRecords = async () => {
-            if (!id || activeTab !== 'services') return;
+    // useEffect(() => {
+    //     const fetchServiceRecords = async () => {
+    //         if (!id || activeTab !== 'services') return;
 
-            setLoadingServices(true);
-            try {
-                const response = await serviceService.getAll({
-                    page: 1,
-                    search: '',
-                });
+    //         setLoadingServices(true);
+    //         try {
+    //             const response = await serviceService.getAll({
+    //                 page: 1,
+    //                 search: '',
+    //             });
 
-                const data = response.data;
+    //             const data = response.data;
 
-                if (data.status && data.services?.data) {
-                    setServiceRecords(data.services.data);
-                } else {
-                    setServiceRecords([]);
-                }
-            } catch (error) {
-                console.error("Failed to load service records:", error);
-                setServiceRecords([]);
-            } finally {
-                setLoadingServices(false);
-            }
-        };
+    //             if (data.status && data.services?.data) {
+    //                 setServiceRecords(data.services.data);
+    //             } else {
+    //                 setServiceRecords([]);
+    //             }
+    //         } catch (error) {
+    //             console.error("Failed to load service records:", error);
+    //             setServiceRecords([]);
+    //         } finally {
+    //             setLoadingServices(false);
+    //         }
+    //     };
 
-        fetchServiceRecords();
-    }, [id, activeTab]);
+    //     fetchServiceRecords();
+    // }, [id, activeTab]);
 
     // Fetch Issue Records
-    useEffect(() => {
-        const fetchIssueRecords = async () => {
-            if (!id || activeTab !== 'issue') return;
+    // useEffect(() => {
+    //     const fetchIssueRecords = async () => {
+    //         if (!id || activeTab !== 'issue') return;
 
-            setLoadingIssues(true);
-            try {
-                const response = await issueService.getAll({
-                    page: 1,
-                    search: '',
-                    status: '',
-                    vehicle_id: Number(id)
-                });
+    //         setLoadingIssues(true);
+    //         try {
+    //             const response = await issueService.getAll({
+    //                 page: 1,
+    //                 search: '',
+    //                 status: '',
+    //                 vehicle_id: Number(id)
+    //             });
 
-                const data = response.data;
+    //             const data = response.data;
 
-                if (data.status && data.issues?.data) {
-                    setIssueRecords(data.issues.data);
-                } else {
-                    setIssueRecords([]);
-                }
-            } catch (error) {
-                console.error("Failed to load issue records:", error);
-                setIssueRecords([]);
-            } finally {
-                setLoadingIssues(false);
-            }
-        };
+    //             if (data.status && data.issues?.data) {
+    //                 setIssueRecords(data.issues.data);
+    //             } else {
+    //                 setIssueRecords([]);
+    //             }
+    //         } catch (error) {
+    //             console.error("Failed to load issue records:", error);
+    //             setIssueRecords([]);
+    //         } finally {
+    //             setLoadingIssues(false);
+    //         }
+    //     };
 
-        fetchIssueRecords();
-    }, [id, activeTab]);
+    //     fetchIssueRecords();
+    // }, [id, activeTab]);
 
     // Fetch Service Reminders
-    useEffect(() => {
-        const fetchServiceReminders = async () => {
-            if (!id || activeTab !== 'reminders') return;
+    // useEffect(() => {
+    //     const fetchServiceReminders = async () => {
+    //         if (!id || activeTab !== 'reminders') return;
 
-            setLoadingReminders(true);
-            try {
-                const response = await serviceReminderService.getAll({
-                    page: 1,
-                    search: '',
-                    status: '',
-                });
+    //         setLoadingReminders(true);
+    //         try {
+    //             const response = await serviceReminderService.getAll({
+    //                 page: 1,
+    //                 search: '',
+    //                 status: '',
+    //             });
 
-                const data = response.data;
+    //             const data = response.data;
 
-                if (data.status && data.service_reminders?.data) {
-                    // Filter by vehicle_id on client side if API doesn't support it
-                    const filtered = data.service_reminders.data.filter(
-                        (reminder: ServiceReminder) => reminder.vehicle_id === Number(id)
-                    );
-                    setServiceReminders(filtered);
-                } else {
-                    setServiceReminders([]);
-                }
-            } catch (error) {
-                console.error("Failed to load service reminders:", error);
-                setServiceReminders([]);
-            } finally {
-                setLoadingReminders(false);
-            }
-        };
+    //             if (data.status && data.service_reminders?.data) {
+    //                 // Filter by vehicle_id on client side if API doesn't support it
+    //                 const filtered = data.service_reminders.data.filter(
+    //                     (reminder: ServiceReminder) => reminder.vehicle_id === Number(id)
+    //                 );
+    //                 setServiceReminders(filtered);
+    //             } else {
+    //                 setServiceReminders([]);
+    //             }
+    //         } catch (error) {
+    //             console.error("Failed to load service reminders:", error);
+    //             setServiceReminders([]);
+    //         } finally {
+    //             setLoadingReminders(false);
+    //         }
+    //     };
 
-        fetchServiceReminders();
-    }, [id, activeTab]);
+    //     fetchServiceReminders();
+    // }, [id, activeTab]);
 
     // Fetch Documents
-    useEffect(() => {
-        const fetchDocuments = async () => {
-            if (!id || activeTab !== 'documents') return;
+    // useEffect(() => {
+    //     const fetchDocuments = async () => {
+    //         if (!id || activeTab !== 'documents') return;
 
-            setLoadingDocuments(true);
-            try {
-                const response = await vehicleService.getAll({
-                    page: 1,
-                    search: '',
-                });
-                const data = response.data;
+    //         setLoadingDocuments(true);
+    //         try {
+    //             const response = await vehicleService.getAll({
+    //                 page: 1,
+    //                 search: '',
+    //             });
+    //             const data = response.data;
 
-                if (data.status && data.documents) {
-                    setDocuments(data.documents);
-                } else {
-                    setDocuments([]);
-                }
-            } catch (error) {
-                console.error('Failed to load documents:', error);
-                setDocuments([]);
-            } finally {
-                setLoadingDocuments(false);
-            }
-        };
+    //             if (data.status && data.documents) {
+    //                 setDocuments(data.documents);
+    //             } else {
+    //                 setDocuments([]);
+    //             }
+    //         } catch (error) {
+    //             console.error('Failed to load documents:', error);
+    //             setDocuments([]);
+    //         } finally {
+    //             setLoadingDocuments(false);
+    //         }
+    //     };
 
-        fetchDocuments();
-    }, [id, activeTab]);
+    //     fetchDocuments();
+    // }, [id, activeTab]);
 
     const handleEdit = () => {
         if (id) {
@@ -643,10 +1014,49 @@ export default function VehicleDetail() {
 
 
                     </div>
-                     <div className="bg-white rounded-lg border border-gray-200 w-full mt-4">
-                            <div className="lg:p-6 p-3">
-                                <nav className="flex bg-[#ECECF0] md:mb-8 mb-4 rounded-[32px] p-1">
-                                    {/* <button
+
+                    <div className='current-assignment mt-6'>
+                        <div className="bg-white rounded-lg px-6 py-4 border border-gray-200 shadow-sm">
+                            <h3 className="text-[18px] font-medium text-[#1D2939] mb-4">Current Assignment</h3>
+                            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-6">
+                                <div className="flex-1">
+                                    <span className="block text-sm text-[#595959] mb-1">Vendor</span>
+                                    <span className="block text-base text-[#1D2939]">
+                                        {vehicle.vendor?.id ? (
+                                            <Link to={`/vendors/${vehicle.vendor.id}`} className="text-blue-500 hover:text-blue-700">
+                                                {capitalizeFirst(vehicle.vendor?.name)}
+                                            </Link>
+                                        ) : 'N/A'}
+                                    </span>
+                                </div>
+                                <div className="flex-1">
+                                    <span className="block text-sm text-[#595959] mb-1">Assigned Driver</span>
+                                    <span className="block text-base text-[#1D2939]">
+                                        {vehicle.contact?.id ? (
+                                            <Link to={`/contacts/${vehicle.contact.id}`} className="text-blue-500 hover:text-blue-700">
+                                                {capitalizeFirst(vehicle.contact?.first_name) + ' ' + capitalizeFirst(vehicle.contact?.last_name)}
+                                            </Link>
+                                        ) : 'N/A'}
+                                    </span>
+                                </div>
+                                <div className="flex-1">
+                                    <span className="block text-sm text-[#595959] mb-1">Primary Location</span>
+                                    <span className="block text-base text-[#1D2939]">{capitalizeFirst(vehicle.primary_location) || 'N/A'}</span>
+                                </div>
+                                <div className="flex-1">
+                                    <span className="block text-sm text-[#595959] mb-1">Department</span>
+                                    <span className="block text-base text-[#1D2939]">
+                                        {capitalizeFirst(vehicle.department) || 'N/A'}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="bg-white rounded-lg border border-gray-200 w-full mt-4">
+                        <div className="lg:p-6 p-3">
+                            <nav className="flex bg-[#ECECF0] md:mb-8 mb-4 rounded-[32px] p-1">
+                                {/* <button
                                         onClick={() => setActiveTab('maintenance')}
                                         className={`lg:px-4 px-2 py-3 lg:text-sm text-xs font-medium transition-colors rounded-[43px] w-full shadow-none ${activeTab === 'maintenance'
                                                 ? 'bg-white text-brand-600 dark:text-brand-400'
@@ -655,106 +1065,107 @@ export default function VehicleDetail() {
                                     >
                                         Maintenance History
                                     </button> */}
-                                    <button
-                                        onClick={() => setActiveTab('work')}
-                                        className={`lg:px-4 px-2 py-3 lg:text-sm text-xs font-medium transition-colors rounded-[43px] w-full shadow-none ${activeTab === 'work'
-                                            ? 'bg-white text-brand-600 dark:text-brand-400'
-                                            : 'text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400'
-                                            }`}
-                                    >
-                                        Work History
-                                    </button>
+                                <button
+                                    onClick={() => setActiveTab('work')}
+                                    className={`lg:px-4 px-2 py-3 lg:text-sm text-xs font-medium transition-colors rounded-[43px] w-full shadow-none ${activeTab === 'work'
+                                        ? 'bg-white text-brand-600 dark:text-brand-400'
+                                        : 'text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400'
+                                        }`}
+                                >
+                                    Work History
+                                </button>
 
-                                    <button
-                                        onClick={() => setActiveTab('fuel')}
-                                        className={`lg:px-4 px-2 py-3 lg:text-sm text-xs font-medium transition-colors rounded-[43px] w-full shadow-none ${activeTab === 'fuel'
-                                            ? 'bg-white text-brand-600 dark:text-brand-400'
-                                            : 'text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400'
-                                            }`}
-                                    >
-                                        Fuel Records
-                                    </button>
+                                <button
+                                    onClick={() => setActiveTab('fuel')}
+                                    className={`lg:px-4 px-2 py-3 lg:text-sm text-xs font-medium transition-colors rounded-[43px] w-full shadow-none ${activeTab === 'fuel'
+                                        ? 'bg-white text-brand-600 dark:text-brand-400'
+                                        : 'text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400'
+                                        }`}
+                                >
+                                    Fuel Records
+                                </button>
 
-                                    <button
-                                        onClick={() => setActiveTab('services')}
-                                        className={`lg:px-4 px-2 py-3 lg:text-sm text-xs font-medium transition-colors rounded-[43px] w-full shadow-none ${activeTab === 'services'
-                                            ? 'bg-white text-brand-600 dark:text-brand-400'
-                                            : 'text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400'
-                                            }`}
-                                    >
-                                        Service History
-                                    </button>
-                                    <button
-                                        onClick={() => setActiveTab('issue')}
-                                        className={`lg:px-4 px-2 py-3 lg:text-sm text-xs font-medium transition-colors rounded-[43px] w-full shadow-none ${activeTab === 'issue'
-                                            ? 'bg-white text-brand-600 dark:text-brand-400'
-                                            : 'text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400'
-                                            }`}
-                                    >
-                                        Issue Records
-                                    </button>
+                                <button
+                                    onClick={() => setActiveTab('services')}
+                                    className={`lg:px-4 px-2 py-3 lg:text-sm text-xs font-medium transition-colors rounded-[43px] w-full shadow-none ${activeTab === 'services'
+                                        ? 'bg-white text-brand-600 dark:text-brand-400'
+                                        : 'text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400'
+                                        }`}
+                                >
+                                    Service History
+                                </button>
+                                <button
+                                    onClick={() => setActiveTab('issue')}
+                                    className={`lg:px-4 px-2 py-3 lg:text-sm text-xs font-medium transition-colors rounded-[43px] w-full shadow-none ${activeTab === 'issue'
+                                        ? 'bg-white text-brand-600 dark:text-brand-400'
+                                        : 'text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400'
+                                        }`}
+                                >
+                                    Issue Records
+                                </button>
 
-                                    <button
-                                        onClick={() => setActiveTab('reminders')}
-                                        className={`lg:px-4 px-2 py-3 lg:text-sm text-xs font-medium transition-colors rounded-[43px] w-full shadow-none whitespace-nowrap ${activeTab === 'reminders'
-                                            ? 'bg-white text-brand-600 dark:text-brand-400'
-                                            : 'text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400'
-                                            }`}
-                                    >
-                                        Service Reminders
-                                    </button>
+                                <button
+                                    onClick={() => setActiveTab('reminders')}
+                                    className={`lg:px-4 px-2 py-3 lg:text-sm text-xs font-medium transition-colors rounded-[43px] w-full shadow-none whitespace-nowrap ${activeTab === 'reminders'
+                                        ? 'bg-white text-brand-600 dark:text-brand-400'
+                                        : 'text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400'
+                                        }`}
+                                >
+                                    Service Reminders
+                                </button>
 
-                                    <button
-                                        onClick={() => setActiveTab('documents')}
-                                        className={`lg:px-4 px-2 py-3 lg:text-sm text-xs font-medium border-b-2 transition-colors rounded-[43px] w-full shadow-none ${activeTab === 'documents'
-                                            ? 'bg-white text-brand-600'
-                                            : 'text-gray-500 hover:text-gray-700'
-                                            }`}
-                                    >
-                                        Documents
-                                    </button>
-                                </nav>
+                                <button
+                                    onClick={() => setActiveTab('documents')}
+                                    className={`lg:px-4 px-2 py-3 lg:text-sm text-xs font-medium border-b-2 transition-colors rounded-[43px] w-full shadow-none ${activeTab === 'documents'
+                                        ? 'bg-white text-brand-600'
+                                        : 'text-gray-500 hover:text-gray-700'
+                                        }`}
+                                >
+                                    Documents
+                                </button>
+                            </nav>
 
-                                {activeTab === 'maintenance' && (
-                                    <div className="space-y-4">
-                                        {loadingMaintenance ? (
-                                            <div className="flex items-center justify-center py-8">
-                                                <div className="text-center">
-                                                    <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-brand-500"></div>
-                                                    <p className="mt-2 text-sm text-gray-600">Loading maintenance records...</p>
-                                                </div>
+                            {activeTab === 'maintenance' && (
+                                <div className="space-y-4">
+                                    {loadingMaintenance ? (
+                                        <div className="flex items-center justify-center py-8">
+                                            <div className="text-center">
+                                                <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-brand-500"></div>
+                                                <p className="mt-2 text-sm text-gray-600">Loading maintenance records...</p>
                                             </div>
-                                        ) : maintenanceRecords.length === 0 ? (
-                                            <div className="text-center py-8">
-                                                <p className="text-gray-500">No maintenance records found</p>
-                                            </div>
-                                        ) : (
-                                            maintenanceRecords.map((record) => (
-                                                <div key={record.id} className="flex items-center justify-between p-4 bg-[#F9FAFB] rounded-lg">
-                                                    <div className="flex-1">
-                                                        <div className="flex items-center justify-between mb-3">
-                                                            <h3 className="md:text-base text-sm font-normal text-[#1D2939] dark:text-white">{record.name}</h3>
-                                                            <Badge size="sm" variant="outline">{record.status}</Badge>
-                                                        </div>
-                                                        <div className="flex items-center gap-4 text-xs text-gray-600 dark:text-gray-400">
-                                                            <p className='text-sm text-[#595959] w-full'>Date:
-                                                                <span className="text-[#1D2939] block mt-1">{record.date}</span>
-                                                            </p>
-                                                            <p className='text-sm text-[#595959] w-full'>Mileage:
-                                                                <span className="text-[#1D2939] block mt-1">{record.mileage}</span>
-                                                            </p>
-                                                            <p className='text-sm text-[#595959] w-full'>Cost:
-                                                                <span className="text-[#1D2939] block mt-1">{record.cost}</span>
-                                                            </p>
-                                                        </div>
+                                        </div>
+                                    ) : maintenanceRecords.length === 0 ? (
+                                        <div className="text-center py-8">
+                                            <p className="text-gray-500">No maintenance records found</p>
+                                        </div>
+                                    ) : (
+                                        maintenanceRecords.map((record) => (
+                                            <div key={record.id} className="flex items-center justify-between p-4 bg-[#F9FAFB] rounded-lg">
+                                                <div className="flex-1">
+                                                    <div className="flex items-center justify-between mb-3">
+                                                        <h3 className="md:text-base text-sm font-normal text-[#1D2939] dark:text-white">{record.name}</h3>
+                                                        <Badge size="sm" variant="outline">{record.status}</Badge>
+                                                    </div>
+                                                    <div className="flex items-center gap-4 text-xs text-gray-600 dark:text-gray-400">
+                                                        <p className='text-sm text-[#595959] w-full'>Date:
+                                                            <span className="text-[#1D2939] block mt-1">{record.date}</span>
+                                                        </p>
+                                                        <p className='text-sm text-[#595959] w-full'>Mileage:
+                                                            <span className="text-[#1D2939] block mt-1">{record.mileage}</span>
+                                                        </p>
+                                                        <p className='text-sm text-[#595959] w-full'>Cost:
+                                                            <span className="text-[#1D2939] block mt-1">{record.cost}</span>
+                                                        </p>
                                                     </div>
                                                 </div>
-                                            ))
-                                        )}
-                                    </div>
-                                )}
+                                            </div>
+                                        ))
+                                    )}
+                                </div>
+                            )}
 
-                                {activeTab === 'work' && (
+                            {activeTab === 'work' && (
+                                <>
                                     <div className="space-y-4">
                                         {loadingWork ? (
                                             <div className="flex items-center justify-center py-8">
@@ -777,26 +1188,15 @@ export default function VehicleDetail() {
                                                     <div className="flex-1">
                                                         <div className="flex items-center justify-between mb-3">
 
-                                                                <h3 className="md:text-base text-sm font-normal text-[#1D2939] dark:text-white">
+                                                            {/* <h3 className="md:text-base text-sm font-normal text-[#1D2939] dark:text-white">
                                                                     WO-{record.id}
-                                                                </h3>
-                                                                <Badge size="sm" variant="outline">{record.repair_priority_class}</Badge>
+                                                                </h3> */}
+                                                            <Badge size="sm" variant="outline">{record.repair_priority_class}</Badge>
 
-                                                             {/* <div>
-                                                                <p className="text-sm text-gray-600 dark:text-gray-400">Issue Date</p>
-                                                                <span className="text-sm text-gray-500 dark:text-gray-400">
-                                                                {record.issue_date
-                                                                    ? new Date(record.issue_date).toLocaleDateString("en-US", {
-                                                                        year: "numeric",
-                                                                        month: "short",
-                                                                        day: "numeric",
-                                                                    })
-                                                                    : "No Date"}
-                                                            </span>
-                                                            </div> */}
+
 
                                                         </div>
-                                                        <div className=" grid grid-cols-5 gap-2 ">
+                                                        <div className=" grid grid-cols-6 gap-2 ">
                                                             <div>
                                                                 <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Vehicle Name</p>
                                                                 <p className="text-sm font-semibold text-gray-900 dark:text-white">
@@ -819,6 +1219,18 @@ export default function VehicleDetail() {
                                                                     {record.assigned_to
                                                                         ? `${record.assigned_to.first_name} ${record.assigned_to.last_name}`
                                                                         : "Unassigned"}
+                                                                </p>
+                                                            </div>
+                                                            <div>
+                                                                <p className="text-sm text-gray-600 dark:text-gray-400">Issue Date</p>
+                                                                <p className="text-sm font-semibold">
+                                                                    {record.issue_date
+                                                                        ? new Date(record.issue_date).toLocaleDateString("en-US", {
+                                                                            year: "numeric",
+                                                                            month: "short",
+                                                                            day: "numeric",
+                                                                        })
+                                                                        : "No Date"}
                                                                 </p>
                                                             </div>
 
@@ -847,9 +1259,17 @@ export default function VehicleDetail() {
                                             ))
                                         )}
                                     </div>
-                                )}
+                                    {workRecords.length > 0 && renderPagination(
+                                        workPagination,
+                                        workCurrentPage,
+                                        setWorkCurrentPage,
+                                        loadingWork
+                                    )}
+                                </>
+                            )}
 
-                                {activeTab === 'fuel' && (
+                            {activeTab === 'fuel' && (
+                                <>
                                     <div className="space-y-4">
                                         {loadingFuel ? (
                                             <div className="flex items-center justify-center py-8">
@@ -918,9 +1338,17 @@ export default function VehicleDetail() {
                                             ))
                                         )}
                                     </div>
-                                )}
+                                    {fuelRecords.length > 0 && renderPagination(
+                                        fuelPagination,
+                                        fuelCurrentPage,
+                                        setFuelCurrentPage,
+                                        loadingFuel
+                                    )}
+                                </>
+                            )}
 
-                                {activeTab === 'issue' && (
+                            {activeTab === 'issue' && (
+                                <>
                                     <div className="space-y-4">
                                         {loadingIssues ? (
                                             <div className="flex items-center justify-center py-8">
@@ -942,13 +1370,11 @@ export default function VehicleDetail() {
                                                 >
                                                     <div className="flex-1">
                                                         <div className="flex items-center justify-between mb-3">
-                                                            <h3 className="md:text-base text-sm font-normal text-[#1D2939]">
+                                                            {/* <h3 className="md:text-base text-sm font-normal text-[#1D2939]">
                                                                 Issue-{record.id}
-                                                            </h3>
+                                                            </h3> */}
 
-                                                            <Badge size="sm" variant="outline">
-                                                                {record.priority || "N/A"}
-                                                            </Badge>
+                                                            <Badge size="sm" variant="solid"> {record.priority || "N/A"} </Badge>
                                                         </div>
                                                         <div className=" grid grid-cols-5 gap-2">
                                                             <div>
@@ -964,10 +1390,12 @@ export default function VehicleDetail() {
                                                                 </p>
                                                             </div>
                                                             <div>
-                                                                <p className="text-xs text-gray-500 mb-1">Status</p>
-                                                                <p className="text-sm font-semibold text-gray-900 capitalize">
-                                                                    {record.status || "N/A"}
-                                                                </p>
+                                                                <p className="text-sm text-gray-600 dark:text-gray-400">Status</p>
+                                                                <span className="light-block">
+                                                                    <Badge color={getStatusBadgeColor(record.status || "N/A")} size="sm">
+                                                                        {getStatusLabel(record.status || "N/A")}
+                                                                    </Badge>
+                                                                </span>
                                                             </div>
 
                                                             <div>
@@ -997,9 +1425,17 @@ export default function VehicleDetail() {
                                             ))
                                         )}
                                     </div>
-                                )}
+                                    {issueRecords.length > 0 && renderPagination(
+                                        issuesPagination,
+                                        issuesCurrentPage,
+                                        setIssuesCurrentPage,
+                                        loadingIssues
+                                    )}
+                                </>
+                            )}
 
-                                {activeTab === 'reminders' && (
+                            {activeTab === 'reminders' && (
+                                <>
                                     <div className="space-y-4">
                                         {loadingReminders ? (
                                             <div className="flex items-center justify-center py-8">
@@ -1020,37 +1456,29 @@ export default function VehicleDetail() {
                                                     className="flex items-center justify-between p-4 bg-[#F9FAFB] rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
                                                 >
                                                     <div className="flex-1">
-                                                        {/* HEADER */}
                                                         <div className="flex items-center justify-between mb-3">
-                                                            <h3 className="md:text-base text-sm font-normal text-[#1D2939]">
+                                                            {/* <h3 className="md:text-base text-sm font-normal text-[#1D2939]">
                                                                 REM-{record.id}
-                                                            </h3>
+                                                            </h3> */}
 
                                                             <Badge size="sm" variant="outline">
                                                                 {record.status || "N/A"}
                                                             </Badge>
                                                         </div>
 
-                                                        {/* GRID CONTENT */}
-                                                        <div className="grid grid-cols-6 gap-2">
-
-                                                            {/* Vehicle Name */}
-                                                            <div>
+                                                        <div className="grid grid-cols-5 gap-2">
+                                                            {/* <div>
                                                                 <p className="text-xs text-gray-500 mb-1">Vehicle</p>
                                                                 <p className="text-sm font-semibold text-gray-900">
                                                                     {record.vehicle?.vehicle_name || "N/A"}
                                                                 </p>
-                                                            </div>
-
-                                                            {/* Service Task */}
+                                                            </div> */}
                                                             <div>
                                                                 <p className="text-xs text-gray-500 mb-1">Service Task</p>
                                                                 <p className="text-sm font-semibold text-gray-900">
                                                                     {record.service_task?.name || "N/A"}
                                                                 </p>
                                                             </div>
-
-                                                            {/* Time Interval */}
                                                             <div>
                                                                 <p className="text-xs text-gray-500 mb-1">Time Interval</p>
                                                                 <p className="text-sm font-semibold text-gray-900">
@@ -1059,8 +1487,6 @@ export default function VehicleDetail() {
                                                                         : "N/A"}
                                                                 </p>
                                                             </div>
-
-                                                            {/* Meter Interval */}
                                                             <div>
                                                                 <p className="text-xs text-gray-500 mb-1">Meter Interval</p>
                                                                 <p className="text-sm font-semibold text-gray-900">
@@ -1069,8 +1495,6 @@ export default function VehicleDetail() {
                                                                         : "N/A"}
                                                                 </p>
                                                             </div>
-
-                                                            {/* Next Due Date */}
                                                             <div>
                                                                 <p className="text-xs text-gray-500 mb-1">Next Due Date</p>
                                                                 <p className="text-sm font-semibold text-gray-900">
@@ -1083,8 +1507,6 @@ export default function VehicleDetail() {
                                                                         : "N/A"}
                                                                 </p>
                                                             </div>
-
-                                                            {/* Next Due Meter */}
                                                             <div>
                                                                 <p className="text-xs text-gray-500 mb-1">Next Due Meter</p>
                                                                 <p className="text-sm font-semibold text-gray-900">
@@ -1098,9 +1520,17 @@ export default function VehicleDetail() {
                                             ))
                                         )}
                                     </div>
-                                )}
+                                    {serviceReminders.length > 0 && renderPagination(
+                                        remindersPagination,
+                                        remindersCurrentPage,
+                                        setRemindersCurrentPage,
+                                        loadingReminders
+                                    )}
+                                </>
+                            )}
 
-                                {activeTab === 'services' && (
+                            {activeTab === 'services' && (
+                                <>
                                     <div className="space-y-4">
                                         {loadingServices ? (
                                             <div className="flex items-center justify-center py-8">
@@ -1122,7 +1552,7 @@ export default function VehicleDetail() {
                                                 >
                                                     <div className="flex-1">
                                                         <div className="flex items-center justify-between mb-3">
-                                                            <h3 className="md:text-base text-sm font-normal text-[#1D2939] dark:text-white">SVC-{record.id}</h3>
+                                                            {/* <h3 className="md:text-base text-sm font-normal text-[#1D2939] dark:text-white">SVC-{record.id}</h3> */}
                                                             <Badge size="sm" variant="outline">{record.repair_priority_class}</Badge>
                                                         </div>
                                                         <div className="grid grid-cols-4 gap-4">
@@ -1167,9 +1597,17 @@ export default function VehicleDetail() {
                                             ))
                                         )}
                                     </div>
-                                )}
+                                    {serviceRecords.length > 0 && renderPagination(
+                                        servicesPagination,
+                                        servicesCurrentPage,
+                                        setServicesCurrentPage,
+                                        loadingServices
+                                    )}
+                                </>
+                            )}
 
-                                {activeTab === 'documents' && (
+                            {activeTab === 'documents' && (
+                                <>
                                     <div className="space-y-4">
                                         {loadingDocuments ? (
                                             <div className="flex items-center justify-center py-8">
@@ -1200,47 +1638,19 @@ export default function VehicleDetail() {
                                             ))
                                         )}
                                     </div>
-                                )}
-                            </div>
+                                    {documents.length > 0 && renderPagination(
+                                        documentsPagination,
+                                        documentsCurrentPage,
+                                        setdocumentsCurrentPage,
+                                        loadingDocuments
+                                    )}
+                                </>
+                            )}
                         </div>
 
-                    <div className='current-assignment mt-6'>
-                        <div className="bg-white rounded-lg px-6 py-4 border border-gray-200 shadow-sm">
-                            <h3 className="text-[18px] font-medium text-[#1D2939] mb-4">Current Assignment</h3>
-                            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-6">
-                                <div className="flex-1">
-                                    <span className="block text-sm text-[#595959] mb-1">Vendor</span>
-                                    <span className="block text-base text-[#1D2939]">
-                                        {vehicle.vendor?.id ? (
-                                            <Link to={`/vendors/${vehicle.vendor.id}`} className="text-blue-500 hover:text-blue-700">
-                                                {capitalizeFirst(vehicle.vendor?.name)}
-                                            </Link>
-                                        ) : 'N/A'}
-                                    </span>
-                                </div>
-                                <div className="flex-1">
-                                    <span className="block text-sm text-[#595959] mb-1">Assigned Driver</span>
-                                    <span className="block text-base text-[#1D2939]">
-                                        {vehicle.contact?.id ? (
-                                            <Link to={`/contacts/${vehicle.contact.id}`} className="text-blue-500 hover:text-blue-700">
-                                                {capitalizeFirst(vehicle.contact?.first_name) + ' ' + capitalizeFirst(vehicle.contact?.last_name)}
-                                            </Link>
-                                        ) : 'N/A'}
-                                    </span>
-                                </div>
-                                <div className="flex-1">
-                                    <span className="block text-sm text-[#595959] mb-1">Primary Location</span>
-                                    <span className="block text-base text-[#1D2939]">{capitalizeFirst(vehicle.primary_location) || 'N/A'}</span>
-                                </div>
-                                <div className="flex-1">
-                                    <span className="block text-sm text-[#595959] mb-1">Department</span>
-                                    <span className="block text-base text-[#1D2939]">
-                                        {capitalizeFirst(vehicle.department) || 'N/A'}
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
                     </div>
+
+
                 </div>
             </div>
         </>
