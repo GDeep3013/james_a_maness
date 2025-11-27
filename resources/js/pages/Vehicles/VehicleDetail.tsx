@@ -369,7 +369,7 @@ export default function VehicleDetail() {
 
         fetchWorkRecords();
     }, [id, activeTab, workCurrentPage]);
-
+    console.log(serviceReminders);
     // Similar updates for other fetch functions
     useEffect(() => {
         const fetchFuelRecords = async () => {
@@ -492,10 +492,7 @@ export default function VehicleDetail() {
                 const data = response.data;
 
                 if (data.status && data.service_reminders) {
-                    const filtered = data.service_reminders.data.filter(
-                        (reminder: ServiceReminder) => reminder.vehicle_id === Number(id)
-                    );
-                    setServiceReminders(filtered);
+                    setServiceReminders(data.service_reminders.data);
                     setRemindersPagination({
                         current_page: data.service_reminders.current_page,
                         last_page: data.service_reminders.last_page,

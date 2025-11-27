@@ -154,6 +154,6 @@ export const serviceReminderService = {
   checkServiceTaskLogged: (vehicleId: number, serviceTaskId: number) =>
         api.get(`/service-reminders/check-logged?vehicle_id=${vehicleId}&service_task_id=${serviceTaskId}`),
 
-  getAllReminder: () => { return api.get(`/get-reminder-service`)}
+//   getAllReminder: () => { return api.get(`/get-reminder-service`)}
 };
 

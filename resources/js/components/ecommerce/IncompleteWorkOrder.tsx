@@ -161,11 +161,11 @@ export default function IncompleteWorkOrder() {
                                     </span>
                                 </div>
 
-                                {order.repair_priority_class && (
+                                {/* {order.repair_priority_class && (
                                     <p className="text-sm text-gray-700 mb-1">
                                         Priority: {order.repair_priority_class}
                                     </p>
-                                )}
+                                )} */}
 
                                 <p className="text-xs text-gray-500">
                                     Assigned to:{" "}

@@ -118,6 +118,7 @@ export const workOrderService = {
 
     getForEdit: (id: number) =>
         api.get(`/work-orders/${id}/edit`),
-    getAllDashboard: () => { return api.get(`/get-dashboard-workorder`)}
+    getAllDashboard: () => { return api.get(`/get-dashboard-workorder`) },
+    getAllReminder: () => { return api.get(`/get-reminder-service`)}
 };
 

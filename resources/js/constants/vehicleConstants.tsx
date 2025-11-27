@@ -58,7 +58,7 @@ export const transmissionOptions: SelectOption[] = [
 
 export const statusOptions: SelectOption[] = [
   { value: 'available', label: 'Available' },
-  { value: 'active', label: 'Active' },
+//   { value: 'active', label: 'Active' },
   { value: 'maintenance', label: 'In Maintenance' },
   { value: 'inactive', label: 'Inactive' },
 ];
