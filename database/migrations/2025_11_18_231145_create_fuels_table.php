@@ -28,6 +28,7 @@ return new class extends Migration
         $table->enum('fuel_type', ['gasoline', 'diesel','hybrid','electric'])->nullable();
         $table->enum('unit_type', ['us_gallons', 'liters', 'uk_gallons'])->nullable();
         $table->decimal('units', 10, 2);
+        $table->decimal('total_cost');
         $table->decimal('price_per_volume_unit', 10, 2);
         $table->string('vehicle_meter');
         $table->text('notes')->nullable();

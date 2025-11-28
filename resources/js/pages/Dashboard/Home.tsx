@@ -3,7 +3,7 @@
 // import MonthlySalesChart from "../../components/ecommerce/MonthlySalesChart";
 // import StatisticsChart from "../../components/ecommerce/StatisticsChart";
 // import MonthlyTarget from "../../components/ecommerce/MonthlyTarget";
-import RecentOrders from "../../components/ecommerce/RecentOrders";
+// import RecentOrders from "../../components/ecommerce/RecentOrders";
 import PageMeta from "../../components/common/PageMeta";
 import TotalCostMap from "../../components/ecommerce/TotalCostMap";
 import FleetPerformanceChart from "../../components/ecommerce/FleetPerformanceChart";
@@ -54,9 +54,9 @@ export default function Home() {
           <IncompleteWorkOrder />
         </div>
 
-        <div className="col-span-12">
+        {/* <div className="col-span-12">
           <RecentOrders />
-        </div>
+        </div> */}
       </div>
     </>
   );

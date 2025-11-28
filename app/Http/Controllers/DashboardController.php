@@ -28,6 +28,11 @@ class DashboardController extends Controller
     }
 
 
+    function getTotalCosts(){
+
+
+
+    }
 
 
     public function getDashboardWorkOrder(Request $request)

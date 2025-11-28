@@ -60,6 +60,7 @@ class FuelController extends Controller
             $fuel->unit_type = $validatedData['unit_type'];
             $fuel->units = $validatedData['units'];
             $fuel->price_per_volume_unit = $validatedData['price_per_volume_unit'];
+            $fuel->total_cost =  ($validatedData['units']* $validatedData['price_per_volume_unit']);
             $fuel->vehicle_meter = $validatedData['vehicle_meter'];
             $fuel->notes = $validatedData['notes'] ?? null;
             $fuel->date = $validatedData['date'];
@@ -134,6 +135,7 @@ class FuelController extends Controller
             $fuel->unit_type = $validatedData['unit_type'];
             $fuel->units = $validatedData['units'];
             $fuel->price_per_volume_unit = $validatedData['price_per_volume_unit'];
+            $fuel->total_cost =  ($validatedData['units'] * $validatedData['price_per_volume_unit']);
             $fuel->vehicle_meter = $validatedData['vehicle_meter'];
             $fuel->notes = $validatedData['notes'] ?? null;
             $fuel->date = $validatedData['date'];

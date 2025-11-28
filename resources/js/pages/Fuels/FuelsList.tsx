@@ -134,7 +134,7 @@ export default function FuelsList() {
     };
 
     const handleExport = () => {
-        //  Implement export functionality
+        //  Implement export    
     };
 
     const formatUnitType = (unitType: string) => {
