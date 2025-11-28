@@ -247,8 +247,8 @@ export default function CreateWorkOrder() {
     const totalValue = afterDiscount + taxAmount;
 
     return {
-      baseValue: parseFloat(baseValue.toFixed(2)),
-      totalValue: parseFloat(totalValue.toFixed(2)),
+      baseValue: parseFloat((Number(baseValue) || 0).toFixed(2)),
+      totalValue: parseFloat((Number(totalValue) || 0).toFixed(2)),
     };
   }, [formData.service_items, formData.parts, formData.discount_type, formData.discount_value, formData.tax_type, formData.tax_value]);
 
