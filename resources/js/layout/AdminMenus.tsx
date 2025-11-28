@@ -44,8 +44,7 @@ export const AdminMenus : NavItem[] = [
         { name: "Service Reminders", path: "/service-reminders", pro: false, allowedRoles: ["Admin", "Manager"] },
         { name: "Services", path: "/services", pro: false, allowedRoles: ["Admin", "Manager"] },
         { name: "Service Tasks", path: "/service-tasks", pro: false, allowedRoles: ["Admin", "Manager"] },
-        { name: "Issues", path: "/issues", pro: false, allowedRoles: ["Admin", "Manager"] },
-        { name: "Schedules", path: "/maintenance-schedules", pro: false, allowedRoles: ["Admin", "Manager"] },
+        { name: "Issues", path: "/issues", pro: false, allowedRoles: ["Admin", "Manager"] }
       ],
     },
     {
