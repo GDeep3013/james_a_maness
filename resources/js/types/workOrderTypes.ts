@@ -46,6 +46,8 @@ export interface WorkOrderFormData {
   notes?: string;
   discount_type?: "percentage" | "fixed";
   discount_value?: number;
+  base_value?: number;
+  total_value?: number;
   tax_type?: "percentage" | "fixed";
   tax_value?: number;
 }

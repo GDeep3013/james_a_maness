@@ -27,6 +27,12 @@ class WorkOrder extends Model
         'vendor_id',
         'invoice_number',
         'po_number',
+        'discount_type',
+        'discount_value',
+        'base_value',
+        'total_value',
+        'tax_type',
+        'tax_value',
         'service_items',
         'parts',
     ];

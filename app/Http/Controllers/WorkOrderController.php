@@ -95,6 +95,12 @@ class WorkOrderController extends Controller
                 //'vendor_id' => 'nullable|exists:vendors,id',
                 'invoice_number' => 'nullable|string|max:255',
                 'po_number' => 'nullable|string|max:255',
+                'discount_type' => 'nullable|string|max:255',
+                'discount_value' => 'nullable|numeric',
+                'base_value' => 'nullable|numeric',
+                'total_value' => 'nullable|numeric',
+                'tax_type' => 'nullable|string|max:255',
+                'tax_value' => 'nullable|numeric',
                 'service_items' => 'nullable|array',
                 'parts' => 'nullable|array',
             ]);
@@ -127,6 +133,12 @@ class WorkOrderController extends Controller
             $workOrder->vendor_id = $request->vendor_id ?? null;
             $workOrder->invoice_number = $request->invoice_number ?? null;
             $workOrder->po_number = $request->po_number ?? null;
+            $workOrder->discount_type = $request->discount_type ?? null;
+            $workOrder->discount_value = $request->discount_value ?? null;
+            $workOrder->base_value = $request->base_value ?? null;
+            $workOrder->total_value = $request->total_value ?? null;
+            $workOrder->tax_type = $request->tax_type ?? null;
+            $workOrder->tax_value = $request->tax_value ?? null;
             
             $serviceItems = $request->service_items;
             if (is_string($serviceItems)) {
@@ -271,6 +283,12 @@ class WorkOrderController extends Controller
                 'vendor_id' => 'nullable|exists:vendors,id',
                 'invoice_number' => 'nullable|string|max:255',
                 'po_number' => 'nullable|string|max:255',
+                'discount_type' => 'nullable|string|max:255',
+                'discount_value' => 'nullable|numeric',
+                'base_value' => 'nullable|numeric',
+                'total_value' => 'nullable|numeric',
+                'tax_type' => 'nullable|string|max:255',
+                'tax_value' => 'nullable|numeric',
                 'service_items' => 'nullable|array',
                 'parts' => 'nullable|array',
             ]);
@@ -330,6 +348,24 @@ class WorkOrderController extends Controller
             }
             if ($request->has('po_number')) {
                 $workOrder->po_number = $request->po_number;
+            }
+            if ($request->has('discount_type')) {
+                $workOrder->discount_type = $request->discount_type;
+            }
+            if ($request->has('discount_value')) {
+                $workOrder->discount_value = $request->discount_value;
+            }
+            if ($request->has('base_value')) {
+                $workOrder->base_value = $request->base_value;
+            }
+            if ($request->has('total_value')) {
+                $workOrder->total_value = $request->total_value;
+            }
+            if ($request->has('tax_type')) {
+                $workOrder->tax_type = $request->tax_type;
+            }
+            if ($request->has('tax_value')) {
+                $workOrder->tax_value = $request->tax_value;
             }
             if ($request->has('service_items')) {
                 $serviceItems = $request->service_items;

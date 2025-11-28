@@ -48,6 +48,14 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/get-reminder-service', [DashboardController::class, 'getDashboardReminders']);
 
+    Route::get('/get-total-costs', [DashboardController::class, 'getTotalCosts']);
+
+    Route::get('/get-fleet-performance', [DashboardController::class, 'getFleetPerformance']);
+
+    Route::get('/get-maintenance-costs', [DashboardController::class, 'getMaintenanceCosts']);
+
+    Route::get('/get-dashboard-statistics', [DashboardController::class, 'getDashboardStatistics']);
+
     Route::apiResource('con', ContactController::class);
     Route::get('/con/{id}/edit', [ContactController::class, 'edit'])->where('id', '[0-9]+');
 

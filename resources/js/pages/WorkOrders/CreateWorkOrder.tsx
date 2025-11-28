@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate, useParams } from "react-router";
 import PageBreadcrumb from "../../components/common/PageBreadCrumb";
 import PageMeta from "../../components/common/PageMeta";
@@ -65,6 +65,8 @@ export default function CreateWorkOrder() {
     notes: "",
     discount_type: "percentage",
     discount_value: 0,
+    base_value: 0,
+    total_value: 0,
     tax_type: "percentage",
     tax_value: 0,
   });
@@ -134,6 +136,8 @@ export default function CreateWorkOrder() {
           notes: String(workOrder.notes || ""),
           discount_type: (workOrder.discount_type as "percentage" | "fixed") || "percentage",
           discount_value: Number(workOrder.discount_value || 0),
+          base_value: Number(workOrder.base_value || 0),
+          total_value: Number(workOrder.total_value || 0),
           tax_type: (workOrder.tax_type as "percentage" | "fixed") || "percentage",
           tax_value: Number(workOrder.tax_value || 0),
         });
@@ -189,6 +193,78 @@ export default function CreateWorkOrder() {
     }
   };
 
+  const calculateValues = useMemo(() => {
+    const getLaborPrice = (item: ServiceItem | Part): number => {
+      if ('name' in item) {
+        return (item as ServiceItem).labor_cost || 0;
+      }
+      return 0;
+    };
+
+    const getPartsPrice = (item: ServiceItem | Part): number => {
+      if ('name' in item) {
+        return (item as ServiceItem & { unit_price?: number }).unit_price || 0;
+      }
+      const part = item as Part;
+      const unitPrice = part.unit_price || 0;
+      const quantity = part.quantity || 1;
+      return unitPrice * quantity;
+    };
+
+    let laborTotal = 0;
+    let partsTotal = 0;
+
+    formData.service_items.forEach((item) => {
+      laborTotal += getLaborPrice(item);
+    });
+
+    formData.parts.forEach((item) => {
+      partsTotal += getPartsPrice(item);
+    });
+
+    const baseValue = laborTotal + partsTotal;
+
+    let discountAmount = 0;
+    if (formData.discount_value && formData.discount_value > 0) {
+      if (formData.discount_type === "percentage") {
+        discountAmount = (baseValue * formData.discount_value) / 100;
+      } else {
+        discountAmount = formData.discount_value;
+      }
+    }
+
+    const afterDiscount = baseValue - discountAmount;
+
+    let taxAmount = 0;
+    if (formData.tax_value && formData.tax_value > 0) {
+      if (formData.tax_type === "percentage") {
+        taxAmount = (afterDiscount * formData.tax_value) / 100;
+      } else {
+        taxAmount = formData.tax_value;
+      }
+    }
+
+    const totalValue = afterDiscount + taxAmount;
+
+    return {
+      baseValue: parseFloat(baseValue.toFixed(2)),
+      totalValue: parseFloat(totalValue.toFixed(2)),
+    };
+  }, [formData.service_items, formData.parts, formData.discount_type, formData.discount_value, formData.tax_type, formData.tax_value]);
+
+  useEffect(() => {
+    setFormData((prev) => {
+      if (prev.base_value === calculateValues.baseValue && prev.total_value === calculateValues.totalValue) {
+        return prev;
+      }
+      return {
+        ...prev,
+        base_value: calculateValues.baseValue,
+        total_value: calculateValues.totalValue,
+      };
+    });
+  }, [calculateValues.baseValue, calculateValues.totalValue]);
+
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
 
@@ -240,9 +316,11 @@ export default function CreateWorkOrder() {
         parts: formData.parts,
         notes: formData.notes || undefined,
         discount_type: formData.discount_type || undefined,
-        discount_value: formData.discount_value || undefined,
+        discount_value: formData.discount_value !== undefined ? formData.discount_value : undefined,
+        base_value: formData.base_value !== undefined ? formData.base_value : undefined,
+        total_value: formData.total_value !== undefined ? formData.total_value : undefined,
         tax_type: formData.tax_type || undefined,
-        tax_value: formData.tax_value || undefined,
+        tax_value: formData.tax_value !== undefined ? formData.tax_value : undefined,
       };
 
       // console.log(typeof workOrderData.service_items);
