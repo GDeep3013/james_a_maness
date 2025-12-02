@@ -38,14 +38,14 @@ const Select: React.FC<SelectProps> = ({
   };
 
   const variantClass = {
-    default: "w-full border border-gray-300 focus:border-brand-300 focus:ring-0 px-4 py-2.5",
-    outline: "w-auto border-b border-gray-300 focus:border-brand-300 focus:outline-hidden focus:ring-0 rounded-none",
+    default: "h-11 w-full border border-gray-300 focus:border-brand-300 focus:ring-0 px-4 py-2.5",
+    outline: "h-6 w-auto border-b border-gray-300 focus:border-brand-300 focus:outline-hidden focus:ring-0 rounded-none",
     none: "border-none focus:border-brand-300 focus:outline-hidden focus:ring-0",
   };
 
   return (
     <select
-      className={`h-11  rounded-lg ${variantClass[variant]} text-sm placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-0 ${
+      className={` rounded-lg ${variantClass[variant]} text-sm placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-0 ${
         selectedValue
           ? "text-gray-800"
           : "text-gray-400"

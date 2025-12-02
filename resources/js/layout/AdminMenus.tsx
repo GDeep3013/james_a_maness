@@ -76,11 +76,6 @@ export const AdminMenus : NavItem[] = [
         name: "Reports",
         path: "/reports",
         allowedRoles: ["Admin", "Manager"],
-      },
-      {
-        icon:'',
-        name: "Others",
-        path: "/others",
-        allowedRoles: ["Admin", "Manager"],
-      },
+      }
+
 ]

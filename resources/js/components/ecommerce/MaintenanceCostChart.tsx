@@ -78,11 +78,11 @@ export default function MaintenanceCostChart() {
             if (selectedVehicleId) {
                 params.vehicle_id = selectedVehicleId;
             }
-            
+
             const response = await api.get<MaintenanceCostsResponse>('/get-maintenance-costs', {
                 params
             });
-            
+
             if (response.data.status && response.data.data) {
                 setCosts(response.data.data);
             }
@@ -165,18 +165,19 @@ export default function MaintenanceCostChart() {
     return (
         <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03]">
             <div className="flex justify-between gap-3 mb-3">
-                <h3 className="text-sm font-semibold text-gray-800">
+                <h3 className="text-base font-semibold text-gray-800">
                     Maintenance Cost
                 </h3>
-                
+
                 <div className="flex flex-row sm:flex-row gap-2">
-                    
+
                         <Select
                             variant="outline"
                             options={vehicleOptions}
                             placeholder="Select Vehicle"
                             onChange={(value) => setSelectedVehicleId(value)}
-                            defaultValue={selectedVehicleId}
+                        defaultValue={selectedVehicleId}
+                        className="min-w-[115px]"
                         />
                         <Select
                             variant="outline"
@@ -207,7 +208,7 @@ export default function MaintenanceCostChart() {
                         <div className="flex justify-between text-sm text-gray-700 dark:text-gray-300">
                             <span>Labor Cost</span>
                             <span className="font-medium">
-                                {formatCurrency(costs.labor_cost)} 
+                                {formatCurrency(costs.labor_cost)}
                                 <span className="text-gray-500 ml-1">({percentages.labor}%)</span>
                             </span>
                         </div>
@@ -215,7 +216,7 @@ export default function MaintenanceCostChart() {
                         <div className="flex justify-between text-sm text-gray-700 dark:text-gray-300">
                             <span>Parts Cost</span>
                             <span className="font-medium">
-                                {formatCurrency(costs.parts_cost)} 
+                                {formatCurrency(costs.parts_cost)}
                                 <span className="text-gray-500 ml-1">({percentages.parts}%)</span>
                             </span>
                         </div>
@@ -223,7 +224,7 @@ export default function MaintenanceCostChart() {
                         <div className="flex justify-between text-sm text-gray-700 dark:text-gray-300">
                             <span>Fuel Cost</span>
                             <span className="font-medium">
-                                {formatCurrency(costs.fuel_cost)} 
+                                {formatCurrency(costs.fuel_cost)}
                                 <span className="text-gray-500 ml-1">({percentages.fuel}%)</span>
                             </span>
                         </div>

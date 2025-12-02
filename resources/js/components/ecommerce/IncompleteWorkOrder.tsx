@@ -102,7 +102,7 @@ export default function IncompleteWorkOrder() {
     return (
         <div className="rounded-2xl border border-gray-200 bg-white px-5 pb-5 pt-5 dark:border-gray-800 dark:bg-white/[0.03] sm:px-6 sm:pt-6 min-h-[140px] h-full">
             <div className="flex justify-between items-center mb-6 border-b pb-4">
-                <h2 className="text-[15px] md:text-xl font-semibold text-gray-800">Incomplete Work Orders</h2>
+                <h2 className="text-base font-semibold text-gray-800">Incomplete Work Orders</h2>
                 <button
                     onClick={handleNewWorkOrder}
                     className="flex items-center space-x-2 px-1 md:px-4 py-2 text-sm md:text-base bg-[#5321B1] text-white rounded-lg hover:bg-blue-700 transition duration-150 shadow-md"

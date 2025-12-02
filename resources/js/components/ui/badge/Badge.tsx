@@ -14,10 +14,10 @@ type BadgeColor =
 interface BadgeProps {
   variant?: BadgeVariant;
   size?: BadgeSize;
-  color?: BadgeColor; 
-  startIcon?: React.ReactNode; 
+  color?: BadgeColor;
+  startIcon?: React.ReactNode;
   endIcon?: React.ReactNode;
-  children: React.ReactNode; 
+  children: React.ReactNode;
 }
 
 const Badge: React.FC<BadgeProps> = ({
@@ -29,7 +29,7 @@ const Badge: React.FC<BadgeProps> = ({
   children,
 }) => {
   const baseStyles =
-    "inline-flex items-center px-2.5 py-0.5 justify-center gap-1 font-medium";
+    "inline-flex min-w-[106px] min-h-[28px] items-center px-2.5 text-sm justify-center gap-1 border-[0.79px] border-[#E2E8F0]";
 
   const sizeStyles = {
     sm: "text-theme-xs",
@@ -39,16 +39,16 @@ const Badge: React.FC<BadgeProps> = ({
   const variants = {
     light: {
       primary:
-        "bg-brand-50 text-brand-500 dark:bg-brand-500/15 dark:text-brand-400 rounded-full",
+        "bg-brand-50 text-brand-500 rounded-full",
       success:
-        "bg-success-50 text-success-600 dark:bg-success-500/15 dark:text-success-500 rounded-full",
+        "bg-success-50 text-success-600 rounded-full",
       error:
-        "bg-error-50 text-error-600 dark:bg-error-500/15 dark:text-error-500 rounded-full",
+        "bg-error-50 text-error-600 rounded-full",
       warning:
-        "bg-warning-50 text-warning-600 dark:bg-warning-500/15 dark:text-orange-400 rounded-full",
-      info: "bg-blue-light-50 text-blue-light-500 dark:bg-blue-light-500/15 dark:text-blue-light-500 rounded-full",
-      light: "bg-gray-100 text-gray-700 dark:bg-white/5 dark:text-white/80 rounded-full",
-      dark: "bg-gray-500 text-white dark:bg-white/5 dark:text-white rounded-full",
+        "bg-[#FEF9C3] text-warning-600 rounded-full",
+      info: "bg-blue-light-50 text-blue-light-500 rounded-full",
+      light: "bg-gray-100 text-gray-700 rounded-full",
+      dark: "bg-gray-500 text-white rounded-full",
     },
     solid: {
       primary: "bg-brand-500 text-white dark:text-white rounded-full",

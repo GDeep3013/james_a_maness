@@ -59,16 +59,16 @@ export default function FleetPerformanceChart() {
 
     const fetchFleetPerformance = useCallback(async () => {
         if (!selectedVehicleId) return;
-        
+
         setLoading(true);
         try {
             const response = await api.get<FleetPerformanceResponse>('/get-fleet-performance', {
-                params: { 
+                params: {
                     vehicle_id: selectedVehicleId,
-                    year: currentYear 
+                    year: currentYear
                 }
             });
-            
+
             if (response.data.status && response.data.data) {
                 setMonthlyData(response.data.data);
             }
@@ -105,10 +105,10 @@ export default function FleetPerformanceChart() {
 
     const options: ApexOptions = {
         legend: {
-            position: "top", 
-            horizontalAlign: "right", 
+            position: "top",
+            horizontalAlign: "right",
         },
-        colors: ["#EB5757", "#3C247D"], 
+        colors: ["#EB5757", "#3C247D"],
         chart: {
             fontFamily: "Outfit, sans-serif",
             height: 310,
@@ -209,11 +209,11 @@ export default function FleetPerformanceChart() {
     return (
         <div className="rounded-2xl border border-gray-200 bg-white px-5 pb-5 pt-5 dark:border-gray-800 dark:bg-white/[0.03] sm:px-6 sm:pt-6 min-h-[422px]">
             <div className="flex flex-col gap-5 mb-2 sm:flex-row sm:justify-between">
-                
-                    <h3 className="text-lg font-semibold text-gray-800 mb-2">
+
+                    <h3 className="text-base font-semibold text-gray-800 mb-2">
                         Fleet Management
                     </h3>
-                    
+
                     <div className="flex flex-col sm:flex-row gap-2 justify-end">
                             <div className="">
                             <Select
@@ -224,7 +224,7 @@ export default function FleetPerformanceChart() {
                                 defaultValue={selectedVehicleId}
                             />
                         </div>
-                        
+
                         <div className="">
                             <Select
                                 variant="outline"
@@ -236,7 +236,7 @@ export default function FleetPerformanceChart() {
                         </div>
                     </div>
 
-                
+
             </div>
 
             <div className="max-w-full overflow-x-auto custom-scrollbar">

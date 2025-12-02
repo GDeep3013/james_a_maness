@@ -49,7 +49,7 @@ export default function TotalCostMap() {
             const response = await api.get<TotalCostsResponse>('/get-total-costs', {
                 params: { year: currentYear }
             });
-            
+
             if (response.data.status && response.data.data) {
                 setMonthlyData(response.data.data);
                 setYearToDateTotal(response.data.year_to_date_total || 0);
@@ -72,28 +72,28 @@ export default function TotalCostMap() {
 
     const chartSeries = useMemo(() => {
         const series = [];
-        
+
         if (showWorkOrders) {
             series.push({
                 name: "Work Orders",
                 data: monthlyData.map(item => item.work_orders_total),
             });
         }
-        
+
         if (showFuels) {
             series.push({
                 name: "Fuels",
                 data: monthlyData.map(item => item.fuels_total),
             });
         }
-        
+
         if (showTotal) {
             series.push({
                 name: "Total",
                 data: monthlyData.map(item => item.total),
             });
         }
-        
+
         return series;
     }, [monthlyData, showWorkOrders, showFuels, showTotal]);
 
@@ -152,12 +152,12 @@ export default function TotalCostMap() {
         <div className="rounded-2xl border border-gray-200 bg-white px-5 pb-5 pt-5 dark:border-gray-800 dark:bg-white/[0.03] sm:px-6 sm:pt-6 min-h-[422px]">
             <div className="flex flex-col gap-5 mb-6 sm:flex-row sm:justify-between">
                 <div className="w-full">
-                    <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90 mb-4">
-                        {formatCurrency(yearToDateTotal)} <small className='text-sm text-[#595959] font-normal'>Year to date</small>
+                    <h3 className="text-base font-semibold text-gray-800 dark:text-white/90 mb-4">
+                       Total Cost  <small className='text-sm text-[#595959] font-normal'>     {formatCurrency(yearToDateTotal)}</small>
                     </h3>
                 </div>
                 <div className="flex items-start w-full gap-2 sm:justify-end">
-                    
+
                     <div className="w-full sm:w-48 text-end">
                         <Select
                             variant='outline'

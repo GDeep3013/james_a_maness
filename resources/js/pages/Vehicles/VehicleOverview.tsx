@@ -150,27 +150,32 @@ export default function VehicleOverview() {
         <span className="mt-2 text-sm text-[#00A63E] font-medium">
           Overall Vehicles
         </span>
-      </div>
+          </div>
+
+          <div className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl p-6 flex flex-col">
+        <span className="text-base font-medium text-black mb-2">Active</span>
+        <span className="text-[40px] font-medium text-[#00A63E]">
+          {statistics.available}
+        </span>
+        <span className="mt-2 text-sm text-[#595959]">Currently in use</span>
+          </div>
+
+
       <div className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl p-6 flex flex-col">
         <span className="text-base font-medium text-black mb-2">In Maintenance</span>
         <span className="text-[40px] font-medium text-[#D08700]">
           {statistics.inMaintenance}
         </span>
         <span className="mt-2 text-sm text-[#595959]">Under repair</span>
-      </div>
+          </div>
+
+
       <div className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl p-6 flex flex-col">
         <span className="text-base font-medium text-black mb-2">Available</span>
         <span className="text-[40px] font-medium text-[#155DFC]">
-          {statistics.available}
-        </span>
-        <span className="mt-2 text-sm text-[#595959]">Ready to assign</span>
-      </div>
-      <div className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl p-6 flex flex-col">
-        <span className="text-base font-medium text-black mb-2">Inactive</span>
-        <span className="text-[40px] font-medium text-[#DC2626]">
           {statistics.outOfService}
         </span>
-        <span className="mt-2 text-sm text-[#595959]">Out of service</span>
+        <span className="mt-2 text-sm text-[#595959]">Ready to assign</span>
       </div>
     </div>
   );

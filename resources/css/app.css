@@ -4,6 +4,7 @@
     --theme-color: #5321B1;
     --delete-color: #cb3a3a;
     --secondary-color: #26ade1;
+        --spacing: 0.25rem;
 }
 
 body {
@@ -34,14 +35,14 @@ body {
 .delete-button{
     color: #E7000B;
 }
-.delete-button span svg path{ 
+.delete-button span svg path{
     fill: #E7000B;
  }
  .next-button svg {
     width: 16px;
     height: 16px;
  }
- .next-button svg path{ 
+ .next-button svg path{
     stroke: #fff;
  }
 .menu-item-others-wrapper {
@@ -91,7 +92,22 @@ body {
 .custom-calendar button.fc-addEventButton-button:hover {
     background-color: #E06B04 !important;
 }
-
+select {
+    appearance: none;
+    background: url('/images/down-arrow.png') no-repeat;
+    background-position: 100% 50%;
+}
+select.all-status-select {
+    background: url('/images/down-arrow.png') no-repeat #F3F3F5;
+    background-position: 95% 50%;
+}
+.footer-shadow{
+    box-shadow: -3px -3px 13.7px 0px #0000001A;
+}
+nav span.menu-item-icon-size svg {
+    width: calc(var(--spacing) * 5) !important;
+    height: calc(var(--spacing) * 5) !important;
+}
 
 
 
@@ -101,5 +117,5 @@ body {
         width: 32px !important;
         height: 32px !important;
     }
-    
+
 }

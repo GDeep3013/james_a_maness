@@ -18,10 +18,15 @@ const LayoutContent: React.FC = () => {
           isExpanded || isHovered ? "lg:ml-[290px]" : "lg:ml-[90px]"
         } ${isMobileOpen ? "ml-0" : ""} dark:border-gray-800 dark:bg-gray-900 lg:border-b`}
       >
-        <AppHeader />
-        <div className="p-4 mx-auto max-w-full md:p-6 dark:border-gray-800 dark:bg-gray-900 lg:border-b">
-          <Outlet />
-        </div>
+            <AppHeader />
+            <div className="p-4 mx-auto max-w-full md:p-6 dark:border-gray-800 dark:bg-gray-900 lg:border-b">
+             <Outlet />
+            </div>
+              <div className="py-3 footer-shadow text-center">
+                  <p className="text-sm text-[#8A8A8A]">© 2025 KAV Expediting. All Rights Reserved</p>
+            </div>
+
+
       </div>
     </div>
   );

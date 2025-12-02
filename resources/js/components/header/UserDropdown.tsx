@@ -29,7 +29,7 @@ export default function UserDropdown() {
       >
 
         <span className="block mr-1 font-semibold text-[17.79px] text-[#222323] text-theme-sm">
-          {user?.name ? user.name.split(' ')[0] : 'User'}
+          My Dashboard
         </span>
         <svg
           className={`stroke-gray-500 dark:stroke-gray-400 transition-transform duration-200 ${
@@ -165,7 +165,7 @@ export default function UserDropdown() {
           </svg>
           Sign out
         </button>
-        
+
       </Dropdown>
     </div>
   );
