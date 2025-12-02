@@ -302,46 +302,39 @@ export default function ExpenseHistoryList() {
                             <>
                                 <Table>
                                     <TableHeader className="border-b border-gray-100 dark:border-white/5">
-                                        <TableRow>
+                                        <TableRow className="bg-[#E5E7EB]">
                                             <TableCell
                                                 isHeader
-                                                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                                             >
                                                 Date
                                             </TableCell>
                                             <TableCell
                                                 isHeader
-                                                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-                                            >
+                                          >
                                                 Vehicle
                                             </TableCell>
                                             <TableCell
                                                 isHeader
-                                                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                                             >
                                                 Expense Type
                                             </TableCell>
                                             <TableCell
                                                 isHeader
-                                                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                                             >
                                                 Amount
                                             </TableCell>
                                             <TableCell
                                                 isHeader
-                                                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                                             >
                                                 Vendor
                                             </TableCell>
                                             <TableCell
                                                 isHeader
-                                                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-                                            >
+                                           >
                                                 Frequency
                                             </TableCell>
                                             <TableCell
                                                 isHeader
-                                                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400 w-[10%]"
                                             >
                                                 Actions
                                             </TableCell>

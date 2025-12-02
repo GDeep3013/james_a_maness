@@ -348,46 +348,39 @@ export default function WorkOrdersList() {
               <>
                 <Table>
                   <TableHeader className="border-b border-gray-100">
-                    <TableRow>
+                    <TableRow className="bg-[#E5E7EB]">
                       <TableCell
                         isHeader
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs"
                       >
                         Work Order ID
                       </TableCell>
                       <TableCell
                         isHeader
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs"
                       >
                         Vehicle
                       </TableCell>
                       <TableCell
                         isHeader
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs"
-                      >
+                     >
                         Status
                       </TableCell>
                       <TableCell
                         isHeader
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs"
                       >
                         Issue Date
                       </TableCell>
                       <TableCell
                         isHeader
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs"
                       >
                         Assigned To
                       </TableCell>
                       <TableCell
                         isHeader
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs"
                       >
                         Invoice/PO
                       </TableCell>
                       <TableCell
                         isHeader
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs w-[10%]"
                       >
                         Actions
                       </TableCell>

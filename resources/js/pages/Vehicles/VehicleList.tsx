@@ -343,61 +343,51 @@ export default function VehicleList() {
                                         <TableRow className="bg-[#E5E7EB]">
                                             <TableCell
                                                 isHeader
-                                                className="px-5 py-4 text-sm font-medium text-gray-500 text-start"
-                                            >
+                                                >
                                                 Vehicle ID
                                             </TableCell>
                                             <TableCell
                                                 isHeader
-                                                className="px-5 py-4 text-sm font-medium text-gray-500 text-start  "
-                                            >
+                                             >
                                                 Vehicle Details
                                             </TableCell>
                                             <TableCell
                                                 isHeader
-                                                className="px-5 py-4 text-sm font-medium text-gray-500 text-start  "
-                                            >
+                                           >
                                                 Status
                                             </TableCell>
                                             <TableCell
                                                 isHeader
-                                                className="px-5 py-4 text-sm font-medium text-gray-500 text-start  "
-                                            >
+                                           >
                                                 VIN
                                             </TableCell>
                                             <TableCell
                                                 isHeader
-                                                className="px-5 py-4 text-sm font-medium text-gray-500 text-start  "
-                                            >
+                                           >
                                                 Make/Model/Year
                                             </TableCell>
                                             <TableCell
                                                 isHeader
-                                                className="px-5 py-4 text-sm font-medium text-gray-500 text-start  "
-                                            >
+                                           >
                                                 Vendor
                                             </TableCell>
                                             <TableCell
                                                 isHeader
-                                                className="px-5 py-4 text-sm font-medium text-gray-500 text-start  "
-                                            >
+                                           >
                                                 Driver
                                             </TableCell>
                                             <TableCell
                                                 isHeader
-                                                className="px-5 py-4 text-sm font-medium text-gray-500 text-start  "
-                                            >
+                                           >
                                                 Location
                                             </TableCell>
                                             <TableCell
                                                 isHeader
-                                                className="px-5 py-4 text-sm font-medium text-gray-500 text-start  "
-                                            >
+                                           >
                                                 Next Service
                                             </TableCell>
                                             <TableCell
                                                 isHeader
-                                                className="px-5 py-4 text-sm font-medium text-gray-500 text-start   w-[10%]"
                                             >
                                                 Actions
                                             </TableCell>

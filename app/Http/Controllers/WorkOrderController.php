@@ -33,7 +33,7 @@ class WorkOrderController extends Controller
     {
         $tableColumns = Schema::getColumnListing('work_orders');
         $query = WorkOrder::with([
-            'vehicle:id,vehicle_name',
+            'vehicle:id,vehicle_name,type,make,model,year,license_plate',
             'assignedTo:id,first_name,last_name',
             'vendor:id,name',
             'user:id,name'
