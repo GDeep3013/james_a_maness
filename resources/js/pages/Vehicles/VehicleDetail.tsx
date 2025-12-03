@@ -875,15 +875,6 @@ export default function VehicleDetail() {
                     <div className="bg-white rounded-lg border border-gray-200 w-full mt-6">
                         <div className="lg:p-6 p-3">
                             <nav className="flex bg-[#ECECF0] md:mb-8 mb-4 rounded-[32px] p-1">
-                                {/* <button
-                                        onClick={() => setActiveTab('maintenance')}
-                                        className={`lg:px-4 px-2 py-3 lg:text-sm text-xs font-medium transition-colors rounded-[43px] w-full shadow-none ${activeTab === 'maintenance'
-                                                ? 'bg-white text-brand-600 dark:text-brand-400'
-                                                : 'text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400'
-                                            }`}
-                                    >
-                                        Maintenance History
-                                    </button> */}
                                 <button
                                     onClick={() => setActiveTab('work')}
                                     className={`lg:px-4 px-2 py-3 lg:text-sm text-xs font-medium transition-colors rounded-[43px] w-full shadow-none ${activeTab === 'work'
@@ -944,44 +935,7 @@ export default function VehicleDetail() {
                                 </button>
                             </nav>
 
-                            {/* {activeTab === 'maintenance' && (
-                                <div className="space-y-4">
-                                    {loadingMaintenance ? (
-                                        <div className="flex items-center justify-center py-8">
-                                            <div className="text-center">
-                                                <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-brand-500"></div>
-                                                <p className="mt-2 text-sm text-gray-600">Loading maintenance records...</p>
-                                            </div>
-                                        </div>
-                                    ) : maintenanceRecords.length === 0 ? (
-                                        <div className="text-center py-8">
-                                            <p className="text-gray-500">No maintenance records found</p>
-                                        </div>
-                                    ) : (
-                                        maintenanceRecords.map((record) => (
-                                            <div key={record.id} className="flex items-center justify-between p-4 bg-[#F9FAFB] rounded-lg">
-                                                <div className="flex-1">
-                                                    <div className="flex items-center justify-between mb-3">
-                                                        <h3 className="md:text-base text-sm font-normal text-[#1D2939] dark:text-white">{record.name}</h3>
-                                                        <Badge size="sm" variant="outline">{record.status}</Badge>
-                                                    </div>
-                                                    <div className="flex items-center gap-4 text-xs text-gray-600 dark:text-gray-400">
-                                                        <p className='text-sm text-[#595959] w-full'>Date:
-                                                            <span className="text-[#1D2939] block mt-1">{record.date}</span>
-                                                        </p>
-                                                        <p className='text-sm text-[#595959] w-full'>Mileage:
-                                                            <span className="text-[#1D2939] block mt-1">{record.mileage}</span>
-                                                        </p>
-                                                        <p className='text-sm text-[#595959] w-full'>Cost:
-                                                            <span className="text-[#1D2939] block mt-1">{record.cost}</span>
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        ))
-                                    )}
-                                </div>
-                            )} */}
+                            
 
                             {activeTab === 'work' && (
                                 <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">

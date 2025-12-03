@@ -68,7 +68,7 @@ export default function ImportVehicles({ onImportSuccess }: { onImportSuccess?: 
             handleClose();
           }, 2000);
         }
-        
+
       } else {
         setError(response.data.message || 'Failed to import vehicles');
       }
@@ -139,6 +139,7 @@ export default function ImportVehicles({ onImportSuccess }: { onImportSuccess?: 
 
             <div className="flex flex-col sm:flex-row gap-3 sm:justify-end pt-4">
               <Button
+                size="sm"
                 variant="outline"
                 onClick={handleClose}
                 disabled={loading}
@@ -147,6 +148,7 @@ export default function ImportVehicles({ onImportSuccess }: { onImportSuccess?: 
                 Cancel
               </Button>
               <Button
+              size="sm"
                 variant="primary"
                 onClick={handleImport}
                 disabled={loading || !file}
@@ -162,7 +164,7 @@ export default function ImportVehicles({ onImportSuccess }: { onImportSuccess?: 
               <strong>Required columns:</strong> vehicle_name, license_plate, type
             </p>
             <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
-              <strong>Optional columns:</strong> make, model, year, vin, color, fuel_type, transmission, purchase_date, engine_size, current_mileage, purchase_price, initial_status, vendor_name, driver_email, primary_location, notes, department
+              <strong>Optional columns:</strong> make, model, year, vin, color, fuel_type, transmission, purchase_date, engine_size, current_mileage, purchase_price, initial_status, vendor_name, primary_location, notes, department
             </p>
             <p className="text-xs text-gray-500 dark:text-gray-400">
               <strong>Note:</strong> Duplicate records (based on license_plate or vin) will be automatically skipped.
