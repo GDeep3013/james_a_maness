@@ -34,7 +34,7 @@ interface Vehicle {
 }
 
 const CreateAssignment: React.FC = () => {
-    
+
   const getTodayDate = () => {
     const today = new Date();
     const year = today.getFullYear();
@@ -112,7 +112,7 @@ const CreateAssignment: React.FC = () => {
         const assignments = Array.isArray(response.data.vehicle_assignments)
           ? response.data.vehicle_assignments
           : response.data.vehicle_assignments.data || [];
-        
+
         const calendarEvents: AssignmentEvent[] = assignments.map((assignment: {
           id: number;
           event_title: string;
@@ -154,7 +154,7 @@ const CreateAssignment: React.FC = () => {
 
           const startDateOnly = extractDateOnly(assignment.start_date);
           let startDateTime = startDateOnly;
-          
+
           if (assignment.start_time && !assignment.full_day) {
             const timeOnly = extractTimeOnly(assignment.start_time);
             if (timeOnly) {
@@ -164,7 +164,7 @@ const CreateAssignment: React.FC = () => {
 
           const endDateOnly = extractDateOnly(assignment.end_date || assignment.start_date);
           let endDateTime = endDateOnly;
-          
+
           if (assignment.end_time && !assignment.full_day) {
             const timeOnly = extractTimeOnly(assignment.end_time);
             if (timeOnly) {
@@ -226,12 +226,12 @@ const CreateAssignment: React.FC = () => {
       const day15 = new Date(startDate.getFullYear(), startDate.getMonth(), 15);
       viewDate = day15;
     }
-    
+
     // Update current month and year when calendar view changes
     // getMonth() returns 0-11, so add 1 to get 1-12 (January = 1, December = 12)
     const viewMonth = viewDate.getMonth() + 1;
     const viewYear = viewDate.getFullYear();
-    
+
     if (viewMonth !== currentMonth || viewYear !== currentYear) {
       setCurrentMonth(viewMonth);
       setCurrentYear(viewYear);
@@ -250,7 +250,7 @@ const CreateAssignment: React.FC = () => {
     setEventStartTime(startTime);
     setEventEndTime(endTime);
     setEventLevel(event.extendedProps.calendar || "");
-    
+
     if (event.extendedProps.vehicle_id) {
       setVehicleId(event.extendedProps.vehicle_id.toString());
     }
@@ -264,7 +264,7 @@ const CreateAssignment: React.FC = () => {
       const response = await vehicleAssignmentService.getForEdit(eventId);
       if (response.data?.status && response.data?.data) {
         const assignment = response.data.data;
-    
+
         setEventTitle(assignment.event_title || "");
         setEventStartDate(assignment.start_date || "");
         setEventEndDate(assignment.end_date || "");
@@ -278,7 +278,7 @@ const CreateAssignment: React.FC = () => {
     } catch {
       // Error handling is silent
     }
-    
+
     openModal();
   };
 
@@ -315,7 +315,7 @@ const CreateAssignment: React.FC = () => {
         if (eventStartTime && eventEndTime) {
           const startDateTime = new Date(`${eventStartDate}T${eventStartTime}`);
           const endDateTime = new Date(`${eventEndDate}T${eventEndTime}`);
-          
+
           if (endDateTime <= startDateTime) {
             newErrors.eventEndTime = "End Time must be later than Start Time";
           }
@@ -365,7 +365,7 @@ const CreateAssignment: React.FC = () => {
         const dateParts = eventStartDate.split('-');
         const eventYear = parseInt(dateParts[0], 10);
         const eventMonth = parseInt(dateParts[1], 10); // Already 1-12 format from YYYY-MM-DD
-        
+
         // If event is in current view month, refresh current month, otherwise fetch event's month
         if (eventMonth === currentMonth && eventYear === currentYear) {
           await fetchEvents(currentMonth, currentYear);
@@ -604,43 +604,43 @@ const CreateAssignment: React.FC = () => {
             />
           </div>
         </div>
-        
+
         {/* Right Sidebar */}
         <div className="lg:col-span-1">
           <div className="rounded-2xl border border-gray-200 bg-white p-6">
             <h3 className="text-lg font-semibold text-gray-800 mb-4">Events</h3>
-            
+
             {/* Events List - All Events */}
             <div>
               <h4 className="text-sm font-medium text-gray-700 mb-3">
-                All Events ({new Date(currentYear, currentMonth - 1, 1).toLocaleDateString('en-US', { 
-                  month: 'long', 
-                  year: 'numeric' 
+                All Events ({new Date(currentYear, currentMonth - 1, 1).toLocaleDateString('en-US', {
+                  month: 'long',
+                  year: 'numeric'
                 })})
               </h4>
-              
+
               {allEventsSorted.length > 0 ? (
                 <div className="space-y-3 max-h-[600px] overflow-y-auto">
                   {allEventsSorted.map((event) => {
                     const colorClass = `fc-bg-${event.extendedProps.calendar.toLowerCase()}`;
                     const startDate = event.start && (typeof event.start === 'string' || event.start instanceof Date)
-                      ? new Date(event.start) 
+                      ? new Date(event.start)
                       : null;
                     const endDate = event.end && (typeof event.end === 'string' || event.end instanceof Date)
-                      ? new Date(event.end) 
+                      ? new Date(event.end)
                       : null;
-                    const timeStr = startDate && !event.allDay 
+                    const timeStr = startDate && !event.allDay
                       ? startDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
                       : 'All Day';
-                    
+
                     // Get vehicle and contact names
-                    const vehicle = event.extendedProps.vehicle_id 
-                      ? vehicles.find(v => v.id === event.extendedProps.vehicle_id) 
+                    const vehicle = event.extendedProps.vehicle_id
+                      ? vehicles.find(v => v.id === event.extendedProps.vehicle_id)
                       : null;
-                    const contact = event.extendedProps.contact_id 
-                      ? contacts.find(c => c.id === event.extendedProps.contact_id) 
+                    const contact = event.extendedProps.contact_id
+                      ? contacts.find(c => c.id === event.extendedProps.contact_id)
                       : null;
-                    
+
                     return (
                       <div
                         key={event.id}
@@ -675,9 +675,9 @@ const CreateAssignment: React.FC = () => {
 
                             {startDate && (
                               <p className="text-xs font-medium text-gray-700 mb-1">
-                                {startDate.toLocaleDateString('en-US', { 
-                                  weekday: 'short', 
-                                  month: 'short', 
+                                {startDate.toLocaleDateString('en-US', {
+                                  weekday: 'short',
+                                  month: 'short',
                                   day: 'numeric',
                                   year: 'numeric'
                                 })}
@@ -717,13 +717,13 @@ const CreateAssignment: React.FC = () => {
             </div>
           </div>
         </div>
-        
+
         <Modal
           isOpen={isOpen}
           onClose={closeModal}
-          className="max-w-[700px] p-6 lg:p-6"
+          className="max-w-[700px] p-3 lg:p-6"
         >
-          <div className="flex flex-col px-2 overflow-y-auto custom-scrollbar">
+          <div className="flex flex-col px-2 overflow-y-auto custom-scrollbar max-h-[90dvh]">
             <div>
               <h5 className="mb-2 font-semibold text-gray-800 modal-title text-theme-xl lg:text-2xl">
                 {selectedEvent ? "Edit Event" : "Add Event"}
@@ -760,7 +760,7 @@ const CreateAssignment: React.FC = () => {
                     )}
                     </div>
                 </div>
-            
+
                 <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                     <label className="mb-1.5 block text-sm font-medium text-gray-700">

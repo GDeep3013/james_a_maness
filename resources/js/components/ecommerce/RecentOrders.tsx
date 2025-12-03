@@ -77,7 +77,7 @@ export default function RecentOrders() {
       try {
         const response = await workOrderService.getAll({ page: 1 });
         const data = response.data as WorkOrdersResponse;
-        
+
         if (data.status && data.work_orders) {
           const latestWorkOrders = (data.work_orders.data || []).slice(0, 10);
           setWorkOrders(latestWorkOrders);
@@ -126,7 +126,7 @@ export default function RecentOrders() {
         </div>
       );
     }
-    
+
     const makeModelParts: string[] = [];
     if (vehicle.make && vehicle.model) {
       makeModelParts.push(`${vehicle.make} ${vehicle.model}`);
@@ -135,11 +135,11 @@ export default function RecentOrders() {
     } else if (vehicle.model) {
       makeModelParts.push(vehicle.model);
     }
-    
-    const mainText = makeModelParts.length > 0 
-      ? makeModelParts.join(" ") 
+
+    const mainText = makeModelParts.length > 0
+      ? makeModelParts.join(" ")
       : vehicle.vehicle_name || "N/A";
-    
+
     const secondaryParts: string[] = [];
     if (vehicle.year) {
       secondaryParts.push(String(vehicle.year));
@@ -147,7 +147,7 @@ export default function RecentOrders() {
     if (vehicle.license_plate) {
       secondaryParts.push(vehicle.license_plate);
     }
-    
+
     return (
       <div>
         <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
@@ -164,9 +164,9 @@ export default function RecentOrders() {
 
   const formatServiceTasks = (serviceItems?: ServiceItem[] | string) => {
     if (!serviceItems) return "N/A";
-    
+
     let items: ServiceItem[] = [];
-    
+
     if (typeof serviceItems === "string") {
       try {
         items = JSON.parse(serviceItems);
@@ -176,17 +176,17 @@ export default function RecentOrders() {
     } else if (Array.isArray(serviceItems)) {
       items = serviceItems;
     }
-    
+
     const serviceTasks = items.filter(
       (item) => item.type === "Service Tasks" || !item.type
     );
-    
+
     if (serviceTasks.length === 0) return "N/A";
-    
+
     if (serviceTasks.length === 1) {
       return serviceTasks[0].name || "N/A";
     }
-    
+
     return serviceTasks.map((item) => item.name).join(", ");
   };
 
@@ -207,7 +207,7 @@ export default function RecentOrders() {
     <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white px-4 pb-3 pt-4 dark:border-gray-800 dark:bg-white/3 sm:px-6">
       <div className="flex flex-col gap-2 mb-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">
+          <h3 className="text-base md:text-lg font-semibold text-gray-800 dark:text-white/90">
             Recent Work Orders
           </h3>
         </div>
@@ -255,13 +255,13 @@ export default function RecentOrders() {
                       Available
                   </button>
 
-               
 
-                 
+
+
               </nav>
           </div>
 
-      
+
       </div>
       <div className="max-w-full overflow-x-auto">
         <Table>
@@ -278,7 +278,7 @@ export default function RecentOrders() {
               <TableCell
                 isHeader
               >
-                Type/Model 
+                Type/Model
               </TableCell>
 
               <TableCell
@@ -286,7 +286,7 @@ export default function RecentOrders() {
               >
                 Status
               </TableCell>
-             
+
               <TableCell
                 isHeader
               >
@@ -305,7 +305,7 @@ export default function RecentOrders() {
               >
                 Issue Date
               </TableCell>
-             
+
             </TableRow>
           </TableHeader>
 

@@ -667,7 +667,7 @@ export default function CreateContact() {
                 <FileIcon className="w-8 h-8" />
               </div>
             </div>
-            <h4 className="mb-3 text-lg font-semibold text-gray-800 dark:text-white/90">
+            <h4 className="mb-3 text-base md:text-lg font-semibold text-gray-800 dark:text-white/90">
               {isLicenseDragActive ? "Drop File Here" : "Drag & Drop File Here"}
             </h4>
             <span className="mb-5 block w-full max-w-[290px] text-center text-sm text-gray-700 dark:text-gray-400">

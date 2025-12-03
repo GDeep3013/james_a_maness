@@ -25,8 +25,8 @@ const Button: React.FC<ButtonProps> = ({
 }) => {
   // Size Classes
   const sizeClasses = {
-    sm: "p-0 px-3 text-sm min-height-[39px] leading-[39px]",
-    md: "p-0 px-3 text-sm min-height-[57px] leading-[57px]",
+    sm: "p-0 px-3 text-xs sm:text-sm min-height-[39px] leading-[39px]",
+    md: "p-0 px-3 text-xs sm:text-sm min-height-[57px] leading-[57px]",
   };
 
   // Variant Classes
@@ -34,7 +34,7 @@ const Button: React.FC<ButtonProps> = ({
     primary:
       "bg-brand-500 text-white shadow-theme-xs primary-button hover:!bg-[#E06B04] disabled:bg-brand-300",
     outline:
-      "bg-white text-gray-700 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-400 dark:ring-gray-700 dark:hover:bg-white/[0.03] dark:hover:text-gray-300",
+      "bg-white text-gray-700 ring-1 ring-inset ring-gray-300 hover:bg-gray-50",
     none:
       "bg-transparent text-gray-700 !min-height-[34px] !leading-[34px]",
   };

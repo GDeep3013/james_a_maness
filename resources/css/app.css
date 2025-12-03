@@ -123,3 +123,13 @@ nav span.menu-item-icon-size svg {
     }
 
 }
+
+@media screen and (max-width:767px) {
+    .custom-calendar .fc-dayGridMonth-view{
+        min-width: 100% !important;
+    }
+    .screen-height {
+    min-height: calc(100vh - 34px);
+    padding-bottom: 34px;
+}
+}

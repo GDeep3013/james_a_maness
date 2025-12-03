@@ -409,7 +409,7 @@ export default function CreateExpenseHistory() {
                         Frequency <span className="text-error-500">*</span>
                     </Label>
 
-                    <div className="flex items-start gap-10 mt-2">
+                    <div className="flex max-[767px]:flex-wrap items-start gap-3 md:gap-10 mt-2">
 
                         {/* Single Expense */}
                         <label className="flex items-start gap-3 cursor-pointer">
@@ -524,7 +524,7 @@ export default function CreateExpenseHistory() {
                         >
                             <ChevronLeftIcon className="w-5 h-5 text-gray-600 dark:text-gray-400" />
                         </button>
-                        <h1 className="text-2xl font-semibold text-gray-800 dark:text-white/90">
+                        <h1 className="text-base md:text-2xl font-semibold text-gray-800 dark:text-white/90">
                             {isEditMode ? "Edit Expense Entry" : "New Expense Entry"}
                         </h1>
                     </div>
@@ -551,7 +551,7 @@ export default function CreateExpenseHistory() {
                                     )}
 
                                     <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-6">
-                                        <h2 className="text-2xl font-semibold text-gray-800 dark:text-white/90 mb-6">
+                                        <h2 className="text-base md:text-2xl font-semibold text-gray-800 dark:text-white/90 mb-6">
                                             Expense Details
                                         </h2>
                                         {renderExpenseDetailsSection()}

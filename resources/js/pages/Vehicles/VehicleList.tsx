@@ -168,7 +168,7 @@ export default function VehicleList({ importSuccess }: { importSuccess?: boolean
         setCurrentPage(page);
     };
 
-    
+
     const options = [
         { value: "All Status", label: "All Status" },
         { value: "All Status", label: "All Status 1" },
@@ -204,13 +204,13 @@ export default function VehicleList({ importSuccess }: { importSuccess?: boolean
                             options={options}
                             placeholder="Select an option"
                             onChange={() => { console.log("data") }}
-                            className="w-full max-w-[200px] all-status-select"
+                            className="w-full md:max-w-[200px] all-status-select"
                         />
                         <Select
                             options={fueloptions}
                             placeholder="All Fuel Types"
                             onChange={() => { console.log("data") }}
-                            className="w-full max-w-[200px] all-status-select"
+                            className="w-full md:max-w-[200px] all-status-select"
                         />
                         <Button
                             variant="outline"

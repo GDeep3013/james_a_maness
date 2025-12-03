@@ -291,7 +291,7 @@ export default function CreateMeterReading() {
                         >
                             <ChevronLeftIcon className="w-5 h-5 text-gray-600 dark:text-gray-400" />
                         </button>
-                        <h1 className="text-2xl font-semibold text-gray-800 dark:text-white/90">
+                        <h1 className="text-base md:text-2xl font-semibold text-gray-800 dark:text-white/90">
                             {isEditMode ? "Edit Meter Entry" : "New Meter Entry"}
                         </h1>
                     </div>
