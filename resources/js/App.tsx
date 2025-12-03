@@ -42,6 +42,8 @@ import PartsList from "./pages/Parts/PartsList";
 import EditPart from "./pages/Parts/EditPart";
 import CreateServiceReminder from "./pages/ServiceReminders/CreateServiceReminder";
 import ServiceReminderList from "./pages/ServiceReminders/ServiceReminderList";
+import CreateSchedule from "./pages/Schedules/CreateSchedule";
+import ScheduleList from "./pages/Schedules/ScheduleList";
 import Fuels from "./pages/Fuels";
 import CreateFuel from "./pages/Fuels/CreateFuel";
 import FuelDetail from "./pages/Fuels/FuelDetail";
@@ -460,6 +462,39 @@ export default function App() {
             element={
               <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
                 <CreateServiceReminder />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/schedules"
+            element={
+              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                <ScheduleList />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/schedules/create"
+            element={
+              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                <CreateSchedule />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/schedules/:id"
+            element={
+              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                <CreateSchedule />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/schedules/:id/edit"
+            element={
+              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                <CreateSchedule />
               </ProtectedRoute>
             }
           />

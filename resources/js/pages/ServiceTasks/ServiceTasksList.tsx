@@ -13,6 +13,7 @@ import PageMeta from "../../components/common/PageMeta";
 import PageBreadcrumb from "../../components/common/PageBreadCrumb";
 import { serviceTaskService } from "../../services/serviceTaskService";
 import { PencilIcon, TrashBinIcon, EyeIcon } from "../../icons";
+import TableFooter, { PaginationData } from "../../components/common/TableFooter";
 
 interface ServiceTask {
   id: number;
@@ -24,12 +25,6 @@ interface ServiceTask {
   updated_at?: string;
 }
 
-interface PaginationData {
-  current_page: number;
-  last_page: number;
-  per_page: number;
-  total: number;
-}
 
 interface ServiceTasksResponse {
   status: boolean;
@@ -123,58 +118,8 @@ export default function ServiceTasksList() {
     }
   };
 
-  const renderPagination = () => {
-    const pages: number[] = [];
-    const maxPages = 5;
-    let startPage = Math.max(1, pagination.current_page - Math.floor(maxPages / 2));
-    const endPage = Math.min(pagination.last_page, startPage + maxPages - 1);
-
-    if (endPage - startPage < maxPages - 1) {
-      startPage = Math.max(1, endPage - maxPages + 1);
-    }
-
-    for (let i = startPage; i <= endPage; i++) {
-      pages.push(i);
-    }
-
-    return (
-      <div className="flex items-center justify-between mt-6">
-        <div className="text-sm text-gray-600">
-          Showing {((pagination.current_page - 1) * pagination.per_page) + 1} to{" "}
-          {Math.min(pagination.current_page * pagination.per_page, pagination.total)} of{" "}
-          {pagination.total} results
-        </div>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
-            disabled={pagination.current_page === 1}
-            className="px-3 py-2 text-sm border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
-          >
-            Previous
-          </button>
-          {pages.map((page) => (
-            <button
-              key={page}
-              onClick={() => setCurrentPage(page)}
-              className={`px-3 py-2 text-sm border rounded-lg ${
-                pagination.current_page === page
-                  ? "bg-brand-500 text-white border-brand-500"
-                  : "border-gray-300 hover:bg-gray-50"
-              }`}
-            >
-              {page}
-            </button>
-          ))}
-          <button
-            onClick={() => setCurrentPage((prev) => Math.min(pagination.last_page, prev + 1))}
-            disabled={pagination.current_page === pagination.last_page}
-            className="px-3 py-2 text-sm border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
-          >
-            Next
-          </button>
-        </div>
-      </div>
-    );
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
   };
 
   return (
@@ -299,7 +244,13 @@ export default function ServiceTasksList() {
                 </TableBody>
               </Table>
             </div>
-            {renderPagination()}
+            <TableFooter
+              pagination={pagination}
+              currentPage={currentPage}
+              onPageChange={handlePageChange}
+              loading={loading}
+              itemLabel="service tasks"
+            />
           </>
         )}
       </div>
