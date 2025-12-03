@@ -39,7 +39,7 @@ export default function ViewServiceTask() {
     try {
       const response = await serviceTaskService.getById(serviceTaskId);
       const data = response.data as { status: boolean; service_task?: ServiceTask };
-      
+
       if (data.status && data.service_task) {
         setServiceTask(data.service_task);
       } else {
@@ -94,10 +94,10 @@ export default function ViewServiceTask() {
     <>
       <PageMeta title="View Service Task" description="View service task details" />
       <PageBreadcrumb pageTitle="View Service Task" />
-      
+
       <div className="bg-white rounded-lg border border-gray-200 p-6">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-semibold text-gray-800">{serviceTask.name}</h1>
+          <h1 className="text-base md:text-2xl font-semibold text-gray-800">{serviceTask.name}</h1>
           <Button
             variant="none"
             size="md"

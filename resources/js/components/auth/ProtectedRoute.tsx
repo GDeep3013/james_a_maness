@@ -34,7 +34,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <h2 className="text-2xl font-semibold text-gray-800 dark:text-white mb-2">
+          <h2 className="text-sm md:text-2xl font-semibold text-gray-800 dark:text-white mb-2">
             Access Denied
           </h2>
           <p className="text-gray-600 dark:text-gray-400">
@@ -49,7 +49,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <h2 className="text-2xl font-semibold text-gray-800 dark:text-white mb-2">
+          <h2 className="text-base md:text-2xl font-semibold text-gray-800 dark:text-white mb-2">
             Access Denied
           </h2>
           <p className="text-gray-600 dark:text-gray-400">

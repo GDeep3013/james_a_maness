@@ -318,7 +318,7 @@ export default function CreateMeterReading() {
                                     )}
 
                                     <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-6">
-                                        <h2 className="text-2xl font-semibold text-gray-800 dark:text-white/90 mb-6">
+                                        <h2 className="text-base md:text-2xl font-semibold text-gray-800 dark:text-white/90 mb-6">
                                             Meter History Details
                                         </h2>
                                         {renderMeterReadingDetailsSection()}

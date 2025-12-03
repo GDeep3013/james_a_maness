@@ -107,7 +107,7 @@ export default function IssuesList() {
     try {
       const response = await issueService.getAll({ page, search, status });
       const data = response.data as IssuesResponse;
-      
+
       if (data.status && data.issues) {
         setIssues(data.issues.data || []);
         setPagination({
@@ -332,7 +332,7 @@ export default function IssuesList() {
         </div>
 
         <div className="border-b border-gray-200 dark:border-white/10">
-          <nav className="flex space-x-8" aria-label="Tabs">
+          <nav className="flex space-x-4 md:space-x-8" aria-label="Tabs">
             {(["All", "Open", "Overdue", "Resolved", "Closed"] as const).map((tab) => (
               <button
                 key={tab}
@@ -397,7 +397,7 @@ export default function IssuesList() {
                 className="!bg-[#F3F3F5] dark:!bg-white/5 border-gray-200 dark:border-white/10"
               />
             </div>
-          
+
             {activeFiltersCount > 0 && (
               <Button
                 variant="primary"

@@ -246,7 +246,7 @@ export default function CreateVendor() {
                         >
                             <ChevronLeftIcon className="w-5 h-5 text-gray-600 dark:text-gray-400" />
                         </button>
-                        <h1 className="text-2xl font-semibold text-gray-800 dark:text-white/90">
+                        <h1 className="text-base md:text-2xl font-semibold text-gray-800 dark:text-white/90">
                             {isEditMode ? "Edit Vendor" : "New Vendor"}
                         </h1>
                     </div>
@@ -275,7 +275,7 @@ export default function CreateVendor() {
                                 <div className="flex flex-col gap-6">
 
                                     <div className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl p-6 lg:p-8">
-                                        <h3 className="text-2xl font-semibold text-gray-800 dark:text-white/90 mb-6">
+                                        <h3 className="text-base md:text-2xl font-semibold text-gray-800 dark:text-white/90 mb-6">
                                             Details
                                         </h3>
 

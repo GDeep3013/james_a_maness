@@ -24,7 +24,7 @@ export default function ImportVehicles({ onImportSuccess }: { onImportSuccess?: 
     if (selectedFile) {
       const validExtensions = ['.xlsx', '.xls', '.csv'];
       const fileExtension = selectedFile.name.substring(selectedFile.name.lastIndexOf('.')).toLowerCase();
-      
+
       if (!validExtensions.includes(fileExtension)) {
         setError('Please select a valid Excel file (.xlsx, .xls, or .csv)');
         setFile(null);
@@ -55,13 +55,13 @@ export default function ImportVehicles({ onImportSuccess }: { onImportSuccess?: 
 
     try {
       const response = await vehicleService.import(file);
-      
+
       if (response.data.status) {
         setResult({
           imported: response.data.imported || 0,
           skipped: response.data.skipped || 0,
         });
-        
+
         if (onImportSuccess) {
           setTimeout(() => {
             onImportSuccess();
@@ -89,7 +89,7 @@ export default function ImportVehicles({ onImportSuccess }: { onImportSuccess?: 
 
   return (
     <>
-      <Button size="sm" variant="outline" className="min-w-[190px]" onClick={openModal}>
+      <Button size="sm" variant="outline" className="md:min-w-[190px]" onClick={openModal}>
         <ExportIcon /> Import Vehicles
       </Button>
 

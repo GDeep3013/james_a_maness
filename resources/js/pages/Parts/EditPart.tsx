@@ -84,7 +84,7 @@ export default function EditPart() {
         try {
             const response = await partService.getForEdit(partId);
             const data = response.data as { status: boolean; data?: any };
-            
+
             if (data.status && data.data) {
                 const part = data.data;
                 setFormData({
@@ -282,9 +282,9 @@ export default function EditPart() {
 
                         <div className="flex-1">
                             <div className="flex flex-col gap-6">
-                                
+
                                 <div className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl p-6 lg:p-8">
-                                    <h3 className="text-2xl font-semibold text-gray-800 dark:text-white/90 mb-6">
+                                    <h3 className="text-base md:text-2xl font-semibold text-gray-800 dark:text-white/90 mb-6">
                                         Details
                                     </h3>
 
@@ -447,7 +447,7 @@ export default function EditPart() {
                                     </Button>
                                 </div>
                             </div>
-                           
+
                         </div>
                     </form>
                 </div>

@@ -24,7 +24,7 @@ export default function Vehicles() {
 
       <div className="page-actions flex flex-wrap items-center justify-between gap-3 mb-6">
         <h2
-          className="text-xl font-semibold text-gray-800 dark:text-white/90"
+          className="text-base md:text-xl font-semibold text-gray-800 dark:text-white/90"
           x-text="pageName"
         >
           Vehicles
@@ -33,7 +33,7 @@ export default function Vehicles() {
           <ImportVehicles onImportSuccess={handleImportSuccess} />
 
           <Link to="/vehicles/add">
-            <Button size="sm" variant="primary" className="min-w-[190px]"> <PlusIcon /> Add New Vehicle</Button>
+            <Button size="sm" variant="primary" className="md:min-w-[190px]"> <PlusIcon /> Add New Vehicle</Button>
           </Link>
         </div>
       </div>
