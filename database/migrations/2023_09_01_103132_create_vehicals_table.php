@@ -16,13 +16,14 @@ return new class extends Migration
 
         Schema::create('vehicals', function (Blueprint $table) {
             $table->id();
+            $table->string('vehicle_code')->unique();
             $table->string('vehicle_name');
             $table->string('type');
             $table->string('make');
             $table->string('model')->nullable();
             $table->string('year')->nullable();
             $table->string('vin')->nullable();
-            $table->string('license_plate');
+            $table->string('license_plate')->unique();
             $table->string('color')->nullable();
             $table->string('fuel_type')->nullable();
             $table->string('transmission')->nullable();
@@ -34,7 +35,7 @@ return new class extends Migration
             $table->string('primary_location')->nullable();
             $table->text('notes')->nullable();
             $table->bigInteger('assigned_driver')->nullable();
-            $table->bigInteger('department')->nullable();
+            $table->string('department')->nullable();
             $table->timestamps();
         });
     }

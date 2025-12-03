@@ -9,11 +9,11 @@ interface VehicleStatistics {
   outOfService: number;
 }
 
-interface AdditionalStatistics {
-  totalContacts: number;
-  totalVendors: number;
-  totalParts: number;
-}
+// interface AdditionalStatistics {
+//   totalContacts: number;
+//   totalVendors: number;
+//   totalParts: number;
+// }
 
 export default function VehiclesInfoCard() {
   const [statistics, setStatistics] = useState<VehicleStatistics>({
@@ -23,11 +23,11 @@ export default function VehiclesInfoCard() {
     available: 0,
     outOfService: 0,
   });
-  const [additionalStats, setAdditionalStats] = useState<AdditionalStatistics>({
-    totalContacts: 0,
-    totalVendors: 0,
-    totalParts: 0,
-  });
+  // const [additionalStats, setAdditionalStats] = useState<AdditionalStatistics>({
+  //   totalContacts: 0,
+  //   totalVendors: 0,
+  //   totalParts: 0,
+  // });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>('');
 
@@ -52,11 +52,11 @@ export default function VehiclesInfoCard() {
             });
           }
 
-          setAdditionalStats({
-            totalContacts: stats.contacts?.total || 0,
-            totalVendors: stats.vendors?.total || 0,
-            totalParts: stats.parts?.total || 0,
-          });
+          // setAdditionalStats({
+          //   totalContacts: stats.contacts?.total || 0,
+          //   totalVendors: stats.vendors?.total || 0,
+          //   totalParts: stats.parts?.total || 0,
+          // });
         } else {
           setError('Failed to load dashboard statistics');
         }
@@ -78,11 +78,11 @@ export default function VehiclesInfoCard() {
     { value: statistics.outOfService, label: "Out of Service", color: "text-[#F2994A]" },
   ];
 
-  const additionalStatsList = [
-    { value: additionalStats.totalContacts, label: "Total Contacts", color: "text-[#10B981]" },
-    { value: additionalStats.totalVendors, label: "Total Vendors", color: "text-[#3B82F6]" },
-    { value: additionalStats.totalParts, label: "Total Parts", color: "text-[#8B5CF6]" }
-  ];
+  // const additionalStatsList = [
+  //   { value: additionalStats.totalContacts, label: "Total Contacts", color: "text-[#10B981]" },
+  //   { value: additionalStats.totalVendors, label: "Total Vendors", color: "text-[#3B82F6]" },
+  //   { value: additionalStats.totalParts, label: "Total Parts", color: "text-[#8B5CF6]" }
+  // ];
 
   if (loading) {
     return (
@@ -135,7 +135,7 @@ export default function VehiclesInfoCard() {
                 <p className={`text-3xl font-semibold mb-2 ${item.color}`}>
                   {item.value}
                 </p>
-                <p className="text-sm text-gray-700 leading-tight">
+                <p className="text-base text-gray-700 leading-tight ">
                   {item.label}
                 </p>
               </div>

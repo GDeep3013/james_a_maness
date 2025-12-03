@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import Chart from "react-apexcharts";
 import { ApexOptions } from "apexcharts";
 import api from '../../services/api';
@@ -23,8 +23,8 @@ export default function TotalCostMap() {
     const [monthlyData, setMonthlyData] = useState<MonthlyData[]>([]);
     const [yearToDateTotal, setYearToDateTotal] = useState(0);
     const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
-    const showWorkOrders = true;
-    const showFuels = true;
+    // const showWorkOrders = false;
+    // const showFuels = false;
     const showTotal = true;
 
     const availableYears = useMemo(() => {
@@ -39,11 +39,7 @@ export default function TotalCostMap() {
         return years;
     }, []);
 
-    useEffect(() => {
-        fetchTotalCosts();
-    }, [currentYear]);
-
-    const fetchTotalCosts = async () => {
+    const fetchTotalCosts = useCallback(async () => {
         setLoading(true);
         try {
             const response = await api.get<TotalCostsResponse>('/get-total-costs', {
@@ -59,7 +55,11 @@ export default function TotalCostMap() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [currentYear]);
+
+    useEffect(() => {
+        fetchTotalCosts();
+    }, [fetchTotalCosts]);
 
     const formatCurrency = (value: number): string => {
         return new Intl.NumberFormat('en-US', {
@@ -73,19 +73,19 @@ export default function TotalCostMap() {
     const chartSeries = useMemo(() => {
         const series = [];
 
-        if (showWorkOrders) {
-            series.push({
-                name: "Work Orders",
-                data: monthlyData.map(item => item.work_orders_total),
-            });
-        }
+        // if (showWorkOrders) {
+        //     series.push({
+        //         name: "Work Orders",
+        //         data: monthlyData.map(item => item.work_orders_total),
+        //     });
+        // }
 
-        if (showFuels) {
-            series.push({
-                name: "Fuels",
-                data: monthlyData.map(item => item.fuels_total),
-            });
-        }
+        // if (showFuels) {
+        //     series.push({
+        //         name: "Fuels",
+        //         data: monthlyData.map(item => item.fuels_total),
+        //     });
+        // }
 
         if (showTotal) {
             series.push({
@@ -95,15 +95,16 @@ export default function TotalCostMap() {
         }
 
         return series;
-    }, [monthlyData, showWorkOrders, showFuels, showTotal]);
+    }, [monthlyData, showTotal]);
 
     const chartColors = useMemo(() => {
         const colors = [];
-        if (showWorkOrders) colors.push("#3C247D");
-        if (showFuels) colors.push("#10B981");
-        if (showTotal) colors.push("#F59E0B");
+        // if (showWorkOrders) colors.push("#F59E0B");
+        // if (showFuels) colors.push("#10B981");
+        if (showTotal) colors.push("#3C247D");
         return colors.length > 0 ? colors : ["#3C247D"];
-    }, [showWorkOrders, showFuels, showTotal]);
+
+    }, [showTotal]);
 
     const chartOptions: ApexOptions = {
         chart: {
@@ -132,7 +133,7 @@ export default function TotalCostMap() {
         plotOptions: {
             bar: {
                 borderRadius: 4,
-                columnWidth: chartSeries.length > 1 ? "60%" : "45%",
+                columnWidth: chartSeries.length > 1 ? "60%" : "67%",
             },
         },
         dataLabels: {
@@ -149,7 +150,7 @@ export default function TotalCostMap() {
     };
 
     return (
-        <div className="rounded-2xl border border-gray-200 bg-white px-5 pb-5 pt-5 dark:border-gray-800 dark:bg-white/[0.03] sm:px-6 sm:pt-6 min-h-[422px]">
+        <div className="rounded-2xl border border-gray-200 bg-white px-5 pb-5 pt-5 dark:border-gray-800 dark:bg-white/3 sm:px-6 sm:pt-6 min-h-[422px]">
             <div className="flex flex-col gap-5 mb-6 sm:flex-row sm:justify-between">
                 <div className="w-full">
                     <h3 className="text-base font-semibold text-gray-800 dark:text-white/90 mb-4">

@@ -83,5 +83,16 @@ export const vehicleService = {
 
   getStatistics: () =>
     api.get('/vehicles'),
+
+  import: (file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    return api.post('/vehicles/import', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+  },
 };
 

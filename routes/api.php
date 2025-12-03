@@ -61,6 +61,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::apiResource('vehicles', VehicleController::class);
     Route::get('/vehicles/{id}/edit', [VehicleController::class, 'edit'])->where('id', '[0-9]+');
+    Route::post('/vehicles/import', [VehicleController::class, 'import']);
 
     Route::apiResource('fuels', FuelController::class);
     Route::get('/fuels/{id}/edit', [FuelController::class, 'edit'])->where('id', '[0-9]+');

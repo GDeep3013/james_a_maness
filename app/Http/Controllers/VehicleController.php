@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\File;
 use App\Traits\NotificationTrate;
 use Auth;
 use Illuminate\Support\Facades\Schema;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\VehicleImport;
 
 class VehicleController extends Controller
 {
@@ -274,6 +276,47 @@ class VehicleController extends Controller
         }
     }
 
+
+    /**
+     * Import vehicles from Excel file.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function import(Request $request)
+    {
+        ini_set('max_execution_time', 0);
+        
+        try {
+            $request->validate([
+                'file' => 'required|mimes:xlsx,xls,csv|max:10240',
+            ]);
+
+            $file = $request->file('file');
+            
+            $import = new VehicleImport;
+            Excel::import($import, $file);
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Vehicles imported successfully',
+                'imported' => $import->getImportedCount(),
+                'skipped' => $import->getSkippedCount(),
+            ]);
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'status' => 'error',
+                'errors' => $e->validator->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'An error occurred while importing vehicles. Please check the file format and try again.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
 
     /**
      * Remove the specified resource from storage.

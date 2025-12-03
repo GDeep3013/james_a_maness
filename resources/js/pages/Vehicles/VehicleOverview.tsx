@@ -10,7 +10,7 @@ interface VehicleStatistics {
   outOfService: number;
 }
 
-export default function VehicleOverview() {
+export default function VehicleOverview({ importSuccess }: { importSuccess?: boolean }) {
   const [statistics, setStatistics] = useState<VehicleStatistics>({
     total: 0,
     active: 0,
@@ -109,9 +109,9 @@ export default function VehicleOverview() {
         setLoading(false);
       }
     };
-
+    
     fetchStatistics();
-  }, []);
+  }, [importSuccess]);
 
   if (loading) {
     return (
@@ -119,12 +119,12 @@ export default function VehicleOverview() {
         {[1, 2, 3, 4].map((item) => (
           <div
             key={item}
-            className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl p-6 flex flex-col"
+            className="bg-white  border border-gray-200 rounded-xl p-6 flex flex-col"
           >
             <div className="animate-pulse">
-              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-24 mb-2"></div>
-              <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-16 mb-2"></div>
-              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-32"></div>
+              <div className="h-4 bg-gray-200 rounded w-24 mb-2"></div>
+              <div className="h-8 bg-gray-200 rounded w-16 mb-2"></div>
+              <div className="h-4 bg-gray-200 rounded w-32"></div>
             </div>
           </div>
         ))}
