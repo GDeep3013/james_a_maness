@@ -72,8 +72,12 @@ export default function ImportVehicles({ onImportSuccess }: { onImportSuccess?: 
       } else {
         setError(response.data.message || 'Failed to import vehicles');
       }
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.message || 'An error occurred while importing vehicles';
+    } catch (err: unknown) {
+      const errorMessage = (err && typeof err === 'object' && 'response' in err && err.response && typeof err.response === 'object' && 'data' in err.response && err.response.data && typeof err.response.data === 'object' && 'message' in err.response.data && typeof err.response.data.message === 'string') 
+        ? err.response.data.message 
+        : (err && typeof err === 'object' && 'message' in err && typeof err.message === 'string')
+        ? err.message
+        : 'An error occurred while importing vehicles';
       setError(errorMessage);
     } finally {
       setLoading(false);

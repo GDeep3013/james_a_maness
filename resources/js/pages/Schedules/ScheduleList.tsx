@@ -310,7 +310,7 @@ export default function ScheduleList() {
                               ? schedule.service_tasks.map((task, index) => (
                                   <span key={task.id || index}>
                                     {task.name}
-                                    {index < schedule.service_tasks.length - 1 && ", "}
+                                    {index < (schedule.service_tasks?.length ?? 0) - 1 && ", "}
                                   </span>
                                 ))
                               : "N/A"}
