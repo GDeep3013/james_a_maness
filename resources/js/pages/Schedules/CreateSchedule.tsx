@@ -550,7 +550,7 @@ export default function CreateSchedule() {
                       </div>
                     </div>
 
-                    <div>
+                    <div className="relative z-0">
                       <Label htmlFor="watchers">Watchers</Label>
                       <MultiSelect
                         label=""

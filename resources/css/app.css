@@ -112,7 +112,10 @@ nav span.menu-item-icon-size svg {
     min-height: calc(100vh - 77px);
     padding-bottom: 44px;
 }
-
+.react-select__menu{
+    z-index: 99999;
+    background-color: #fff;
+}
 
 
 @media (max-width: 1023px) {

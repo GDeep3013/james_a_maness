@@ -34,7 +34,7 @@ interface TableCellProps {
 
 // Table Component
 const Table: React.FC<TableProps> = ({ children, className="" }) => {
-  return <table className={`min-w-[max-content] w-full max-w-full ${className}`}>{children}</table>;
+  return <table className={`max-[1400px]:min-w-[1200px] w-full max-w-full ${className}`}>{children}</table>;
 };
 
 // TableHeader Component

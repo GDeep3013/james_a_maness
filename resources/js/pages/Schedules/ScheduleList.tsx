@@ -166,10 +166,6 @@ export default function ScheduleList() {
     }
   };
 
-  const formatInterval = (value?: string, unit?: string) => {
-    if (!value || !unit) return "N/A";
-    return `Every ${value} ${unit}`;
-  };
 
   return (
     <>
@@ -304,7 +300,7 @@ export default function ScheduleList() {
                             {schedule.vehicle?.vehicle_name || "N/A"}
                           </div>
                         </TableCell>
-                        <TableCell className="px-4 py-3 text-start">
+                        <TableCell className="px-4 py-3 text-start w-[300px]">
                           <div className="text-gray-800 text-theme-sm">
                             {schedule.service_tasks && schedule.service_tasks.length > 0
                               ? schedule.service_tasks.map((task, index) => (
