@@ -182,7 +182,7 @@ export default function ScheduleList() {
           </div>
           <Button
             variant="primary"
-            size="md"
+            size="sm"
             onClick={handleCreate}
           >
             + Create Schedule
@@ -219,7 +219,7 @@ export default function ScheduleList() {
         )}
 
         <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
-          <div className="max-w-full overflow-x-auto">
+          <div className="w-full overflow-x-auto">
             {loading ? (
               <div className="flex items-center justify-center py-12">
                 <div className="text-center">

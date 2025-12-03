@@ -176,7 +176,6 @@ class ScheduleController extends Controller
 
         $schedule = Schedule::with([
             'vehicle:id,vehicle_name',
-            'serviceTask:id,name',
             'user:id,name'
         ])->where('id', $id)->first();
 
@@ -352,4 +351,3 @@ class ScheduleController extends Controller
     }
 
 }
-

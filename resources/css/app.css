@@ -7,8 +7,14 @@
         --spacing: 0.25rem;
 }
 
+html {
+    overflow-x: hidden;
+}
+
 body {
     font-family: "Outfit", sans-serif;
+    overflow-x: hidden;
+    width: 100%;
 }
 
 
