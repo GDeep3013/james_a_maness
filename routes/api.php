@@ -11,6 +11,7 @@ use App\Http\Controllers\WorkOrderController;
 use App\Http\Controllers\IssueController;
 use App\Http\Controllers\ServiceTaskController;
 use App\Http\Controllers\ServiceReminderController;
+use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\VendorController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\MeterReadingController;
@@ -61,7 +62,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::apiResource('vehicles', VehicleController::class);
     Route::get('/vehicles/{id}/edit', [VehicleController::class, 'edit'])->where('id', '[0-9]+');
-    Route::post('/vehicles/import', [VehicleController::class, 'import']);
 
     Route::apiResource('fuels', FuelController::class);
     Route::get('/fuels/{id}/edit', [FuelController::class, 'edit'])->where('id', '[0-9]+');
@@ -85,6 +85,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/service-reminders/check-logged', [ServiceReminderController::class, 'checkServiceTaskLogged']);
     Route::apiResource('service-reminders', ServiceReminderController::class);
     Route::get('/service-reminders/{id}/edit', [ServiceReminderController::class, 'edit'])->where('id', '[0-9]+');
+
+    Route::get('/schedules/check-logged', [ScheduleController::class, 'checkServiceTaskLogged']);
+    Route::apiResource('schedules', ScheduleController::class);
+    Route::get('/schedules/{id}/edit', [ScheduleController::class, 'edit'])->where('id', '[0-9]+');
 
     Route::apiResource('vendors', VendorController::class);
     Route::get('/vendors/{id}/edit', [VendorController::class, 'edit'])->where('id', '[0-9]+');

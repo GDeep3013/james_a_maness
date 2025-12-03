@@ -67,15 +67,15 @@ interface WorkOrdersResponse {
 }
 
 export default function RecentOrders() {
-  const navigate = useNavigate();
   const [workOrders, setWorkOrders] = useState<WorkOrder[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeFilter, setActiveFilter] = useState('');
 
   useEffect(() => {
     const fetchWorkOrders = async () => {
       setLoading(true);
       try {
-        const response = await workOrderService.getAll({ page: 1 });
+        const response = await workOrderService.getAll({ page: 1, status: activeFilter });
         const data = response.data as WorkOrdersResponse;
         
         if (data.status && data.work_orders) {
@@ -92,7 +92,7 @@ export default function RecentOrders() {
     };
 
     fetchWorkOrders();
-  }, []);
+  }, [activeFilter]);
 
   const formatDate = (dateString?: string) => {
     if (!dateString) return "N/A";
@@ -196,13 +196,15 @@ export default function RecentOrders() {
     return name || "N/A";
   };
 
-  const handleSeeAll = () => {
-    navigate("/work-orders");
-  };
 
-  const Filters  = [];
+  const Filters  = [
+    {label: 'All', value: ''},
+    {label: 'Open', value: 'Open'},
+    {label: 'In Progress', value: 'In Progress'},
+    {label: 'Completed', value: 'Completed'},
+    {label: 'Cancelled', value: 'Cancelled'},
+  ];
 
-  const activeTab= 'work';
   return (
     <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white px-4 pb-3 pt-4 dark:border-gray-800 dark:bg-white/3 sm:px-6">
       <div className="flex flex-col gap-2 mb-4 sm:flex-row sm:items-center sm:justify-between">
@@ -213,51 +215,20 @@ export default function RecentOrders() {
         </div>
 
 
-          <div className="w-full max-w-[433px]">
+          <div className="w-full max-w-[500px]">
               <nav className="flex w-full bg-[#ECECF0] rounded-1 p-1">
-                  <button
-                      onClick={() => {}}
-                      className={`lg:px-4 px-2 py-2 lg:text-sm text-xs font-medium transition-colors rounded-1 w-full shadow-none ${activeTab === 'work'
+                  {Filters.map((filter) => (
+                    <button
+                      key={filter.value}
+                      onClick={() => setActiveFilter(filter.value)}
+                      className={`lg:px-2 px-1 py-2 lg:text-sm text-xs font-medium transition-colors rounded-1 w-full shadow-none ${activeFilter === filter.value
                           ? 'bg-white text-[#020817]'
-                          : 'text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400'
+                          : 'text-gray-500 hover:text-gray-700 hover:border-gray-300'
                           }`}
                   >
-                      All Vehicles
-                  </button>
-
-                  <button
-                      onClick={() => {}}
-                      className={`lg:px-4 px-2 py-2 lg:text-sm text-xs font-medium transition-colors rounded-1 w-full shadow-none ${activeTab === 'fuel'
-                          ? 'bg-white text-[#020817]'
-                          : 'text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400'
-                          }`}
-                  >
-                      Active
-                  </button>
-
-                  <button
-                      onClick={() => {}}
-                      className={`lg:px-4 px-2 py-2 lg:text-sm text-xs font-medium transition-colors rounded-1 w-full shadow-none ${activeTab === 'services'
-                          ? 'bg-white text-[#020817]'
-                          : 'text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400'
-                          }`}
-                  >
-                      Maintenance
-                  </button>
-
-                  <button
-                      onClick={() => {}}
-                      className={`lg:px-4 px-2 py-2 lg:text-sm text-xs font-medium transition-colors rounded-1 w-full shadow-none ${activeTab === 'issue'
-                          ? 'bg-white text-[#020817]'
-                          : 'text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400'
-                          }`}
-                  >
-                      Available
-                  </button>
-
-               
-
-                 
+                      {filter.label}
+                    </button>
+                  ))}
               </nav>
           </div>
 

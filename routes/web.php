@@ -96,6 +96,12 @@ Route::middleware(['auth','page.access'])->group(function () {
     Route::get('/service-reminders/{id}', [HomeController::class, 'index'])->where('id', '[0-9]+');
     Route::get('/service-reminders/{id}/edit', [HomeController::class, 'index'])->where('id', '[0-9]+');
 
+    // Schedules
+    Route::get('/schedules', [HomeController::class, 'index']);
+    Route::get('/schedules/create', [HomeController::class, 'index']);
+    Route::get('/schedules/{id}', [HomeController::class, 'index'])->where('id', '[0-9]+');
+    Route::get('/schedules/{id}/edit', [HomeController::class, 'index'])->where('id', '[0-9]+');
+
     // Services
     Route::get('/services', [HomeController::class, 'index']);
     Route::get('/services/create', [HomeController::class, 'index']);
