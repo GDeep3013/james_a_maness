@@ -108,6 +108,10 @@ nav span.menu-item-icon-size svg {
     width: calc(var(--spacing) * 5) !important;
     height: calc(var(--spacing) * 5) !important;
 }
+.screen-height {
+    min-height: calc(100vh - 77px);
+    padding-bottom: 44px;
+}
 
 
 

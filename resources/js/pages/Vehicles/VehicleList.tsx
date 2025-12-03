@@ -229,8 +229,8 @@ export default function VehicleList({ importSuccess }: { importSuccess?: boolean
                     </div>
                 )}
 
-                <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/5 dark:bg-white/3">
-                    <div className="max-w-full overflow-x-auto">
+                <div className="rounded-xl border border-gray-200 bg-white dark:border-white/5 dark:bg-white/3">
+                    <div className="max-w-full overflow-hidden overflow-x-auto">
                         {loading ? (
                             <div className="flex items-center justify-center py-12">
                                 <div className="text-center">
@@ -354,7 +354,7 @@ export default function VehicleList({ importSuccess }: { importSuccess?: boolean
                                                         </div>
                                                     </TableCell>
                                                     <TableCell className="px-5 py-4 text-start">
-                                                        <div className="flex items-center gap-2">
+                                                        <div className="items-center gap-2">
                                                             <Button
                                                                 variant="none"
                                                                 size="sm"
