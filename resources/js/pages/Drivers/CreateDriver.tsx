@@ -173,7 +173,7 @@ export default function CreateContact() {
     try {
       const response = await contactService.getForEdit(contactId);
       const data = response.data as { status: boolean; data?: Record<string, unknown> };
-      
+
       if (data.status && data.data) {
         const contact = data.data;
         setFormData({
@@ -250,7 +250,7 @@ export default function CreateContact() {
     } else if (formData.password.trim() && formData.password.length < 6) {
       newErrors.password = "Password must be at least 6 characters";
     }
-    
+
     if (!formData.license_no.trim()) {
       newErrors.license_no = "License number is required";
     } else if (formData.license_no.length < 10) {
@@ -516,7 +516,7 @@ export default function CreateContact() {
         </div>
       </div>
 
-      
+
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <div>
@@ -991,7 +991,7 @@ export default function CreateContact() {
       <form onSubmit={handleSubmit}>
         <div className="flex flex-col lg:flex-row gap-6">
           <div className="w-full lg:w-64 shrink-0">
-            
+
             <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-4 mb-2">
                 {renderProfilePictureSection()}
             </div>
@@ -1046,7 +1046,7 @@ export default function CreateContact() {
                 )}
 
                 <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-6">
-              <h2 className="text-2xl font-semibold text-gray-800 dark:text-white/90 mb-6">
+              <h2 className="text-base md:text-2xl font-semibold text-gray-800 dark:text-white/90 mb-6">
                 {sidebarItems.find((item) => item.key === activeSection)?.label}
               </h2>
               {renderSectionContent()}

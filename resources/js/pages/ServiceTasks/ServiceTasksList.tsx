@@ -58,7 +58,7 @@ export default function ServiceTasksList() {
     try {
       const response = await serviceTaskService.getAll({ page, search });
       const data = response.data as ServiceTasksResponse;
-      
+
       if (data.status && data.service_tasks) {
         setServiceTasks(data.service_tasks.data || []);
         setPagination({
@@ -126,10 +126,10 @@ export default function ServiceTasksList() {
     <>
       <PageMeta title="Service Tasks" description="Manage service tasks" />
       <PageBreadcrumb pageTitle="Service Tasks" />
-      
+
       <div className="bg-white rounded-lg border border-gray-200 p-6">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-semibold text-gray-800">Service Tasks</h1>
+          <h1 className="text-base md:text-2xl font-semibold text-gray-800">Service Tasks</h1>
           <Button
             variant="none"
             size="md"

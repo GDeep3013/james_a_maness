@@ -70,7 +70,7 @@ export default function ServiceList() {
     try {
       const response = await serviceService.getAll({ page, search });
       const data = response.data as ServicesResponse;
-      
+
       if (data.status && data.services) {
         setServices(data.services.data || []);
         setPagination({
@@ -130,7 +130,7 @@ export default function ServiceList() {
   };
 
   const handleExport = () => {
-    
+
   };
 
   const formatDateTime = (dateString?: string) => {
@@ -259,7 +259,7 @@ export default function ServiceList() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-semibold text-gray-800">Services</h1>
+            <h1 className="text-base md:text-2xl font-semibold text-gray-800">Services</h1>
           </div>
           <Button
             variant="primary"
@@ -272,7 +272,7 @@ export default function ServiceList() {
 
         <form onSubmit={handleSearch} className="bg-white border border-gray-200 rounded-xl p-4">
           <div className="flex flex-wrap items-center gap-4">
-            <div className="flex-1 max-w-[50%]">
+            <div className="flex-1 sm:max-w-[50%] max-w-[50%]">
               <Input
                 type="text"
                 placeholder="Search by vehicle, vendor..."
@@ -284,7 +284,7 @@ export default function ServiceList() {
             <Button
               variant="outline"
               onClick={handleExport}
-              className="bg-gray-50 border-gray-200 hover:bg-gray-100 w-full max-w-[10%] min-h-[44px] !leading-[44px]"
+              className="bg-gray-50 border-gray-200 hover:bg-gray-100 w- sm:max-w-[50%] md:max-w-[10%] min-h-[44px] !leading-[44px]"
             >
               <ExportIcon />
               Export

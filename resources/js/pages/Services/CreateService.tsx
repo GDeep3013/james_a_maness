@@ -88,7 +88,7 @@ export default function CreateService() {
     try {
       const response = await serviceService.getForEdit(serviceId);
       const data = response.data as { status: boolean; data?: Record<string, unknown> };
-      
+
       if (data.status && data.data) {
         const service = data.data;
         setFormData({
@@ -438,7 +438,7 @@ export default function CreateService() {
         description={isEditMode ? "Edit service" : "Create a new service"}
       />
       <PageBreadcrumb pageTitle={isEditMode ? "Edit Service" : "Create Service"} />
-      
+
       <div className="flex flex-col gap-6 justify-center max-w-5xl mx-auto">
         <form onSubmit={handleSubmit}>
           <div className="flex-1">
@@ -462,7 +462,7 @@ export default function CreateService() {
                 {sidebarItems.map((item) => (
                   <div key={item.key} className="bg-white  rounded-lg border border-gray-200 p-6">
                     {item.label && (
-                      <h2 className="text-2xl font-semibold text-gray-800 dark:text-white/90 mb-6">
+                      <h2 className="text-base md:text-2xl font-semibold text-gray-800 dark:text-white/90 mb-6">
                         {item.label}
                       </h2>
                     )}

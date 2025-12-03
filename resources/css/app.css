@@ -95,7 +95,7 @@ body {
 select {
     appearance: none;
     background: url('/images/down-arrow.png') no-repeat;
-    background-position: 100% 50%;
+    background-position: 98% 50%;
 }
 select.all-status-select {
     background: url('/images/down-arrow.png') no-repeat #F3F3F5;

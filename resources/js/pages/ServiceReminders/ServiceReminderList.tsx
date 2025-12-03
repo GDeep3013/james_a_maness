@@ -95,7 +95,7 @@ export default function ServiceReminderList() {
     try {
       const response = await serviceReminderService.getAll({ page, search, status });
       const data = response.data as ServiceRemindersResponse;
-      
+
       if (data.status && data.service_reminders) {
         setServiceReminders(data.service_reminders.data || []);
         setPagination({
@@ -286,11 +286,11 @@ export default function ServiceReminderList() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-semibold text-gray-800">Service Reminders</h1>
+            <h1 className="text-base md:text-2xl font-semibold text-gray-800">Service Reminders</h1>
           </div>
           <Button
             variant="primary"
-            size="md"
+            size="sm"
             onClick={handleCreate}
           >
             + Create Service Reminder
@@ -299,7 +299,7 @@ export default function ServiceReminderList() {
 
         <form onSubmit={handleSearch} className="bg-white border border-gray-200 rounded-xl p-4">
           <div className="flex flex-wrap items-center gap-4">
-            <div className="flex-1 max-w-[50%]">
+            <div className="flex-1 sm:max-w-[50%] max-w-[50%]">
               <Input
                 type="text"
                 placeholder="Search by vehicle, service task..."
@@ -308,7 +308,7 @@ export default function ServiceReminderList() {
                 className="!bg-[#F3F3F5] max-w-full border-none !rounded-[8px]"
               />
             </div>
-            <div className="w-full max-w-[20%]">
+            <div className="w-full sm:max-w-[50%] md:max-w-[20%]">
               <Select
                 options={STATUS_FILTER_OPTIONS}
                 placeholder="All Status"

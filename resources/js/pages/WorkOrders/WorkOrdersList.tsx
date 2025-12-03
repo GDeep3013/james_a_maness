@@ -85,7 +85,7 @@ export default function WorkOrdersList() {
     try {
       const response = await workOrderService.getAll({ page, search, status });
       const data = response.data as WorkOrdersResponse;
-      
+
       if (data.status && data.work_orders) {
         setWorkOrders(data.work_orders.data || []);
         setPagination({
@@ -145,7 +145,7 @@ export default function WorkOrdersList() {
   };
 
   const handleExport = () => {
-    
+
   };
 
   const formatDate = (dateString?: string) => {
@@ -290,7 +290,7 @@ export default function WorkOrdersList() {
 
         <form onSubmit={handleSearch} className="bg-white border border-gray-200 rounded-xl p-4">
           <div className="flex flex-wrap items-center gap-4">
-            <div className="flex-1 max-w-[50%]">
+            <div className="flex-1 md:max-w-[50%]">
               <Input
                 type="text"
                 placeholder="Search by vehicle, invoice number, PO number..."
@@ -299,7 +299,7 @@ export default function WorkOrdersList() {
                 className="!bg-[#F3F3F5] max-w-full border-none !rounded-[8px]"
               />
             </div>
-            <div className="w-full max-w-[20%]">
+            <div className="w-full sm:max-w-[50%] md:max-w-[20%]">
               <Select
                 options={WORK_ORDER_STATUS_FILTER_OPTIONS}
                 placeholder="All Status"
@@ -311,7 +311,7 @@ export default function WorkOrdersList() {
             <Button
               variant="outline"
               onClick={handleExport}
-              className="bg-gray-50 border-gray-200 hover:bg-gray-100 w-full max-w-[10%] min-h-[44px] !leading-[44px]"
+              className="bg-gray-50 border-gray-200 hover:bg-gray-100 w-full sm:max-w-[50%] md:max-w-[10%] min-h-[44px] !leading-[44px]"
             >
               <ExportIcon />
               Export

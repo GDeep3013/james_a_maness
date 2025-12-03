@@ -12,10 +12,10 @@ export default function Contacts() {
         title="Contacts"
         description="This is Contacts page for KAV EXPEDITING"
       />
-      
+
       <div className="page-actions flex flex-wrap items-center justify-between gap-3 mb-6">
         <h2
-          className="text-xl font-semibold text-gray-800 dark:text-white/90"
+          className="text-base md:text-xl font-semibold text-gray-800 dark:text-white/90"
           x-text="pageName"
         >
           Contacts
@@ -23,11 +23,11 @@ export default function Contacts() {
 
         <Link to="/contacts/create">
           <Button size="sm" variant="primary"> <PlusIcon /> Add Contact</Button>
-        </Link> 
+        </Link>
 
       </div>
-      
-      
+
+
       <div className="space-y-6">
         <ContactsList />
       </div>

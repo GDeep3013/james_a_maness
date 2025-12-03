@@ -167,8 +167,8 @@ export default function ContactDetail() {
                             <ChevronLeftIcon className="size-5" />
                         </button>
                         <div>
-                            <h1 className="text-lg font-medium text-gray-500 dark:text-gray-400 mb-0">Contact</h1>
-                            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
+                            <h1 className="text-sm md:text-lg font-medium text-gray-500 dark:text-gray-400 mb-0">Contact</h1>
+                            <h2 className="text-base md:text-2xl font-semibold text-gray-900 dark:text-white">
                                 {getFullName() || `Contact #${contact.id}`}
                             </h2>
                         </div>
@@ -257,7 +257,7 @@ export default function ContactDetail() {
                             </div>
                         </div>
                         <div className="bg-white rounded-lg lg:p-6 p-3 border border-gray-200 mt-4">
-                            <h2 className="text-lg font-semibold text-gray-800 dark:text-white/90 mb-3">Classification</h2>
+                            <h2 className="text-base md:text-lg font-semibold text-gray-800 dark:text-white/90 mb-3">Classification</h2>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Classification</label>
@@ -266,7 +266,7 @@ export default function ContactDetail() {
                             </div>
                         </div>
                         <div className="bg-white rounded-lg lg:p-6 p-3 border border-gray-200 mt-4">
-                            <h2 className="text-lg font-semibold text-gray-800 dark:text-white/90 mb-3">License</h2>
+                            <h2 className="text-base md:text-lg font-semibold text-gray-800 dark:text-white/90 mb-3">License</h2>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 {(contact.license_no || contact.license_number) && (
                                     <div>
@@ -299,7 +299,7 @@ export default function ContactDetail() {
                             </div>
                         </div>
                         <div className="bg-white rounded-lg lg:p-6 p-3 border border-gray-200 mt-4">
-                            <h2 className="text-lg font-semibold text-gray-800 dark:text-white/90 mb-3">Immigration</h2>
+                            <h2 className="text-base md:text-lg font-semibold text-gray-800 dark:text-white/90 mb-3">Immigration</h2>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Status in Country</label>
@@ -316,7 +316,7 @@ export default function ContactDetail() {
                             </div>
                         </div>
                         <div className="bg-white rounded-lg lg:p-6 p-3 border border-gray-200 mt-4">
-                            <h2 className="text-lg font-semibold text-gray-800 dark:text-white/90 mb-3">Employment</h2>
+                            <h2 className="text-base md:text-lg font-semibold text-gray-800 dark:text-white/90 mb-3">Employment</h2>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Job Title</label>
@@ -341,7 +341,7 @@ export default function ContactDetail() {
                             </div>
                         </div>
                         <div className="bg-white rounded-lg lg:p-6 p-3 border border-gray-200 mt-4">
-                            <h2 className="text-lg font-semibold text-gray-800 dark:text-white/90 mb-3">Emergency Contact</h2>
+                            <h2 className="text-base md:text-lg font-semibold text-gray-800 dark:text-white/90 mb-3">Emergency Contact</h2>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Contact Name</label>
@@ -361,7 +361,7 @@ export default function ContactDetail() {
                     <div className="w-full">
                         <div className="bg-white rounded-lg lg:p-6 p-3 border border-gray-200">
                             <div className="flex flex-wrap sm:flex-nowrap justify-between items-center mb-2">
-                                <h2 className="text-lg font-semibold text-gray-800 dark:text-white/90 mb-3">
+                                <h2 className="text-base md:text-lg font-semibold text-gray-800 dark:text-white/90 mb-3">
                                     No currently active vehicle assignments.
                                 </h2>
                                 <div className="flex gap-3">
@@ -381,7 +381,7 @@ export default function ContactDetail() {
                         </div>
                         <div className="bg-white rounded-lg lg:p-6 p-3 border border-gray-200 mt-4">
                             <div className="flex flex-wrap sm:flex-nowrap justify-between items-center mb-2">
-                                <h2 className="text-lg font-semibold text-gray-800 dark:text-white/90 mb-3">
+                                <h2 className="text-base md:text-lg font-semibold text-gray-800 dark:text-white/90 mb-3">
                                     Incomplete Work Order Assignments
                                 </h2>
                             </div>
@@ -393,7 +393,7 @@ export default function ContactDetail() {
                         </div>
                         <div className="bg-white rounded-lg lg:p-6 p-3 border border-gray-200 mt-4">
                             <div className="flex flex-wrap sm:flex-nowrap justify-between items-center mb-2">
-                                <h2 className="text-lg font-semibold text-gray-800 dark:text-white/90 mb-3">
+                                <h2 className="text-base md:text-lg font-semibold text-gray-800 dark:text-white/90 mb-3">
                                     Open Issue Assignments
                                 </h2>
                                 <div className="flex gap-3">
@@ -410,7 +410,7 @@ export default function ContactDetail() {
                         </div>
                         <div className="bg-white rounded-lg lg:p-6 p-3 border border-gray-200 mt-4">
                             <div className="flex flex-wrap sm:flex-nowrap justify-between items-center mb-2">
-                                <h2 className="text-lg font-semibold text-gray-800 dark:text-white/90 mb-3">
+                                <h2 className="text-base md:text-lg font-semibold text-gray-800 dark:text-white/90 mb-3">
                                     Service Reminder Assignments
                                 </h2>
                                 <div className="flex gap-3">

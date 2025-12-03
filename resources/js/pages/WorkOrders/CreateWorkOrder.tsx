@@ -108,7 +108,7 @@ export default function CreateWorkOrder() {
     try {
       const response = await workOrderService.getForEdit(workOrderId);
       const data = response.data as { status: boolean; data?: Record<string, unknown> };
-      
+
       if (data.status && data.data) {
         const workOrder = data.data;
         setFormData({
@@ -661,7 +661,7 @@ export default function CreateWorkOrder() {
         description={isEditMode ? "Edit work order" : "Create a new work order"}
       />
       <PageBreadcrumb pageTitle={isEditMode ? "Edit Work Order" : "Create Work Order"} />
-      
+
       <div className="flex flex-col gap-6 justify-center max-w-5xl mx-auto">
         <form onSubmit={handleSubmit}>
           <div className="flex-1">
@@ -684,7 +684,7 @@ export default function CreateWorkOrder() {
 
                 {sidebarItems.map((item) => (
                   <div key={item.key} className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-6">
-                    {item.label && <h2 className="text-2xl font-semibold text-gray-800 dark:text-white/90 mb-6">
+                    {item.label && <h2 className="text-base md:text-2xl font-semibold text-gray-800 dark:text-white/90 mb-6">
                         {item.label}
                       </h2>
                     }

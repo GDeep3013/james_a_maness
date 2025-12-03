@@ -173,7 +173,7 @@ export default function Notes({
               <select
                 value={discountType}
                 onChange={(e) => setDiscountType?.(e.target.value as "percentage" | "fixed")}
-                className="px-2 py-1 text-xs border border-gray-300  rounded bg-white  text-gray-900  focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="px-2 py-1 text-xs border border-gray-300  rounded bg-white  text-gray-900  focus:outline-none focus:ring-1 focus:ring-blue-500 min-w-[61px]"
               >
                 <option value="percentage">%</option>
                 <option value="fixed">$</option>
@@ -197,7 +197,7 @@ export default function Notes({
               <select
                 value={taxType}
                 onChange={(e) => setTaxType?.(e.target.value as "percentage" | "fixed")}
-                className="px-2 py-1 text-xs border border-gray-300  rounded bg-white  text-gray-900  focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="px-2 py-1 text-xs border border-gray-300  rounded bg-white  text-gray-900  focus:outline-none focus:ring-1 focus:ring-blue-500 min-w-[61px]"
               >
                 <option value="percentage">%</option>
                 <option value="fixed">$</option>
