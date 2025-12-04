@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate, useParams } from "react-router";
 import PageMeta from "../../components/common/PageMeta";
 import Label from "../../components/form/Label";
@@ -38,23 +38,17 @@ export default function CreateMeterReading() {
         date: new Date().toISOString().split('T')[0],
     });
 
-    const [vehicles, setVehicles] = useState<Array<{ value: string; label: string }>>([]);
-
-    useEffect(() => {
-        fetchDropdownData();
-
-        if (isEditMode && id) {
-            fetchMeterReadingData(parseInt(id));
-        }
-    }, [isEditMode, id]);
+    const [vehicles, setVehicles] = useState<Array<{ value: string; label: string; current_mileage?: string }>>([]);
+    const [currentMileage, setCurrentMileage] = useState<string>("");
 
     const fetchDropdownData = async () => {
         try {
             const vehiclesRes = await vehicleService.getAll();
 
-            const vehicleOptions = (vehiclesRes.data.vehical || vehiclesRes.data.vehicles || []).map((vehicle: any) => ({
+            const vehicleOptions = (vehiclesRes.data.vehical || vehiclesRes.data.vehicles || []).map((vehicle: { id: number; name?: string; current_mileage?: string }) => ({
                 value: String(vehicle.id),
                 label: vehicle.name || `Vehicle #${vehicle.id}`,
+                current_mileage: vehicle.current_mileage || "",
             }));
 
             setVehicles(vehicleOptions);
@@ -64,7 +58,7 @@ export default function CreateMeterReading() {
         }
     };
 
-    const fetchMeterReadingData = async (readingId: number) => {
+    const fetchMeterReadingData = useCallback(async (readingId: number) => {
         setIsLoading(true);
         setGeneralError("");
         try {
@@ -79,6 +73,11 @@ export default function CreateMeterReading() {
                     vehicle_meter: String(reading.vehicle_meter || ""),
                     date: reading.date ? String(reading.date).split('T')[0] : new Date().toISOString().split('T')[0],
                 });
+
+                if (reading.vehicle_id && vehicles.length > 0) {
+                    const selectedVehicle = vehicles.find((v) => v.value === String(reading.vehicle_id));
+                    setCurrentMileage(selectedVehicle?.current_mileage || "");
+                }
             }
         } catch (error) {
             console.error("Failed to load meter reading data:", error);
@@ -86,7 +85,17 @@ export default function CreateMeterReading() {
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [vehicles]);
+
+    useEffect(() => {
+        fetchDropdownData();
+    }, []);
+
+    useEffect(() => {
+        if (isEditMode && id) {
+            fetchMeterReadingData(parseInt(id));
+        }
+    }, [isEditMode, id, fetchMeterReadingData]);
 
     const handleInputChange = (name: keyof MeterReadingFormData, value: string) => {
         setFormData((prev) => ({ ...prev, [name]: value }));
@@ -118,6 +127,13 @@ export default function CreateMeterReading() {
                 delete newErrors[name];
                 return newErrors;
             });
+        }
+
+        if (name === "vehicle_id" && value) {
+            const selectedVehicle = vehicles.find((v) => v.value === value);
+            setCurrentMileage(selectedVehicle?.current_mileage || "");
+        } else if (name === "vehicle_id" && !value) {
+            setCurrentMileage("");
         }
     };
 
@@ -159,8 +175,8 @@ export default function CreateMeterReading() {
             };
 
             const response = isEditMode && id
-                ? await meterReadingService.update(parseInt(id), readingData as any)
-                : await meterReadingService.create(readingData as any);
+                ? await meterReadingService.update(parseInt(id), readingData)
+                : await meterReadingService.create(readingData);
 
             if (response.data?.status === true || response.status === 200 || response.status === 201) {
                 if (saveAndAddAnother && !isEditMode) {
@@ -267,6 +283,11 @@ export default function CreateMeterReading() {
                         placeholder="Enter odometer reading (e.g., 108043)"
                         className={errors.vehicle_meter ? "border-error-500" : ""}
                     />
+                    {currentMileage && (
+                        <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                            Previous meter reading: <span className="font-medium">{currentMileage}</span>
+                        </p>
+                    )}
                     {errors.vehicle_meter && (
                         <p className="mt-1 text-sm text-error-500">{errors.vehicle_meter}</p>
                     )}
