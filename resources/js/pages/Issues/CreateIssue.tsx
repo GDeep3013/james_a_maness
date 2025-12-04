@@ -342,14 +342,15 @@ export default function CreateIssue() {
           </div>
         )}
         <div className="flex flex-col lg:flex-row gap-6 justify-center">
-            <form onSubmit={handleSubmit} className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl p-6 lg:p-8">
+            <form onSubmit={handleSubmit} className="w-full max-w-5xl bg-white border border-gray-200 rounded-xl p-6 lg:p-8">
             <div className="space-y-6">
                 <div>
-                <h3 className="mb-4 text-lg font-medium text-gray-800 dark:text-white/90">
+                <h3 className="mb-4 text-lg font-medium text-gray-800">
                     Details
                 </h3>
 
-                <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                  <div className="grid grid-cols-1 gap-6 lg:grid-cols-3 mb-6">
+                  
                     <div>
                     <Label htmlFor="asset">
                         Asset <span className="text-red-500">*</span>
@@ -367,49 +368,62 @@ export default function CreateIssue() {
                     </div>
 
                     <div>
-                    <Label htmlFor="priority">Priority</Label>
-                    <Select
-                        options={PRIORITY_OPTIONS}
-                        placeholder="No Priority"
-                        onChange={(value) => handleInputChange("priority", value)}
-                        defaultValue={formData.priority}
-                    />
+                      <Label htmlFor="priority">Priority</Label>
+                      <Select
+                          options={PRIORITY_OPTIONS}
+                          placeholder="No Priority"
+                          onChange={(value) => handleInputChange("priority", value)}
+                          defaultValue={formData.priority}
+                      />
                     </div>
 
-                    <div className="lg:col-span-2">
-                    <Label htmlFor="reported_date">
-                        Reported Date <span className="text-red-500">*</span>
-                    </Label>
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                        <div className="relative">
-                        <DatePicker
-                            id="reported_date"
-                            label=""
-                            placeholder="Select date"
-                            onChange={handleDateChange("reported_date")}
-                            defaultDate={formData.reported_date || undefined}
-                        />
-                        {errors.reported_date && (
-                            <p className="mt-1 text-sm text-red-500">
-                            {errors.reported_date}
-                            </p>
-                        )}
-                        </div>
-                        <div className="relative">
-                        <Input
-                            type="time"
-                            id="reported_time"
-                            value={formData.reported_time}
-                            onChange={(e) =>
-                            handleInputChange("reported_time", e.target.value)
-                            }
-                            placeholder="Select time"
-                        />
-                        <span className="absolute text-gray-500 -translate-y-1/2 pointer-events-none right-3 top-1/2">
-                            <TimeIcon className="size-6" />
-                        </span>
-                        </div>
+                    <div>
+                    <Label htmlFor="status">Status</Label>
+                    <Select
+                        options={ISSUE_STATUS_OPTIONS}
+                        placeholder="Select status"
+                        onChange={(value) => handleInputChange("status", value)}
+                        defaultValue={formData.status}
+                    />
                     </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+
+                    <div className="lg:col-span-2">
+                      <Label htmlFor="reported_date">
+                          Reported Date <span className="text-red-500">*</span>
+                      </Label>
+                      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                          <div className="relative">
+                          <DatePicker
+                              id="reported_date"
+                              label=""
+                              placeholder="Select date"
+                              onChange={handleDateChange("reported_date")}
+                              defaultDate={formData.reported_date || undefined}
+                          />
+                          {errors.reported_date && (
+                              <p className="mt-1 text-sm text-red-500">
+                              {errors.reported_date}
+                              </p>
+                          )}
+                          </div>
+                          <div className="relative">
+                          <Input
+                              type="time"
+                              id="reported_time"
+                              value={formData.reported_time}
+                              onChange={(e) =>
+                              handleInputChange("reported_time", e.target.value)
+                              }
+                              placeholder="Select time"
+                          />
+                          <span className="absolute text-gray-500 -translate-y-1/2 pointer-events-none right-3 top-1/2">
+                              <TimeIcon className="size-6" />
+                          </span>
+                          </div>
+                      </div>
                     </div>
 
                     <div className="lg:col-span-2">
@@ -469,7 +483,7 @@ export default function CreateIssue() {
                             placeholder="Enter value"
                         />
                         <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-500">
-                            hr
+                            mi
                         </span>
                     </div>
                     </div>
@@ -492,16 +506,6 @@ export default function CreateIssue() {
                         placeholder={isLoadingContacts ? "Loading contacts..." : "Please select"}
                         onChange={(value) => handleInputChange("assigned_to", value)}
                         defaultValue={formData.assigned_to}
-                    />
-                    </div>
-
-                    <div>
-                    <Label htmlFor="status">Status</Label>
-                    <Select
-                        options={ISSUE_STATUS_OPTIONS}
-                        placeholder="Select status"
-                        onChange={(value) => handleInputChange("status", value)}
-                        defaultValue={formData.status}
                     />
                     </div>
                 </div>
@@ -540,7 +544,7 @@ export default function CreateIssue() {
                         placeholder="Enter value"
                         />
                         <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-500">
-                        hr
+                        mi
                         </span>
                     </div>
                     <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
