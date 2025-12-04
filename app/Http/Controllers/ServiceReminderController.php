@@ -19,7 +19,6 @@ class ServiceReminderController extends Controller
         $tableColumns = Schema::getColumnListing('service_reminders');
         $query = ServiceReminder::with([
             'vehicle:id,vehicle_name',
-            'serviceTask:id,name',
             'user:id,name'
         ])->orderBy('id', 'desc');
         
@@ -36,7 +35,7 @@ class ServiceReminderController extends Controller
         if (!empty($searchTerm)) {
             $query->where(function ($query) use ($tableColumns, $searchTerm) {
                 foreach ($tableColumns as $column) {
-                    if ($column !== 'created_at' && $column !== 'updated_at' && $column !== 'watchers') {
+                    if ($column !== 'created_at' && $column !== 'updated_at' && $column !== 'watchers' && $column !== 'service_task_ids') {
                         $query->orWhere($column, 'LIKE', '%' . $searchTerm . '%');
                     }
                 }
@@ -46,12 +45,22 @@ class ServiceReminderController extends Controller
                 $q->where('vehicle_name', 'LIKE', '%' . $searchTerm . '%');
             });
 
-            $query->orWhereHas('serviceTask', function ($q) use ($searchTerm) {
-                $q->where('name', 'LIKE', '%' . $searchTerm . '%');
-            });
+            if (!empty($searchTerm)) {
+                $query->orWhereJsonContains('service_task_ids', $searchTerm);
+            }
         }
 
         $serviceReminders = $query->paginate(20);
+
+        $serviceReminders->getCollection()->transform(function ($reminder) {
+            if ($reminder->service_task_ids && is_array($reminder->service_task_ids)) {
+                $reminder->service_tasks = \App\Models\ServiceTask::whereIn('id', $reminder->service_task_ids)
+                    ->get(['id', 'name']);
+            } else {
+                $reminder->service_tasks = collect([]);
+            }
+            return $reminder;
+        });
 
         return response()->json(['status' => true, 'service_reminders' => $serviceReminders]);
     }
@@ -61,7 +70,8 @@ class ServiceReminderController extends Controller
         try {
             $validatedData = $request->validate([
                 'vehicle_id' => 'required|exists:vehicals,id',
-                'service_task_id' => 'required|exists:service_tasks,id',
+                'service_task_ids' => 'required|array',
+                'service_task_ids.*' => 'exists:service_tasks,id',
                 'time_interval_value' => 'nullable|string|max:255',
                 'time_interval_unit' => 'nullable|string|max:255',
                 'time_due_soon_threshold_value' => 'nullable|string|max:255',
@@ -83,7 +93,10 @@ class ServiceReminderController extends Controller
             $serviceReminder = new ServiceReminder;
             $serviceReminder->user_id = Auth::id();
             $serviceReminder->vehicle_id = $request->vehicle_id;
-            $serviceReminder->service_task_id = $request->service_task_id;
+            
+            if ($request->has('service_task_ids') && is_array($request->service_task_ids)) {
+                $serviceReminder->service_task_ids = array_map('intval', $request->service_task_ids);
+            }
             $serviceReminder->time_interval_value = $request->time_interval_value ?? null;
             $serviceReminder->time_interval_unit = $request->time_interval_unit ?? null;
             $serviceReminder->time_due_soon_threshold_value = $request->time_due_soon_threshold_value ?? null;
@@ -133,7 +146,7 @@ class ServiceReminderController extends Controller
                 return response()->json([
                     'status' => true,
                     'message' => 'Service reminder created successfully',
-                    'data' => $serviceReminder->load(['vehicle', 'serviceTask', 'user'])
+                    'data' => $serviceReminder->load(['vehicle', 'user'])
                 ]);
             } else {
                 DB::rollBack();
@@ -172,9 +185,16 @@ class ServiceReminderController extends Controller
             ], 400);
         }
 
-        $serviceReminder = ServiceReminder::with(['vehicle', 'serviceTask', 'user'])->where('id', $id)->first();
+        $serviceReminder = ServiceReminder::with(['vehicle', 'user'])->where('id', $id)->first();
 
         if ($serviceReminder) {
+            if ($serviceReminder->service_task_ids && is_array($serviceReminder->service_task_ids)) {
+                $serviceReminder->service_tasks = \App\Models\ServiceTask::whereIn('id', $serviceReminder->service_task_ids)
+                    ->get(['id', 'name']);
+            } else {
+                $serviceReminder->service_tasks = collect([]);
+            }
+            
             return response()->json([
                 'status' => true,
                 'message' => 'Service reminder retrieved successfully',
@@ -199,11 +219,17 @@ class ServiceReminderController extends Controller
 
         $serviceReminder = ServiceReminder::with([
             'vehicle:id,vehicle_name',
-            'serviceTask:id,name',
             'user:id,name'
         ])->where('id', $id)->first();
 
         if ($serviceReminder) {
+            if ($serviceReminder->service_task_ids && is_array($serviceReminder->service_task_ids)) {
+                $serviceReminder->service_tasks = \App\Models\ServiceTask::whereIn('id', $serviceReminder->service_task_ids)
+                    ->get(['id', 'name']);
+            } else {
+                $serviceReminder->service_tasks = collect([]);
+            }
+            
             return response()->json([
                 'status' => true,
                 'message' => 'Service reminder data',
@@ -237,7 +263,8 @@ class ServiceReminderController extends Controller
         try {
             $validatedData = $request->validate([
                 'vehicle_id' => 'nullable|exists:vehicals,id',
-                'service_task_id' => 'nullable|exists:service_tasks,id',
+                'service_task_ids' => 'nullable|array',
+                'service_task_ids.*' => 'exists:service_tasks,id',
                 'time_interval_value' => 'nullable|string|max:255',
                 'time_interval_unit' => 'nullable|string|max:255',
                 'time_due_soon_threshold_value' => 'nullable|string|max:255',
@@ -261,8 +288,8 @@ class ServiceReminderController extends Controller
             if ($request->has('vehicle_id')) {
                 $serviceReminder->vehicle_id = $request->vehicle_id;
             }
-            if ($request->has('service_task_id')) {
-                $serviceReminder->service_task_id = $request->service_task_id;
+            if ($request->has('service_task_ids') && is_array($request->service_task_ids)) {
+                $serviceReminder->service_task_ids = array_map('intval', $request->service_task_ids);
             }
             if ($request->has('time_interval_value')) {
                 $serviceReminder->time_interval_value = $request->time_interval_value;
@@ -353,7 +380,7 @@ class ServiceReminderController extends Controller
                 return response()->json([
                     'status' => true,
                     'message' => 'Service reminder updated successfully',
-                    'data' => $serviceReminder->load(['vehicle', 'serviceTask', 'user'])
+                    'data' => $serviceReminder->load(['vehicle', 'user'])
                 ]);
             } else {
                 DB::rollBack();
@@ -426,7 +453,7 @@ class ServiceReminderController extends Controller
         }
 
         $hasBeenLogged = ServiceReminder::where('vehicle_id', $vehicleId)
-            ->where('service_task_id', $serviceTaskId)
+            ->whereJsonContains('service_task_ids', (int)$serviceTaskId)
             ->whereNotNull('last_completed_date')
             ->exists();
 

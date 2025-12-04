@@ -17,7 +17,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('user_id')->nullable();
             $table->unsignedBigInteger('vehicle_id')->nullable();
-            $table->unsignedBigInteger('service_task_id')->nullable();
+            $table->json('service_task_ids')->nullable();
             
             $table->string('time_interval_value')->nullable();
             $table->string('time_interval_unit')->nullable();
@@ -46,7 +46,6 @@ return new class extends Migration
             
             $table->foreign('user_id')->references('id')->on('users')->onDelete('set null');
             $table->foreign('vehicle_id')->references('id')->on('vehicals')->onDelete('cascade');
-            $table->foreign('service_task_id')->references('id')->on('service_tasks')->onDelete('cascade');
         });
     }
 

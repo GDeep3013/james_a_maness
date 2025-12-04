@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate, useParams } from "react-router";
+import ReactSelect, { MultiValue } from "react-select";
 import PageBreadcrumb from "../../components/common/PageBreadCrumb";
 import PageMeta from "../../components/common/PageMeta";
 import Label from "../../components/form/Label";
@@ -16,14 +17,16 @@ import { serviceTaskService } from "../../services/serviceTaskService";
 import { serviceReminderService } from "../../services/serviceReminderService";
 import { Vehicle, Contact } from "../../types/workOrderTypes";
 
-interface ServiceTask {
-  id: number;
-  name: string;
+interface ServiceTaskOption {
+  value: string;
+  label: string;
+  id?: number;
+  [key: string]: unknown;
 }
 
 interface ServiceReminderFormData {
   vehicle_id: string;
-  service_task_id: string;
+  service_task_ids: string[];
   time_interval_value: string;
   time_interval_unit: string;
   time_due_soon_threshold_value: string;
@@ -61,11 +64,15 @@ export default function CreateServiceReminder() {
   const [generalError, setGeneralError] = useState<string>("");
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [contacts, setContacts] = useState<Contact[]>([]);
-  const [serviceTasks, setServiceTasks] = useState<ServiceTask[]>([]);
-  const [serviceTaskNeverLogged, setServiceTaskNeverLogged] = useState(false);
+  const [serviceTaskOptions, setServiceTaskOptions] = useState<ServiceTaskOption[]>([]);
+  const [allServiceTasks, setAllServiceTasks] = useState<ServiceTaskOption[]>([]);
+  const [isLoadingServiceTasks, setIsLoadingServiceTasks] = useState(false);
+  const [searchTimeout, setSearchTimeout] = useState<ReturnType<typeof setTimeout> | null>(null);
+  const selectedTasksRef = useRef<ServiceTaskOption[]>([]);
+  const dataLoadedRef = useRef(false);
   const [formData, setFormData] = useState<ServiceReminderFormData>({
     vehicle_id: "",
-    service_task_id: "",
+    service_task_ids: [],
     time_interval_value: "",
     time_interval_unit: "month",
     time_due_soon_threshold_value: "",
@@ -80,34 +87,55 @@ export default function CreateServiceReminder() {
     next_due_meter: "",
   });
 
-  useEffect(() => {
-    fetchDropdownData();
-    if (isEditMode && id) {
-      fetchServiceReminderData(parseInt(id));
-    }
-  }, [isEditMode, id]);
-
-  const checkServiceTaskLogged = useCallback(async () => {
-    if (!formData.vehicle_id || !formData.service_task_id) return;
-    
+  const fetchServiceTasks = useCallback(async (search: string = "") => {
+    setIsLoadingServiceTasks(true);
     try {
-      const response = await serviceReminderService.checkServiceTaskLogged(
-        parseInt(formData.vehicle_id),
-        parseInt(formData.service_task_id)
-      );
-      setServiceTaskNeverLogged(response.data?.never_logged || false);
+      const response = await serviceTaskService.getAll({ search });
+      const data = response.data as { status: boolean; service_tasks?: { data: Array<{ id: number; name: string }> } };
+      
+      if (data.status && data.service_tasks?.data) {
+        const fetchedTasks = data.service_tasks.data.map((task) => ({
+          value: task.id.toString(),
+          label: task.name,
+          id: task.id,
+        }));
+
+        if (!search) {
+          setAllServiceTasks(fetchedTasks);
+        }
+
+        setServiceTaskOptions((prevOptions) => {
+          const currentSelected = selectedTasksRef.current;
+          
+          const mergedOptions = [...currentSelected];
+          fetchedTasks.forEach(task => {
+            if (!mergedOptions.find(opt => opt.value === task.value)) {
+              mergedOptions.push(task);
+            }
+          });
+
+          return mergedOptions.length > 0 ? mergedOptions : prevOptions;
+        });
+      }
     } catch {
-      setServiceTaskNeverLogged(false);
+      setServiceTaskOptions((prevOptions) => {
+        const currentSelected = selectedTasksRef.current;
+        return currentSelected.length > 0 ? currentSelected : (prevOptions.length > 0 ? prevOptions : []);
+      });
+    } finally {
+      setIsLoadingServiceTasks(false);
     }
-  }, [formData.vehicle_id, formData.service_task_id]);
+  }, []);
 
   useEffect(() => {
-    if (formData.vehicle_id && formData.service_task_id) {
-      checkServiceTaskLogged();
-    }
-  }, [formData.vehicle_id, formData.service_task_id, checkServiceTaskLogged]);
+    return () => {
+      if (searchTimeout) {
+        clearTimeout(searchTimeout);
+      }
+    };
+  }, [searchTimeout]);
 
-  const fetchDropdownData = async () => {
+  const fetchDropdownData = useCallback(async () => {
     try {
       const [vehiclesRes, contactsRes, serviceTasksRes] = await Promise.all([
         vehicleService.getAll({ page: 1 }),
@@ -124,15 +152,21 @@ export default function CreateServiceReminder() {
       }
 
       if (serviceTasksRes.data?.status && serviceTasksRes.data?.service_tasks?.data) {
-        setServiceTasks(serviceTasksRes.data.service_tasks.data);
+        const fetchedTasks = serviceTasksRes.data.service_tasks.data.map((task: { id: number; name: string }) => ({
+          value: task.id.toString(),
+          label: task.name,
+          id: task.id,
+        }));
+        setAllServiceTasks(fetchedTasks);
+        setServiceTaskOptions(fetchedTasks);
       }
     } catch {
       setGeneralError("Failed to load dropdown data");
     }
-  };
+  }, []);
 
 
-  const fetchServiceReminderData = async (reminderId: number) => {
+  const fetchServiceReminderData = useCallback(async (reminderId: number) => {
     setIsLoading(true);
     setGeneralError("");
     try {
@@ -151,9 +185,15 @@ export default function CreateServiceReminder() {
           }
         }
         
+        const reminderServiceTaskIds = Array.isArray(reminder.service_task_ids) 
+          ? reminder.service_task_ids.map((id: unknown) => String(id))
+          : reminder.service_task_id 
+            ? [String(reminder.service_task_id)]
+            : [];
+        
         setFormData({
           vehicle_id: String(reminder.vehicle_id || ""),
-          service_task_id: String(reminder.service_task_id || ""),
+          service_task_ids: reminderServiceTaskIds,
           time_interval_value: String(reminder.time_interval_value || ""),
           time_interval_unit: String(reminder.time_interval_unit || "month"),
           time_due_soon_threshold_value: String(reminder.time_due_soon_threshold_value || ""),
@@ -169,13 +209,48 @@ export default function CreateServiceReminder() {
           next_due_date: reminder.next_due_date ? String(reminder.next_due_date) : "",
           next_due_meter: nextDueMeterValue,
         });
+
+        if (reminderServiceTaskIds.length > 0) {
+          setTimeout(() => {
+            const selectedOptions = allServiceTasks.filter((task: ServiceTaskOption) => 
+              reminderServiceTaskIds.includes(task.value)
+            );
+            if (selectedOptions.length > 0) {
+              selectedTasksRef.current = selectedOptions;
+              setServiceTaskOptions((prev) => {
+                const merged = [...selectedOptions];
+                prev.forEach(task => {
+                  if (!merged.find(opt => opt.value === task.value)) {
+                    merged.push(task);
+                  }
+                });
+                return merged;
+              });
+            }
+          }, 100);
+        }
       }
     } catch {
       setGeneralError("Failed to load service reminder data. Please try again.");
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [allServiceTasks]);
+
+  useEffect(() => {
+    if (dataLoadedRef.current) return;
+    dataLoadedRef.current = true;
+
+    fetchDropdownData();
+  }, [fetchDropdownData]);
+
+  useEffect(() => {
+    if (!isEditMode || !id || dataLoadedRef.current === false) return;
+
+    if (allServiceTasks.length > 0) {
+      fetchServiceReminderData(parseInt(id));
+    }
+  }, [isEditMode, id, allServiceTasks, fetchServiceReminderData]);
 
   const handleInputChange = (name: string, value: string | boolean) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -197,6 +272,39 @@ export default function CreateServiceReminder() {
         return newErrors;
       });
     }
+  };
+
+  const handleServiceTaskChange = (selectedOptions: MultiValue<ServiceTaskOption>) => {
+    if (selectedOptions && selectedOptions.length > 0) {
+      const values = selectedOptions.map(option => option.value);
+      selectedTasksRef.current = selectedOptions as ServiceTaskOption[];
+      setFormData((prev) => ({ ...prev, service_task_ids: values }));
+      if (errors.service_task_ids) {
+        setErrors((prev) => {
+          const newErrors = { ...prev };
+          delete newErrors.service_task_ids;
+          return newErrors;
+        });
+      }
+    } else {
+      selectedTasksRef.current = [];
+      setFormData((prev) => ({ ...prev, service_task_ids: [] }));
+    }
+  };
+
+  const handleServiceTaskSearch = (inputValue: string) => {
+    if (searchTimeout) {
+      clearTimeout(searchTimeout);
+    }
+    if(inputValue.trim() === "") {
+      return;
+    }
+
+    const timeout = setTimeout(() => {
+      fetchServiceTasks(inputValue);
+    }, 300);
+
+    setSearchTimeout(timeout);
   };
 
   const handleCheckboxChange = (name: string) => (checked: boolean) => {
@@ -231,8 +339,8 @@ export default function CreateServiceReminder() {
       newErrors.vehicle_id = "Vehicle is required";
     }
 
-    if (!formData.service_task_id.trim()) {
-      newErrors.service_task_id = "Service Task is required";
+    if (!formData.service_task_ids || formData.service_task_ids.length === 0) {
+      newErrors.service_task_ids = "At least one Service Task is required";
     }
 
     setErrors(newErrors);
@@ -257,7 +365,7 @@ export default function CreateServiceReminder() {
 
       const reminderData = {
         vehicle_id: formData.vehicle_id ? parseInt(formData.vehicle_id) : undefined,
-        service_task_id: formData.service_task_id ? parseInt(formData.service_task_id) : undefined,
+        service_task_ids: formData.service_task_ids.map((id) => parseInt(id)),
         time_interval_value: formData.time_interval_value || undefined,
         time_interval_unit: formData.time_interval_unit || undefined,
         time_due_soon_threshold_value: formData.time_due_soon_threshold_value || undefined,
@@ -322,11 +430,6 @@ export default function CreateServiceReminder() {
   const vehicleOptions = vehicles.map((vehicle) => ({
     value: vehicle.id.toString(),
     label: vehicle.vehicle_name,
-  }));
-
-  const serviceTaskOptions = serviceTasks.map((task) => ({
-    value: task.id.toString(),
-    label: task.name,
   }));
 
   const watcherOptions = contacts.map((contact) => ({
@@ -471,22 +574,54 @@ export default function CreateServiceReminder() {
                     </div>
 
                     <div>
-                      <Label htmlFor="service_task_id">
+                      <Label htmlFor="service_task_ids">
                         Service Task <span className="text-error-500">*</span>
                       </Label>
-                      <Select
+                      <ReactSelect<ServiceTaskOption, true>
+                        isMulti={true}
+                        isClearable
+                        isSearchable
+                        isLoading={isLoadingServiceTasks}
                         options={serviceTaskOptions}
-                        placeholder="Please select"
-                        onChange={handleSelectChange("service_task_id")}
-                        defaultValue={formData.service_task_id}
+                        onChange={handleServiceTaskChange}
+                        onInputChange={handleServiceTaskSearch}
+                        value={serviceTaskOptions.filter(option => formData.service_task_ids.includes(option.value))}
+                        placeholder="Search and select service tasks"
+                        noOptionsMessage={({ inputValue }) =>
+                          inputValue ? `No service tasks found for "${inputValue}"` : "No service tasks available"
+                        }
+                        styles={{
+                          control: (baseStyles, state) => ({
+                            ...baseStyles,
+                            minHeight: "44px",
+                            borderColor: state.isFocused ? "#3b82f6" : "#d1d5db",
+                            boxShadow: state.isFocused ? "0 0 0 1px #3b82f6" : "none",
+                            "&:hover": {
+                              borderColor: "#3b82f6",
+                            },
+                          }),
+                          multiValue: (baseStyles) => ({
+                            ...baseStyles,
+                            backgroundColor: "#f3f4f6",
+                          }),
+                          multiValueLabel: (baseStyles) => ({
+                            ...baseStyles,
+                            color: "#1f2937",
+                          }),
+                          multiValueRemove: (baseStyles) => ({
+                            ...baseStyles,
+                            color: "#6b7280",
+                            "&:hover": {
+                              backgroundColor: "#e5e7eb",
+                              color: "#374151",
+                            },
+                          }),
+                        }}
+                        className="react-select-container"
+                        classNamePrefix="react-select"
                       />
-                      {serviceTaskNeverLogged && (
-                        <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                          Never logged for this vehicle
-                        </p>
-                      )}
-                      {errors.service_task_id && (
-                        <p className="mt-1 text-sm text-error-500">{errors.service_task_id}</p>
+                      {errors.service_task_ids && (
+                        <p className="mt-1 text-sm text-error-500">{errors.service_task_ids}</p>
                       )}
                     </div>
 
@@ -654,7 +789,7 @@ export default function CreateServiceReminder() {
 
                         const reminderData = {
                           vehicle_id: formData.vehicle_id ? parseInt(formData.vehicle_id) : undefined,
-                          service_task_id: formData.service_task_id ? parseInt(formData.service_task_id) : undefined,
+                          service_task_ids: formData.service_task_ids.map((id) => parseInt(id)),
                           time_interval_value: formData.time_interval_value || undefined,
                           time_interval_unit: formData.time_interval_unit || undefined,
                           time_due_soon_threshold_value: formData.time_due_soon_threshold_value || undefined,
@@ -674,7 +809,7 @@ export default function CreateServiceReminder() {
                           await serviceReminderService.create(reminderData);
                           setFormData({
                             vehicle_id: "",
-                            service_task_id: "",
+                            service_task_ids: [],
                             time_interval_value: "",
                             time_interval_unit: "month",
                             time_due_soon_threshold_value: "",

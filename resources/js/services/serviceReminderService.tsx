@@ -2,7 +2,7 @@ import api from './api';
 
 interface ServiceReminderData {
   vehicle_id?: number;
-  service_task_id?: number;
+  service_task_ids?: number[];
   time_interval_value?: string;
   time_interval_unit?: string;
   time_due_soon_threshold_value?: string;
@@ -35,8 +35,10 @@ export const serviceReminderService = {
     if (data.vehicle_id) {
       formData.append('vehicle_id', data.vehicle_id.toString());
     }
-    if (data.service_task_id) {
-      formData.append('service_task_id', data.service_task_id.toString());
+    if (data.service_task_ids && data.service_task_ids.length > 0) {
+      data.service_task_ids.forEach((taskId) => {
+        formData.append('service_task_ids[]', taskId.toString());
+      });
     }
     if (data.time_interval_value) {
       formData.append('time_interval_value', data.time_interval_value);
@@ -91,8 +93,12 @@ export const serviceReminderService = {
     if (data.vehicle_id !== undefined) {
       formData.append('vehicle_id', data.vehicle_id.toString());
     }
-    if (data.service_task_id !== undefined) {
-      formData.append('service_task_id', data.service_task_id.toString());
+    if (data.service_task_ids !== undefined) {
+      if (data.service_task_ids.length > 0) {
+        data.service_task_ids.forEach((taskId) => {
+          formData.append('service_task_ids[]', taskId.toString());
+        });
+      }
     }
     if (data.time_interval_value !== undefined) {
       formData.append('time_interval_value', data.time_interval_value || '');

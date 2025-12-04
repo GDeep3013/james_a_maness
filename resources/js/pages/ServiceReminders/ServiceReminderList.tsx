@@ -23,11 +23,11 @@ interface ServiceReminder {
     id?: number;
     vehicle_name?: string;
   };
-  service_task_id?: number;
-  service_task?: {
+  service_task_ids?: number[];
+  service_tasks?: Array<{
     id?: number;
     name?: string;
-  };
+  }>;
   time_interval_value?: string;
   time_interval_unit?: string;
   time_due_soon_threshold_value?: string;
@@ -414,9 +414,16 @@ export default function ServiceReminderList() {
                             {reminder.vehicle?.vehicle_name || "N/A"}
                           </div>
                         </TableCell>
-                        <TableCell className="px-4 py-3 text-start">
+                        <TableCell className="px-4 py-3 text-start w-[300px]">
                           <div className="text-gray-800 text-theme-sm">
-                            {reminder.service_task?.name || "N/A"}
+                            {reminder.service_tasks && reminder.service_tasks.length > 0
+                              ? reminder.service_tasks.map((task, index) => (
+                                  <span key={task.id || index}>
+                                    {task.name}
+                                    {index < (reminder.service_tasks?.length ?? 0) - 1 && ", "}
+                                  </span>
+                                ))
+                              : "N/A"}
                           </div>
                         </TableCell>
                         <TableCell className="px-4 py-3 text-start">
@@ -458,7 +465,7 @@ export default function ServiceReminderList() {
                           </Badge>
                         </TableCell>
                         <TableCell className="px-4 py-3 text-start">
-                          <div className="flex items-center gap-2">
+                          <div className="items-center gap-2">
                             <Button
                               variant="none"
                               size="sm"

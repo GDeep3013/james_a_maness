@@ -12,7 +12,7 @@ class ServiceReminder extends Model
     protected $fillable = [
         'user_id',
         'vehicle_id',
-        'service_task_id',
+        'service_task_ids',
         'time_interval_value',
         'time_interval_unit',
         'time_due_soon_threshold_value',
@@ -31,6 +31,7 @@ class ServiceReminder extends Model
     ];
 
     protected $casts = [
+        'service_task_ids' => 'array',
         'manually_set_next_reminder' => 'boolean',
         'notifications_enabled' => 'boolean',
         'watchers' => 'array',
@@ -48,9 +49,5 @@ class ServiceReminder extends Model
         return $this->belongsTo(Vehical::class, 'vehicle_id', 'id');
     }
 
-    public function serviceTask()
-    {
-        return $this->belongsTo(ServiceTask::class, 'service_task_id', 'id');
-    }
 }
 
