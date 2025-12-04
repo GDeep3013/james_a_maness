@@ -62,7 +62,7 @@ export default function CreateServiceReminder() {
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [generalError, setGeneralError] = useState<string>("");
-  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+  const [vehicles, setVehicles] = useState<Array<Vehicle & { current_mileage?: string }>>([]);
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [serviceTaskOptions, setServiceTaskOptions] = useState<ServiceTaskOption[]>([]);
   const [allServiceTasks, setAllServiceTasks] = useState<ServiceTaskOption[]>([]);
@@ -70,6 +70,7 @@ export default function CreateServiceReminder() {
   const [searchTimeout, setSearchTimeout] = useState<ReturnType<typeof setTimeout> | null>(null);
   const selectedTasksRef = useRef<ServiceTaskOption[]>([]);
   const dataLoadedRef = useRef(false);
+  const [currentMileage, setCurrentMileage] = useState<string>("");
   const [formData, setFormData] = useState<ServiceReminderFormData>({
     vehicle_id: "",
     service_task_ids: [],
@@ -144,7 +145,11 @@ export default function CreateServiceReminder() {
       ]);
 
       if (vehiclesRes.data?.status && vehiclesRes.data?.vehical?.data) {
-        setVehicles(vehiclesRes.data.vehical.data);
+        const vehiclesData = vehiclesRes.data.vehical.data.map((vehicle: Vehicle & { current_mileage?: string }) => ({
+          ...vehicle,
+          current_mileage: vehicle.current_mileage || "",
+        }));
+        setVehicles(vehiclesData);
       }
 
       if (contactsRes.data?.status && contactsRes.data?.contact?.data) {
@@ -210,6 +215,11 @@ export default function CreateServiceReminder() {
           next_due_meter: nextDueMeterValue,
         });
 
+        if (reminder.vehicle_id && vehicles.length > 0) {
+          const selectedVehicle = vehicles.find((v) => v.id.toString() === String(reminder.vehicle_id));
+          setCurrentMileage(selectedVehicle?.current_mileage || "");
+        }
+
         if (reminderServiceTaskIds.length > 0) {
           setTimeout(() => {
             const selectedOptions = allServiceTasks.filter((task: ServiceTaskOption) => 
@@ -235,7 +245,7 @@ export default function CreateServiceReminder() {
     } finally {
       setIsLoading(false);
     }
-  }, [allServiceTasks]);
+  }, [allServiceTasks, vehicles]);
 
   useEffect(() => {
     if (dataLoadedRef.current) return;
@@ -271,6 +281,13 @@ export default function CreateServiceReminder() {
         delete newErrors[name];
         return newErrors;
       });
+    }
+
+    if (name === "vehicle_id" && value) {
+      const selectedVehicle = vehicles.find((v) => v.id.toString() === value);
+      setCurrentMileage(selectedVehicle?.current_mileage || "");
+    } else if (name === "vehicle_id" && !value) {
+      setCurrentMileage("");
     }
   };
 
@@ -341,6 +358,15 @@ export default function CreateServiceReminder() {
 
     if (!formData.service_task_ids || formData.service_task_ids.length === 0) {
       newErrors.service_task_ids = "At least one Service Task is required";
+    }
+
+    if (formData.primary_meter_interval_value && currentMileage) {
+      const intervalValue = parseFloat(formData.primary_meter_interval_value);
+      const currentMileageValue = parseFloat(currentMileage);
+      
+      if (!isNaN(intervalValue) && !isNaN(currentMileageValue) && intervalValue <= currentMileageValue) {
+        newErrors.primary_meter_interval_value = `Primary Meter Interval must be greater than current mileage (${currentMileage})`;
+      }
     }
 
     setErrors(newErrors);
@@ -464,17 +490,23 @@ export default function CreateServiceReminder() {
             value={value}
             onChange={(e) => handleInputChange(valueName, e.target.value)}
             placeholder="Every"
+            className={errors[valueName] ? "border-error-500" : ""}
           />
         </div>
-        <div className="w-32">
+        {/* <div className="w-32">
           <Select
             options={unitOptions}
             placeholder="Select"
             onChange={handleSelectChange(unitName)}
             defaultValue={unit}
           />
-        </div>
+        </div> */}
       </div>
+      {valueName === "primary_meter_interval_value" && currentMileage && (
+        <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+          Current mileage: <span className="font-medium">{currentMileage}</span>
+        </p>
+      )}
       {errors[valueName] && (
         <p className="mt-1 text-sm text-error-500">{errors[valueName]}</p>
       )}
@@ -633,7 +665,7 @@ export default function CreateServiceReminder() {
                         formData.time_interval_value,
                         formData.time_interval_unit,
                         TIME_UNIT_OPTIONS,
-                        true
+                        false
                       )}
 
                       {renderThresholdInput(
@@ -643,7 +675,7 @@ export default function CreateServiceReminder() {
                         formData.time_due_soon_threshold_value,
                         formData.time_due_soon_threshold_unit,
                         TIME_UNIT_OPTIONS,
-                        true
+                        false
                       )}
                     </div>
 
@@ -655,15 +687,15 @@ export default function CreateServiceReminder() {
                         formData.primary_meter_interval_value,
                         formData.primary_meter_interval_unit,
                         METER_UNIT_OPTIONS,
-                        true
+                        false
                       )}
 
                       <div>
                         <Label htmlFor="primary_meter_due_soon_threshold_value" className="flex items-center gap-2">
                           Primary Meter Due Soon Threshold
-                          <span className="cursor-help">
+                          {/* <span className="cursor-help">
                             <InfoIcon className="w-4 h-4 text-gray-400" />
-                          </span>
+                          </span> */}
                         </Label>
                         <Input
                           type="number"
@@ -877,4 +909,3 @@ export default function CreateServiceReminder() {
     </>
   );
 }
-

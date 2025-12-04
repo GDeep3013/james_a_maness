@@ -1,6 +1,5 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router";
-import Select from "react-select";
 import PageBreadcrumb from "../../components/common/PageBreadCrumb";
 import PageMeta from "../../components/common/PageMeta";
 import Label from "../../components/form/Label";
@@ -12,7 +11,6 @@ interface ServiceTaskFormData {
   name: string;
   description: string;
   labor_cost: string;
-  subtasks: number[];
 }
 
 export default function CreateServiceTask() {
@@ -27,35 +25,13 @@ export default function CreateServiceTask() {
     name: "",
     description: "",
     labor_cost: "",
-    subtasks: [],
   });
-  const [availableSubtasks, setAvailableSubtasks] = useState<Array<{ value: string; label: string }>>([]);
-
-  const fetchAvailableSubtasks = useCallback(async (search: string = "") => {
-    try {
-      const response = await serviceTaskService.getAvailableSubtasks({
-        search: search,
-        exclude_id: id ? parseInt(id) : undefined,
-      });
-      if (response.data?.status && response.data?.service_tasks) {
-        setAvailableSubtasks(
-          response.data.service_tasks.map((task: { id: number; name: string }) => ({
-            value: task.id.toString(),
-            label: task.name,
-          }))
-        );
-      }
-    } catch (error) {
-      console.error("Error fetching available subtasks:", error);
-    }
-  }, [id]);
 
   useEffect(() => {
     if (isEditMode && id) {
       fetchServiceTaskData(parseInt(id));
     }
-    fetchAvailableSubtasks();
-  }, [isEditMode, id, fetchAvailableSubtasks]);
+  }, [isEditMode, id]);
 
   const fetchServiceTaskData = async (serviceTaskId: number) => {
     setIsLoading(true);
@@ -69,27 +45,12 @@ export default function CreateServiceTask() {
           name?: string;
           description?: string;
           labor_cost?: number;
-          subtasks?: Array<{ id: number; name: string }>;
         };
-        const subtaskIds = serviceTask.subtasks ? serviceTask.subtasks.map((st) => st.id) : [];
         setFormData({
           name: String(serviceTask.name || ""),
           description: String(serviceTask.description || ""),
           labor_cost: serviceTask.labor_cost ? String(serviceTask.labor_cost) : "",
-          subtasks: subtaskIds,
         });
-        // Add selected subtasks to available list so they show in react-select
-        if (serviceTask.subtasks && serviceTask.subtasks.length > 0) {
-          const selectedSubtasks = serviceTask.subtasks.map((st) => ({
-            value: st.id.toString(),
-            label: st.name,
-          }));
-          setAvailableSubtasks((prev) => {
-            const existing = prev.map((st) => st.value);
-            const newOnes = selectedSubtasks.filter((st) => !existing.includes(st.value));
-            return [...newOnes, ...prev];
-          });
-        }
       }
     } catch {
       setGeneralError("Failed to load service task data. Please try again.");
@@ -99,7 +60,7 @@ export default function CreateServiceTask() {
   };
 
 
-  const handleInputChange = (name: keyof ServiceTaskFormData, value: string | number[]) => {
+  const handleInputChange = (name: keyof ServiceTaskFormData, value: string) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
     if (errors[name]) {
       setErrors((prev) => {
@@ -137,7 +98,6 @@ export default function CreateServiceTask() {
         name: formData.name,
         description: formData.description || undefined,
         labor_cost: formData.labor_cost ? parseFloat(formData.labor_cost) : undefined,
-        subtasks: formData.subtasks.length > 0 ? formData.subtasks : undefined,
       };
 
       const response = isEditMode && id
@@ -236,8 +196,8 @@ export default function CreateServiceTask() {
                       <p className="mt-1 text-sm text-red-500">{errors.name}</p>
                     )}
                     <p className="mt-1 text-sm text-gray-500">
-                      A brief title for your unique task. See examples of Fleetio's comprehensive list of{" "}
-                      <a href="#" className="text-brand-600 hover:underline">Standard Service Tasks</a> that cover most common repairs and maintenance.
+                      A brief title for your unique task. See examples comprehensive list of{" "}
+                      <b>Standard Service Tasks</b> that cover most common repairs and maintenance.
                     </p>
                   </div>
 
@@ -272,67 +232,6 @@ export default function CreateServiceTask() {
                     )}
                   </div>
 
-                  <div>
-                    <Label htmlFor="subtasks">Subtasks</Label>
-                    <Select
-                      isMulti
-                      isSearchable
-                      isClearable
-                      options={availableSubtasks}
-                      value={formData.subtasks.map((id) => {
-                        const subtask = availableSubtasks.find((st) => st.value === id.toString());
-                        return subtask ? { value: subtask.value, label: subtask.label } : null;
-                      }).filter((item): item is { value: string; label: string } => item !== null)}
-                      onChange={(selectedOptions) => {
-                        const selectedIds = selectedOptions
-                          ? selectedOptions.map((option) => parseInt(option.value))
-                          : [];
-                        handleInputChange("subtasks", selectedIds);
-                      }}
-                      onInputChange={(inputValue) => {
-                        fetchAvailableSubtasks(inputValue);
-                      }}
-                      placeholder="Select Service Tasks"
-                      noOptionsMessage={({ inputValue }) =>
-                        inputValue ? `No service tasks found for "${inputValue}"` : "No service tasks available"
-                      }
-                      styles={{
-                        control: (baseStyles, state) => ({
-                          ...baseStyles,
-                          minHeight: "44px",
-                          borderColor: errors.subtasks ? "#ef4444" : state.isFocused ? "#3b82f6" : "#d1d5db",
-                          boxShadow: state.isFocused ? "0 0 0 1px #3b82f6" : "none",
-                          "&:hover": {
-                            borderColor: errors.subtasks ? "#ef4444" : "#3b82f6",
-                          },
-                        }),
-                        multiValue: (baseStyles) => ({
-                          ...baseStyles,
-                          backgroundColor: "#f3f4f6",
-                        }),
-                        multiValueLabel: (baseStyles) => ({
-                          ...baseStyles,
-                          color: "#1f2937",
-                        }),
-                        multiValueRemove: (baseStyles) => ({
-                          ...baseStyles,
-                          color: "#6b7280",
-                          "&:hover": {
-                            backgroundColor: "#e5e7eb",
-                            color: "#374151",
-                          },
-                        }),
-                      }}
-                      className="react-select-container"
-                      classNamePrefix="react-select"
-                    />
-                    {errors.subtasks && (
-                      <p className="mt-1 text-sm text-red-500">{errors.subtasks}</p>
-                    )}
-                    <p className="mt-1 text-sm text-gray-500">
-                      Only Service Tasks without Subtasks can be added.
-                    </p>
-                  </div>
                 </div>
 
                 <div className="mt-6 flex justify-end gap-4 border-t border-gray-200 pt-6">

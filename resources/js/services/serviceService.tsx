@@ -5,7 +5,7 @@ interface ServiceData {
   vehicle_id?: number;
   vendor_id?: number;
   repair_priority_class?: string;
-  hour_meter?: number;
+  primary_meter?: number;
   completion_date?: string;
   set_start_date?: boolean;
   start_date?: string;

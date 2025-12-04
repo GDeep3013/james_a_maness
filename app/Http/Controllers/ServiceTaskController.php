@@ -15,7 +15,7 @@ class ServiceTaskController extends Controller
     public function index(Request $request)
     {
         $tableColumns = Schema::getColumnListing('service_tasks');
-        $query = ServiceTask::with(['subtasks'])->orderBy('name', 'asc');
+        $query = ServiceTask::orderBy('name', 'asc');
         
         $searchTerm = $request->search;
 
@@ -41,8 +41,6 @@ class ServiceTaskController extends Controller
                 'name' => 'required|string|max:255',
                 'description' => 'nullable|string',
                 'labor_cost' => 'nullable|numeric|min:0',
-                'subtasks' => 'nullable|array',
-                'subtasks.*' => 'exists:service_tasks,id',
             ]);
 
             DB::beginTransaction();
@@ -53,28 +51,11 @@ class ServiceTaskController extends Controller
             $serviceTask->labor_cost = $request->labor_cost ?? null;
 
             if ($serviceTask->save()) {
-                // Attach subtasks if provided
-                if ($request->has('subtasks') && is_array($request->subtasks)) {
-                    // Validate that subtasks don't have their own subtasks
-                    foreach ($request->subtasks as $subtaskId) {
-                        $subtask = ServiceTask::find($subtaskId);
-                        if ($subtask && $subtask->hasSubtasks()) {
-                            DB::rollBack();
-                            return response()->json([
-                                'status' => false,
-                                'message' => 'Only Service Tasks without Subtasks can be added.',
-                                'errors' => ['subtasks' => ['Only Service Tasks without Subtasks can be added.']]
-                            ], 422);
-                        }
-                    }
-                    $serviceTask->subtasks()->sync($request->subtasks);
-                }
-
                 DB::commit();
                 return response()->json([
                     'status' => true,
                     'message' => 'Service task created successfully',
-                    'data' => $serviceTask->load('subtasks')
+                    'data' => $serviceTask
                 ]);
             } else {
                 DB::rollBack();
@@ -113,7 +94,7 @@ class ServiceTaskController extends Controller
             ], 400);
         }
 
-        $serviceTask = ServiceTask::with(['subtasks'])->where('id', $id)->first();
+        $serviceTask = ServiceTask::where('id', $id)->first();
 
         if ($serviceTask) {
             return response()->json([
@@ -138,7 +119,7 @@ class ServiceTaskController extends Controller
             ], 400);
         }
 
-        $serviceTask = ServiceTask::with(['subtasks'])->where('id', $id)->first();
+        $serviceTask = ServiceTask::where('id', $id)->first();
 
         if ($serviceTask) {
             return response()->json([
@@ -176,8 +157,6 @@ class ServiceTaskController extends Controller
                 'name' => 'required|string|max:255',
                 'description' => 'nullable|string',
                 'labor_cost' => 'nullable|numeric|min:0',
-                'subtasks' => 'nullable|array',
-                'subtasks.*' => 'exists:service_tasks,id',
             ]);
 
             DB::beginTransaction();
@@ -193,40 +172,11 @@ class ServiceTaskController extends Controller
             }
 
             if ($serviceTask->save()) {
-                // Update subtasks if provided
-                if ($request->has('subtasks')) {
-                    // Validate that subtasks don't have their own subtasks
-                    if (is_array($request->subtasks)) {
-                        foreach ($request->subtasks as $subtaskId) {
-                            if ($subtaskId == $id) {
-                                DB::rollBack();
-                                return response()->json([
-                                    'status' => false,
-                                    'message' => 'A service task cannot be its own subtask.',
-                                    'errors' => ['subtasks' => ['A service task cannot be its own subtask.']]
-                                ], 422);
-                            }
-                            $subtask = ServiceTask::find($subtaskId);
-                            if ($subtask && $subtask->hasSubtasks()) {
-                                DB::rollBack();
-                                return response()->json([
-                                    'status' => false,
-                                    'message' => 'Only Service Tasks without Subtasks can be added.',
-                                    'errors' => ['subtasks' => ['Only Service Tasks without Subtasks can be added.']]
-                                ], 422);
-                            }
-                        }
-                        $serviceTask->subtasks()->sync($request->subtasks);
-                    } else {
-                        $serviceTask->subtasks()->detach();
-                    }
-                }
-
                 DB::commit();
                 return response()->json([
                     'status' => true,
                     'message' => 'Service task updated successfully',
-                    'data' => $serviceTask->load('subtasks')
+                    'data' => $serviceTask
                 ]);
             } else {
                 DB::rollBack();
@@ -286,24 +236,5 @@ class ServiceTaskController extends Controller
         }
     }
 
-    public function getAvailableSubtasks(Request $request)
-    {
-        $query = ServiceTask::whereDoesntHave('subtasks');
-
-        if ($request->has('search') && !empty($request->search)) {
-            $query->where('name', 'LIKE', '%' . $request->search . '%');
-        }
-
-        if ($request->has('exclude_id') && !empty($request->exclude_id)) {
-            $query->where('id', '!=', $request->exclude_id);
-        }
-
-        $serviceTasks = $query->get(['id', 'name']);
-
-        return response()->json([
-            'status' => true,
-            'service_tasks' => $serviceTasks
-        ]);
-    }
 }
 

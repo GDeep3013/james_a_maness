@@ -141,7 +141,7 @@ interface ServiceRecord {
         name?: string;
     };
     repair_priority_class?: string;
-    hour_meter?: number;
+    primary_meter?: number;
     completion_date?: string;
     start_date?: string;
     created_at?: string;
@@ -1365,7 +1365,7 @@ export default function VehicleDetail() {
                                                                 </TableCell>
                                                                 <TableCell className="px-4 py-3 text-start">
                                                                     <div className="text-gray-800 text-theme-sm">
-                                                                        {record.hour_meter ?? "N/A"}
+                                                                        {record.primary_meter ?? "N/A"}
                                                                     </div>
                                                                 </TableCell>
                                                                 <TableCell className="px-4 py-3 text-start">

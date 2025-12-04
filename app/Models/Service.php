@@ -14,7 +14,7 @@ class Service extends Model
         'vehicle_id',
         'vendor_id',
         'repair_priority_class',
-        'hour_meter',
+        'primary_meter',
         'completion_date',
         'set_start_date',
         'start_date',

@@ -12,6 +12,7 @@ import Button from "../../components/ui/button/Button";
 import PageMeta from "../../components/common/PageMeta";
 import { meterReadingService } from "../../services/meterReadingService";
 import { PencilIcon, TrashBinIcon, ExportIcon, EyeIcon } from "../../icons";
+import TableFooter, { PaginationData } from "../../components/common/TableFooter";
 
 interface MeterReading {
     id: number;
@@ -28,13 +29,6 @@ interface MeterReading {
         name: string;
     };
     created_at?: string;
-}
-
-interface PaginationData {
-    current_page: number;
-    last_page: number;
-    per_page: number;
-    total: number;
 }
 
 interface MeterReadingsResponse {
@@ -124,6 +118,10 @@ export default function MeterReadingsList() {
         navigate(`/meter-history/${id}/MeterReadingDetail`);
     };
 
+    const handlePageChange = (page: number) => {
+        setCurrentPage(page);
+    };
+
     const handleExport = () => {
         // Implement export functionality
     };
@@ -146,100 +144,6 @@ export default function MeterReadingsList() {
             hour: '2-digit',
             minute: '2-digit',
         });
-    };
-
-    const renderPagination = () => {
-        const pages: number[] = [];
-        const maxPages = 5;
-        let startPage = Math.max(1, pagination.current_page - Math.floor(maxPages / 2));
-        const endPage = Math.min(pagination.last_page, startPage + maxPages - 1);
-
-        if (endPage - startPage < maxPages - 1) {
-            startPage = Math.max(1, endPage - maxPages + 1);
-        }
-
-        for (let i = startPage; i <= endPage; i++) {
-            pages.push(i);
-        }
-
-        return (
-            <div className="flex items-center justify-between px-4 py-3 sm:px-6">
-                <div className="flex flex-1 justify-between sm:hidden">
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setCurrentPage(currentPage - 1)}
-                        disabled={currentPage === 1 || loading}
-                        className="min-height-[34px] !leading-[34px]"
-                    >
-                        Previous
-                    </Button>
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setCurrentPage(currentPage + 1)}
-                        disabled={currentPage === pagination.last_page || loading}
-                        className="min-height-[34px] !leading-[34px]"
-                    >
-                        Next
-                    </Button>
-                </div>
-                <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
-                    <div>
-                        <p className="text-sm text-gray-700 dark:text-gray-400">
-                            Showing{" "}
-                            <span className="font-medium">
-                                {pagination.total === 0
-                                    ? 0
-                                    : (pagination.current_page - 1) * pagination.per_page + 1}
-                            </span>{" "}
-                            to{" "}
-                            <span className="font-medium">
-                                {Math.min(
-                                    pagination.current_page * pagination.per_page,
-                                    pagination.total
-                                )}
-                            </span>{" "}
-                            of <span className="font-medium">{pagination.total}</span> results
-                        </p>
-                    </div>
-                    <div>
-                        <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => setCurrentPage(currentPage - 1)}
-                                disabled={currentPage === 1 || loading}
-                                className="rounded-r-none min-height-[34px] !leading-[34px]"
-                            >
-                                Previous
-                            </Button>
-                            {pages.map((page) => (
-                                <Button
-                                    key={page}
-                                    variant={currentPage === page ? "primary" : "outline"}
-                                    size="sm"
-                                    onClick={() => setCurrentPage(page)}
-                                    disabled={loading}
-                                    className="rounded-none border-l-0 min-height-[34px] !leading-[34px]"
-                                >
-                                    {page}
-                                </Button>
-                            ))}
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => setCurrentPage(currentPage + 1)}
-                                disabled={currentPage === pagination.last_page || loading}
-                                className="rounded-l-none border-l-0 min-height-[34px] !leading-[34px]"
-                            >
-                                Next
-                            </Button>
-                        </nav>
-                    </div>
-                </div>
-            </div>
-        );
     };
 
     return (
@@ -392,7 +296,13 @@ export default function MeterReadingsList() {
                                         ))}
                                     </TableBody>
                                 </Table>
-                                {renderPagination()}
+                                <TableFooter
+                                    pagination={pagination}
+                                    currentPage={currentPage}
+                                    onPageChange={handlePageChange}
+                                    loading={loading}
+                                    itemLabel="meter readings"
+                                />
                             </>
                         )}
                     </div>

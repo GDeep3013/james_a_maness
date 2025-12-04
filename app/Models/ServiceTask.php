@@ -18,22 +18,5 @@ class ServiceTask extends Model
     protected $casts = [
         'labor_cost' => 'decimal:2',
     ];
-
-    public function subtasks()
-    {
-        return $this->belongsToMany(ServiceTask::class, 'service_task_subtasks', 'service_task_id', 'subtask_id')
-            ->withTimestamps();
-    }
-
-    public function parentTasks()
-    {
-        return $this->belongsToMany(ServiceTask::class, 'service_task_subtasks', 'subtask_id', 'service_task_id')
-            ->withTimestamps();
-    }
-
-    public function hasSubtasks()
-    {
-        return $this->subtasks()->count() > 0;
-    }
 }
 

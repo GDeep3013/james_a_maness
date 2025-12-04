@@ -16,6 +16,7 @@ import { LABEL_OPTIONS } from "../../constants/selectOptions";
 import { EyeIcon, PencilIcon, TrashBinIcon } from "../../icons";
 import Select from "../../components/form/Select";
 import { contactService } from "../../services/contactService";
+import TableFooter, { PaginationData } from "../../components/common/TableFooter";
 
 interface Issue {
   id: number;
@@ -36,13 +37,6 @@ interface Issue {
   };
   labels?: string | string[];
   created_at?: string;
-}
-
-interface PaginationData {
-  current_page: number;
-  last_page: number;
-  per_page: number;
-  total: number;
 }
 
 interface IssuesResponse {
@@ -168,6 +162,10 @@ export default function IssuesList() {
     navigate("/issues/create");
   };
 
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
   const formatDate = (dateString?: string) => {
     if (!dateString) return "—";
     try {
@@ -216,100 +214,6 @@ export default function IssuesList() {
   }));
 
   const labelOptions = LABEL_OPTIONS.filter(opt => opt.value !== "");
-
-  const renderPagination = () => {
-    const pages: number[] = [];
-    const maxPages = 5;
-    let startPage = Math.max(1, pagination.current_page - Math.floor(maxPages / 2));
-    const endPage = Math.min(pagination.last_page, startPage + maxPages - 1);
-
-    if (endPage - startPage < maxPages - 1) {
-      startPage = Math.max(1, endPage - maxPages + 1);
-    }
-
-    for (let i = startPage; i <= endPage; i++) {
-      pages.push(i);
-    }
-
-    return (
-      <div className="flex items-center justify-between px-4 py-3 sm:px-6">
-        <div className="flex flex-1 justify-between sm:hidden">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setCurrentPage(currentPage - 1)}
-            disabled={currentPage === 1 || loading}
-            className="min-height-[34px] !leading-[34px]"
-          >
-            Previous
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setCurrentPage(currentPage + 1)}
-            disabled={currentPage === pagination.last_page || loading}
-            className="min-height-[34px] !leading-[34px]"
-          >
-            Next
-          </Button>
-        </div>
-        <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
-          <div>
-            <p className="text-sm text-gray-700 dark:text-gray-300">
-              Showing{" "}
-              <span className="font-medium">
-                {pagination.total === 0
-                  ? 0
-                  : (pagination.current_page - 1) * pagination.per_page + 1}
-              </span>{" "}
-              to{" "}
-              <span className="font-medium">
-                {Math.min(
-                  pagination.current_page * pagination.per_page,
-                  pagination.total
-                )}
-              </span>{" "}
-              of <span className="font-medium">{pagination.total}</span> results
-            </p>
-          </div>
-          <div>
-            <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setCurrentPage(currentPage - 1)}
-                disabled={currentPage === 1 || loading}
-                className="rounded-r-none min-height-[34px] !leading-[34px]"
-              >
-                Previous
-              </Button>
-              {pages.map((page) => (
-                <Button
-                  key={page}
-                  variant={currentPage === page ? "primary" : "outline"}
-                  size="sm"
-                  onClick={() => setCurrentPage(page)}
-                  disabled={loading}
-                  className="rounded-none border-l-0 min-height-[34px] !leading-[34px]"
-                >
-                  {page}
-                </Button>
-              ))}
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setCurrentPage(currentPage + 1)}
-                disabled={currentPage === pagination.last_page || loading}
-                className="rounded-l-none border-l-0 min-height-[34px] !leading-[34px]"
-              >
-                Next
-              </Button>
-            </nav>
-          </div>
-        </div>
-      </div>
-    );
-  };
 
   return (
     <>
@@ -452,28 +356,16 @@ export default function IssuesList() {
                 <Table>
                   <TableHeader className="border-b border-gray-100 dark:border-white/5">
                     <TableRow>
-                      <TableCell
-                        isHeader
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-                      >
+                      <TableCell isHeader >
                         Priority
                       </TableCell>
-                      <TableCell
-                        isHeader
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-                      >
+                      <TableCell isHeader >
                         Name
                       </TableCell>
-                      <TableCell
-                        isHeader
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-                      >
+                      <TableCell isHeader >
                         Type
                       </TableCell>
-                      <TableCell
-                        isHeader
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-                      >
+                      <TableCell isHeader >
                         Issue
                       </TableCell>
                       <TableCell
@@ -482,42 +374,34 @@ export default function IssuesList() {
                       >
                         Summary
                       </TableCell>
-                      <TableCell
-                        isHeader
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-                      >
+                      <TableCell isHeader >
                         Issue Status
                       </TableCell>
-                      <TableCell
-                        isHeader
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-                      >
+                      <TableCell isHeader >
                         Source
                       </TableCell>
-                      <TableCell
-                        isHeader
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-                      >
+                        <TableCell isHeader >
                         Reported Date
                       </TableCell>
-                      <TableCell
-                        isHeader
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-                      >
+                      <TableCell isHeader >
                         Assigned
                       </TableCell>
-                      <TableCell
-                        isHeader
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400 w-[10%]"
-                      >
+                      <TableCell isHeader >
                         Actions
                       </TableCell>
                     </TableRow>
                   </TableHeader>
 
                   <TableBody className="divide-y divide-gray-100 dark:divide-white/5">
-                    {issues.map((issue) => (
+                    {issues.map((issue, index) => (
                       <TableRow key={issue.id}>
+
+                        <TableCell className="px-4 py-3 text-start">
+                          <div className="text-brand-600 dark:text-brand-400 text-theme-sm font-medium">
+                            #{index + 1}
+                          </div>
+                        </TableCell>
+
                         <TableCell className="px-4 py-3 text-start">
                           {issue.priority && issue.priority !== "" ? (
                             <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${getPriorityColor(issue.priority)}`}>
@@ -537,11 +421,7 @@ export default function IssuesList() {
                             Vehicle
                           </div>
                         </TableCell>
-                        <TableCell className="px-4 py-3 text-start">
-                          <div className="text-brand-600 dark:text-brand-400 text-theme-sm font-medium">
-                            #{issue.id}
-                          </div>
-                        </TableCell>
+                       
                         <TableCell className="px-4 py-3 text-start">
                           <div className="text-gray-800 text-theme-sm dark:text-white/90">
                             {issue.summary || "—"}
@@ -578,7 +458,7 @@ export default function IssuesList() {
                         </TableCell>
 
                          <TableCell className="px-4 py-3 text-start">
-                          <div className="flex items-center gap-2">
+                          <div className="items-center gap-2">
                             <Button
                               variant="none"
                               size="sm"
@@ -614,7 +494,13 @@ export default function IssuesList() {
                     ))}
                   </TableBody>
                 </Table>
-                {renderPagination()}
+                <TableFooter
+                  pagination={pagination}
+                  currentPage={currentPage}
+                  onPageChange={handlePageChange}
+                  loading={loading}
+                  itemLabel="issues"
+                />
               </>
             )}
           </div>

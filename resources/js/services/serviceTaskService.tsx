@@ -4,7 +4,6 @@ interface ServiceTaskData {
   name: string;
   description?: string;
   labor_cost?: number;
-  subtasks?: number[];
 }
 
 export const serviceTaskService = {
@@ -28,11 +27,6 @@ export const serviceTaskService = {
     }
     if (data.labor_cost !== undefined && data.labor_cost !== null) {
       formData.append('labor_cost', data.labor_cost.toString());
-    }
-    if (data.subtasks && data.subtasks.length > 0) {
-      data.subtasks.forEach((subtaskId) => {
-        formData.append('subtasks[]', subtaskId.toString());
-      });
     }
 
     const token = localStorage.getItem('auth_token');
@@ -58,13 +52,6 @@ export const serviceTaskService = {
     if (data.labor_cost !== undefined && data.labor_cost !== null) {
       formData.append('labor_cost', data.labor_cost.toString());
     }
-    if (data.subtasks !== undefined) {
-      if (data.subtasks.length > 0) {
-        data.subtasks.forEach((subtaskId) => {
-          formData.append('subtasks[]', subtaskId.toString());
-        });
-      }
-    }
 
     formData.append('_method', 'PUT');
 
@@ -84,13 +71,5 @@ export const serviceTaskService = {
 
   getForEdit: (id: number) =>
     api.get(`/service-tasks/${id}/edit`),
-
-  getAvailableSubtasks: (params?: { search?: string; exclude_id?: number }) => {
-    const queryParams = new URLSearchParams();
-    if (params?.search) queryParams.append('search', params.search);
-    if (params?.exclude_id) queryParams.append('exclude_id', params.exclude_id.toString());
-    const queryString = queryParams.toString();
-    return api.get(`/service-tasks/available-subtasks${queryString ? `?${queryString}` : ''}`);
-  },
 };
 

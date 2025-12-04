@@ -125,7 +125,7 @@ class ServiceController extends Controller
                 'vehicle_id' => 'nullable|exists:vehicals,id',
                 'vendor_id' => 'nullable|exists:vendors,id',
                 'repair_priority_class' => 'nullable|string|max:255',
-                'hour_meter' => 'nullable|numeric',
+                'primary_meter' => 'nullable|numeric',
                 'completion_date' => 'nullable|date',
                 'set_start_date' => 'nullable',
                 'start_date' => 'nullable|date',
@@ -140,7 +140,7 @@ class ServiceController extends Controller
             $service->vehicle_id = $request->vehicle_id ?? null;
             $service->vendor_id = $request->vendor_id ?? null;
             $service->repair_priority_class = $request->repair_priority_class ?? null;
-            $service->hour_meter = $request->hour_meter ?? null;
+            $service->primary_meter = $request->primary_meter ?? null;
             $service->completion_date = $request->completion_date ?? null;
             $service->set_start_date = $this->convertToBoolean($request->set_start_date, false);
             $service->start_date = $request->start_date ?? null;
@@ -295,7 +295,7 @@ class ServiceController extends Controller
                 'vehicle_id' => 'nullable|exists:vehicals,id',
                 'vendor_id' => 'nullable|exists:vendors,id',
                 'repair_priority_class' => 'nullable|string|max:255',
-                'hour_meter' => 'nullable|numeric',
+                'primary_meter' => 'nullable|numeric',
                 'completion_date' => 'nullable|date',
                 'set_start_date' => 'nullable',
                 'start_date' => 'nullable|date',
@@ -319,8 +319,8 @@ class ServiceController extends Controller
             if ($request->has('repair_priority_class')) {
                 $service->repair_priority_class = $request->repair_priority_class;
             }
-            if ($request->has('hour_meter')) {
-                $service->hour_meter = $request->hour_meter;
+            if ($request->has('primary_meter')) {
+                $service->primary_meter = $request->primary_meter;
             }
             if ($request->has('completion_date')) {
                 $service->completion_date = $request->completion_date;

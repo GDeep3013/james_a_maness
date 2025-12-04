@@ -20,7 +20,6 @@ interface ServiceTask {
   name: string;
   description?: string;
   labor_cost?: number;
-  subtasks?: ServiceTask[];
   created_at?: string;
   updated_at?: string;
 }
@@ -84,18 +83,11 @@ export default function ServiceTasksList() {
     fetchServiceTasks(currentPage, searchTerm);
   }, [currentPage, searchTerm, fetchServiceTasks]);
 
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value);
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
     setCurrentPage(1);
+    fetchServiceTasks(1, searchTerm);
   };
-
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      fetchServiceTasks(1, searchTerm);
-    }, 500);
-
-    return () => clearTimeout(timeoutId);
-  }, [searchTerm, fetchServiceTasks]);
 
   const handleDelete = async (id: number) => {
     if (!window.confirm("Are you sure you want to delete this service task?")) {
@@ -127,132 +119,157 @@ export default function ServiceTasksList() {
       <PageMeta title="Service Tasks" description="Manage service tasks" />
       <PageBreadcrumb pageTitle="Service Tasks" />
 
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-base md:text-2xl font-semibold text-gray-800">Service Tasks</h1>
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-base md:text-2xl font-semibold text-gray-800">Service Tasks</h1>
+          </div>
           <Button
-            variant="none"
-            size="md"
+            variant="primary"
+            size="sm"
             onClick={() => navigate("/service-tasks/create")}
           >
-            + Add Service Task
+            + Create Service Task
           </Button>
         </div>
 
-        <div className="mb-6">
-          <Input
-            type="text"
-            placeholder="Search service tasks..."
-            value={searchTerm}
-            onChange={handleSearch}
-            className="max-w-md"
-          />
-        </div>
+        <form onSubmit={handleSearch} className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl p-4">
+          <div className="flex max-[767px]:flex-wrap items-center gap-4">
+            <div className="w-full">
+              <Input
+                type="text"
+                placeholder="Search by name, description..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="!bg-[#F3F3F5] max-w-full border-none !rounded-[8px]"
+              />
+            </div>
+          </div>
+        </form>
 
-        {loading ? (
-          <div className="flex items-center justify-center py-12">
-            <p className="text-gray-500">Loading service tasks...</p>
+        {error && (
+          <div className="p-4 bg-error-50 dark:bg-error-900/20 border border-error-200 dark:border-error-800 rounded-lg">
+            <p className="text-sm text-error-600 dark:text-error-400">{error}</p>
           </div>
-        ) : error ? (
-          <div className="flex items-center justify-center py-12">
-            <p className="text-red-500">{error}</p>
-          </div>
-        ) : serviceTasks.length === 0 ? (
-          <div className="flex items-center justify-center py-12">
-            <p className="text-gray-500">No service tasks found.</p>
-          </div>
-        ) : (
-          <>
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableCell>Name</TableCell>
-                    <TableCell>Description</TableCell>
-                    <TableCell>Labor Cost</TableCell>
-                    <TableCell>Subtasks</TableCell>
-                    <TableCell>Created At</TableCell>
-                    <TableCell>Actions</TableCell>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {serviceTasks.map((task) => (
-                    <TableRow key={task.id}>
-                      <TableCell className="font-medium">{task.name}</TableCell>
-                      <TableCell>
-                        {task.description ? (
-                          <span className="text-sm text-gray-600">
-                            {task.description.length > 100
-                              ? `${task.description.substring(0, 100)}...`
-                              : task.description}
-                          </span>
-                        ) : (
-                          <span className="text-sm text-gray-400">-</span>
-                        )}
+        )}
+
+        <div className="rounded-xl border border-gray-200 bg-white">
+          <div className="max-w-full overflow-hidden overflow-x-auto">
+            {loading ? (
+              <div className="flex items-center justify-center py-12">
+                <div className="text-center">
+                  <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-brand-500"></div>
+                  <p className="mt-2 text-sm text-gray-600">
+                    Loading service tasks...
+                  </p>
+                </div>
+              </div>
+            ) : serviceTasks.length === 0 ? (
+              <div className="flex items-center justify-center py-12">
+                <div className="text-center">
+                  <p className="text-gray-600">
+                    No service tasks found
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <>
+                <Table>
+                  <TableHeader className="border-b border-gray-100 dark:border-white/5">
+                    <TableRow className="bg-[#E5E7EB]">
+                      <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs">
+                        Name
                       </TableCell>
-                      <TableCell>
-                        {task.labor_cost !== undefined && task.labor_cost !== null ? (
-                          <span className="text-sm text-gray-800 font-medium">
-                            ${parseFloat(String(task.labor_cost)).toFixed(2)}
-                          </span>
-                        ) : (
-                          <span className="text-sm text-gray-400">-</span>
-                        )}
+                      <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs">
+                        Description
                       </TableCell>
-                      <TableCell>
-                        {task.subtasks && task.subtasks.length > 0 ? (
-                          <span className="text-sm text-gray-600">
-                            {task.subtasks.length} subtask{task.subtasks.length !== 1 ? 's' : ''}
-                          </span>
-                        ) : (
-                          <span className="text-sm text-gray-400">-</span>
-                        )}
+                      <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs">
+                        Labor Cost
                       </TableCell>
-                      <TableCell>
-                        {task.created_at
-                          ? new Date(task.created_at).toLocaleDateString()
-                          : "-"}
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <button
-                            onClick={() => navigate(`/service-tasks/${task.id}`)}
-                            className="p-2 text-gray-600 hover:text-brand-600 transition-colors"
-                            title="View"
-                          >
-                            <EyeIcon className="w-5 h-5" />
-                          </button>
-                          <button
-                            onClick={() => navigate(`/service-tasks/${task.id}/edit`)}
-                            className="p-2 text-gray-600 hover:text-brand-600 transition-colors"
-                            title="Edit"
-                          >
-                            <PencilIcon className="w-5 h-5" />
-                          </button>
-                          <button
-                            onClick={() => handleDelete(task.id)}
-                            disabled={deletingId === task.id}
-                            className="p-2 text-gray-600 hover:text-red-600 transition-colors disabled:opacity-50"
-                            title="Delete"
-                          >
-                            <TrashBinIcon className="w-5 h-5" />
-                          </button>
-                        </div>
+                      <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs w-[10%]">
+                        Actions
                       </TableCell>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-            <TableFooter
-              pagination={pagination}
-              currentPage={currentPage}
-              onPageChange={handlePageChange}
-              loading={loading}
-              itemLabel="service tasks"
-            />
-          </>
-        )}
+                  </TableHeader>
+
+                  <TableBody className="divide-y divide-gray-100 dark:divide-white/5">
+                    {serviceTasks.map((task) => (
+                      <TableRow key={task.id}>
+                        <TableCell className="px-5 py-4 sm:px-6 text-start">
+                          <span className="block font-medium text-gray-800 text-theme-sm">
+                            {task.name}
+                          </span>
+                        </TableCell>
+                        <TableCell className="px-4 py-3 text-start">
+                          <div className="text-gray-800 text-theme-sm">
+                            {task.description ? (
+                              task.description.length > 100
+                                ? `${task.description.substring(0, 100)}...`
+                                : task.description
+                            ) : (
+                              <span className="text-gray-400">—</span>
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell className="px-4 py-3 text-start">
+                          <div className="text-gray-800 text-theme-sm">
+                            {task.labor_cost !== undefined && task.labor_cost !== null ? (
+                              <span className="font-medium">
+                                ${parseFloat(String(task.labor_cost)).toFixed(2)}
+                              </span>
+                            ) : (
+                              <span className="text-gray-400">—</span>
+                            )}
+                          </div>
+                        </TableCell>
+                       
+                        <TableCell className="px-4 py-3 text-start">
+                          <div className="items-center gap-2">
+                            <Button
+                              variant="none"
+                              size="sm"
+                              onClick={() => navigate(`/service-tasks/${task.id}`)}
+                              className="view-button hover:scale-105 transition-all duration-300"
+                              startIcon={<EyeIcon />}
+                            >
+                              {""}
+                            </Button>
+                            <Button
+                              variant="none"
+                              size="sm"
+                              onClick={() => navigate(`/service-tasks/${task.id}/edit`)}
+                              className="edit-button hover:scale-105 transition-all duration-300"
+                              startIcon={<PencilIcon />}
+                            >
+                              {""}
+                            </Button>
+                            <Button
+                              variant="none"
+                              size="sm"
+                              onClick={() => handleDelete(task.id)}
+                              disabled={deletingId === task.id}
+                              className="delete-button hover:scale-105 transition-all duration-300"
+                              startIcon={<TrashBinIcon />}
+                            >
+                              {""}
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+                <TableFooter
+                  pagination={pagination}
+                  currentPage={currentPage}
+                  onPageChange={handlePageChange}
+                  loading={loading}
+                  itemLabel="service tasks"
+                />
+              </>
+            )}
+          </div>
+        </div>
       </div>
     </>
   );

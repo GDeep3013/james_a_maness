@@ -80,7 +80,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('issues', IssueController::class);
     Route::get('/issues/{id}/edit', [IssueController::class, 'edit'])->where('id', '[0-9]+');
 
-    Route::get('/service-tasks/available-subtasks', [ServiceTaskController::class, 'getAvailableSubtasks']);
     Route::apiResource('service-tasks', ServiceTaskController::class);
     Route::get('/service-tasks/{id}/edit', [ServiceTaskController::class, 'edit'])->where('id', '[0-9]+');
 

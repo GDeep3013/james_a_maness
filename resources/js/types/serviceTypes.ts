@@ -3,7 +3,7 @@ import { ServiceItem, Part, Vehicle, Vendor, LineItemsProps } from './workOrderT
 export interface ServiceFormData {
   vehicle_id: string;
   repair_priority_class: string;
-  hour_meter: string;
+  primary_meter: string;
   completion_date: string;
   set_start_date: boolean;
   start_date: string;
@@ -27,7 +27,7 @@ export interface Service {
   vehicle_id?: number;
   vendor_id?: number;
   repair_priority_class?: string;
-  hour_meter?: number;
+  primary_meter?: number;
   completion_date?: string;
   set_start_date?: boolean;
   start_date?: string;

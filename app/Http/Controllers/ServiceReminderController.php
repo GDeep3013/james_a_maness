@@ -88,6 +88,25 @@ class ServiceReminderController extends Controller
                 'status' => 'nullable|in:active,inactive,completed',
             ]);
 
+            $vehicle = Vehical::find($validatedData['vehicle_id']);
+            if (!$vehicle) {
+                return response()->json(['status' => false, 'message' => 'Vehicle not found'], 404);
+            }
+
+            if ($request->has('primary_meter_interval_value') && !empty($request->primary_meter_interval_value)) {
+                $currentMileage = $vehicle->current_mileage ? (float) $vehicle->current_mileage : 0;
+                $primaryMeterInterval = (float) $request->primary_meter_interval_value;
+
+                if ($primaryMeterInterval <= $currentMileage) {
+                    return response()->json([
+                        'status' => 'error',
+                        'errors' => [
+                            'primary_meter_interval_value' => ['Primary Meter Interval must be greater than current mileage (' . $currentMileage . ')']
+                        ]
+                    ], 422);
+                }
+            }
+
             DB::beginTransaction();
 
             $serviceReminder = new ServiceReminder;
@@ -282,6 +301,26 @@ class ServiceReminderController extends Controller
                 'last_completed_meter' => 'nullable|string|max:255',
                 'status' => 'nullable|in:active,inactive,completed',
             ]);
+
+            $vehicleId = $request->has('vehicle_id') ? $request->vehicle_id : $serviceReminder->vehicle_id;
+            $vehicle = Vehical::find($vehicleId);
+            if (!$vehicle) {
+                return response()->json(['status' => false, 'message' => 'Vehicle not found'], 404);
+            }
+
+            if ($request->has('primary_meter_interval_value') && !empty($request->primary_meter_interval_value)) {
+                $currentMileage = $vehicle->current_mileage ? (float) $vehicle->current_mileage : 0;
+                $primaryMeterInterval = (float) $request->primary_meter_interval_value;
+
+                if ($primaryMeterInterval <= $currentMileage) {
+                    return response()->json([
+                        'status' => 'error',
+                        'errors' => [
+                            'primary_meter_interval_value' => ['Primary Meter Interval must be greater than current mileage (' . $currentMileage . ')']
+                        ]
+                    ], 422);
+                }
+            }
 
             DB::beginTransaction();
 

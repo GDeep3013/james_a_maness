@@ -37,12 +37,13 @@ export default function CreateService() {
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [generalError, setGeneralError] = useState<string>("");
-  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+  const [vehicles, setVehicles] = useState<Array<Vehicle & { current_mileage?: string }>>([]);
   const [vendors, setVendors] = useState<Vendor[]>([]);
+  const [currentMileage, setCurrentMileage] = useState<string>("");
   const [formData, setFormData] = useState<ServiceFormData>({
     vehicle_id: "",
     repair_priority_class: "",
-    hour_meter: "",
+    primary_meter: "",
     completion_date: "",
     set_start_date: false,
     start_date: "",
@@ -56,33 +57,7 @@ export default function CreateService() {
     tax_value: 0,
   });
 
-  useEffect(() => {
-    fetchDropdownData();
-    if (isEditMode && id) {
-      fetchServiceData(parseInt(id));
-    }
-  }, [isEditMode, id]);
-
-  const fetchDropdownData = async () => {
-    try {
-      const [vehiclesRes, vendorsRes] = await Promise.all([
-        vehicleService.getAll({ page: 1 }),
-        vendorService.getAll({ page: 1 }),
-      ]);
-
-      if (vehiclesRes.data?.status && vehiclesRes.data?.vehical?.data) {
-        setVehicles(vehiclesRes.data.vehical.data);
-      }
-
-      if (vendorsRes.data?.status && vendorsRes.data?.vendor?.data) {
-        setVendors(vendorsRes.data.vendor.data);
-      }
-    } catch {
-      setGeneralError("Failed to load dropdown data");
-    }
-  };
-
-  const fetchServiceData = async (serviceId: number) => {
+  const fetchServiceData = useCallback(async (serviceId: number) => {
     setIsLoading(true);
     setGeneralError("");
     try {
@@ -94,7 +69,7 @@ export default function CreateService() {
         setFormData({
           vehicle_id: String(service.vehicle_id || ""),
           repair_priority_class: String(service.repair_priority_class || ""),
-          hour_meter: String(service.hour_meter || ""),
+          primary_meter: String(service.primary_meter || ""),
           completion_date: String(service.completion_date || ""),
           set_start_date: Boolean(service.set_start_date || false),
           start_date: String(service.start_date || ""),
@@ -111,13 +86,54 @@ export default function CreateService() {
           tax_type: (service.tax_type as "percentage" | "fixed") || "percentage",
           tax_value: Number(service.tax_value || 0),
         });
+
+        if (service.vehicle_id) {
+          const selectedVehicle = vehicles.find((v) => v.id.toString() === String(service.vehicle_id));
+          if (selectedVehicle) {
+            setCurrentMileage(selectedVehicle.current_mileage || "");
+          }
+        }
       }
     } catch {
       setGeneralError("Failed to load service data. Please try again.");
     } finally {
       setIsLoading(false);
     }
+  }, [vehicles]);
+
+  useEffect(() => {
+    fetchDropdownData();
+  }, []);
+
+  useEffect(() => {
+    if (isEditMode && id && vehicles.length > 0) {
+      fetchServiceData(parseInt(id));
+    }
+  }, [isEditMode, id, vehicles.length, fetchServiceData]);
+
+  const fetchDropdownData = async () => {
+    try {
+      const [vehiclesRes, vendorsRes] = await Promise.all([
+        vehicleService.getAll({ page: 1 }),
+        vendorService.getAll({ page: 1 }),
+      ]);
+
+      if (vehiclesRes.data?.status && vehiclesRes.data?.vehical?.data) {
+        const vehiclesData = vehiclesRes.data.vehical.data.map((vehicle: Vehicle & { current_mileage?: string }) => ({
+          ...vehicle,
+          current_mileage: vehicle.current_mileage || "",
+        }));
+        setVehicles(vehiclesData);
+      }
+
+      if (vendorsRes.data?.status && vendorsRes.data?.vendor?.data) {
+        setVendors(vendorsRes.data.vendor.data);
+      }
+    } catch {
+      setGeneralError("Failed to load dropdown data");
+    }
   };
+
 
   const handleInputChange = (name: string, value: string | boolean) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -138,6 +154,13 @@ export default function CreateService() {
         delete newErrors[name];
         return newErrors;
       });
+    }
+
+    if (name === "vehicle_id" && value) {
+      const selectedVehicle = vehicles.find((v) => v.id.toString() === value);
+      setCurrentMileage(selectedVehicle?.current_mileage || "");
+    } else if (name === "vehicle_id" && !value) {
+      setCurrentMileage("");
     }
   };
 
@@ -170,8 +193,15 @@ export default function CreateService() {
       newErrors.vehicle_id = "Vehicle is required";
     }
 
-    if (!formData.hour_meter.trim()) {
-      newErrors.hour_meter = "Hour Meter is required";
+    if (!formData.primary_meter.trim()) {
+      newErrors.primary_meter = "Primary Meter is required";
+    } else if (formData.primary_meter && currentMileage) {
+      const primaryMeterValue = parseFloat(formData.primary_meter);
+      const currentMileageValue = parseFloat(currentMileage);
+      
+      if (!isNaN(primaryMeterValue) && !isNaN(currentMileageValue) && primaryMeterValue <= currentMileageValue) {
+        newErrors.primary_meter = `Primary Meter must be greater than current mileage (${currentMileage})`;
+      }
     }
 
     if (!formData.completion_date.trim()) {
@@ -197,7 +227,7 @@ export default function CreateService() {
       const serviceData = {
         vehicle_id: formData.vehicle_id ? parseInt(formData.vehicle_id) : undefined,
         repair_priority_class: formData.repair_priority_class || undefined,
-        hour_meter: formData.hour_meter ? parseFloat(formData.hour_meter) : undefined,
+        primary_meter: formData.primary_meter ? parseFloat(formData.primary_meter) : undefined,
         completion_date: formData.completion_date || undefined,
         set_start_date: Boolean(formData.set_start_date),
         start_date: formData.set_start_date && formData.start_date ? formData.start_date : undefined,
@@ -310,23 +340,25 @@ export default function CreateService() {
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <div>
-          <Label htmlFor="hour_meter">
-            Hour Meter <span className="text-error-500">*</span>
+          <Label htmlFor="primary_meter">
+            Primary Meter <span className="text-error-500">*</span>
           </Label>
-          <div className="flex items-center gap-2">
             <Input
               type="number"
-              id="hour_meter"
-              name="hour_meter"
-              value={formData.hour_meter}
-              onChange={(e) => handleInputChange("hour_meter", e.target.value)}
-              placeholder="Enter hour meter"
+              id="primary_meter"
+              name="primary_meter"
+              value={formData.primary_meter}
+              onChange={(e) => handleInputChange("primary_meter", e.target.value)}
+              placeholder="Enter primary meter"
               className="flex-1"
             />
-            <span className="text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap">hr</span>
-          </div>
-          {errors.hour_meter && (
-            <p className="mt-1 text-sm text-error-500">{errors.hour_meter}</p>
+          {errors.primary_meter && (
+            <p className="mt-1 text-sm text-error-500">{errors.primary_meter}</p>
+          )}
+          {currentMileage && (
+            <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+              Current mileage: <span className="font-medium">{currentMileage}</span>
+            </p>
           )}
         </div>
 
