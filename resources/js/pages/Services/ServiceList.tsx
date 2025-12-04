@@ -228,7 +228,7 @@ export default function ServiceList() {
                     <TableRow className="bg-[#E5E7EB]">
                       <TableCell
                         isHeader
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-sm rounded-tl-xl"
+                        className="px-5 py-3 font-medium text-gray-500 text-start text-sm"
                       >
                         Service ID
                       </TableCell>
@@ -264,7 +264,7 @@ export default function ServiceList() {
                       </TableCell>
                       <TableCell
                         isHeader
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-sm w-[10%] rounded-tr-xl"
+                        className="px-5 py-3 font-medium text-gray-500 text-start text-sm w-[10%]"
                       >
                         Actions
                       </TableCell>

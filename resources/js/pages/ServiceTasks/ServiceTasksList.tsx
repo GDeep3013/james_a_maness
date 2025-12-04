@@ -177,16 +177,16 @@ export default function ServiceTasksList() {
                 <Table>
                   <TableHeader className="border-b border-gray-100 dark:border-white/5">
                     <TableRow className="bg-[#E5E7EB]">
-                      <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs">
+                      <TableCell isHeader>
                         Name
                       </TableCell>
-                      <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs">
+                      <TableCell isHeader>
                         Description
                       </TableCell>
-                      <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs">
+                      <TableCell isHeader>
                         Labor Cost
                       </TableCell>
-                      <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs w-[10%]">
+                      <TableCell isHeader>
                         Actions
                       </TableCell>
                     </TableRow>

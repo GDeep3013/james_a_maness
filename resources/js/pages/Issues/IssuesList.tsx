@@ -355,7 +355,7 @@ export default function IssuesList() {
               <>
                 <Table>
                   <TableHeader className="border-b border-gray-100 dark:border-white/5">
-                    <TableRow>
+                    <TableRow className="bg-[#E5E7EB]">
                       <TableCell isHeader >
                         Priority
                       </TableCell>
@@ -370,7 +370,6 @@ export default function IssuesList() {
                       </TableCell>
                       <TableCell
                         isHeader
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-sm"
                       >
                         Summary
                       </TableCell>

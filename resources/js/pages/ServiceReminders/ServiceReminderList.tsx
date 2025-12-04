@@ -231,7 +231,7 @@ export default function ServiceReminderList() {
         )}
 
         <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
-          <div className="max-w-full overflow-x-auto">
+          <div className="max-w-full overflow-hidden overflow-x-auto">
             {loading ? (
               <div className="flex items-center justify-center py-12">
                 <div className="text-center">
@@ -253,53 +253,29 @@ export default function ServiceReminderList() {
               <>
                 <Table>
                   <TableHeader className="border-b border-gray-100">
-                    <TableRow>
-                      <TableCell
-                        isHeader
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs"
-                      >
+                    <TableRow className="bg-[#E5E7EB]">
+                      <TableCell isHeader>
                         ID
                       </TableCell>
-                      <TableCell
-                        isHeader
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs"
-                      >
+                      <TableCell isHeader >
                         Vehicle
                       </TableCell>
-                      <TableCell
-                        isHeader
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs"
-                      >
+                      <TableCell isHeader >
                         Service Task
                       </TableCell>
-                      <TableCell
-                        isHeader
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs"
-                      >
+                      <TableCell isHeader >
                         Time Interval
                       </TableCell>
-                      <TableCell
-                        isHeader
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs"
-                      >
+                      <TableCell isHeader >
                         Meter Interval
                       </TableCell>
-                      <TableCell
-                        isHeader
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs"
-                      >
+                      <TableCell isHeader >
                         Next Due Date
                       </TableCell>
-                      <TableCell
-                        isHeader
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs"
-                      >
+                      <TableCell isHeader >
                         Status
                       </TableCell>
-                      <TableCell
-                        isHeader
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs w-[10%]"
-                      >
+                      <TableCell isHeader >
                         Actions
                       </TableCell>
                     </TableRow>
