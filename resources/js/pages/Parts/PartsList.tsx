@@ -261,7 +261,7 @@ export default function PartsList() {
 
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-semibold text-gray-800 dark:text-white/90">Parts</h1>
+          <h1 className="text-2xl font-semibold text-gray-800   ">Parts</h1>
           <Button
             variant="primary"
             size="sm"
@@ -303,13 +303,13 @@ export default function PartsList() {
           </div>
         )}
 
-        <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/5 dark:bg-white/3">
-          <div className="max-w-full overflow-x-auto">
+        <div className="rounded-xl border border-gray-200 bg-white">
+          <div className="max-w-full overflow-hidden overflow-x-auto">
             {loading ? (
               <div className="flex items-center justify-center py-12">
                 <div className="text-center">
                   <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-brand-500"></div>
-                  <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                  <p className="mt-2 text-sm text-gray-600  ">
                     Loading parts...
                   </p>
                 </div>
@@ -317,7 +317,7 @@ export default function PartsList() {
             ) : parts.length === 0 ? (
               <div className="flex items-center justify-center py-12">
                 <div className="text-center">
-                  <p className="text-gray-600 dark:text-gray-400">
+                  <p className="text-gray-600  ">
                     No parts found
                   </p>
                 </div>
@@ -326,70 +326,70 @@ export default function PartsList() {
               <>
                 <Table>
                   <TableHeader className="border-b border-gray-100 dark:border-white/5">
-                    <TableRow>
+                    <TableRow className="bg-[#E5E7EB]">
                       <TableCell
                         isHeader
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                        className="px-5 py-3 font-medium text-gray-500 text-start text-sm rounded-tl-xl"
                       >
                         Part Name
                       </TableCell>
                       <TableCell
                         isHeader
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                        className="px-5 py-3 font-medium text-gray-500 text-start text-sm"
                       >
                         Part Code
                       </TableCell>
                       <TableCell
                         isHeader
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                        className="px-5 py-3 font-medium text-gray-500 text-start text-sm"
                       >
                         Description
                       </TableCell>
                       <TableCell
                         isHeader
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                        className="px-5 py-3 font-medium text-gray-500 text-start text-sm"
                       >
                         Vehicle Types
                       </TableCell>
                       <TableCell
                         isHeader
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                        className="px-5 py-3 font-medium text-gray-500 text-start text-sm"
                       >
                         Manufacturer
                       </TableCell>
                       <TableCell
                         isHeader
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                        className="px-5 py-3 font-medium text-gray-500 text-start text-sm"
                       >
                         Unit Price
                       </TableCell>
                       <TableCell
                         isHeader
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                        className="px-5 py-3 font-medium text-gray-500 text-start text-sm"
                       >
                         Purchase Price
                       </TableCell>
                       <TableCell
                         isHeader
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                        className="px-5 py-3 font-medium text-gray-500 text-start text-sm"
                       >
                         Vendor
                       </TableCell>
                       <TableCell
                         isHeader
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                        className="px-5 py-3 font-medium text-gray-500 text-start text-sm"
                       >
                         Warranty (Months)
                       </TableCell>
                       <TableCell
                         isHeader
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                        className="px-5 py-3 font-medium text-gray-500 text-start text-sm"
                       >
                         Status
                       </TableCell>
                       <TableCell
                         isHeader
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400 w-[10%]"
+                        className="px-5 py-3 font-medium text-gray-500 text-start text-sm w-[10%] rounded-tr-xl"
                       >
                         Actions
                       </TableCell>
@@ -400,17 +400,17 @@ export default function PartsList() {
                     {parts.map((part) => (
                       <TableRow key={part.id}>
                         <TableCell className="px-5 py-4 text-start">
-                          <div className="font-semibold text-gray-900 dark:text-white text-sm">
+                          <div className="font-semibold text-gray-900  text-theme-sm">
                             {part.part_name}
                           </div>
                         </TableCell>
                         <TableCell className="px-5 py-4 text-start">
-                          <div className="text-gray-800 text-theme-sm dark:text-white/90 font-mono">
+                          <div className="text-gray-800  text-theme-sm font-mono">
                             {part.part_code}
                           </div>
                         </TableCell>
                         <TableCell className="px-5 py-4 text-start">
-                          <div className="text-gray-800 text-theme-sm dark:text-white/90">
+                          <div className="text-gray-800 text-theme-sm">
                             {part.description ? (
                               part.description.length > 50
                                 ? `${part.description.substring(0, 50)}...`
@@ -421,38 +421,38 @@ export default function PartsList() {
                           </div>
                         </TableCell>
                         <TableCell className="px-5 py-4 text-start">
-                          <div className="text-gray-800 text-theme-sm dark:text-white/90">
+                          <div className="text-gray-800 text-theme-sm">
                             {formatVehicleTypes(part.vehical_types)}
                           </div>
                         </TableCell>
                         <TableCell className="px-5 py-4 text-start">
-                          <div className="text-gray-800 text-theme-sm dark:text-white/90">
+                          <div className="text-gray-800 text-theme-sm">
                             {part.manufacturer_name || "—"}
                           </div>
                         </TableCell>
                         <TableCell className="px-5 py-4 text-start">
-                          <div className="text-gray-800 text-theme-sm dark:text-white/90 font-medium">
+                          <div className="text-gray-800 text-theme-sm    font-medium">
                             {part.unit_price !== undefined && part.unit_price !== null
                               ? `$${parseFloat(String(part.unit_price)).toFixed(2)}`
                               : "—"}
                           </div>
                         </TableCell>
                         <TableCell className="px-5 py-4 text-start">
-                          <div className="text-gray-800 text-theme-sm dark:text-white/90 font-medium">
+                          <div className="text-gray-800 text-theme-sm    font-medium">
                             {part.purchase_price !== undefined && part.purchase_price !== null
                               ? `$${parseFloat(String(part.purchase_price)).toFixed(2)}`
                               : "—"}
                           </div>
                         </TableCell>
                         <TableCell className="px-5 py-4 text-start">
-                          <div className="text-gray-800 text-theme-sm dark:text-white/90">
+                          <div className="text-gray-800 text-theme-sm   ">
                             {part.vendor
                               ? part.vendor.name || part.vendor.first_name || `Vendor ${part.vendor.id}`
                               : "—"}
                           </div>
                         </TableCell>
                         <TableCell className="px-5 py-4 text-start">
-                          <div className="text-gray-800 text-theme-sm dark:text-white/90">
+                          <div className="text-gray-800 text-theme-sm">
                             {part.warranty_period_months !== undefined && part.warranty_period_months !== null
                               ? part.warranty_period_months
                               : "—"}
@@ -467,7 +467,7 @@ export default function PartsList() {
                           </Badge>
                         </TableCell>
                         <TableCell className="px-5 py-4 text-start">
-                          <div className="flex items-center gap-2">
+                          <div className="">
                             <Button
                               variant="none"
                               size="sm"

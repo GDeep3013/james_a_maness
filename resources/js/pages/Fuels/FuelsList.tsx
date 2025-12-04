@@ -289,8 +289,8 @@ export default function FuelsList() {
                     </div>
                 )}
 
-                <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/5 dark:bg-white/3">
-                    <div className="max-w-full overflow-x-auto">
+                <div className="rounded-xl border border-gray-200 bg-white">
+                    <div className="max-w-full overflow-hidden overflow-x-auto">
                         {loading ? (
                             <div className="flex items-center justify-center py-12">
                                 <div className="text-center">
@@ -312,58 +312,58 @@ export default function FuelsList() {
                             <>
                                 <Table>
                                     <TableHeader className="border-b border-gray-100 dark:border-white/5">
-                                        <TableRow>
+                                        <TableRow className="bg-[#E5E7EB]">
                                             <TableCell
                                                 isHeader
-                                                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                                                className="px-5 py-3 font-medium text-gray-500 text-start text-sm rounded-tl-xl"
                                             >
                                                 Date
                                             </TableCell>
                                             <TableCell
                                                 isHeader
-                                                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                                                className="px-5 py-3 font-medium text-gray-500 text-start text-sm"
                                             >
                                                 Vehicle
                                             </TableCell>
                                             <TableCell
                                                 isHeader
-                                                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                                                className="px-5 py-3 font-medium text-gray-500 text-start text-sm"
                                             >
                                                 Vendor
                                             </TableCell>
                                             <TableCell
                                                 isHeader
-                                                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                                                className="px-5 py-3 font-medium text-gray-500 text-start text-sm"
                                             >
                                                 Fuel Type
                                             </TableCell>
                                             <TableCell
                                                 isHeader
-                                                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                                                className="px-5 py-3 font-medium text-gray-500 text-start text-sm"
                                             >
                                                 Quantity
                                             </TableCell>
                                             <TableCell
                                                 isHeader
-                                                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                                                className="px-5 py-3 font-medium text-gray-500 text-start text-sm"
                                             >
                                                 Price/Unit
                                             </TableCell>
                                             <TableCell
                                                 isHeader
-                                                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                                                className="px-5 py-3 font-medium text-gray-500 text-start text-sm"
                                             >
                                                 Total Cost
                                             </TableCell>
                                             <TableCell
                                                 isHeader
-                                                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                                                className="px-5 py-3 font-medium text-gray-500 text-start text-sm"
                                             >
                                                 Odometer
                                             </TableCell>
                                             <TableCell
                                                 isHeader
-                                                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400 w-[10%]"
+                                                className="px-5 py-3 font-medium text-gray-500 text-start text-sm w-[10%] rounded-tr-xl"
                                             >
                                                 Actions
                                             </TableCell>
@@ -374,55 +374,55 @@ export default function FuelsList() {
                                         {fuels.map((fuel) => (
                                             <TableRow key={fuel.id}>
                                                 <TableCell className="px-5 py-4 sm:px-6 text-start">
-                                                    <span className="block font-medium text-gray-800 text-theme-sm dark:text-white/90">
+                                                    <span className="block font-medium text-gray-800  text-theme-sm">
                                                         {formatDate(fuel.date)}
                                                     </span>
-                                                    <span className="block text-gray-500 text-theme-xs dark:text-gray-400">
+                                                    <span className="block text-gray-500 text-theme-sm">
                                                         ID: {fuel.id}
                                                     </span>
                                                 </TableCell>
                                                 <TableCell className="px-4 py-3 text-start">
-                                                    <span className="text-gray-800 text-theme-sm dark:text-white/90">
+                                                    <span className="text-gray-800  text-theme-sm   ">
                                                         {fuel.vehicle?.name || `Vehicle #${fuel.vehicle_id}`}
                                                     </span>
                                                 </TableCell>
                                                 <TableCell className="px-4 py-3 text-start">
-                                                    <span className="text-gray-800 text-theme-sm dark:text-white/90">
+                                                    <span className="text-gray-800  text-theme-sm   ">
                                                         {fuel.vendor?.name || `Vendor #${fuel.vendor_id}`}
                                                     </span>
                                                 </TableCell>
                                                 <TableCell className="px-4 py-3 text-start">
-                                                    <span className="text-gray-800 text-theme-sm dark:text-white/90">
+                                                    <span className="text-gray-800  text-theme-sm   ">
                                                         {fuel.fuel_type ? fuel.fuel_type.charAt(0).toUpperCase() + fuel.fuel_type.slice(1) : 'N/A'}
                                                     </span>
                                                 </TableCell>
                                                 <TableCell className="px-4 py-3 text-start">
                                                     <div className="space-y-1">
-                                                        <div className="text-gray-800 text-theme-sm dark:text-white/90">
+                                                        <div className="text-gray-800  text-theme-sm   ">
                                                             {fuel.units}
                                                         </div>
-                                                        <div className="text-gray-500 text-theme-xs dark:text-gray-400">
+                                                        <div className="text-gray-500 text-theme-sm">
                                                             {formatUnitType(fuel.unit_type)}
                                                         </div>
                                                     </div>
                                                 </TableCell>
                                                 <TableCell className="px-4 py-3 text-start">
-                                                    <span className="text-gray-800 text-theme-sm dark:text-white/90">
+                                                    <span className="text-gray-800  text-theme-sm   ">
                                                         ${Number(fuel.price_per_volume_unit).toFixed(2)}
                                                     </span>
                                                 </TableCell>
                                                 <TableCell className="px-4 py-3 text-start">
-                                                    <span className="font-semibold text-brand-600 text-theme-sm dark:text-brand-400">
+                                                    <span className="font-semibold text-brand-600  text-theme-sm">
                                                         ${calculateTotalCost(fuel.units, fuel.price_per_volume_unit)}
                                                     </span>
                                                 </TableCell>
                                                 <TableCell className="px-4 py-3 text-start">
-                                                    <span className="text-gray-800 text-theme-sm dark:text-white/90">
+                                                    <span className="text-gray-800  text-theme-sm   ">
                                                         {fuel.vehicle_meter}
                                                     </span>
                                                 </TableCell>
                                                 <TableCell className="px-4 py-3 text-start">
-                                                    <div className="flex items-center gap-2">
+                                                    <div className="">
                                                         <Button
                                                             variant="none"
                                                             size="sm"

@@ -279,13 +279,13 @@ export default function ContactsList() {
           </div>
         )}
 
-        <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/5 dark:bg-white/3">
-          <div className="max-w-full overflow-x-auto">
+        <div className="rounded-xl border border-gray-200 bg-white">
+          <div className="max-w-full overflow-hidden overflow-x-auto">
             {loading ? (
               <div className="flex items-center justify-center py-12">
                 <div className="text-center">
                   <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-brand-500"></div>
-                  <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                  <p className="mt-2 text-sm text-gray-600  ">
                     Loading contacts...
                   </p>
                 </div>
@@ -293,7 +293,7 @@ export default function ContactsList() {
             ) : contacts.length === 0 ? (
               <div className="flex items-center justify-center py-12">
                 <div className="text-center">
-                  <p className="text-gray-600 dark:text-gray-400">
+                  <p className="text-gray-600  ">
                     No contacts found
                   </p>
                 </div>
@@ -302,40 +302,40 @@ export default function ContactsList() {
               <>
                 <Table>
                     <TableHeader className="border-b border-gray-100 dark:border-white/5">
-                    <TableRow>
+                    <TableRow className="bg-[#E5E7EB]">
                       <TableCell
                         isHeader
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                        className="px-5 py-3 font-medium text-gray-500 text-start text-sm rounded-tl-xl"
                       >
                         Contact
                       </TableCell>
                       <TableCell
                         isHeader
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                        className="px-5 py-3 font-medium text-gray-500 text-start text-sm  "
                       >
                         Email/Phone
                       </TableCell>
                       <TableCell
                         isHeader
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                        className="px-5 py-3 font-medium text-gray-500 text-start text-sm  "
                       >
                         License
                       </TableCell>
                       <TableCell
                         isHeader
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                        className="px-5 py-3 font-medium text-gray-500 text-start text-sm  "
                       >
                         Designation
                       </TableCell>
                       <TableCell
                         isHeader
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                        className="px-5 py-3 font-medium text-gray-500 text-start text-sm  "
                       >
                         Status
                       </TableCell>
                       <TableCell
                         isHeader
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400 w-[10%]"
+                        className="px-5 py-3 font-medium text-gray-500 text-start text-sm   w-[10%] rounded-tr-xl"
                       >
                         Actions
                       </TableCell>
@@ -351,7 +351,7 @@ export default function ContactsList() {
                               <span className="block font-medium text-gray-800 text-theme-sm dark:text-white/90">
                                 {getFullName(contact)}
                               </span>
-                              <span className="block text-gray-500 text-theme-xs dark:text-gray-400">
+                              <span className="block text-gray-500 text-sm  ">
                                 ID: {contact.id}
                               </span>
                             </div>
@@ -362,7 +362,7 @@ export default function ContactsList() {
                             <div className="text-gray-800 text-theme-sm dark:text-white/90">
                               {contact.email}
                             </div>
-                            <div className="text-gray-500 text-theme-xs dark:text-gray-400">
+                            <div className="text-gray-500 text-sm  ">
                               {contact.phone}
                             </div>
                           </div>
@@ -373,13 +373,13 @@ export default function ContactsList() {
                               {contact.license_no || "N/A"}
                             </div>
                             {contact.license_class && (
-                              <div className="text-gray-500 text-theme-xs dark:text-gray-400">
+                              <div className="text-gray-500 text-sm  ">
                                 {contact.license_class}
                               </div>
                             )}
                           </div>
                         </TableCell>
-                        <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
+                        <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm  ">
                           {contact.designation || "N/A"}
                         </TableCell>
                         <TableCell className="px-4 py-3 text-start">
@@ -397,7 +397,7 @@ export default function ContactsList() {
                           </Badge>
                         </TableCell>
                         <TableCell className="px-4 py-3 text-start">
-                          <div className="flex items-center gap-2">
+                          <div className="">
                             <Button
                               variant="none"
                               size="sm"
