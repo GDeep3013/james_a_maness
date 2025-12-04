@@ -82,7 +82,7 @@ export const vehicleService = {
     api.get(`/vehicles/${id}/edit`),
 
   getStatistics: () =>
-    api.get('/vehicles'),
+    api.get('/vehicles-statistics'),
 
   import: (file: File) => {
     const formData = new FormData();

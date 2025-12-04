@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { vehicleService } from '../../services/vehicleService';
-import api from '../../services/api';
 
 interface VehicleStatistics {
   total: number;
   active: number;
   inMaintenance: number;
   available: number;
-  outOfService: number;
 }
 
 export default function VehicleOverview({ importSuccess }: { importSuccess?: boolean }) {
@@ -16,7 +14,6 @@ export default function VehicleOverview({ importSuccess }: { importSuccess?: boo
     active: 0,
     inMaintenance: 0,
     available: 0,
-    outOfService: 0,
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>('');
@@ -26,79 +23,19 @@ export default function VehicleOverview({ importSuccess }: { importSuccess?: boo
       setLoading(true);
       setError('');
       try {
-        const [vehiclesResponse, maintenanceResponse] = await Promise.all([
-          vehicleService.getStatistics(),
-          api.get('/maintenances').catch(() => ({ data: { status: false, maintenance: [] } })),
-        ]);
+        const vehiclesResponse = await vehicleService.getStatistics();
 
         const vehiclesData = vehiclesResponse.data;
-        const maintenanceData = maintenanceResponse.data;
 
-        if (vehiclesData.status && vehiclesData.vehical) {
-          let vehicles: any[] = [];
-
-          if (Array.isArray(vehiclesData.vehical)) {
-            vehicles = vehiclesData.vehical;
-          } else if (vehiclesData.vehical.data && Array.isArray(vehiclesData.vehical.data)) {
-            vehicles = vehiclesData.vehical.data;
-          } else if (vehiclesData.vehical.total !== undefined) {
-            vehicles = vehiclesData.vehical.data || [];
-          }
-
-          let maintenanceVehicleIds = new Set();
-          if (maintenanceData.status && maintenanceData.maintenance) {
-            const maintenances = Array.isArray(maintenanceData.maintenance)
-              ? maintenanceData.maintenance
-              : maintenanceData.maintenance.data || [];
-
-            maintenanceVehicleIds = new Set(
-              maintenances
-                .map((m: any) => m.vehicle_id)
-                .filter((id: any) => id !== null && id !== undefined)
-            );
-          }
-
-          // Count vehicles based on initial_status
-          let activeCount = 0;
-          let inMaintenanceCount = 0;
-          let availableCount = 0;
-          let outOfServiceCount = 0;
-
-          vehicles.forEach((vehicle: any) => {
-            const status = vehicle.initial_status?.toLowerCase() || vehicle.status?.toLowerCase() || '';
-            const vehicleId = vehicle.id;
-
-            console.log(`Vehicle ID: ${vehicleId}, initial_status: ${vehicle.initial_status}, status: ${vehicle.status}`);
-            if (status === 'maintenance') {
-              inMaintenanceCount++;
-            } else if (status === 'inactive' || status === 'out_of_service' || status === 'out of service') {
-              outOfServiceCount++;
-            } else if (status === 'active') {
-              activeCount++;
-            } else if (status === 'available') {
-              availableCount++;
-            } else {
-              availableCount++;
-            }
-          });
-
-          const totalVehicles = activeCount + inMaintenanceCount + availableCount + outOfServiceCount;
-
-          console.log('Statistics:', {
-            total: totalVehicles,
-            active: activeCount,
-            inMaintenance: inMaintenanceCount,
-            available: availableCount,
-            outOfService: outOfServiceCount
-          });
+        if (vehiclesData.status && vehiclesData.data) {
 
           setStatistics({
-            total: totalVehicles,
-            active: activeCount,
-            inMaintenance: inMaintenanceCount,
-            available: availableCount,
-            outOfService: outOfServiceCount,
+            total: vehiclesData.data.total ?? 0,
+            active: vehiclesData.data.active ?? 0,
+            inMaintenance: vehiclesData.data.in_maintenance ?? 0,
+            available: vehiclesData.data.available ?? 0
           });
+
         } else {
           setError('Failed to load vehicle statistics');
         }
@@ -134,15 +71,15 @@ export default function VehicleOverview({ importSuccess }: { importSuccess?: boo
 
   if (error) {
     return (
-      <div className="mt-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-        <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+      <div className="mt-4 p-4 bg-red-50 border border-red-200  rounded-lg">
+        <p className="text-sm text-red-600">{error}</p>
       </div>
     );
   }
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
-      <div className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl p-6 flex flex-col">
+      <div className="bg-white border border-gray-200 rounded-xl p-6 flex flex-col">
         <span className="text-base font-medium text-black mb-2">Total Vehicles</span>
         <span className="text-[40px] font-medium text-[#1D2939]">
           {statistics.total}
@@ -152,16 +89,16 @@ export default function VehicleOverview({ importSuccess }: { importSuccess?: boo
         </span>
           </div>
 
-          <div className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl p-6 flex flex-col">
+          <div className="bg-white border border-gray-200 rounded-xl p-6 flex flex-col">
         <span className="text-base font-medium text-black mb-2">Active</span>
         <span className="text-[40px] font-medium text-[#00A63E]">
-          {statistics.available}
+          {statistics.active}
         </span>
         <span className="mt-2 text-sm text-[#595959]">Currently in use</span>
           </div>
 
 
-      <div className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl p-6 flex flex-col">
+      <div className="bg-white border border-gray-200 rounded-xl p-6 flex flex-col">
         <span className="text-base font-medium text-black mb-2">In Maintenance</span>
         <span className="text-[40px] font-medium text-[#D08700]">
           {statistics.inMaintenance}
@@ -170,10 +107,10 @@ export default function VehicleOverview({ importSuccess }: { importSuccess?: boo
           </div>
 
 
-      <div className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl p-6 flex flex-col">
+      <div className="bg-white border border-gray-200 rounded-xl p-6 flex flex-col">
         <span className="text-base font-medium text-black mb-2">Available</span>
         <span className="text-[40px] font-medium text-[#155DFC]">
-          {statistics.outOfService}
+          {statistics.available}
         </span>
         <span className="mt-2 text-sm text-[#595959]">Ready to assign</span>
       </div>

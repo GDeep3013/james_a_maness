@@ -88,12 +88,12 @@ class VehicleController extends Controller
                 'engine_size' => 'nullable|string|max:255',
                 'current_mileage' => 'nullable|string|max:255',
                 'purchase_price' => 'nullable|string|max:255',
-                'initial_status' => 'nullable|in:available,assigned,maintenance,inactive',
+                'initial_status' => 'nullable|in:available,assigned,maintenance,active,inactive',
                 'vendor_id' => 'nullable|integer|exists:vendors,id',
                 'primary_location' => 'nullable|string|max:255',
                 'notes' => 'nullable|string',
                 'assigned_driver' => 'nullable|integer',
-                'department' => 'nullable|integer',
+                'department' => 'nullable|string|max:255',
             ]);
 
             $vehicle = new Vehical;
@@ -229,12 +229,12 @@ class VehicleController extends Controller
                 'engine_size' => 'nullable|string|max:255',
                 'current_mileage' => 'nullable|string|max:255',
                 'purchase_price' => 'nullable|string|max:255',
-                'initial_status' => 'nullable|in:available,assigned,maintenance,inactive',
+                'initial_status' => 'nullable|in:available,assigned,maintenance,active,inactive',
                 'vendor_id' => 'nullable|integer|exists:vendors,id',
                 'primary_location' => 'nullable|string|max:255',
                 'notes' => 'nullable|string',
                 'assigned_driver' => 'nullable|integer',
-                'department' => 'nullable|integer',
+                'department' => 'nullable|string|max:255',
             ]);
 
             $vehicle->vehicle_name = $validatedData['vehicle_name'];
@@ -334,5 +334,22 @@ class VehicleController extends Controller
                 return response()->json(['status' => false, 'message' => 'Vehical not found']);
             }
         }
+    }
+
+    public function getStatistics()
+    {
+        
+        $totalVehicles = Vehical::count();
+        $activeCount = Vehical::where('initial_status', '=', 'active')->count();
+        $inMaintenanceCount = Vehical::where('initial_status', '=', 'maintenance')->count();
+        $availableCount = Vehical::where('initial_status', '=', 'available')->count();
+
+        return response()->json(['status' => true, 'data' => [
+            'total' => $totalVehicles,
+            'active' => $activeCount,
+            'in_maintenance' => $inMaintenanceCount,
+            'available' => $availableCount,
+        ]]);
+       
     }
 }

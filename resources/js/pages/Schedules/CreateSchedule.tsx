@@ -38,7 +38,7 @@ export default function CreateSchedule() {
   const { id } = useParams<{ id?: string }>();
   const isEditMode = !!id;
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(isEditMode);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [generalError, setGeneralError] = useState<string>("");
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
@@ -139,6 +139,7 @@ export default function CreateSchedule() {
     if (!isEditMode || !id || dataLoadedRef.current === false) return;
 
     const loadScheduleData = async () => {
+
       const scheduleId = parseInt(id);
       setIsLoading(true);
       setGeneralError("");
@@ -255,8 +256,12 @@ export default function CreateSchedule() {
   };
 
   const handleServiceTaskSearch = (inputValue: string) => {
+
     if (searchTimeout) {
       clearTimeout(searchTimeout);
+    }
+    if(inputValue.trim() === "") {
+      return;
     }
 
     const timeout = setTimeout(() => {

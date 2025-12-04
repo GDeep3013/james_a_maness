@@ -31,7 +31,7 @@ return new class extends Migration
             $table->string('engine_size')->nullable();
             $table->string('current_mileage')->nullable();
             $table->string('purchase_price')->nullable();
-            $table->enum('initial_status', ['available', 'assigned', 'maintenance', 'inactive'])->default('available');
+            $table->enum('initial_status', ['available', 'assigned', 'maintenance','active', 'inactive'])->default('available');
             $table->string('primary_location')->nullable();
             $table->text('notes')->nullable();
             $table->bigInteger('assigned_driver')->nullable();

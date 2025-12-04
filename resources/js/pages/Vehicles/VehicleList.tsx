@@ -229,7 +229,7 @@ export default function VehicleList({ importSuccess }: { importSuccess?: boolean
                     </div>
                 )}
 
-                <div className="rounded-xl border border-gray-200 bg-white dark:border-white/5 dark:bg-white/3">
+                <div className="rounded-xl border border-gray-200 bg-white">
                     <div className="max-w-full overflow-hidden overflow-x-auto">
                         {loading ? (
                             <div className="flex items-center justify-center py-12">
@@ -267,9 +267,6 @@ export default function VehicleList({ importSuccess }: { importSuccess?: boolean
                                             </TableCell>
                                             <TableCell isHeader>
                                                 Make/Model/Year
-                                            </TableCell>
-                                            <TableCell isHeader>
-                                                Vendor
                                             </TableCell>
                                             <TableCell isHeader>
                                                 Driver
@@ -331,11 +328,6 @@ export default function VehicleList({ importSuccess }: { importSuccess?: boolean
                                                             <div className="text-gray-500   text-xs mt-0.5">
                                                                 {vehicle.year}
                                                             </div>
-                                                        </div>
-                                                    </TableCell>
-                                                    <TableCell className="px-5 py-4 text-start">
-                                                        <div className="text-gray-800 text-theme-sm dark:text-white/90">
-                                                            {capitalize(vehicle.vendor?.name) || "—"}
                                                         </div>
                                                     </TableCell>
                                                     <TableCell className="px-5 py-4 text-start">
