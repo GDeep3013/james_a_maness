@@ -25,7 +25,6 @@ interface WorkOrder {
   status?: string;
   repair_priority_class?: string;
   issue_date?: string;
-  issued_by?: string;
   scheduled_start_date?: string;
   actual_start_date?: string;
   expected_completion_date?: string;
@@ -421,11 +420,6 @@ export default function WorkOrdersList() {
                           <div className="text-gray-800 text-theme-sm">
                             {formatDate(workOrder.issue_date)}
                           </div>
-                          {workOrder.issued_by && (
-                            <div className="text-gray-500 text-theme-xs">
-                              By: {workOrder.issued_by}
-                            </div>
-                          )}
                         </TableCell>
                         <TableCell className="px-4 py-3 text-start">
                           {workOrder.assigned_to ? (

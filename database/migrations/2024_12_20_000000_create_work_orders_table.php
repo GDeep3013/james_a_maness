@@ -15,7 +15,6 @@ return new class extends Migration
             $table->string('status')->nullable();
             $table->string('repair_priority_class')->nullable();
             $table->dateTime('issue_date')->nullable();
-            $table->string('issued_by')->nullable();
             $table->dateTime('scheduled_start_date')->nullable();
             $table->boolean('send_scheduled_start_date_reminder')->default(false);
             $table->dateTime('actual_start_date')->nullable();

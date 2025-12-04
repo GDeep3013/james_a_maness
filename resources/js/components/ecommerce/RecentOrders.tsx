@@ -34,7 +34,6 @@ interface WorkOrder {
   status?: string;
   repair_priority_class?: string;
   issue_date?: string;
-  issued_by?: string;
   scheduled_start_date?: string;
   actual_start_date?: string;
   expected_completion_date?: string;
@@ -327,11 +326,6 @@ export default function RecentOrders() {
                   <TableCell className="py-4 px-5 text-gray-800 text-theme-sm">
                     <div>
                       <span>{formatDate(workOrder.issue_date)}</span>
-                      {workOrder.issued_by && (
-                        <span className="block text-gray-500 text-theme-xs">
-                          By: {workOrder.issued_by}
-                        </span>
-                      )}
                     </div>
                   </TableCell>
                 </TableRow>

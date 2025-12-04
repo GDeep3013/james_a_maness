@@ -71,7 +71,6 @@ interface IssueRecord {
     source?: string;
     issue_date?: string;
     reported_date?: string;
-    issued_by?: string;
     assigned_to?: {
         id?: number;
         first_name?: string;
@@ -112,7 +111,6 @@ interface WorkOrderRecord {
     status?: string;
     repair_priority_class?: string;
     issue_date?: string;
-    issued_by?: string;
     scheduled_start_date?: string;
     actual_start_date?: string;
     expected_completion_date?: string;
@@ -1000,11 +998,6 @@ export default function VehicleDetail() {
                                                                     <div className="text-gray-800 text-theme-sm">
                                                                         {record.issue_date ? formatDate(record.issue_date) : "N/A"}
                                                                     </div>
-                                                                    {record.issued_by && (
-                                                                        <div className="text-gray-500 text-theme-xs">
-                                                                            By: {record.issued_by}
-                                                                        </div>
-                                                                    )}
                                                                 </TableCell>
                                                                 <TableCell className="px-4 py-3 text-start">
                                                                     {record.assigned_to ? (

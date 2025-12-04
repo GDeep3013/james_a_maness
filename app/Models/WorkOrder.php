@@ -15,7 +15,6 @@ class WorkOrder extends Model
         'status',
         'repair_priority_class',
         'issue_date',
-        'issued_by',
         'scheduled_start_date',
         'send_scheduled_start_date_reminder',
         'actual_start_date',

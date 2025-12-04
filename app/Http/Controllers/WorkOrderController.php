@@ -83,7 +83,6 @@ class WorkOrderController extends Controller
                 'status' => 'nullable|string|max:255',
                 'repair_priority_class' => 'nullable|string|max:255',
                 'issue_date' => 'nullable|date',
-                'issued_by' => 'nullable|string|max:255',
                 'scheduled_start_date' => 'nullable|date',
                 'send_scheduled_start_date_reminder' => 'nullable',
                 'actual_start_date' => 'nullable|date',
@@ -113,7 +112,6 @@ class WorkOrderController extends Controller
             $workOrder->status = $request->status ?? null;
             $workOrder->repair_priority_class = $request->repair_priority_class ?? null;
             $workOrder->issue_date = $request->issue_date ?? null;
-            $workOrder->issued_by = $request->issued_by ?? null;
             $workOrder->scheduled_start_date = $request->scheduled_start_date ?? null;
             $workOrder->send_scheduled_start_date_reminder = $this->convertToBoolean($request->send_scheduled_start_date_reminder, false);
             $workOrder->actual_start_date = $request->actual_start_date ?? null;
@@ -271,7 +269,6 @@ class WorkOrderController extends Controller
                 'status' => 'nullable|string|max:255',
                 'repair_priority_class' => 'nullable|string|max:255',
                 'issue_date' => 'nullable|date',
-                'issued_by' => 'nullable|string|max:255',
                 'scheduled_start_date' => 'nullable|date',
                 'send_scheduled_start_date_reminder' => 'nullable',
                 'actual_start_date' => 'nullable|date',
@@ -306,9 +303,6 @@ class WorkOrderController extends Controller
             }
             if ($request->has('issue_date')) {
                 $workOrder->issue_date = $request->issue_date;
-            }
-            if ($request->has('issued_by')) {
-                $workOrder->issued_by = $request->issued_by;
             }
             if ($request->has('scheduled_start_date')) {
                 $workOrder->scheduled_start_date = $request->scheduled_start_date;

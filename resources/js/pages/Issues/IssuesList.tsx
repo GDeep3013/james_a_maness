@@ -29,7 +29,6 @@ interface Issue {
   source?: string;
   issue_date?: string;
   reported_date?: string;
-  issued_by?: string;
   assigned_to?: {
     id?: number;
     first_name?: string;
@@ -545,7 +544,7 @@ export default function IssuesList() {
                         </TableCell>
                         <TableCell className="px-4 py-3 text-start">
                           <div className="text-gray-800 text-theme-sm dark:text-white/90">
-                            {issue.summary || issue.issued_by || "—"}
+                            {issue.summary || "—"}
                           </div>
                         </TableCell>
                         <TableCell className="px-4 py-3 text-start">

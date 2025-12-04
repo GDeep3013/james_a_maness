@@ -6,7 +6,6 @@ interface WorkOrderData {
   status?: string;
   repair_priority_class?: string;
   issue_date?: string;
-  issued_by?: string;
   scheduled_start_date?: string;
   send_scheduled_start_date_reminder?: boolean;
   actual_start_date?: string;

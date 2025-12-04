@@ -49,7 +49,6 @@ export default function CreateWorkOrder() {
     status: "Open",
     repair_priority_class: "",
     issue_date: "",
-    issued_by: "",
     scheduled_start_date: "",
     send_scheduled_start_date_reminder: false,
     actual_start_date: "",
@@ -116,7 +115,6 @@ export default function CreateWorkOrder() {
           status: String(workOrder.status || "Open"),
           repair_priority_class: String(workOrder.repair_priority_class || ""),
           issue_date: String(workOrder.issue_date || ""),
-          issued_by: String(workOrder.issued_by || ""),
           scheduled_start_date: String(workOrder.scheduled_start_date || ""),
           send_scheduled_start_date_reminder: Boolean(workOrder.send_scheduled_start_date_reminder || false),
           actual_start_date: String(workOrder.actual_start_date || ""),
@@ -301,7 +299,6 @@ export default function CreateWorkOrder() {
         status: formData.status || undefined,
         repair_priority_class: formData.repair_priority_class || undefined,
         issue_date: formData.issue_date || undefined,
-        issued_by: formData.issued_by || undefined,
         scheduled_start_date: formData.scheduled_start_date || undefined,
         send_scheduled_start_date_reminder: Boolean(formData.send_scheduled_start_date_reminder),
         actual_start_date: formData.actual_start_date || undefined,
@@ -322,13 +319,6 @@ export default function CreateWorkOrder() {
         tax_type: formData.tax_type || undefined,
         tax_value: formData.tax_value !== undefined ? formData.tax_value : undefined,
       };
-
-      // console.log(typeof workOrderData.service_items);
-      // console.log(typeof workOrderData.parts);
-
-      // console.log(workOrderData);
-      // return;
-
 
       const response = isEditMode && id
         ? await workOrderService.update(parseInt(id), workOrderData)
@@ -434,7 +424,7 @@ export default function CreateWorkOrder() {
           defaultValue={formData.repair_priority_class}
         />
         <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-          Repair Priority Class (VMRS Code Key 16) is a simple way to classify whether a service or repair was scheduled, non-scheduled, or an emergency.
+          Repair Priority Class is a simple way to classify whether a service or repair was scheduled, non-scheduled, or an emergency.
         </p>
       </div>
 
@@ -463,18 +453,6 @@ export default function CreateWorkOrder() {
             placeholder="Select scheduled start date and time"
             onChange={handleDateTimeChange("scheduled_start_date")}
             defaultDate={formData.scheduled_start_date || undefined}
-          />
-        </div>
-
-        <div>
-          <Label htmlFor="issued_by">Issued By</Label>
-          <Input
-            type="text"
-            id="issued_by"
-            name="issued_by"
-            value={formData.issued_by}
-            onChange={(e) => handleInputChange("issued_by", e.target.value)}
-            placeholder="Enter issued by"
           />
         </div>
       </div>

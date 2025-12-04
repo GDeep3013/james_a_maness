@@ -12,7 +12,6 @@ interface WorkOrderRecord {
     status?: string;
     repair_priority_class?: string;
     issue_date?: string;
-    issued_by?: string;
     scheduled_start_date?: string;
     actual_start_date?: string;
     expected_completion_date?: string;
