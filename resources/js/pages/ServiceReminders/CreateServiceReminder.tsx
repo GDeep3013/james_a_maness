@@ -48,12 +48,6 @@ const TIME_UNIT_OPTIONS = [
   { value: "year", label: "year(s)" },
 ];
 
-const METER_UNIT_OPTIONS = [
-  { value: "hr", label: "hr" },
-  { value: "mi", label: "mi" },
-  { value: "km", label: "km" },
-];
-
 export default function CreateServiceReminder() {
   const navigate = useNavigate();
   const { id } = useParams<{ id?: string }>();
@@ -466,10 +460,7 @@ export default function CreateServiceReminder() {
   const renderIntervalInput = (
     label: string,
     valueName: string,
-    unitName: string,
     value: string,
-    unit: string,
-    unitOptions: { value: string; label: string }[],
     showInfoIcon: boolean = false
   ) => (
     <div>
@@ -493,14 +484,6 @@ export default function CreateServiceReminder() {
             className={errors[valueName] ? "border-error-500" : ""}
           />
         </div>
-        {/* <div className="w-32">
-          <Select
-            options={unitOptions}
-            placeholder="Select"
-            onChange={handleSelectChange(unitName)}
-            defaultValue={unit}
-          />
-        </div> */}
       </div>
       {valueName === "primary_meter_interval_value" && currentMileage && (
         <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
@@ -661,10 +644,7 @@ export default function CreateServiceReminder() {
                       {renderIntervalInput(
                         "Time Interval",
                         "time_interval_value",
-                        "time_interval_unit",
                         formData.time_interval_value,
-                        formData.time_interval_unit,
-                        TIME_UNIT_OPTIONS,
                         false
                       )}
 
@@ -683,10 +663,7 @@ export default function CreateServiceReminder() {
                       {renderIntervalInput(
                         "Primary Meter Interval",
                         "primary_meter_interval_value",
-                        "primary_meter_interval_unit",
                         formData.primary_meter_interval_value,
-                        formData.primary_meter_interval_unit,
-                        METER_UNIT_OPTIONS,
                         false
                       )}
 

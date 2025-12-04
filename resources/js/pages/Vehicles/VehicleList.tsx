@@ -229,7 +229,7 @@ export default function VehicleList({ importSuccess }: { importSuccess?: boolean
                     </div>
                 )}
 
-                <div className="rounded-xl border border-gray-200 bg-white">
+                <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
                     <div className="max-w-full overflow-hidden overflow-x-auto">
                         {loading ? (
                             <div className="flex items-center justify-center py-12">

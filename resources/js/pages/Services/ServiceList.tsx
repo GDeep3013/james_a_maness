@@ -203,7 +203,7 @@ export default function ServiceList() {
         )}
 
         <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
-          <div className="max-w-full overflow-x-auto">
+          <div className="max-w-full overflow-hidden overflow-x-auto">
             {loading ? (
               <div className="flex items-center justify-center py-12">
                 <div className="text-center">
@@ -225,46 +225,46 @@ export default function ServiceList() {
               <>
                 <Table>
                   <TableHeader className="border-b border-gray-100">
-                    <TableRow>
+                    <TableRow className="bg-[#E5E7EB]">
                       <TableCell
                         isHeader
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs"
+                        className="px-5 py-3 font-medium text-gray-500 text-start text-sm rounded-tl-xl"
                       >
                         Service ID
                       </TableCell>
                       <TableCell
                         isHeader
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs"
+                        className="px-5 py-3 font-medium text-gray-500 text-start text-sm"
                       >
                         Vehicle
                       </TableCell>
                       <TableCell
                         isHeader
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs"
+                        className="px-5 py-3 font-medium text-gray-500 text-start text-sm"
                       >
                         Repair Priority Class
                       </TableCell>
                       <TableCell
                         isHeader
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs"
+                        className="px-5 py-3 font-medium text-gray-500 text-start text-sm"
                       >
                         Primary Meter
                       </TableCell>
                       <TableCell
                         isHeader
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs"
+                        className="px-5 py-3 font-medium text-gray-500 text-start text-sm"
                       >
                         Completion Date
                       </TableCell>
                       <TableCell
                         isHeader
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs"
+                        className="px-5 py-3 font-medium text-gray-500 text-start text-sm"
                       >
                         Vendor
                       </TableCell>
                       <TableCell
                         isHeader
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs w-[10%]"
+                        className="px-5 py-3 font-medium text-gray-500 text-start text-sm w-[10%] rounded-tr-xl"
                       >
                         Actions
                       </TableCell>
@@ -318,7 +318,7 @@ export default function ServiceList() {
                           </div>
                         </TableCell>
                         <TableCell className="px-4 py-3 text-start">
-                          <div className="items-center gap-2">
+                          <div className="">
                             <Button
                               variant="none"
                               size="sm"

@@ -332,8 +332,8 @@ export default function IssuesList() {
           </div>
         )}
 
-        <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/5 dark:bg-white/3">
-          <div className="max-w-full overflow-x-auto">
+        <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
+          <div className="max-w-full overflow-hidden overflow-x-auto">
             {loading ? (
               <div className="flex items-center justify-center py-12">
                 <div className="text-center">
@@ -370,7 +370,7 @@ export default function IssuesList() {
                       </TableCell>
                       <TableCell
                         isHeader
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                        className="px-5 py-3 font-medium text-gray-500 text-start text-sm"
                       >
                         Summary
                       </TableCell>
@@ -458,7 +458,7 @@ export default function IssuesList() {
                         </TableCell>
 
                          <TableCell className="px-4 py-3 text-start">
-                          <div className="items-center gap-2">
+                          <div className="items-center">
                             <Button
                               variant="none"
                               size="sm"

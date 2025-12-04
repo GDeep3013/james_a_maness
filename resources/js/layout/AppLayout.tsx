@@ -18,8 +18,8 @@ const LayoutContent: React.FC = () => {
                     } ${isMobileOpen ? "ml-0" : ""} dark:border-gray-800 dark:bg-gray-900 lg:border-b`}
             >
                 <AppHeader />
-                <div className="mx-auto max-w-full relative screen-height overflow-x-hidden">
-                    <div className="p-4 md:p-6 overflow-x-hidden">
+                <div className="mx-auto max-w-full relative overflow-x-hidden">
+                    <div className="p-4 md:p-6 overflow-hidden overflow-y-auto screen-height">
                         <Outlet />
                     </div>
                     <div className="py-3 footer-shadow text-center w-full absolute bottom-0 bg-white">
