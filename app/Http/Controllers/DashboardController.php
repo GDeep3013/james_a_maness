@@ -115,7 +115,6 @@ class DashboardController extends Controller
     {
         $serviceReminders = ServiceReminder::with([
             'vehicle:id,vehicle_name',
-            'serviceTask:id,name',
             'user:id,name'
         ])
             ->whereDate('next_due_date', '>=', today())
