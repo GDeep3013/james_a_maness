@@ -1,8 +1,8 @@
 export interface ServiceItem {
-  id: number;
-  name: string;
+  id?: number;
+  name?: string;
   description?: string;
-  type: "Service Tasks" | "Parts";
+  type?: "Service Tasks" | "Parts" | string;
   quantity?: number;
   total?: number;
   labor_cost?: number;
@@ -100,4 +100,49 @@ export interface NotesProps {
   setDiscountValue?: (value: number) => void;
   setTaxType?: (type: "percentage" | "fixed") => void;
   setTaxValue?: (value: number) => void;
+}
+
+export interface WorkOrder {
+  id: number;
+  vehicle_id?: number;
+  vehicle?: {
+    vehicle_name?: string;
+    type?: string;
+    make?: string;
+    model?: string;
+    year?: string | number;
+    license_plate?: string;
+  };
+  status?: string;
+  repair_priority_class?: string;
+  issue_date?: string;
+  scheduled_start_date?: string;
+  actual_start_date?: string;
+  expected_completion_date?: string;
+  actual_completion_date?: string;
+  assigned_to?: {
+    id?: number;
+    first_name?: string;
+    last_name?: string;
+  };
+  vendor_id?: number;
+  vendor?: {
+    first_name?: string;
+    company_contact?: string;
+  };
+  invoice_number?: string;
+  po_number?: string;
+  service_items?: ServiceItem[] | string;
+  created_at?: string;
+}
+
+export interface WorkOrdersResponse {
+  status: boolean;
+  work_orders?: {
+    data: WorkOrder[];
+    current_page: number;
+    last_page: number;
+    per_page: number;
+    total: number;
+  };
 }

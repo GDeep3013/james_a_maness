@@ -1,5 +1,3 @@
-import React from "react";
-
 export interface PaginationData {
     current_page: number;
     last_page: number;

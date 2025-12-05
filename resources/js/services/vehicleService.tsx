@@ -16,10 +16,12 @@ interface VehicleData {
 }
 
 export const vehicleService = {
-  getAll: (params?: { search?: string; page?: number }) => {
+  getAll: (params?: { search?: string; page?: number; status?: string; fuelType?: string }) => {
     const queryParams = new URLSearchParams();
     if (params?.search) queryParams.append('search', params.search);
     if (params?.page) queryParams.append('page', params.page.toString());
+    if (params?.status) queryParams.append('status', params.status);
+    if (params?.fuelType) queryParams.append('fuelType', params.fuelType);
     const queryString = queryParams.toString();
     return api.get(`/vehicles${queryString ? `?${queryString}` : ''}`);
   },

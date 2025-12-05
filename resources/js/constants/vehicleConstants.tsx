@@ -35,6 +35,7 @@ export const typeOptions: SelectOption[] = [
 export const fuelTypeOptions: SelectOption[] = [
   { value: "gasoline", label: "Gasoline" },
   { value: "diesel", label: "Diesel" },
+  { value: "petrol", label: "Petrol" },
   { value: "electric", label: "Electric" },
   { value: "hybrid", label: "Hybrid" },
   { value: "cng", label: "CNG" },

@@ -37,6 +37,14 @@ class VehicleController extends Controller
             }
         });
 
+        if ($request->has('status') && !empty($request->status)) {
+            $query->where('initial_status','=', $request->status);
+        }
+
+        if ($request->has('fuelType') && !empty($request->fuelType)) {
+            $query->where('fuel_type', '=', $request->fuelType);
+        }
+
         if (!empty($request->page) && $request->page !== "page") {
             $vehicle = $query->paginate(20);
             if (!empty($vehicle)) {

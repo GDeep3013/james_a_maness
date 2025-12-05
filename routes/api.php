@@ -17,6 +17,7 @@ use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\MeterReadingController;
 use App\Http\Controllers\VehicleAssignmentController;
 use App\Http\Controllers\VehicleReplacementController;
+use App\Http\Controllers\MaintenanceController;
 
 use App\Http\Controllers\PartController;
 use App\Http\Controllers\DashboardController;
@@ -107,6 +108,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::apiResource('vehicle-replacements', VehicleReplacementController::class);
     Route::get('/vehicle-replacements/{id}/edit', [VehicleReplacementController::class, 'edit'])->where('id', '[0-9]+');
+
+    Route::apiResource('maintenances', MaintenanceController::class);
+    Route::get('/maintenances/{id}/edit', [MaintenanceController::class, 'edit'])->where('id', '[0-9]+');
 });
 
 // Route::prefix('mobileApps')->group(function () {

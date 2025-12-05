@@ -15,10 +15,10 @@ import Button from "../../components/ui/button/Button";
 import PageMeta from "../../components/common/PageMeta";
 import { vehicleService } from "../../services/vehicleService";
 import { PencilIcon, TrashBinIcon, ExportIcon, EyeIcon } from "../../icons";
-import { formatVehicleIdentifier, formatDate, uppercase, capitalize } from "../../utils";
+import { formatTypeModel ,formatVehicleIdentifier, formatDate, capitalize, formatMileage } from "../../utilites";
 import Select from "../../components/form/Select";
 import TableFooter, { PaginationData } from "../../components/common/TableFooter";
-
+import { statusOptions , fuelTypeOptions } from "../../constants/vehicleConstants";
 
 interface Vehicle {
     id: number;
@@ -73,12 +73,14 @@ export default function VehicleList({ importSuccess }: { importSuccess?: boolean
         total: 0,
     });
     const [deletingId, setDeletingId] = useState<number | null>(null);
+    const [status, setStatus] = useState<string>("");
+    const [fuelType, setFuelType] = useState<string>("");
 
-    const fetchVehicles = useCallback(async (page: number = 1, search: string = "") => {
+    const fetchVehicles = useCallback(async (page: number = 1, search: string = "", status: string = "", fuelType: string = "") => {
         setLoading(true);
         setError("");
         try {
-            const response = await vehicleService.getAll({ page, search });
+            const response = await vehicleService.getAll({ page, search, status, fuelType });
             const data = response.data as VehiclesResponse;
 
             if (data.status && data.vehical) {
@@ -108,13 +110,13 @@ export default function VehicleList({ importSuccess }: { importSuccess?: boolean
     }, [importSuccess]);
 
     useEffect(() => {
-        fetchVehicles(currentPage, searchTerm);
-    }, [currentPage, searchTerm, fetchVehicles]);
+        fetchVehicles(currentPage, searchTerm, status, fuelType);
+    }, [currentPage, searchTerm, fetchVehicles, status, fuelType]);
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
         setCurrentPage(1);
-        fetchVehicles(1, searchTerm);
+        fetchVehicles(1, searchTerm, status, fuelType);
     };
 
     const handleDelete = async (id: number) => {
@@ -124,7 +126,7 @@ export default function VehicleList({ importSuccess }: { importSuccess?: boolean
         setDeletingId(id);
         try {
             await vehicleService.delete(id);
-            fetchVehicles(currentPage, searchTerm);
+            fetchVehicles(currentPage, searchTerm, status, fuelType);
         } catch {
             alert("Failed to delete vehicle. Please try again.");
         } finally {
@@ -141,7 +143,6 @@ export default function VehicleList({ importSuccess }: { importSuccess?: boolean
     };
 
     const handleExport = () => {
-
     };
 
     const getStatusColor = (status?: string) => {
@@ -168,18 +169,6 @@ export default function VehicleList({ importSuccess }: { importSuccess?: boolean
         setCurrentPage(page);
     };
 
-
-    const options = [
-        { value: "All Status", label: "All Status" },
-        { value: "All Status", label: "All Status 1" },
-        { value: "All Status", label: "All Status 2" },
-    ];
-    const fueloptions = [
-        { value: "All Fuel Types", label: "All Fuel Types" },
-        { value: "All Fuel Types", label: "All Fuel Types 1" },
-        { value: "All Fuel Types", label: "All Fuel Types 2" },
-    ];
-
     return (
         <>
             <PageMeta
@@ -201,15 +190,15 @@ export default function VehicleList({ importSuccess }: { importSuccess?: boolean
                         </div>
 
                         <Select
-                            options={options}
-                            placeholder="Select an option"
-                            onChange={() => { console.log("data") }}
+                            options={statusOptions}
+                            placeholder="All Status"
+                            onChange={(value) => setStatus(value)}
                             className="w-full md:max-w-[200px] all-status-select"
                         />
                         <Select
-                            options={fueloptions}
+                            options={fuelTypeOptions}
                             placeholder="All Fuel Types"
-                            onChange={() => { console.log("data") }}
+                            onChange={(value) => setFuelType(value)}
                             className="w-full md:max-w-[200px] all-status-select"
                         />
                         <Button
@@ -229,7 +218,7 @@ export default function VehicleList({ importSuccess }: { importSuccess?: boolean
                     </div>
                 )}
 
-                <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
+                <div className="rounded-xl border border-gray-200 bg-white">
                     <div className="max-w-full overflow-hidden overflow-x-auto">
                         {loading ? (
                             <div className="flex items-center justify-center py-12">
@@ -251,7 +240,7 @@ export default function VehicleList({ importSuccess }: { importSuccess?: boolean
                         ) : (
                             <>
                                 <Table>
-                                    <TableHeader className="border-b border-gray-100 dark:border-white/5">
+                                    <TableHeader className="border-b border-gray-100">
                                         <TableRow className="bg-[#E5E7EB]">
                                             <TableCell isHeader>
                                                 Vehicle ID
@@ -266,7 +255,7 @@ export default function VehicleList({ importSuccess }: { importSuccess?: boolean
                                                 VIN
                                             </TableCell>
                                             <TableCell isHeader>
-                                                Make/Model/Year
+                                                Mileage
                                             </TableCell>
                                             <TableCell isHeader>
                                                 Driver
@@ -283,7 +272,7 @@ export default function VehicleList({ importSuccess }: { importSuccess?: boolean
                                         </TableRow>
                                     </TableHeader>
 
-                                    <TableBody className="divide-y divide-gray-100 dark:divide-white/5">
+                                    <TableBody className="divide-y divide-gray-100">
                                         {vehicles.map((vehicle) => {
                                             const vehicleId = formatVehicleIdentifier(vehicle.type, vehicle.id);
 
@@ -295,16 +284,7 @@ export default function VehicleList({ importSuccess }: { importSuccess?: boolean
                                                         </div>
                                                     </TableCell>
                                                     <TableCell className="px-5 py-4 text-start">
-                                                        <div>
-                                                            <div className="font-semibold text-gray-900 dark:text-white text-sm">
-                                                                {uppercase(vehicle.license_plate)}
-                                                            </div>
-                                                            {
-                                                                <div className="text-gray-500   text-xs mt-0.5">
-                                                                    {vehicle.vehicle_name}
-                                                                </div>
-                                                            }
-                                                        </div>
+                                                    {formatTypeModel(vehicle)}
                                                     </TableCell>
                                                     <TableCell className="px-5 py-4 text-start">
                                                         <Badge
@@ -321,13 +301,7 @@ export default function VehicleList({ importSuccess }: { importSuccess?: boolean
                                                     </TableCell>
                                                     <TableCell className="px-5 py-4 text-start">
                                                         <div className="text-gray-800 text-theme-sm dark:text-white/90">
-                                                            <div className="font-semibold text-gray-900 dark:text-white text-sm">
-                                                                {`${vehicle.make} - ${vehicle.model}`}
-                                                            </div>
-
-                                                            <div className="text-gray-500   text-xs mt-0.5">
-                                                                {vehicle.year}
-                                                            </div>
+                                                            {vehicle.current_mileage ? formatMileage(vehicle.current_mileage) : "—"}
                                                         </div>
                                                     </TableCell>
                                                     <TableCell className="px-5 py-4 text-start">

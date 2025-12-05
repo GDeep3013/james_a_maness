@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router";
 import {
   Table,
   TableBody,
@@ -9,61 +8,8 @@ import {
 } from "../ui/table";
 import Badge from "../ui/badge/Badge";
 import { workOrderService } from "../../services/workOrderService";
-
-interface ServiceItem {
-  id?: number;
-  name?: string;
-  description?: string;
-  type?: string;
-  quantity?: number;
-  total?: number;
-  labor_cost?: number;
-}
-
-interface WorkOrder {
-  id: number;
-  vehicle_id?: number;
-  vehicle?: {
-    vehicle_name?: string;
-    type?: string;
-    make?: string;
-    model?: string;
-    year?: string | number;
-    license_plate?: string;
-  };
-  status?: string;
-  repair_priority_class?: string;
-  issue_date?: string;
-  scheduled_start_date?: string;
-  actual_start_date?: string;
-  expected_completion_date?: string;
-  actual_completion_date?: string;
-  assigned_to?: {
-    id?: number;
-    first_name?: string;
-    last_name?: string;
-  };
-  vendor_id?: number;
-  vendor?: {
-    first_name?: string;
-    company_contact?: string;
-  };
-  invoice_number?: string;
-  po_number?: string;
-  service_items?: ServiceItem[] | string;
-  created_at?: string;
-}
-
-interface WorkOrdersResponse {
-  status: boolean;
-  work_orders?: {
-    data: WorkOrder[];
-    current_page: number;
-    last_page: number;
-    per_page: number;
-    total: number;
-  };
-}
+import { WorkOrder, WorkOrdersResponse, ServiceItem } from "../../types/workOrderTypes";
+import { formatTypeModel } from "../../utilites";
 
 export default function RecentOrders() {
   const [workOrders, setWorkOrders] = useState<WorkOrder[]>([]);
@@ -117,50 +63,6 @@ export default function RecentOrders() {
     }
   };
 
-  const formatTypeModel = (vehicle?: WorkOrder["vehicle"]) => {
-    if (!vehicle) {
-      return (
-        <div>
-          <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">N/A</p>
-        </div>
-      );
-    }
-
-    const makeModelParts: string[] = [];
-    if (vehicle.make && vehicle.model) {
-      makeModelParts.push(`${vehicle.make} ${vehicle.model}`);
-    } else if (vehicle.make) {
-      makeModelParts.push(vehicle.make);
-    } else if (vehicle.model) {
-      makeModelParts.push(vehicle.model);
-    }
-
-    const mainText = makeModelParts.length > 0
-      ? makeModelParts.join(" ")
-      : vehicle.vehicle_name || "N/A";
-
-    const secondaryParts: string[] = [];
-    if (vehicle.year) {
-      secondaryParts.push(String(vehicle.year));
-    }
-    if (vehicle.license_plate) {
-      secondaryParts.push(vehicle.license_plate);
-    }
-
-    return (
-      <div>
-        <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
-          {mainText}
-        </p>
-        {secondaryParts.length > 0 && (
-          <p className="text-gray-500 text-theme-xs dark:text-gray-400">
-            {secondaryParts.join(" • ")}
-          </p>
-        )}
-      </div>
-    );
-  };
-
   const formatServiceTasks = (serviceItems?: ServiceItem[] | string) => {
     if (!serviceItems) return "N/A";
 
@@ -183,10 +85,10 @@ export default function RecentOrders() {
     if (serviceTasks.length === 0) return "N/A";
 
     if (serviceTasks.length === 1) {
-      return serviceTasks[0].name || "N/A";
+      return serviceTasks[0]?.name || "N/A";
     }
 
-    return serviceTasks.map((item) => item.name).join(", ");
+    return serviceTasks.map((item) => item?.name).filter(Boolean).join(", ");
   };
 
   const formatDriver = (assignedTo?: WorkOrder["assigned_to"]) => {
