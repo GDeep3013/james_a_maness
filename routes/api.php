@@ -22,6 +22,7 @@ use App\Http\Controllers\MaintenanceController;
 use App\Http\Controllers\PartController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ReminderController;
+use App\Http\Controllers\VehicleDocumentController;
 
 // use App\Http\Controllers\Apps\LoginController;
 // use App\Http\Controllers\Apps\ContactApiController;
@@ -111,6 +112,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::apiResource('maintenances', MaintenanceController::class);
     Route::get('/maintenances/{id}/edit', [MaintenanceController::class, 'edit'])->where('id', '[0-9]+');
+
+    Route::apiResource('vehicle-documents', VehicleDocumentController::class);
+    Route::get('/vehicle-documents/{id}/edit', [VehicleDocumentController::class, 'show'])->where('id', '[0-9]+');
 });
 
 // Route::prefix('mobileApps')->group(function () {
