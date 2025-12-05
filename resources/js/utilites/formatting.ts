@@ -197,43 +197,31 @@ export const formatVehicleIdentifier = (type: string | null | undefined, id: num
     return `${typePrefix}-${String(id).padStart(3, '0')}`;
 };
 
-export const calculateServiceReminderStatus = (
-    primaryMeterDueSoonThresholdValue: string | null | undefined,
-    primaryMeterIntervalValue: string | null | undefined,
+export const calculateServiceStatus = (
+    primaryMeter: string | number | null | undefined,
     currentMileage: string | number | null | undefined
 ): string => {
 
-    if (!primaryMeterIntervalValue || currentMileage === null || currentMileage === undefined) {
-        return 'active';
+    if (!primaryMeter || currentMileage === null || currentMileage === undefined) {
+        return 'Due';
     }
 
     const currentMileageNum = typeof currentMileage === 'string' ? parseFloat(currentMileage) : currentMileage;
-    const intervalValueNum = parseFloat(primaryMeterIntervalValue);
-    const thresholdValueNum = primaryMeterDueSoonThresholdValue ? parseFloat(primaryMeterDueSoonThresholdValue) : null;
+    const intervalValueNum = typeof primaryMeter === 'string' ? parseFloat(primaryMeter) : primaryMeter as number;
 
     if (isNaN(currentMileageNum) || isNaN(intervalValueNum)) {
-        return 'due';
+        return 'Due';
     }
 
-    if(
-        (thresholdValueNum !== null && !isNaN(thresholdValueNum)) 
-        && ((currentMileageNum >  (thresholdValueNum - 100) ) && (currentMileageNum < (thresholdValueNum+100) )
-        && currentMileageNum < intervalValueNum)
-    ) {
-        return 'due soon';
-    }else{
-
-        if (currentMileageNum >= intervalValueNum && currentMileageNum < intervalValueNum + 200) {
-            return 'service due';
-        }
-
-        if (currentMileageNum >= intervalValueNum+300) {
-            return 'over due';
-        }
+    if (currentMileageNum >= (intervalValueNum-100) && currentMileageNum < (intervalValueNum + 100)) {
+        return 'Due Soon';
     }
 
-    return 'due';
+    if (currentMileageNum >= intervalValueNum+200) {
+        return 'Over Due';
+    }
 
+    return 'Due';
 };
 
 export const getServiceReminderStatusBadgeColor = (
@@ -257,14 +245,9 @@ export const getServiceReminderStatusBadgeColor = (
     return 'info';
 };
 
-export const formatNextDue = (
-    nextDueDate: string | null | undefined,
-    nextDueMeter: string | null | undefined,
-    currentMileage: string | number | null | undefined,
-    primaryMeterIntervalValue: string | null | undefined
-): string => {
+export const formatNextDue = (nextDueDate: string | null | undefined): string => {  
     let timeText = '';
-    let milesText = '';
+
 
     if (nextDueDate) {
         try {
@@ -300,40 +283,12 @@ export const formatNextDue = (
                     timeText = `${Math.abs(diffYears)} ${Math.abs(diffYears) === 1 ? 'year' : 'years'} ago`;
                 }
             }
-        } catch {
+        } catch(error) {
+            console.error(error);
             timeText = '';
         }
     }
 
-    if (currentMileage !== null && currentMileage !== undefined) {
-        const currentMileageNum = typeof currentMileage === 'string' ? parseFloat(currentMileage) : currentMileage;
-        
-        if (!isNaN(currentMileageNum)) {
-            let dueMeterValue: number | null = null;
-            
-            if (nextDueMeter) {
-                dueMeterValue = parseFloat(nextDueMeter);
-            } else if (primaryMeterIntervalValue) {
-                dueMeterValue = parseFloat(primaryMeterIntervalValue);
-            }
-
-            if (dueMeterValue !== null && !isNaN(dueMeterValue)) {
-                const milesOverdue = Math.max(0, currentMileageNum - dueMeterValue);
-                if (milesOverdue > 0) {
-                    milesText = `${new Intl.NumberFormat('en-US').format(Math.round(milesOverdue))} miles overdue`;
-                }
-            }
-        }
-    }
-
-    if (timeText && milesText) {
-        return `${timeText}: ${milesText}`;
-    } else if (timeText) {
-        return timeText;
-    } else if (milesText) {
-        return milesText;
-    }
-
-    return 'N/A';
+    return timeText ;
 };
 

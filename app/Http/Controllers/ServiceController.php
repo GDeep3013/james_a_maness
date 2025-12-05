@@ -86,7 +86,7 @@ class ServiceController extends Controller
     {
         $tableColumns = Schema::getColumnListing('services');
         $query = Service::with([
-            'vehicle:id,vehicle_name',
+            'vehicle:id,vehicle_name,make,model,year,license_plate,current_mileage',
             'vendor:id,name',
             'user:id,name'
         ])->orderBy('id', 'desc');
@@ -112,6 +112,24 @@ class ServiceController extends Controller
         }
 
         $services = $query->paginate(20);
+
+        $services->getCollection()->transform(function ($service) {
+            if ($service->vehicle_id) {
+                $lastCompletedService = Service::where('vehicle_id', $service->vehicle_id)
+                    ->where('id', '!=', $service->id)
+                    ->whereNotNull('completion_date')
+                    ->orderBy('completion_date', 'desc')
+                    ->first(['completion_date','primary_meter']);
+                
+                $service->last_completed_date = $lastCompletedService ? $lastCompletedService->completion_date : null;
+                $service->last_completed_meter = $lastCompletedService ? $lastCompletedService->primary_meter : null;
+            } else {
+                $service->last_completed_date = null;
+                $service->last_completed_meter = null;
+            }
+            
+            return $service;
+        });
 
         return response()->json(['status' => true, 'services' => $services]);
     }
