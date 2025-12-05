@@ -54,6 +54,7 @@ export interface WorkOrderFormData {
 export interface Vehicle {
   id: number;
   vehicle_name: string;
+  current_mileage?: string | number;
 }
 
 export interface Contact {
