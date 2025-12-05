@@ -10,7 +10,7 @@ import {
 } from "../ui/table";
 import Badge from '../ui/badge/Badge';
 import Button from '../ui/button/Button';
-import { formatDate, getStatusBadgeColor } from '../../utilites';
+import { formatDate, formatTypeModel, calculateServiceReminderStatus, getServiceReminderStatusBadgeColor, formatNextDue } from '../../utilites';
 import { ServiceReminder } from '../../types/ServiceReminderTypes';
 import { PaginationData } from '../common/TableFooter';
 
@@ -190,67 +190,105 @@ export default function RemindersTab({ activeTab }: RemindersTabProps) {
                         <Table>
                             <TableHeader className="border-b border-gray-100">
                                 <TableRow>
-                                    <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs">
+                                    <TableCell isHeader >
+                                        Vehicle
+                                    </TableCell>
+                                    <TableCell isHeader >
                                         Service Task
                                     </TableCell>
-                                    <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs">
-                                        Time Interval
-                                    </TableCell>
-                                    <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs">
-                                        Meter Interval
-                                    </TableCell>
-                                    <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs">
-                                        Next Due Date
-                                    </TableCell>
-                                    <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs">
-                                        Next Due Meter
-                                    </TableCell>
-                                    <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs">
+                                    <TableCell isHeader >
                                         Status
                                     </TableCell>
+                                    <TableCell isHeader >
+                                        Next Due
+                                    </TableCell>
+                                    <TableCell isHeader >
+                                        Incomplete Work Order
+                                    </TableCell>
+                                    <TableCell isHeader >
+                                        Last Completed
+                                    </TableCell>
+                                    <TableCell isHeader >
+                                        Next Due Date
+                                    </TableCell>
+                                    <TableCell isHeader >
+                                        Next Due Meter
+                                    </TableCell>
+                                   
                                 </TableRow>
                             </TableHeader>
                             <TableBody className="divide-y divide-gray-100">
-                                {serviceReminders.map((record) => (
-                                    <TableRow key={record.id}>
+                                { serviceReminders.map((record) => {
+                                    
+                                    const BadgeStatus =calculateServiceReminderStatus(
+                                        record.primary_meter_due_soon_threshold_value,
+                                        record.primary_meter_interval_value,
+                                        record.vehicle?.current_mileage
+                                    );
+
+                                    const BadgeColor = getServiceReminderStatusBadgeColor(BadgeStatus);
+
+                                    return (<TableRow key={record.id}>
                                         <TableCell className="px-4 py-3 text-start">
                                             <div className="text-gray-800 text-theme-sm">
-                                                {record.service_task?.name || "N/A"}
+                                                {formatTypeModel(record.vehicle)}
                                             </div>
                                         </TableCell>
+                                        <TableCell className="px-4 py-3 text-start w-[300px]">
+                                            <div className="text-gray-800 text-theme-sm">
+                                            {record.service_tasks && record.service_tasks.length > 0
+                                            ? record.service_tasks.map((task, index) => (
+                                                <span key={task.id || index}>
+                                                    {task.name}
+                                                    {index < (record.service_tasks?.length ?? 0) - 1 && ", "}
+                                                </span>
+                                                ))
+                                            : "N/A"}
+                                            </div>
+                                        </TableCell>
+
+                                        <TableCell className="px-4 py-3 text-start">
+                                            <Badge size="sm" color={BadgeColor}>
+                                                {BadgeStatus}
+                                            </Badge>
+                                        </TableCell>
+
                                         <TableCell className="px-4 py-3 text-start">
                                             <div className="text-gray-800 text-theme-sm">
-                                                {record.time_interval_value
-                                                    ? `${record.time_interval_value} ${record.time_interval_unit}`
+                                                {formatNextDue(
+                                                    record.next_due_date,
+                                                    record.next_due_meter,
+                                                    record.vehicle?.current_mileage,
+                                                    record.primary_meter_interval_value
+                                                )}
+                                                <br/>
+                                                <span className={`text-${BadgeColor}-500 text-theme-xs`}> {record.primary_meter_interval_value} miles {BadgeStatus} </span>
+                                            </div>
+                                        </TableCell>
+
+                                        <TableCell className="px-4 py-3 text-start">
+                                            <div className="text-gray-800 text-theme-sm">
+                                                --
+                                            </div>
+                                        </TableCell>
+
+                                        <TableCell className="px-4 py-3 text-start">
+                                            <div className="text-gray-800 text-theme-sm">
+                                                {record.last_completed_date
+                                                    ? formatDate(record.last_completed_date)
                                                     : "N/A"}
                                             </div>
                                         </TableCell>
-                                        <TableCell className="px-4 py-3 text-start">
-                                            <div className="text-gray-800 text-theme-sm">
-                                                {record.primary_meter_interval_value
-                                                    ? `${record.primary_meter_interval_value} ${record.primary_meter_interval_unit}`
-                                                    : "N/A"}
-                                            </div>
-                                        </TableCell>
-                                        <TableCell className="px-4 py-3 text-start">
-                                            <div className="text-gray-800 text-theme-sm">
-                                                {record.next_due_date
-                                                    ? formatDate(record.next_due_date)
-                                                    : "N/A"}
-                                            </div>
-                                        </TableCell>
+
                                         <TableCell className="px-4 py-3 text-start">
                                             <div className="text-gray-800 text-theme-sm">
                                                 {record.next_due_meter || "N/A"}
                                             </div>
                                         </TableCell>
-                                        <TableCell className="px-4 py-3 text-start">
-                                            <Badge size="sm" color={getStatusBadgeColor(record.status)}>
-                                                {record.status}
-                                            </Badge>
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
+                                   
+                                    </TableRow>)
+                                
+                                })}
                             </TableBody>
                         </Table>
                         {serviceReminders.length > 0 && renderPagination(remindersPagination, remindersCurrentPage, setRemindersCurrentPage, loadingReminders)}

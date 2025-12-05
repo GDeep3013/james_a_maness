@@ -30,7 +30,7 @@ class IssueController extends Controller
 
         $tableColumns = Schema::getColumnListing('issues');
         $query = Issue::with([
-            'vehicle:id,vehicle_name',
+            'vehicle:id,vehicle_name,make,model,year,license_plate',
             'assignedTo:id,first_name,last_name',
             'workOrder:id,status'
         ])->orderBy('id', 'desc');
@@ -50,6 +50,10 @@ class IssueController extends Controller
 
         if ($request->has('status') && !empty($request->status)) {
             $query->where('status', $request->status);
+        }
+
+        if ($request->has('vehicle_id') && !empty($request->vehicle_id)) {
+            $query->where('vehicle_id', $request->vehicle_id);
         }
 
         if (!empty($searchTerm)) {

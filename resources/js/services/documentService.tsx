@@ -10,6 +10,7 @@ interface DocumentData {
     vehicle_id: number;
     title: string;
     file: File | null;
+    expires_date?: string | null;
 }
 
 export const documentService = {
@@ -31,6 +32,9 @@ export const documentService = {
         if (data.file) {
             formData.append('file', data.file);
         }
+        if (data.expires_date) {
+            formData.append('expires_date', data.expires_date);
+        }
 
         return api.post('/vehicle-documents', formData, {
             headers: {
@@ -45,6 +49,9 @@ export const documentService = {
         if (data.title) formData.append('title', data.title);
         if (data.file) {
             formData.append('file', data.file);
+        }
+        if (data.expires_date !== undefined) {
+            formData.append('expires_date', data.expires_date || '');
         }
 
         formData.append('_method', 'PUT');

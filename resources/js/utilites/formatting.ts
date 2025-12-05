@@ -197,3 +197,143 @@ export const formatVehicleIdentifier = (type: string | null | undefined, id: num
     return `${typePrefix}-${String(id).padStart(3, '0')}`;
 };
 
+export const calculateServiceReminderStatus = (
+    primaryMeterDueSoonThresholdValue: string | null | undefined,
+    primaryMeterIntervalValue: string | null | undefined,
+    currentMileage: string | number | null | undefined
+): string => {
+
+    if (!primaryMeterIntervalValue || currentMileage === null || currentMileage === undefined) {
+        return 'active';
+    }
+
+    const currentMileageNum = typeof currentMileage === 'string' ? parseFloat(currentMileage) : currentMileage;
+    const intervalValueNum = parseFloat(primaryMeterIntervalValue);
+    const thresholdValueNum = primaryMeterDueSoonThresholdValue ? parseFloat(primaryMeterDueSoonThresholdValue) : null;
+
+    if (isNaN(currentMileageNum) || isNaN(intervalValueNum)) {
+        return 'due';
+    }
+
+    if(
+        (thresholdValueNum !== null && !isNaN(thresholdValueNum)) 
+        && ((currentMileageNum >  (thresholdValueNum - 100) ) && (currentMileageNum < (thresholdValueNum+100) )
+        && currentMileageNum < intervalValueNum)
+    ) {
+        return 'due soon';
+    }else{
+
+        if (currentMileageNum >= intervalValueNum && currentMileageNum < intervalValueNum + 200) {
+            return 'service due';
+        }
+
+        if (currentMileageNum >= intervalValueNum+300) {
+            return 'over due';
+        }
+    }
+
+    return 'due';
+
+};
+
+export const getServiceReminderStatusBadgeColor = (
+    status: string | null | undefined
+): 'success' | 'warning' | 'error' | 'info' => {
+    if (!status) return 'info';
+    const statusLower = status.toLowerCase();
+    
+    if (statusLower === 'over due' || statusLower === 'overdue') {
+        return 'error';
+    }
+    if (statusLower === 'service due') {
+        return 'warning';
+    }
+    if (statusLower === 'due soon') {
+        return 'warning';
+    }
+    if (statusLower === 'due') {
+        return 'success';
+    }
+    return 'info';
+};
+
+export const formatNextDue = (
+    nextDueDate: string | null | undefined,
+    nextDueMeter: string | null | undefined,
+    currentMileage: string | number | null | undefined,
+    primaryMeterIntervalValue: string | null | undefined
+): string => {
+    let timeText = '';
+    let milesText = '';
+
+    if (nextDueDate) {
+        try {
+            const dueDate = new Date(nextDueDate);
+            const now = new Date();
+            const diffTime = dueDate.getTime() - now.getTime();
+            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+            const diffMonths = Math.floor(diffDays / 30);
+            const diffYears = Math.floor(diffDays / 365);
+
+            if (Math.abs(diffDays) < 30) {
+                if (diffDays === 0) {
+                    timeText = 'today';
+                } else if (diffDays === 1) {
+                    timeText = 'tomorrow';
+                } else if (diffDays === -1) {
+                    timeText = 'yesterday';
+                } else if (diffDays > 0) {
+                    timeText = `${diffDays} ${diffDays === 1 ? 'day' : 'days'} from now`;
+                } else {
+                    timeText = `${Math.abs(diffDays)} ${Math.abs(diffDays) === 1 ? 'day' : 'days'} ago`;
+                }
+            } else if (Math.abs(diffDays) < 365) {
+                if (diffMonths > 0) {
+                    timeText = `${diffMonths} ${diffMonths === 1 ? 'month' : 'months'} from now`;
+                } else {
+                    timeText = `${Math.abs(diffMonths)} ${Math.abs(diffMonths) === 1 ? 'month' : 'months'} ago`;
+                }
+            } else {
+                if (diffYears > 0) {
+                    timeText = `${diffYears} ${diffYears === 1 ? 'year' : 'years'} from now`;
+                } else {
+                    timeText = `${Math.abs(diffYears)} ${Math.abs(diffYears) === 1 ? 'year' : 'years'} ago`;
+                }
+            }
+        } catch {
+            timeText = '';
+        }
+    }
+
+    if (currentMileage !== null && currentMileage !== undefined) {
+        const currentMileageNum = typeof currentMileage === 'string' ? parseFloat(currentMileage) : currentMileage;
+        
+        if (!isNaN(currentMileageNum)) {
+            let dueMeterValue: number | null = null;
+            
+            if (nextDueMeter) {
+                dueMeterValue = parseFloat(nextDueMeter);
+            } else if (primaryMeterIntervalValue) {
+                dueMeterValue = parseFloat(primaryMeterIntervalValue);
+            }
+
+            if (dueMeterValue !== null && !isNaN(dueMeterValue)) {
+                const milesOverdue = Math.max(0, currentMileageNum - dueMeterValue);
+                if (milesOverdue > 0) {
+                    milesText = `${new Intl.NumberFormat('en-US').format(Math.round(milesOverdue))} miles overdue`;
+                }
+            }
+        }
+    }
+
+    if (timeText && milesText) {
+        return `${timeText}: ${milesText}`;
+    } else if (timeText) {
+        return timeText;
+    } else if (milesText) {
+        return milesText;
+    }
+
+    return 'N/A';
+};
+

@@ -17,6 +17,7 @@ import { EyeIcon, PencilIcon, TrashBinIcon } from "../../icons";
 import Select from "../../components/form/Select";
 import { contactService } from "../../services/contactService";
 import TableFooter, { PaginationData } from "../../components/common/TableFooter";
+import { formatTypeModel } from "../../utilites";
 
 interface Issue {
   id: number;
@@ -357,13 +358,13 @@ export default function IssuesList() {
                   <TableHeader className="border-b border-gray-100 dark:border-white/5">
                     <TableRow className="bg-[#E5E7EB]">
                       <TableCell isHeader >
+                        Issue ID.
+                      </TableCell>
+                      <TableCell isHeader >
+                        Vehicle Name
+                      </TableCell>
+                      <TableCell isHeader >
                         Priority
-                      </TableCell>
-                      <TableCell isHeader >
-                        Name
-                      </TableCell>
-                      <TableCell isHeader >
-                        Type
                       </TableCell>
                       <TableCell isHeader >
                         Issue
@@ -392,12 +393,18 @@ export default function IssuesList() {
                   </TableHeader>
 
                   <TableBody className="divide-y divide-gray-100 dark:divide-white/5">
-                    {issues.map((issue, index) => (
+                    {issues.map((issue) => (
                       <TableRow key={issue.id}>
 
                         <TableCell className="px-4 py-3 text-start">
+                          <div className="text-theme-sm font-medium">
+                            ISS-{issue.id}
+                          </div>
+                        </TableCell>
+
+                        <TableCell className="px-4 py-3 text-start">
                           <div className="text-brand-600 dark:text-brand-400 text-theme-sm font-medium">
-                            #{index + 1}
+                            {  formatTypeModel(issue.vehicle)}
                           </div>
                         </TableCell>
 
@@ -409,11 +416,6 @@ export default function IssuesList() {
                           ) : (
                             <span className="text-gray-400 text-sm">—</span>
                           )}
-                        </TableCell>
-                        <TableCell className="px-4 py-3 text-start">
-                          <div className="text-brand-600 dark:text-brand-400 text-theme-sm font-medium">
-                            {issue.vehicle?.vehicle_name || "—"}
-                          </div>
                         </TableCell>
                         <TableCell className="px-4 py-3 text-start">
                           <div className="text-gray-800 text-theme-sm dark:text-white/90">
