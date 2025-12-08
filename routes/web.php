@@ -115,6 +115,8 @@ Route::middleware(['auth','page.access'])->group(function () {
     // Vehicle Replacement Analysis
     Route::get('/vehicle-replacement-analysis', [HomeController::class, 'index']);
 
+    // Reports
+    Route::get('/reports', [HomeController::class, 'index']);
 
     Route::get('profile', [HomeController::class, 'index']);
 });
