@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Auth\LoginController;
-
+use App\Http\Controllers\TimeLineController;
 
 Route::middleware(['guest'])->group(function () {
     Route::get('/', function(){  return view('auth.login');});
@@ -117,4 +117,10 @@ Route::middleware(['auth','page.access'])->group(function () {
 
 
     Route::get('profile', [HomeController::class, 'index']);
+
+    // TimeLine Records For the All Modules
+    Route::get('/timeline', [TimeLineController::class, 'index'])->name('timeline.index');
+    Route::get('/timeline/vehicle/{vehicleId}', [TimeLineController::class, 'vehicle'])->name('timeline.vehicle');
+    Route::get('/timeline/module/{moduleName}', [TimeLineController::class, 'module'])->name('timeline.module');
+    Route::get('/timeline/{timeLine}', [TimeLineController::class, 'show'])->name('timeline.show');
 });

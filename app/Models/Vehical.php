@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
+use App\Traits\HasTimeLine;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Vehical extends Model
 {
-    use HasFactory;
+    use HasFactory, HasTimeLine;
 
     protected $fillable = [
         'vehicle_name',
