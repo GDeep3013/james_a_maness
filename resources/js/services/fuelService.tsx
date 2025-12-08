@@ -3,11 +3,12 @@ import api from './api';
 interface FuelFormData {
   vehicle_id: number;
   vendor_id: number;
-  fuel_type: number;
+  fuel_type: string;
   unit_type: string;
   units: number;
   price_per_volume_unit: number;
   vehicle_meter: string;
+  previous_meter?: string;
   notes?: string;
   date: string;
 }
@@ -15,11 +16,12 @@ interface FuelFormData {
 interface FuelData {
   vehicle_id: number;
   vendor_id: number;
-  fuel_type: number;
+  fuel_type: string;
   unit_type: string;
   units: number;
   price_per_volume_unit: number;
   vehicle_meter: string;
+  previous_meter?: string;
   notes?: string;
   date: string;
 }
@@ -44,6 +46,7 @@ export const fuelService = {
       units: data.units,
       price_per_volume_unit: data.price_per_volume_unit,
       vehicle_meter: data.vehicle_meter,
+      previous_meter: data.previous_meter || undefined,
       notes: data.notes || undefined,
       date: data.date,
     };
@@ -61,6 +64,7 @@ export const fuelService = {
     if (data.units !== undefined) fuelData.units = data.units;
     if (data.price_per_volume_unit !== undefined) fuelData.price_per_volume_unit = data.price_per_volume_unit;
     if (data.vehicle_meter) fuelData.vehicle_meter = data.vehicle_meter;
+    if (data.previous_meter !== undefined) fuelData.previous_meter = data.previous_meter;
     if (data.notes !== undefined) fuelData.notes = data.notes;
     if (data.date) fuelData.date = data.date;
 
@@ -70,4 +74,8 @@ export const fuelService = {
   delete: (id: number) => api.delete(`/fuels/${id}`),
 
   getForEdit: (id: number) => api.get(`/fuels/${id}/edit`),
+
+  getStatistics: () => api.get('/fuels-statistics'),
+
+  getLastEntryByVehicle: (vehicleId: number) => api.get(`/fuels/last-entry/${vehicleId}`),
 };

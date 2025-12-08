@@ -183,48 +183,51 @@ export default function ServiceTasks({
                 </tr>
               </thead>
               <tbody>
-                {selectedTasks.map((item) => (
-                  <tr
-                    key={item.id}
-                    className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors bg-white dark:bg-gray-900"
-                  >
-                    <td className="py-3 px-4">
-                      <div>
-                        <h3 className="text-sm font-semibold text-gray-800 dark:text-white/90 mb-1">
-                          {item.name}
-                        </h3>
-                        {item.description && (
-                          <p className="text-xs text-gray-600 dark:text-gray-400">
-                            {item.description}
-                          </p>
-                        )}
-                      </div>
-                    </td>
-                    <td className="py-3 px-4">
-                      <input
-                        name="labor_cost_"
-                        type="number"
-                        value={editingPrice[item.id]?.labor !== undefined ? editingPrice[item.id].labor! : ''}
-                        onChange={(e) => handleLaborChange(item.id, e.target.value)}
-                        onFocus={() => handleLaborFocus(item.id)}
-                        onBlur={() => handlePriceBlur(item.id)}
-                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md bg-white text-gray-900"
-                        placeholder={`$${formatCurrency(getLaborPrice(item))}`}
-                        min={0.00}
-                        step={0.10}
-                      />
-                    </td>
-                    <td className="py-3 px-4 text-right">
-                      <button
-                        onClick={() => handleDeleteTask(item.id)}
-                        className="p-2 text-error-600 hover:text-error-700 dark:text-error-400 dark:hover:text-error-300 hover:bg-error-50 dark:hover:bg-error-900/20 rounded transition-colors"
-                        title="Delete"
-                      >
-                        <TrashBinIcon className="w-4 h-4" />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                {selectedTasks.filter((item) => item.id !== undefined).map((item) => {
+                  const taskId = item.id!;
+                  return (
+                    <tr
+                      key={taskId}
+                      className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors bg-white dark:bg-gray-900"
+                    >
+                      <td className="py-3 px-4">
+                        <div>
+                          <h3 className="text-sm font-semibold text-gray-800 dark:text-white/90 mb-1">
+                            {item.name}
+                          </h3>
+                          {item.description && (
+                            <p className="text-xs text-gray-600 dark:text-gray-400">
+                              {item.description}
+                            </p>
+                          )}
+                        </div>
+                      </td>
+                      <td className="py-3 px-4">
+                        <input
+                          name="labor_cost_"
+                          type="number"
+                          value={editingPrice[taskId]?.labor !== undefined ? editingPrice[taskId].labor! : ''}
+                          onChange={(e) => handleLaborChange(taskId, e.target.value)}
+                          onFocus={() => handleLaborFocus(taskId)}
+                          onBlur={() => handlePriceBlur(taskId)}
+                          className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md bg-white text-gray-900"
+                          placeholder={`$${formatCurrency(getLaborPrice(item))}`}
+                          min={0.00}
+                          step={0.10}
+                        />
+                      </td>
+                      <td className="py-3 px-4 text-right">
+                        <button
+                          onClick={() => handleDeleteTask(taskId)}
+                          className="p-2 text-error-600 hover:text-error-700 dark:text-error-400 dark:hover:text-error-300 hover:bg-error-50 dark:hover:bg-error-900/20 rounded transition-colors"
+                          title="Delete"
+                        >
+                          <TrashBinIcon className="w-4 h-4" />
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

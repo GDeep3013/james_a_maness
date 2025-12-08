@@ -13,43 +13,10 @@ import PageMeta from "../../components/common/PageMeta";
 import { fuelService } from "../../services/fuelService";
 import { PencilIcon, TrashBinIcon, ExportIcon, EyeIcon } from "../../icons";
 import TableFooter, { PaginationData } from "../../components/common/TableFooter";
+import { formatTypeModel } from "../../utilites/vehicleUtils";
+import { FuelRecord as Fuel , FuelsResponse } from "../../types/FuelRecordTypes";
 
-interface Fuel {
-    id: number;
-    vehicle_id: number;
-    vendor_id: number;
-    fuel_type: string;
-    unit_type: string;
-    units: number;
-    price_per_volume_unit: number;
-    vehicle_meter: string;
-    notes?: string;
-    date: string;
-    vehicle?: {
-        id: number;
-        name: string;
-    };
-    vendor?: {
-        id: number;
-        name: string;
-    };
-    //   fuel_type?: {
-    //     id: number;
-    //     name: string;
-    //   };
-    created_at?: string;
-}
 
-interface FuelsResponse {
-    status: boolean;
-    fuel: {
-        data: Fuel[];
-        current_page: number;
-        last_page: number;
-        per_page: number;
-        total: number;
-    };
-}
 
 export default function FuelsList() {
     const navigate = useNavigate();
@@ -147,13 +114,13 @@ export default function FuelsList() {
         return (units * pricePerUnit).toFixed(2);
     };
 
+    const calculateMilage = (previousMeter: number, vehicleMeter: number, units: number) => {
+        return ((vehicleMeter - previousMeter) / units).toFixed(2);
+    };
+
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
-        return date.toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric',
-        });
+        return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
     };
 
     return (
@@ -164,7 +131,7 @@ export default function FuelsList() {
             />
 
             <div className="space-y-6">
-                <form onSubmit={handleSearch} className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl p-4">
+                {/* <form onSubmit={handleSearch} className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl p-4">
                     <div className="flex flex-wrap items-center gap-4">
                         <div className="w-full max-w-full md:max-w-[70%]">
                             <Input
@@ -184,7 +151,7 @@ export default function FuelsList() {
                             Export
                         </Button>
                     </div>
-                </form>
+                </form> */}
 
                 {error && (
                     <div className="p-4 bg-error-50 dark:bg-error-900/20 border border-error-200 dark:border-error-800 rounded-lg">
@@ -216,58 +183,34 @@ export default function FuelsList() {
                                 <Table>
                                     <TableHeader className="border-b border-gray-100 dark:border-white/5">
                                         <TableRow className="bg-[#E5E7EB]">
-                                            <TableCell
-                                                isHeader
-                                                className="px-5 py-3 font-medium text-gray-500 text-start text-sm"
-                                            >
-                                                Date
-                                            </TableCell>
-                                            <TableCell
-                                                isHeader
-                                                className="px-5 py-3 font-medium text-gray-500 text-start text-sm"
-                                            >
+                                            
+                                            <TableCell isHeader >
                                                 Vehicle
                                             </TableCell>
-                                            <TableCell
-                                                isHeader
-                                                className="px-5 py-3 font-medium text-gray-500 text-start text-sm"
-                                            >
-                                                Vendor
+                                            <TableCell isHeader >
+                                                Vendor Name
                                             </TableCell>
-                                            <TableCell
-                                                isHeader
-                                                className="px-5 py-3 font-medium text-gray-500 text-start text-sm"
-                                            >
-                                                Fuel Type
+                                            <TableCell isHeader >
+                                                Gallons
                                             </TableCell>
-                                            <TableCell
-                                                isHeader
-                                                className="px-5 py-3 font-medium text-gray-500 text-start text-sm"
-                                            >
+                                            <TableCell isHeader >
                                                 Quantity
                                             </TableCell>
-                                            <TableCell
-                                                isHeader
-                                                className="px-5 py-3 font-medium text-gray-500 text-start text-sm"
-                                            >
+                                            <TableCell isHeader >
                                                 Price/Unit
                                             </TableCell>
-                                            <TableCell
-                                                isHeader
-                                                className="px-5 py-3 font-medium text-gray-500 text-start text-sm"
-                                            >
-                                                Total Cost
+                                            <TableCell isHeader >
+                                                Cost
                                             </TableCell>
-                                            <TableCell
-                                                isHeader
-                                                className="px-5 py-3 font-medium text-gray-500 text-start text-sm"
-                                            >
-                                                Odometer
+                                            <TableCell isHeader>
+                                                MPG
                                             </TableCell>
-                                            <TableCell
-                                                isHeader
-                                                className="px-5 py-3 font-medium text-gray-500 text-start text-sm w-[10%]"
-                                            >
+
+                                            <TableCell isHeader >
+                                                Date
+                                            </TableCell>
+
+                                            <TableCell isHeader >
                                                 Actions
                                             </TableCell>
                                         </TableRow>
@@ -276,36 +219,34 @@ export default function FuelsList() {
                                     <TableBody className="divide-y divide-gray-100 dark:divide-white/5">
                                         {fuels.map((fuel) => (
                                             <TableRow key={fuel.id}>
-                                                <TableCell className="px-5 py-4 sm:px-6 text-start">
+                                                {/* <TableCell className="px-5 py-4 sm:px-6 text-start">
                                                     <span className="block font-medium text-gray-800  text-theme-sm">
                                                         {formatDate(fuel.date)}
                                                     </span>
                                                     <span className="block text-gray-500 text-theme-sm">
                                                         ID: {fuel.id}
                                                     </span>
-                                                </TableCell>
+                                                </TableCell> */}
                                                 <TableCell className="px-4 py-3 text-start">
-                                                    <span className="text-gray-800  text-theme-sm   ">
-                                                        {fuel.vehicle?.name || `Vehicle #${fuel.vehicle_id}`}
+                                                    <span className="text-gray-800  text-theme-sm">
+                                                        { formatTypeModel(fuel.vehicle as Fuel["vehicle"]) }
                                                     </span>
                                                 </TableCell>
                                                 <TableCell className="px-4 py-3 text-start">
-                                                    <span className="text-gray-800  text-theme-sm   ">
+                                                    <span className="text-gray-800  text-theme-sm">
                                                         {fuel.vendor?.name || `Vendor #${fuel.vendor_id}`}
                                                     </span>
                                                 </TableCell>
                                                 <TableCell className="px-4 py-3 text-start">
-                                                    <span className="text-gray-800  text-theme-sm   ">
-                                                        {fuel.fuel_type ? fuel.fuel_type.charAt(0).toUpperCase() + fuel.fuel_type.slice(1) : 'N/A'}
+                                                    <span className="text-gray-800  text-theme-sm">
+                                                        {fuel.units} {' '}
+                                                        {formatUnitType(fuel.unit_type)}
                                                     </span>
                                                 </TableCell>
                                                 <TableCell className="px-4 py-3 text-start">
                                                     <div className="space-y-1">
-                                                        <div className="text-gray-800  text-theme-sm   ">
-                                                            {fuel.units}
-                                                        </div>
-                                                        <div className="text-gray-500 text-theme-sm">
-                                                            {formatUnitType(fuel.unit_type)}
+                                                        <div className="text-gray-800  text-theme-sm">
+                                                            {fuel.vehicle_meter} {' '}   <span className="text-theme-sm">mi</span>
                                                         </div>
                                                     </div>
                                                 </TableCell>
@@ -315,15 +256,26 @@ export default function FuelsList() {
                                                     </span>
                                                 </TableCell>
                                                 <TableCell className="px-4 py-3 text-start">
-                                                    <span className="font-semibold text-brand-600  text-theme-sm">
+                                                    <span className="font-semibold  text-theme-sm">
                                                         ${calculateTotalCost(fuel.units, fuel.price_per_volume_unit)}
                                                     </span>
                                                 </TableCell>
+
                                                 <TableCell className="px-4 py-3 text-start">
                                                     <span className="text-gray-800  text-theme-sm   ">
-                                                        {fuel.vehicle_meter}
+                                                        {calculateMilage(fuel.previous_meter, Number(fuel.vehicle_meter), fuel.units)} {' gpm'}
                                                     </span>
                                                 </TableCell>
+
+                                                <TableCell className="px-4 py-3 text-start">
+                                                    <span className="text-gray-800  text-theme-sm">
+                                                        {formatDate(fuel.date)}
+                                                    </span>
+                                                </TableCell>
+
+
+
+
                                                 <TableCell className="px-4 py-3 text-start">
                                                     <div className="">
                                                         <Button

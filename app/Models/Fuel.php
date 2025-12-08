@@ -23,6 +23,7 @@ class Fuel extends Model
         'price_per_volume_unit',
         'total_cost',
         'vehicle_meter',
+        'previous_meter',
         'notes',
         'date',
     ];
