@@ -4,7 +4,7 @@ import { issueService } from "../../services/issueService";
 import PageMeta from "../../components/common/PageMeta";
 import Button from "../../components/ui/button/Button";
 import Badge from "../../components/ui/badge/Badge";
-import { ChevronLeftIcon, PencilIcon } from "../../icons";
+import { ChevronLeftIcon, PencilIcon, ReopenIcon } from "../../icons";
 import { useAuth } from "../../context/AuthContext";
 
 interface Issue {
@@ -175,7 +175,7 @@ export default function IssueDetails() {
       case "high":
         return "bg-orange-500 text-white";
       case "medium":
-        return "bg-blue-500 text-white";
+        return "bg-[#DBEAFE] text-[#1447E6]";
       case "low":
         return "bg-gray-300 text-gray-800";
       default:
@@ -274,35 +274,24 @@ export default function IssueDetails() {
 
       <div className="space-y-6">
         <div className="flex items-start justify-between mb-6">
-          <div className="flex items-center gap-3">
-            <Button
-              variant="primary"
-              size="sm"
-              className="py-2"
-              onClick={() => navigate("/issues")}
-            >
-              <ChevronLeftIcon className="size-5" />
-            </Button>
+          <div className="flex items-center gap-3 justify-between">
             <div>
-              <h1 className="text-lg font-medium text-gray-500 dark:text-gray-400 mb-1">Issues</h1>
-              <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
+              <h1 className="text-2xl font-semibold text-text-color">Issues</h1>
+              <h2 className="text-base font-normal text-[#595959]">
                 {issue.summary || `Issue #${issue.id}`}
               </h2>
             </div>
+
           </div>
           <div className="flex items-center gap-3">
-            {isClosed && (
+            {!isClosed && (
               <Button
-                variant="primary"
+                variant="outline"
                 size="sm"
                 onClick={handleReopen}
                 disabled={isReopening}
                 className="min-height-[40px] !leading-[40px]"
-                startIcon={
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                  </svg>
-                }
+                startIcon={<ReopenIcon className="w-4 h-4" />}
               >
                 {isReopening ? "Reopening..." : "Reopen"}
               </Button>
@@ -311,149 +300,171 @@ export default function IssueDetails() {
         </div>
 
         <div className="bg-white dark:bg-white/5 rounded-lg border border-gray-200 dark:border-white/10">
-          <div className="p-6 border-b border-gray-200 dark:border-white/10">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Details</h3>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">All Fields</p>
+          <div className="p-6 pb-0">
+            <h3 className="text-[20px] font-normal text-text-color">Details</h3>
           </div>
 
-          <div className="p-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Issue #
-                </label>
-                <p className="text-sm text-gray-900 dark:text-white">{issue.id}</p>
-              </div>
+          <div className="p-6 pb-3">
+            <p className="text-xs mb-3 text-[#595959]">All Fields</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="">
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Priority
-                </label>
-                <div className="flex flex-col gap-1">
-                  {issue.priority && issue.priority !== "" ? (
-                    <>
-                      <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium capitalize w-fit ${getPriorityColor(issue.priority)}`}>
-                        {issue.priority}
-                      </span>
-                      {getPriorityDescription(issue.priority) && (
-                        <p className="text-xs text-gray-500 dark:text-gray-400">
-                          {getPriorityDescription(issue.priority)}
-                        </p>
-                      )}
-                    </>
-                  ) : (
-                    <span className="text-sm text-gray-400">—</span>
-                  )}
+                <div className="flex justify-between border-b border-[#F3F4F6] py-4">
+                  <label className="block text-sm text-[#595959] mb-1 w-full max-w-[143px]">
+                    Issue #
+                  </label>
+                  <p className="text-sm text-text-color w-full">{issue.id}</p>
                 </div>
-              </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Odometer
-                </label>
-                <p className="text-sm text-gray-900 dark:text-white">
-                  {issue.primary_meter ? `${issue.primary_meter} mi` : "0 mi"}
-                </p>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Status
-                </label>
-                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-200 text-gray-700">
-                  {issue.status || "Open"}
-                </span>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Vehicle
-                </label>
-                <div className="flex items-center gap-2 flex-wrap">
-                  {issue.vehicle?.vehicle_name ? (
-                    <>
-                      <span className="text-sm text-blue-600 font-medium">
-                        {issue.vehicle.vehicle_name}
-                      </span>
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-200 text-gray-700">
-                        Sample
-                      </span>
-                    </>
-                  ) : (
-                    <span className="text-sm text-gray-400">—</span>
-                  )}
+                <div className="flex justify-between border-b border-[#F3F4F6] py-4">
+                  <label className="block text-sm text-[#595959] mb-1 w-full max-w-[143px]">
+                    Status
+                  </label>
+                  <div className="w-full">
+                    <span className="inline-flex items-center px-3 min-h-[22px] leading-[22px] rounded-[16px] text-xs font-normal bg-[#6A7282] text-white">
+                      {issue.status || "Open"}
+                    </span>
+                  </div>
                 </div>
+
+
+                <div className="flex justify-between border-b border-[#F3F4F6] py-4">
+                  <label className="block text-sm text-[#595959] mb-1 w-full max-w-[143px]">
+                    Summary
+                  </label>
+                  <p className="text-sm text-text-color w-full">
+                    {issue.summary || "—"}
+                  </p>
+                </div>
+
+                <div className="flex justify-between border-b border-[#F3F4F6] py-4">
+                  <label className="block text-sm text-[#595959] mb-1 w-full max-w-[143px]">
+                    Description
+                  </label>
+                  <p className="text-sm text-text-color w-full">
+                    {issue.description || "—"}
+                  </p>
+                </div>
+
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Source
-                </label>
-                <p className="text-sm text-gray-900 dark:text-white">—</p>
+
+                <div className="flex justify-between border-b border-[#F3F4F6] py-4">
+                  <label className="block text-sm text-[#595959] mb-1 w-full max-w-[143px]">
+                    Priority
+                  </label>
+                  <div className="text-sm text-text-color w-full relative">
+                    {issue.priority && issue.priority !== "" ? (
+                      <>
+                        <span className={`sm:absolute top-[-26px] left-0 inline-flex items-center px-3 py-1 rounded-[5px] text-xs font-medium capitalize w-fit ${getPriorityColor(issue.priority)}`}>
+                          {issue.priority}
+                        </span>
+                        {getPriorityDescription(issue.priority) && (
+                          <p className="text-xs text-gray-500">
+                            {getPriorityDescription(issue.priority)}
+                          </p>
+                        )}
+                      </>
+                    ) : (
+                      <span className="text-sm text-gray-400">—</span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex justify-between border-b border-[#F3F4F6] py-4">
+                  <label className="block text-sm text-[#595959] mb-1 w-full max-w-[143px]">
+                    Vehicle
+                  </label>
+                  <div className="text-sm text-text-color w-full">
+                    {issue.vehicle?.vehicle_name ? (
+                      <>
+                        <span className="text-sm text-[#5321B1] font-medium">
+                          {issue.vehicle.vehicle_name}
+                        </span>
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-[8px] text-xs font-medium bg-[#F3F4F6] text-[#4A5565] ml-1.5">
+                          Sample
+                        </span>
+                      </>
+                    ) : (
+                      <span className="text-sm text-gray-400">—</span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex justify-between border-b border-[#F3F4F6] py-4">
+                  <label className="block text-sm text-[#595959] mb-1 w-full max-w-[143px]">
+                    Reported Date
+                  </label>
+                  <p className="text-sm text-text-color w-full">
+                    {formatDateTime(issue.reported_date)}
+                  </p>
+                </div>
+
+
+                <div className="flex justify-between border-b border-[#F3F4F6] py-4">
+                  <label className="block text-sm text-[#595959] mb-1 w-full max-w-[143px]">
+                    Reported By
+                  </label>
+                  <p className="text-sm text-text-color w-full">
+                    {issue.reported_by || "—"}
+                  </p>
+                </div>
+
+
               </div>
 
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Summary
-                </label>
-                <p className="text-sm text-gray-900 dark:text-white">
-                  {issue.summary || "—"}
-                </p>
-              </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Reported Date
-                </label>
-                <p className="text-sm text-gray-900 dark:text-white">
-                  {formatDateTime(issue.reported_date)}
-                </p>
+
+                <div className="flex justify-between border-b border-[#F3F4F6] py-4">
+                  <label className="block text-sm text-[#595959] mb-1 w-full max-w-[143px]">
+                    Odometer
+                  </label>
+                  <p className="text-sm text-text-color w-full">
+                    {issue.primary_meter ? `${issue.primary_meter} mi` : "0 mi"}
+                  </p>
+                </div>
+
+
+                <div className="flex justify-between border-b border-[#F3F4F6] py-4">
+                  <label className="block text-sm text-[#595959] mb-1 w-full max-w-[143px]">
+                    Source
+                  </label>
+                  <p className="text-sm text-text-color w-full">—</p>
+                </div>
+
+                <div className="flex justify-between border-b border-[#F3F4F6] py-4">
+                  <label className="block text-sm text-[#595959] mb-1 w-full max-w-[143px]">
+                    Assigned To
+                  </label>
+                  <p className="text-sm text-text-color w-full">
+                    {assignedToName || "—"}
+                  </p>
+                </div>
+
+                <div className="flex justify-between border-b border-[#F3F4F6] py-4">
+                  <label className="block text-sm text-[#595959] mb-1 w-full max-w-[143px]">
+                    Due Date
+                  </label>
+                  <p className="text-sm text-text-color w-full">
+                    {formatDate(issue.due_date)}
+                  </p>
+                </div>
+
+
+                <div className="flex justify-between py-4">
+                  <label className="block text-sm text-[#595959] mb-1 w-full max-w-[143px]">
+                    Due Odometer
+                  </label>
+                  <p className="text-sm text-text-color w-full">
+                    {issue.primary_meter_due ? `${issue.primary_meter_due} mi` : "—"}
+                  </p>
+                </div>
+
+
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Assigned To
-                </label>
-                <p className="text-sm text-gray-900 dark:text-white">
-                  {assignedToName || "—"}
-                </p>
-              </div>
-
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Description
-                </label>
-                <p className="text-sm text-gray-900 dark:text-white whitespace-pre-wrap">
-                  {issue.description || "—"}
-                </p>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Reported By
-                </label>
-                <p className="text-sm text-gray-900 dark:text-white">
-                  {issue.reported_by || "—"}
-                </p>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Due Date
-                </label>
-                <p className="text-sm text-gray-900 dark:text-white">
-                  {formatDate(issue.due_date)}
-                </p>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Due Odometer
-                </label>
-                <p className="text-sm text-gray-900 dark:text-white">
-                  {issue.primary_meter_due ? `${issue.primary_meter_due} mi` : "—"}
-                </p>
-              </div>
             </div>
           </div>
         </div>

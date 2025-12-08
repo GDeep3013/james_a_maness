@@ -57,6 +57,7 @@ import CreateExpenseHistory from "./pages/Expense/CreateExpenseHistory";
 import ExpenseHistoryDetail from "./pages/Expense/ExpenseHistoryDetail";
 import CreateAssignment from "./pages/VehicleAssignments/CreateAssignment";
 import VehicleReplacement from "./pages/VehicleReplacementAnalysis/VehicleReplacement";
+import Reports from "./pages/Reports/index";
 
 export default function App() {
   return (
@@ -154,6 +155,14 @@ export default function App() {
             element={
               <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
                 <WorkOrdersList />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/reports"
+            element={
+              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                <Reports />
               </ProtectedRoute>
             }
           />
