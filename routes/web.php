@@ -14,9 +14,9 @@ Route::middleware(['guest'])->group(function () {
 
 Route::middleware(['auth','page.access'])->group(function () {
 
-    Route::get('/logout', [LoginController::class, 'logout'])->name('logout');
+    Route::get('/logout', [LoginController::class, 'logout']);
     Route::get('/', [HomeController::class, 'index'])->name('home');
-    Route::get('/home', [HomeController::class, 'index'])->name('home');
+    Route::get('/home', [HomeController::class, 'index']);
 
     // Vehicles
     Route::get('/vehicles', [HomeController::class, 'index']);
