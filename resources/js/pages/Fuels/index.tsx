@@ -1,5 +1,6 @@
 import PageMeta from "../../components/common/PageMeta";
 import FuelsList from "./FuelsList";
+import FuelOverview from "./FuelOverview";
 import { PlusIcon } from "../../icons";
 import Button from "../../components/ui/button/Button";
 import { Link } from "react-router";
@@ -29,6 +30,7 @@ export default function Fuels() {
 
 
       <div className="space-y-6">
+        <FuelOverview />
         <FuelsList />
       </div>
     </>
