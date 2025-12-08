@@ -75,8 +75,12 @@ export const AdminMenus : NavItem[] = [
       {
         icon: <ReportsIcon className="svg-no-fill"/>,
         name: "Reports",
-        path: "/reports",
         allowedRoles: ["Admin", "Manager"],
+        subItems: [
+          { name: "Monthly Maintenance Reports (MMR)", path: "/reports/monthly-maintenance", pro: false, allowedRoles: ["Admin", "Manager"] },
+          { name: "Maintenance Report", path: "/reports/maintenance", pro: false, allowedRoles: ["Admin", "Manager"] },
+          { name: "Fuel Report", path: "/reports/fuel", pro: false, allowedRoles: ["Admin", "Manager"] },
+        ],
       }
 
 ]

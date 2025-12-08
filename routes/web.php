@@ -117,6 +117,9 @@ Route::middleware(['auth','page.access'])->group(function () {
 
     // Reports
     Route::get('/reports', [HomeController::class, 'index']);
+    Route::get('/reports/monthly-maintenance', [HomeController::class, 'index']);
+    Route::get('/reports/maintenance', [HomeController::class, 'index']);
+    Route::get('/reports/fuel', [HomeController::class, 'index']);
 
     Route::get('profile', [HomeController::class, 'index']);
 
