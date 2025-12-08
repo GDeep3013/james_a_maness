@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('time_lines', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            // $table->string('trackable_type'); // Model class name
+            $table->string('trackable_type');
             $table->unsignedBigInteger('trackable_id'); // Record ID
             $table->enum('action', ['created', 'updated', 'deleted', 'restored'])->default('created');
             $table->string('module'); // fuel, work_order, service, etc.
@@ -32,7 +32,7 @@ return new class extends Migration
             $table->timestamps();
 
             // Indexes
-            $table->index(['trackable_id']);
+            $table->index(['trackable_type','trackable_id']);
             $table->index(['user_id', 'created_at']);
             $table->index(['vehicle_id', 'created_at']);
             $table->index('module');

@@ -11,7 +11,7 @@ class TimeLine extends Model
 
     protected $fillable = [
         'user_id',
-        // 'trackable_type',
+        'trackable_type',
         'trackable_id',
         'action',
         'module',
