@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
+use App\Traits\HasTimeLine;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class ExpenseHistory extends Model
 {
-    use HasFactory;
+    use HasFactory, HasTimeLine;
     protected $table = 'expense_histories';
 
     protected $fillable = [

@@ -1,13 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router';
 import { fuelService } from '../../services/fuelService';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHeader,
-    TableRow,
-} from "../ui/table";
 import Button from '../ui/button/Button';
 import { formatDate, capitalizeFirst } from '../../utilites';
 import { FuelRecord } from '../../types/FuelRecordTypes';
@@ -49,7 +42,7 @@ export default function FuelTab({ activeTab }: FuelTabProps) {
         }
 
         return (
-            <div className="flex items-center justify-between px-4 py-3 sm:px-6 border-t border-gray-200">
+            <div className="flex items-center justify-between px-4 py-3 sm:px-6">
                 <div className="flex flex-1 justify-between sm:hidden">
                     <Button
                         variant="outline"
@@ -166,89 +159,109 @@ export default function FuelTab({ activeTab }: FuelTabProps) {
         return null;
     }
 
+    const getUnitLabel = (unitType: string) => {
+        if (unitType === 'us_gallons') return 'gal';
+        if (unitType === 'liters') return 'L';
+        if (unitType === 'uk_gallons') return 'gal (UK)';
+        return 'gal';
+    };
+
     return (
-        <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
-            <div className="max-w-full overflow-x-auto">
+            <>
                 {loadingFuel ? (
-                    <div className="flex items-center justify-center py-12">
-                        <div className="text-center">
-                            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-brand-500"></div>
-                            <p className="mt-2 text-sm text-gray-600">Loading fuel records...</p>
+                    <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
+                        <div className="p-4 sm:p-6">
+                            <div className="flex items-center justify-center py-12">
+                                <div className="text-center">
+                                    <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-brand-500"></div>
+                                    <p className="mt-2 text-sm text-gray-600">Loading fuel records...</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 ) : fuelRecords.length === 0 ? (
-                    <div className="flex items-center justify-center py-12">
-                        <div className="text-center">
-                            <p className="text-gray-600">No fuel records found</p>
+                    <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
+                        <div className="p-4 sm:p-6">
+                            <div className="flex items-center justify-center py-12">
+                                <div className="text-center">
+                                    <p className="text-gray-600">No fuel records found</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 ) : (
                     <>
-                        <Table>
-                            <TableHeader className="border-b border-gray-100">
-                                <TableRow>
-                                    <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs">
-                                        Fuel Type
-                                    </TableCell>
-                                    <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs">
-                                        Date
-                                    </TableCell>
-                                    <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs">
-                                        Quantity
-                                    </TableCell>
-                                    <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs">
-                                        Price/Unit
-                                    </TableCell>
-                                    <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs">
-                                        Total Cost
-                                    </TableCell>
-                                    <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs">
-                                        Odometer
-                                    </TableCell>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody className="divide-y divide-gray-100">
-                                {fuelRecords.map((record) => (
-                                    <TableRow key={record.id}>
-                                        <TableCell className="px-4 py-3 text-start">
-                                            <div className="text-gray-800 text-theme-sm">
-                                                {capitalizeFirst(record.fuel_type) || 'N/A'}
+                        <div className="flex flex-col gap-4">
+                            {fuelRecords.map((record) => {
+                                const totalCost = record.units * record.price_per_volume_unit;
+                                const unitLabel = getUnitLabel(record.unit_type);
+                                
+                                return (
+                                    <div
+                                        key={record.id}
+                                        className="bg-gray-50 rounded-lg p-3 hover:shadow-md transition-shadow"
+                                    >
+                                        <div className="flex items-start justify-between mb-2">
+                                            <div className='w-full'>
+                                                <p className="text-base font-medium text-[#1D2939] mb-1">
+                                                Vendor - {record.vendor?.name || 'N/A'}
+                                                </p>
                                             </div>
-                                        </TableCell>
-                                        <TableCell className="px-4 py-3 text-start">
-                                            <div className="text-gray-800 text-theme-sm">
-                                                {formatDate(record.date)}
+                                        </div>
+
+                                        <div className="flex gap-3">
+                                            <div className='w-full'>
+                                                <p className="text-sm text-gray-500 mb-1">Date</p>
+                                                <p className="text-sm text-gray-800">
+                                                    {formatDate(record.date)}
+                                                </p>
                                             </div>
-                                        </TableCell>
-                                        <TableCell className="px-4 py-3 text-start">
-                                            <div className="text-gray-800 text-theme-sm">
-                                                {record.units} {record.unit_type === 'us_gallons' ? 'gal' : record.unit_type === 'liters' ? 'L' : 'gal (UK)'}
+
+                                            <div className='w-full'>
+                                                <p className="text-sm text-gray-500 mb-1">Gallons</p>
+                                                <p className="text-base text-gray-800">
+                                                    {record.units} {unitLabel}
+                                                </p>
                                             </div>
-                                        </TableCell>
-                                        <TableCell className="px-4 py-3 text-start">
-                                            <div className="text-gray-800 text-theme-sm">
-                                                ${Number(record.price_per_volume_unit).toFixed(2)}
+                                            <div className='w-full'>
+                                                <p className="text-sm text-gray-500 mb-1">Cost</p>
+                                                <p className="text-base text-gray-800">
+                                                    ${totalCost.toFixed(2)}
+                                                </p>
                                             </div>
-                                        </TableCell>
-                                        <TableCell className="px-4 py-3 text-start">
-                                            <div className="text-gray-800 text-theme-sm">
-                                                ${(record.units * record.price_per_volume_unit).toFixed(2)}
+                                        
+                                            <div className='w-full'>
+                                                <p className="text-sm text-gray-500 mb-1">Fuel Type</p>
+                                                <p className="text-sm text-gray-800">
+                                                    {capitalizeFirst(record.fuel_type) || 'N/A'}
+                                                </p>
                                             </div>
-                                        </TableCell>
-                                        <TableCell className="px-4 py-3 text-start">
-                                            <div className="text-gray-800 text-theme-sm">
-                                                {record.vehicle_meter || 'N/A'}
+                                            <div className='w-full'>
+                                                <p className="text-sm text-gray-500 mb-1">Odometer</p>
+                                                <p className="text-sm text-gray-800">
+                                                    {record.vehicle_meter || 'N/A'}
+                                                </p>
                                             </div>
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
+
+                                            {record.price_per_volume_unit && (
+                                                <div className='w-full'>
+                                                    <p className="text-sm text-gray-500 mb-1">Price/Unit</p>
+                                                    <p className="text-sm text-gray-800">
+                                                        ${Number(record.price_per_volume_unit).toFixed(2)}/{unitLabel}
+                                                    </p>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        
+                                    </div>
+                                );
+                            })}
+                        </div>
                         {fuelRecords.length > 0 && renderPagination(fuelPagination, fuelCurrentPage, setFuelCurrentPage, loadingFuel)}
                     </>
                 )}
-            </div>
-        </div>
+            </>
     );
 }
 

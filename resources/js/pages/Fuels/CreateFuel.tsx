@@ -16,7 +16,9 @@ import { vendorService } from "../../services/vendorService";
 
 interface Vehicle {
     id: number;
-    name: string;
+    name?: string;
+    vehicle_name?: string;
+    current_mileage?: string;
 }
 interface Vendor {
     id: number;
@@ -31,6 +33,7 @@ export interface FuelFormData {
     units: string;
     price_per_volume_unit: string;
     vehicle_meter: string;
+    previous_meter: string;
     notes: string;
     date: string;
 }
@@ -44,6 +47,7 @@ interface FuelApiPayload {
     units: number;
     price_per_volume_unit: number;
     vehicle_meter: string;
+    previous_meter?: string;
     notes?: string;
     date: string;
 }
@@ -66,12 +70,13 @@ export default function CreateFuel() {
         units: "",
         price_per_volume_unit: "",
         vehicle_meter: "",
+        previous_meter: "",
         notes: "",
         date: new Date().toISOString().split('T')[0],
     });
 
     // Dropdown options
-    const [vehicles, setVehicles] = useState<Array<{ value: string; label: string }>>([]);
+    const [vehicles, setVehicles] = useState<Array<{ value: string; label: string; current_mileage?: string }>>([]);
     const [vendors, setVendors] = useState<Array<{ value: string; label: string }>>([]);
 
     const fuelTypeOptions = [
@@ -102,9 +107,10 @@ export default function CreateFuel() {
                 vendorService.getAll(),
             ]);
             // Transform vehicles data for Select component
-            const vehicleOptions = (vehiclesRes.data.vehical || vehiclesRes.data.vehical || []).map((vehicle: Vehicle) => ({
+            const vehicleOptions = (vehiclesRes.data.vehical?.data || vehiclesRes.data.vehical || []).map((vehicle: Vehicle) => ({
                 value: String(vehicle.id),
-                label: vehicle.name || `Vehicle #${vehicle.id}`,
+                label: vehicle.vehicle_name || vehicle.name || `Vehicle #${vehicle.id}`,
+                current_mileage: vehicle.current_mileage || "",
             }));
 
             // Transform vendors data for Select component
@@ -138,6 +144,7 @@ export default function CreateFuel() {
                     units: String(fuel.units || ""),
                     price_per_volume_unit: String(fuel.price_per_volume_unit || ""),
                     vehicle_meter: String(fuel.vehicle_meter || ""),
+                    previous_meter: String(fuel.previous_meter || ""),
                     notes: String(fuel.notes || ""),
                     date: fuel.date ? String(fuel.date).split('T')[0] : new Date().toISOString().split('T')[0],
                 });
@@ -172,8 +179,59 @@ export default function CreateFuel() {
         }
     };
 
-    const handleSelectChange = (name: keyof FuelFormData) => (value: string) => {
-        setFormData((prev) => ({ ...prev, [name]: value }));
+    const handleSelectChange = (name: keyof FuelFormData) => async (value: string) => {
+        setFormData((prev) => {
+            const updated = { ...prev, [name]: value };
+            
+            if (name === "vehicle_id" && !value) {
+                updated.previous_meter = "";
+            }
+            
+            return updated;
+        });
+
+        if (name === "vehicle_id" && value) {
+            try {
+                const vehicleId = parseInt(value);
+                const lastEntryResponse = await fuelService.getLastEntryByVehicle(vehicleId);
+                
+                if (lastEntryResponse.data?.status) {
+                    const lastEntry = lastEntryResponse.data.data;
+                    
+                    if (lastEntry?.vehicle_meter) {
+                        setFormData((prev) => ({
+                            ...prev,
+                            previous_meter: String(lastEntry.vehicle_meter),
+                        }));
+                    } else {
+                        const selectedVehicle = vehicles.find((v) => v.value === value);
+                        if (selectedVehicle?.current_mileage) {
+                            setFormData((prev) => ({
+                                ...prev,
+                                previous_meter: selectedVehicle.current_mileage || "",
+                            }));
+                        }
+                    }
+                } else {
+                    const selectedVehicle = vehicles.find((v) => v.value === value);
+                    if (selectedVehicle?.current_mileage) {
+                        setFormData((prev) => ({
+                            ...prev,
+                            previous_meter: selectedVehicle.current_mileage || "",
+                        }));
+                    }
+                }
+            } catch {
+                const selectedVehicle = vehicles.find((v) => v.value === value);
+                if (selectedVehicle?.current_mileage) {
+                    setFormData((prev) => ({
+                        ...prev,
+                        previous_meter: selectedVehicle.current_mileage || "",
+                    }));
+                }
+            }
+        }
+
         if (errors[name]) {
             setErrors((prev) => {
                 const newErrors = { ...prev };
@@ -210,8 +268,18 @@ export default function CreateFuel() {
             newErrors.price_per_volume_unit = "Price per unit must be greater than 0";
         }
 
+        if (!formData.previous_meter.trim()) {
+            newErrors.previous_meter = "Previous meter reading is required";
+        }
+
         if (!formData.vehicle_meter.trim()) {
             newErrors.vehicle_meter = "Vehicle meter reading is required";
+        } else if (formData.previous_meter.trim() && formData.vehicle_meter.trim()) {
+            const vehicleMeter = parseFloat(formData.vehicle_meter);
+            const previousMeter = parseFloat(formData.previous_meter);
+            if (!isNaN(vehicleMeter) && !isNaN(previousMeter) && vehicleMeter <= previousMeter) {
+                newErrors.vehicle_meter = "Vehicle meter reading must be greater than previous meter reading";
+            }
         }
 
         if (!formData.date) {
@@ -242,13 +310,14 @@ export default function CreateFuel() {
                 units: parseFloat(formData.units),
                 price_per_volume_unit: parseFloat(formData.price_per_volume_unit),
                 vehicle_meter: formData.vehicle_meter,
+                previous_meter: formData.previous_meter || undefined,
                 notes: formData.notes || undefined,
                 date: formData.date,
             };
             console.log(fuelData, "fuel")
             const response = isEditMode && id
-                ? await fuelService.update(parseInt(id), fuelData as any)
-                : await fuelService.create(fuelData as any);
+                ? await fuelService.update(parseInt(id), fuelData)
+                : await fuelService.create(fuelData);
 
             if (response.data?.status === true || response.status === 200 || response.status === 201) {
                 if (saveAndAddAnother && !isEditMode) {
@@ -260,6 +329,7 @@ export default function CreateFuel() {
                         units: "",
                         price_per_volume_unit: "",
                         vehicle_meter: "",
+                        previous_meter: "",
                         notes: "",
                         date: new Date().toISOString().split('T')[0],
                     });
@@ -386,7 +456,7 @@ export default function CreateFuel() {
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
                 <div>
                     <Label htmlFor="unit_type">
                         Unit Type <span className="text-error-500">*</span>
@@ -418,9 +488,7 @@ export default function CreateFuel() {
                         <p className="mt-1 text-sm text-error-500">{errors.units}</p>
                     )}
                 </div>
-            </div>
 
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <div>
                     <Label htmlFor="price_per_volume_unit">
                         Price Per Unit <span className="text-error-500">*</span>
@@ -435,6 +503,25 @@ export default function CreateFuel() {
                     />
                     {errors.price_per_volume_unit && (
                         <p className="mt-1 text-sm text-error-500">{errors.price_per_volume_unit}</p>
+                    )}
+                </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                <div>
+                    <Label htmlFor="previous_meter">
+                        Previous Meter Reading <span className="text-error-500">*</span>
+                    </Label>
+                    <Input
+                        type="text"
+                        id="previous_meter"
+                        value={formData.previous_meter}
+                        onChange={(e) => handleInputChange("previous_meter", e.target.value)}
+                        placeholder="Enter previous odometer reading"
+                        className={errors.previous_meter ? "border-error-500" : ""}
+                    />
+                    {errors.previous_meter && (
+                        <p className="mt-1 text-sm text-error-500">{errors.previous_meter}</p>
                     )}
                 </div>
 

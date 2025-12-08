@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\Fuel;
 use Auth;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class FuelController extends Controller
 {
@@ -48,9 +50,22 @@ class FuelController extends Controller
                 'units' => 'required|numeric|min:0',
                 'price_per_volume_unit' => 'required|numeric|min:0',
                 'vehicle_meter' => 'required|string|max:255',
+                'previous_meter' => 'required|string|max:255',
                 'notes' => 'nullable|string',
                 'date' => 'required|date',
             ]);
+
+            $vehicleMeter = (float) $validatedData['vehicle_meter'];
+            $previousMeter = (float) $validatedData['previous_meter'];
+            
+            if ($vehicleMeter <= $previousMeter) {
+                return response()->json([
+                    'status' => 'error',
+                    'errors' => [
+                        'vehicle_meter' => ['Vehicle meter reading must be greater than previous meter reading']
+                    ]
+                ], 422);
+            }
 
             $fuel = new Fuel;
             $fuel->user_id = Auth::user()->id;
@@ -62,6 +77,7 @@ class FuelController extends Controller
             $fuel->price_per_volume_unit = $validatedData['price_per_volume_unit'];
             $fuel->total_cost =  ($validatedData['units']* $validatedData['price_per_volume_unit']);
             $fuel->vehicle_meter = $validatedData['vehicle_meter'];
+            $fuel->previous_meter = $validatedData['previous_meter'] ?? null;
             $fuel->notes = $validatedData['notes'] ?? null;
             $fuel->date = $validatedData['date'];
 
@@ -119,9 +135,22 @@ class FuelController extends Controller
                 'units' => 'required|numeric|min:0',
                 'price_per_volume_unit' => 'required|numeric|min:0',
                 'vehicle_meter' => 'required|string|max:255',
+                'previous_meter' => 'required|string|max:255',
                 'notes' => 'nullable|string',
                 'date' => 'required|date',
             ]);
+
+            $vehicleMeter = (float) $validatedData['vehicle_meter'];
+            $previousMeter = (float) $validatedData['previous_meter'];
+            
+            if ($vehicleMeter <= $previousMeter) {
+                return response()->json([
+                    'status' => 'error',
+                    'errors' => [
+                        'vehicle_meter' => ['Vehicle meter reading must be greater than previous meter reading']
+                    ]
+                ], 422);
+            }
 
             $fuel = Fuel::find($id);
             if (!$fuel) {
@@ -137,6 +166,7 @@ class FuelController extends Controller
             $fuel->price_per_volume_unit = $validatedData['price_per_volume_unit'];
             $fuel->total_cost =  ($validatedData['units'] * $validatedData['price_per_volume_unit']);
             $fuel->vehicle_meter = $validatedData['vehicle_meter'];
+            $fuel->previous_meter = $validatedData['previous_meter'] ?? null;
             $fuel->notes = $validatedData['notes'] ?? null;
             $fuel->date = $validatedData['date'];
 
@@ -159,6 +189,36 @@ class FuelController extends Controller
             } else {
                 return response()->json(['status' => false, 'message' => 'Fuel entry not found']);
             }
+        }
+    }
+
+    public function getLastEntryByVehicle($vehicleId)
+    {
+        try {
+            $lastFuelEntry = Fuel::where('vehicle_id', $vehicleId)
+                ->orderBy('date', 'desc')
+                ->orderBy('id', 'desc')
+                ->first();
+
+            if ($lastFuelEntry) {
+                return response()->json([
+                    'status' => true,
+                    'data' => [
+                        'vehicle_meter' => $lastFuelEntry->vehicle_meter,
+                    ]
+                ]);
+            } else {
+                return response()->json([
+                    'status' => true,
+                    'data' => null
+                ]);
+            }
+        } catch (\Exception $e) {
+            \Log::error('Get last fuel entry error: ' . $e->getMessage());
+            return response()->json([
+                'status' => false,
+                'message' => 'Error fetching last fuel entry'
+            ], 500);
         }
     }
 }

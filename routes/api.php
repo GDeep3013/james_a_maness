@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\ExpenseHistoryController;
 use App\Http\Controllers\FuelController;
+use App\Http\Controllers\FuelEconomyController;
 use App\Http\Controllers\VehicleController;
 use App\Http\Controllers\WorkOrderController;
 use App\Http\Controllers\IssueController;
@@ -68,6 +69,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/vehicles/{id}/edit', [VehicleController::class, 'edit'])->where('id', '[0-9]+');
     Route::get('/vehicles-statistics', [VehicleController::class, 'getStatistics']);
 
+    Route::get('/fuels/last-entry/{vehicleId}', [FuelController::class, 'getLastEntryByVehicle'])->where('vehicleId', '[0-9]+');
+    Route::get('/fuels-statistics', [FuelEconomyController::class, 'getStatistics']);
     Route::apiResource('fuels', FuelController::class);
     Route::get('/fuels/{id}/edit', [FuelController::class, 'edit'])->where('id', '[0-9]+');
 

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router';
-import { serviceReminderService } from '../../services/serviceReminderService';
+import { serviceService } from '../../services/serviceService';
 import {
     Table,
     TableBody,
@@ -10,8 +10,8 @@ import {
 } from "../ui/table";
 import Badge from '../ui/badge/Badge';
 import Button from '../ui/button/Button';
-import { formatDate, getStatusBadgeColor } from '../../utilites';
-import { ServiceReminder } from '../../types/ServiceReminderTypes';
+import { formatDate, formatTypeModel, formatNextDue, calculateServiceStatus, getServiceReminderStatusBadgeColor } from '../../utilites';
+import { Service } from '../../types/serviceTypes';
 import { PaginationData } from '../common/TableFooter';
 
 interface RemindersTabProps {
@@ -21,7 +21,7 @@ interface RemindersTabProps {
 export default function RemindersTab({ activeTab }: RemindersTabProps) {
     const { id } = useParams<{ id: string }>();
     const [loadingReminders, setLoadingReminders] = useState(false);
-    const [serviceReminders, setServiceReminders] = useState<ServiceReminder[]>([]);
+    const [services, setServices] = useState<Service[]>([]);
     const [remindersPagination, setRemindersPagination] = useState<PaginationData>({
         current_page: 1,
         last_page: 1,
@@ -130,39 +130,40 @@ export default function RemindersTab({ activeTab }: RemindersTabProps) {
     };
 
     useEffect(() => {
-        const fetchServiceReminders = async () => {
+        const fetchServices = async () => {
             if (!id || activeTab !== 'reminders') return;
 
             setLoadingReminders(true);
             try {
-                const response = await serviceReminderService.getAll({
+                const response = await serviceService.getAll({
                     page: remindersCurrentPage,
                     search: '',
-                    status: '',
                 });
 
                 const data = response.data;
 
-                if (data.status && data.service_reminders) {
-                    setServiceReminders(data.service_reminders.data);
+                if (data.status && data.services) {
+                    const filteredServices = data.services.data.filter((service: Service) => 
+                        service.vehicle_id === parseInt(id)
+                    );
+                    setServices(filteredServices);
                     setRemindersPagination({
-                        current_page: data.service_reminders.current_page,
-                        last_page: data.service_reminders.last_page,
-                        per_page: data.service_reminders.per_page,
-                        total: data.service_reminders.total,
+                        current_page: data.services.current_page,
+                        last_page: data.services.last_page,
+                        per_page: data.services.per_page,
+                        total: filteredServices.length,
                     });
                 } else {
-                    setServiceReminders([]);
+                    setServices([]);
                 }
-            } catch (error) {
-                console.error("Failed to load service reminders:", error);
-                setServiceReminders([]);
+            } catch {
+                setServices([]);
             } finally {
                 setLoadingReminders(false);
             }
         };
 
-        fetchServiceReminders();
+        fetchServices();
     }, [id, activeTab, remindersCurrentPage]);
 
     if (activeTab !== 'reminders') {
@@ -179,10 +180,10 @@ export default function RemindersTab({ activeTab }: RemindersTabProps) {
                             <p className="mt-2 text-sm text-gray-600">Loading service reminders...</p>
                         </div>
                     </div>
-                ) : serviceReminders.length === 0 ? (
+                ) : services.length === 0 ? (
                     <div className="flex items-center justify-center py-12">
                         <div className="text-center">
-                            <p className="text-gray-600">No service reminders found</p>
+                            <p className="text-gray-600">No services found</p>
                         </div>
                     </div>
                 ) : (
@@ -190,70 +191,114 @@ export default function RemindersTab({ activeTab }: RemindersTabProps) {
                         <Table>
                             <TableHeader className="border-b border-gray-100">
                                 <TableRow>
-                                    <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs">
+                                    <TableCell isHeader >
+                                        Vehicle
+                                    </TableCell>
+                                    <TableCell isHeader >
                                         Service Task
                                     </TableCell>
-                                    <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs">
-                                        Time Interval
-                                    </TableCell>
-                                    <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs">
-                                        Meter Interval
-                                    </TableCell>
-                                    <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs">
-                                        Next Due Date
-                                    </TableCell>
-                                    <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs">
-                                        Next Due Meter
-                                    </TableCell>
-                                    <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs">
+                                    <TableCell isHeader >
                                         Status
                                     </TableCell>
+                                    <TableCell isHeader >
+                                        Next Due
+                                    </TableCell>
+                                    <TableCell isHeader >
+                                        Incomplete Work Order
+                                    </TableCell>
+                                    <TableCell isHeader >
+                                        Last Completed
+                                    </TableCell>
+                                    <TableCell isHeader >
+                                        Compliance
+                                    </TableCell>
+                                    <TableCell isHeader >
+                                        Watchers
+                                    </TableCell>
+                                    <TableCell isHeader >
+                                        Assignee
+                                    </TableCell>
+                                   
                                 </TableRow>
                             </TableHeader>
                             <TableBody className="divide-y divide-gray-100">
-                                {serviceReminders.map((record) => (
-                                    <TableRow key={record.id}>
+                                { services.map((record) => {
+                                    
+                                    const BadgeStatus =calculateServiceStatus(record.primary_meter,record.vehicle?.current_mileage);
+
+                                    const BadgeColor = getServiceReminderStatusBadgeColor(BadgeStatus);
+
+                                    return (<TableRow key={record.id}>
                                         <TableCell className="px-4 py-3 text-start">
                                             <div className="text-gray-800 text-theme-sm">
-                                                {record.service_task?.name || "N/A"}
+                                                {formatTypeModel(record.vehicle)}
                                             </div>
                                         </TableCell>
-                                        <TableCell className="px-4 py-3 text-start">
+                                        <TableCell className="px-4 py-3 text-start w-[300px]">
                                             <div className="text-gray-800 text-theme-sm">
-                                                {record.time_interval_value
-                                                    ? `${record.time_interval_value} ${record.time_interval_unit}`
-                                                    : "N/A"}
+                                            {record.service_items && record.service_items.length > 0
+                                            ? record.service_items.map((task, index) => (
+                                                <span key={task.id || index}>
+                                                    {task.name}
+                                                    {index < (record.service_items?.length ?? 0) - 1 && ", "}
+                                                </span>
+                                                ))
+                                            : "N/A"}
                                             </div>
                                         </TableCell>
+
                                         <TableCell className="px-4 py-3 text-start">
-                                            <div className="text-gray-800 text-theme-sm">
-                                                {record.primary_meter_interval_value
-                                                    ? `${record.primary_meter_interval_value} ${record.primary_meter_interval_unit}`
-                                                    : "N/A"}
-                                            </div>
-                                        </TableCell>
-                                        <TableCell className="px-4 py-3 text-start">
-                                            <div className="text-gray-800 text-theme-sm">
-                                                {record.next_due_date
-                                                    ? formatDate(record.next_due_date)
-                                                    : "N/A"}
-                                            </div>
-                                        </TableCell>
-                                        <TableCell className="px-4 py-3 text-start">
-                                            <div className="text-gray-800 text-theme-sm">
-                                                {record.next_due_meter || "N/A"}
-                                            </div>
-                                        </TableCell>
-                                        <TableCell className="px-4 py-3 text-start">
-                                            <Badge size="sm" color={getStatusBadgeColor(record.status)}>
-                                                {record.status}
+                                            <Badge size="sm" color={BadgeColor}>
+                                                {BadgeStatus}
                                             </Badge>
                                         </TableCell>
-                                    </TableRow>
-                                ))}
+
+                                        <TableCell className="px-4 py-3 text-start">
+                                            <div className="text-gray-800 text-theme-sm">
+                                                {formatNextDue(record.start_date)}
+                                                <br/>
+                                                <span className={`text-${BadgeColor}-500 text-theme-xs`}> {record.primary_meter} miles {BadgeStatus} </span>
+                                            </div>
+                                        </TableCell>
+
+                                        <TableCell className="px-4 py-3 text-start">
+                                            <div className="text-gray-800 text-theme-sm">
+                                                --
+                                            </div>
+                                        </TableCell>
+
+                                        <TableCell className="px-4 py-3 text-start">
+                                            <div className="text-gray-800 text-theme-sm">
+                                                {record.last_completed_date
+                                                    ? formatDate(record.last_completed_date)
+                                                    : "N/A"}
+                                                    <br/>
+                                                    {record.last_completed_meter && <span className={`text-gray-500 text-theme-xs`}> {record.last_completed_meter} miles completed </span>}
+                                            </div>
+                                        </TableCell>
+
+                                        <TableCell className="px-4 py-3 text-start">
+                                            <div className="text-gray-800 text-theme-sm">
+                                                --
+                                            </div>
+                                        </TableCell>
+                                        <TableCell className="px-4 py-3 text-start">
+                                            <div className="text-gray-800 text-theme-sm">
+                                                --
+                                            </div>
+                                        </TableCell>
+                                        <TableCell className="px-4 py-3 text-start">
+                                            <div className="text-gray-800 text-theme-sm">
+                                                --
+                                            </div>
+                                        </TableCell>
+                                   
+                                    </TableRow>)
+                                
+                                })}
                             </TableBody>
                         </Table>
-                        {serviceReminders.length > 0 && renderPagination(remindersPagination, remindersCurrentPage, setRemindersCurrentPage, loadingReminders)}
+                        {services.length > 0 && renderPagination(remindersPagination, remindersCurrentPage, setRemindersCurrentPage, loadingReminders)}
                     </>
                 )}
             </div>

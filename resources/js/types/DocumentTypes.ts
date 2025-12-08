@@ -16,5 +16,6 @@ export interface DocumentFormData {
     vehicle_id: number;
     title: string;
     file: File | null;
+    expires_date?: string | null;
 }
 

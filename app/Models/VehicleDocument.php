@@ -15,10 +15,20 @@ class VehicleDocument extends Model
         'file_path',
         'file_name',
         'file_type',
+        'expires_date',
+    ];
+
+    protected $casts = [
+        'expires_date' => 'date',
     ];
 
     public function vehicle()
     {
         return $this->belongsTo(Vehical::class);
+    }
+
+    public function getFilePathAttribute()
+    {
+        return asset('vehicle-documents/' . $this->file_name);
     }
 }

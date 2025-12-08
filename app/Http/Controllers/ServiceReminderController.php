@@ -18,7 +18,7 @@ class ServiceReminderController extends Controller
     {
         $tableColumns = Schema::getColumnListing('service_reminders');
         $query = ServiceReminder::with([
-            'vehicle:id,vehicle_name',
+            'vehicle:id,vehicle_name,make,model,year,license_plate,current_mileage',
             'user:id,name'
         ])->orderBy('id', 'desc');
         
@@ -237,7 +237,7 @@ class ServiceReminderController extends Controller
         }
 
         $serviceReminder = ServiceReminder::with([
-            'vehicle:id,vehicle_name',
+            'vehicle:id,vehicle_name,make,model,year,license_plate',
             'user:id,name'
         ])->where('id', $id)->first();
 

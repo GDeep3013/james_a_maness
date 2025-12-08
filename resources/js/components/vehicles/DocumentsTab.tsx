@@ -4,7 +4,7 @@ import { documentService } from '../../services/documentService';
 import { Modal } from '../ui/modal';
 import { useModal } from '../../hooks/useModal';
 import Button from '../ui/button/Button';
-import { FileIcon } from '../../icons';
+import { ExportIcon, FileIcon } from '../../icons';
 import { Document, DocumentFormData } from '../../types/DocumentTypes';
 import { PaginationData } from '../common/TableFooter';
 import Label from '../form/Label';
@@ -50,6 +50,7 @@ export default function DocumentsTab({ activeTab }: DocumentsTabProps) {
         vehicle_id: id ? parseInt(id) : 0,
         title: '',
         file: null,
+        expires_date: null,
     });
     const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
@@ -173,6 +174,7 @@ export default function DocumentsTab({ activeTab }: DocumentsTabProps) {
             vehicle_id: id ? parseInt(id) : 0,
             title: '',
             file: null,
+            expires_date: null,
         });
         setFormErrors({});
         setEditingDocument(null);
@@ -189,6 +191,7 @@ export default function DocumentsTab({ activeTab }: DocumentsTabProps) {
             vehicle_id: document.vehicle_id,
             title: document.title,
             file: null,
+            expires_date: document.expires_date ? document.expires_date.split('T')[0] : null,
         });
         setFormErrors({});
         closeUploadModal();
@@ -352,15 +355,18 @@ export default function DocumentsTab({ activeTab }: DocumentsTabProps) {
         return null;
     }
 
+    const downloadDocument = (document: Document) => {
+        window.open(document.file_path || '', '_blank');
+    };
+
     return (
         <>
-            <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
-                <div className="px-4 py-4 sm:px-6 border-b border-gray-200 flex justify-between items-center">
-                    <h3 className="text-lg font-semibold text-gray-900">Documents</h3>
+            <div className="overflow-hidden rounded-xl">
+             { documents.length > 0 && <div className="flex justify-end items-center">
                     <Button size="sm" variant="primary" onClick={handleOpenUploadModal}>
                         Upload Document
                     </Button>
-                </div>
+                </div>}
 
                 <div className="p-4 sm:p-6">
                     {loadingDocuments ? (
@@ -371,7 +377,7 @@ export default function DocumentsTab({ activeTab }: DocumentsTabProps) {
                             </div>
                         </div>
                     ) : documents.length === 0 ? (
-                        <div className="flex items-center justify-center py-12">
+                        <div className="flex items-center justify-center py-6">
                             <div className="text-center">
                                 <FileIcon className="w-12 h-12 text-gray-400 mx-auto mb-4" />
                                 <p className="text-gray-600">No documents found</p>
@@ -387,7 +393,7 @@ export default function DocumentsTab({ activeTab }: DocumentsTabProps) {
                         </div>
                     ) : (
                         <>
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <div className="flex flex-col gap-4">
                                 {documents.map((document) => (
                                     <div
                                         key={document.id}
@@ -397,27 +403,40 @@ export default function DocumentsTab({ activeTab }: DocumentsTabProps) {
                                             <div className="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center shrink-0">
                                                 <FileIcon className="w-5 h-5 text-purple-600" />
                                             </div>
-                                            <div className="flex-1 min-w-0">
+                                            <div className="flex w-full">
+                                                <div className='w-full'>
                                                 <h4 className="font-semibold text-gray-800 text-sm mb-1 truncate">
                                                     {document.title}
                                                 </h4>
                                                 <p className="text-xs text-gray-500 mb-2">
                                                     Uploaded: {formatDate(document.created_at || null)}
                                                 </p>
-                                                <div className="flex items-center justify-between mt-3">
+                                                </div>
+                                                <div className='w-full'>
+                                                <div className="flex items-center justify-end">
                                                     <div className="flex gap-2">
+
+                                                        <button
+                                                            onClick={() => downloadDocument(document)}
+                                                            className=" text-gray-600 hover:text-gray-900 hover:bg-gray-200 rounded transition-colors"
+                                                            title="Edit"
+                                                        >
+                                                            <ExportIcon />
+                                                        </button>
+
                                                         <button
                                                             onClick={() => handleOpenEditModal(document)}
-                                                            className="p-1.5 text-gray-600 hover:text-gray-900 hover:bg-gray-200 rounded transition-colors"
+                                                            className=" text-gray-600 hover:text-gray-900 hover:bg-gray-200 rounded transition-colors"
                                                             title="Edit"
                                                         >
                                                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                                             </svg>
                                                         </button>
+
                                                         <button
                                                             onClick={() => handleDelete(document.id)}
-                                                            className="p-1.5 text-red-600 hover:text-red-900 hover:bg-red-50 rounded transition-colors"
+                                                            className="text-red-600 hover:text-red-900 hover:bg-red-50 rounded transition-colors"
                                                             title="Delete"
                                                         >
                                                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -425,7 +444,17 @@ export default function DocumentsTab({ activeTab }: DocumentsTabProps) {
                                                             </svg>
                                                         </button>
                                                     </div>
+                                                </div>    
+                                                {document.expires_date && (
+                                                    <div className="text-right mt-1">
+                                                        <p className="text-xs text-gray-500">Expires</p>
+                                                        <p className="text-sm font-semibold text-gray-800">
+                                                            {formatDate(document.expires_date)}
+                                                        </p>
+                                                    </div>
+                                                )}
                                                 </div>
+                                                
                                             </div>
                                         </div>
                                     </div>
@@ -461,6 +490,17 @@ export default function DocumentsTab({ activeTab }: DocumentsTabProps) {
                             {formErrors.title && (
                                 <p className="mt-1 text-sm text-red-600">{formErrors.title}</p>
                             )}
+                        </div>
+
+                        <div>
+                            <Label htmlFor="expires_date">Expires Date</Label>
+                            <input
+                                type="date"
+                                id="expires_date"
+                                value={formData.expires_date || ''}
+                                onChange={(e) => handleInputChange('expires_date', e.target.value || null)}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent"
+                            />
                         </div>
 
                         <div>

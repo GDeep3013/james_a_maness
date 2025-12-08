@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('file_path');
             $table->string('file_name');
             $table->string('file_type')->nullable();
+            $table->date('expires_date')->nullable();
             $table->timestamps();
 
             $table->foreign('vehicle_id')->references('id')->on('vehicals')->onDelete('cascade');

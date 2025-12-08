@@ -46,6 +46,9 @@ export interface Service {
   parts?: Part[];
   created_at?: string;
   updated_at?: string;
+  last_completed_date?: string;
+  last_completed_meter?: string | number;
+  next_due_meter?: string | number;
   vehicle?: Vehicle;
   vendor?: Vendor;
 }

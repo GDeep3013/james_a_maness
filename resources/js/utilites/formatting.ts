@@ -197,3 +197,98 @@ export const formatVehicleIdentifier = (type: string | null | undefined, id: num
     return `${typePrefix}-${String(id).padStart(3, '0')}`;
 };
 
+export const calculateServiceStatus = (
+    primaryMeter: string | number | null | undefined,
+    currentMileage: string | number | null | undefined
+): string => {
+
+    if (!primaryMeter || currentMileage === null || currentMileage === undefined) {
+        return 'Due';
+    }
+
+    const currentMileageNum = typeof currentMileage === 'string' ? parseFloat(currentMileage) : currentMileage;
+    const intervalValueNum = typeof primaryMeter === 'string' ? parseFloat(primaryMeter) : primaryMeter as number;
+
+    if (isNaN(currentMileageNum) || isNaN(intervalValueNum)) {
+        return 'Due';
+    }
+
+    if (currentMileageNum >= (intervalValueNum-100) && currentMileageNum < (intervalValueNum + 100)) {
+        return 'Due Soon';
+    }
+
+    if (currentMileageNum >= intervalValueNum+200) {
+        return 'Over Due';
+    }
+
+    return 'Due';
+};
+
+export const getServiceReminderStatusBadgeColor = (
+    status: string | null | undefined
+): 'success' | 'warning' | 'error' | 'info' => {
+    if (!status) return 'info';
+    const statusLower = status.toLowerCase();
+    
+    if (statusLower === 'over due' || statusLower === 'overdue') {
+        return 'error';
+    }
+    if (statusLower === 'service due') {
+        return 'warning';
+    }
+    if (statusLower === 'due soon') {
+        return 'warning';
+    }
+    if (statusLower === 'due') {
+        return 'success';
+    }
+    return 'info';
+};
+
+export const formatNextDue = (nextDueDate: string | null | undefined): string => {  
+    let timeText = '';
+
+
+    if (nextDueDate) {
+        try {
+            const dueDate = new Date(nextDueDate);
+            const now = new Date();
+            const diffTime = dueDate.getTime() - now.getTime();
+            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+            const diffMonths = Math.floor(diffDays / 30);
+            const diffYears = Math.floor(diffDays / 365);
+
+            if (Math.abs(diffDays) < 30) {
+                if (diffDays === 0) {
+                    timeText = 'today';
+                } else if (diffDays === 1) {
+                    timeText = 'tomorrow';
+                } else if (diffDays === -1) {
+                    timeText = 'yesterday';
+                } else if (diffDays > 0) {
+                    timeText = `${diffDays} ${diffDays === 1 ? 'day' : 'days'} from now`;
+                } else {
+                    timeText = `${Math.abs(diffDays)} ${Math.abs(diffDays) === 1 ? 'day' : 'days'} ago`;
+                }
+            } else if (Math.abs(diffDays) < 365) {
+                if (diffMonths > 0) {
+                    timeText = `${diffMonths} ${diffMonths === 1 ? 'month' : 'months'} from now`;
+                } else {
+                    timeText = `${Math.abs(diffMonths)} ${Math.abs(diffMonths) === 1 ? 'month' : 'months'} ago`;
+                }
+            } else {
+                if (diffYears > 0) {
+                    timeText = `${diffYears} ${diffYears === 1 ? 'year' : 'years'} from now`;
+                } else {
+                    timeText = `${Math.abs(diffYears)} ${Math.abs(diffYears) === 1 ? 'year' : 'years'} ago`;
+                }
+            }
+        } catch(error) {
+            console.error(error);
+            timeText = '';
+        }
+    }
+
+    return timeText ;
+};
+

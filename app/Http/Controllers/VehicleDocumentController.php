@@ -45,6 +45,7 @@ class VehicleDocumentController extends Controller
                 'vehicle_id' => 'required|exists:vehicals,id',
                 'title' => 'required|string|max:255',
                 'file' => 'required|mimes:pdf,doc,docx,xls,xlsx,jpg,jpeg,png,gif,webp|max:10240',
+                'expires_date' => 'nullable|date',
             ]);
 
             $vehicle = Vehical::find($validatedData['vehicle_id']);
@@ -70,6 +71,7 @@ class VehicleDocumentController extends Controller
                 $document->file_path = $filePath;
                 $document->file_name = $fileName;
                 $document->file_type = $file->getClientOriginalExtension();
+                $document->expires_date = $request->expires_date ?? null;
 
                 if ($document->save()) {
                     return response()->json([
@@ -127,6 +129,7 @@ class VehicleDocumentController extends Controller
             $validatedData = $request->validate([
                 'title' => 'required|string|max:255',
                 'file' => 'nullable|mimes:pdf,doc,docx,xls,xlsx,jpg,jpeg,png,gif,webp|max:10240',
+                'expires_date' => 'nullable|date',
             ]);
 
             $oldFileName = $document->file_name;
@@ -151,6 +154,7 @@ class VehicleDocumentController extends Controller
             }
 
             $document->title = $validatedData['title'];
+            $document->expires_date = $request->expires_date ?? null;
 
             if ($document->save()) {
                 return response()->json([

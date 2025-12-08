@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use App\Traits\HasTimeLine;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Testing\Fluent\Concerns\Has;
 
 class Fuel extends Model
 {
-    use HasFactory;
+    use HasFactory, HasTimeLine;
 
     protected $table = 'fuels';
 
@@ -21,6 +23,7 @@ class Fuel extends Model
         'price_per_volume_unit',
         'total_cost',
         'vehicle_meter',
+        'previous_meter',
         'notes',
         'date',
     ];
