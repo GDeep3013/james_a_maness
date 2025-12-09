@@ -3,7 +3,6 @@ import Chart from "react-apexcharts";
 import { ApexOptions } from "apexcharts";
 import api from '../../services/api';
 import Select from '../form/Select';
-import { vehicleService } from '../../services/vehicleService';
 
 interface MonthlyPerformanceData {
     month: number;
@@ -15,19 +14,11 @@ interface FleetPerformanceResponse {
     status: boolean;
     data: MonthlyPerformanceData[];
     year: number;
-    vehicle_id: number;
-}
-
-interface Vehicle {
-    id: number;
-    vehicle_name: string;
 }
 
 export default function FleetPerformanceChart() {
     const [loading, setLoading] = useState(true);
     const [monthlyData, setMonthlyData] = useState<MonthlyPerformanceData[]>([]);
-    const [vehicles, setVehicles] = useState<Vehicle[]>([]);
-    const [selectedVehicleId, setSelectedVehicleId] = useState<string>("");
     const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
 
     const availableYears = useMemo(() => {
@@ -42,29 +33,11 @@ export default function FleetPerformanceChart() {
         return years;
     }, []);
 
-    const fetchVehicles = useCallback(async () => {
-        try {
-            const response = await vehicleService.getAll({ page: 1 });
-            if (response.data?.status && response.data?.vehical?.data) {
-                const vehiclesList = response.data.vehical.data;
-                setVehicles(vehiclesList);
-                if (vehiclesList.length > 0 && !selectedVehicleId) {
-                    setSelectedVehicleId(vehiclesList[0].id.toString());
-                }
-            }
-        } catch (error) {
-            console.error('Error fetching vehicles:', error);
-        }
-    }, [selectedVehicleId]);
-
     const fetchFleetPerformance = useCallback(async () => {
-        if (!selectedVehicleId) return;
-
         setLoading(true);
         try {
             const response = await api.get<FleetPerformanceResponse>('/get-fleet-performance', {
                 params: {
-                    vehicle_id: selectedVehicleId,
                     year: currentYear
                 }
             });
@@ -77,24 +50,12 @@ export default function FleetPerformanceChart() {
         } finally {
             setLoading(false);
         }
-    }, [selectedVehicleId, currentYear]);
+    }, [currentYear]);
 
     useEffect(() => {
-        fetchVehicles();
-    }, [fetchVehicles]);
+        fetchFleetPerformance();
+    }, [fetchFleetPerformance]);
 
-    useEffect(() => {
-        if (selectedVehicleId) {
-            fetchFleetPerformance();
-        }
-    }, [selectedVehicleId, fetchFleetPerformance]);
-
-    const vehicleOptions = useMemo(() => {
-        return vehicles.map((vehicle) => ({
-            value: vehicle.id.toString(),
-            label: vehicle.vehicle_name,
-        }));
-    }, [vehicles]);
     const issuesData = useMemo(() => {
         return monthlyData.map(item => item.issues_count);
     }, [monthlyData]);
@@ -207,7 +168,7 @@ export default function FleetPerformanceChart() {
         },
     ];
     return (
-        <div className="rounded-2xl border border-gray-200 bg-white px-5 pb-5 pt-5 dark:border-gray-800 dark:bg-white/[0.03] sm:px-6 sm:pt-6 min-h-[422px]">
+        <div className="rounded-2xl border border-gray-200 bg-white px-5 pb-5 pt-5 dark:border-gray-800 sm:px-6 sm:pt-6 min-h-[422px]">
             <div className="flex flex-col gap-5 mb-2 sm:flex-row sm:justify-between">
 
                     <h3 className="text-base font-semibold text-gray-800 mb-2">
@@ -215,16 +176,6 @@ export default function FleetPerformanceChart() {
                     </h3>
 
                     <div className="flex flex-col sm:flex-row gap-2 justify-end">
-                            <div className="">
-                            <Select
-                            variant="outline"
-                                options={vehicleOptions}
-                                placeholder="Select Vehicle"
-                                onChange={(value) => setSelectedVehicleId(value)}
-                                defaultValue={selectedVehicleId}
-                            />
-                        </div>
-
                         <div className="">
                             <Select
                                 variant="outline"
@@ -249,12 +200,6 @@ export default function FleetPerformanceChart() {
                                     Loading chart data...
                                 </p>
                             </div>
-                        </div>
-                    ) : !selectedVehicleId ? (
-                        <div className="flex items-center justify-center h-[310px]">
-                            <p className="text-sm text-gray-600 dark:text-gray-400">
-                                Please select a vehicle to view performance data
-                            </p>
                         </div>
                     ) : (
                         <Chart options={options} series={series} type="area" height={310} />
