@@ -12,6 +12,11 @@ Route::middleware(['guest'])->group(function () {
     Auth::routes(['register' => false ]);
 });
 
+
+Route::get('/invoice/MMR_Report', function(){
+    return view('invoice.MMR_Report');
+});
+
 Route::middleware(['auth','page.access'])->group(function () {
 
     Route::get('/logout', [LoginController::class, 'logout']);
@@ -117,6 +122,10 @@ Route::middleware(['auth','page.access'])->group(function () {
 
     // Reports
     Route::get('/reports', [HomeController::class, 'index']);
+    Route::get('/reports/mmr', [HomeController::class, 'index']);
+    Route::get('/reports/mmr/create', [HomeController::class, 'index']);
+    Route::get('/reports/mmr/{id}', [HomeController::class, 'index'])->where('id', '[0-9]+');
+    Route::get('/reports/mmr/{id}/edit', [HomeController::class, 'index'])->where('id', '[0-9]+');
     Route::get('/reports/monthly-maintenance', [HomeController::class, 'index']);
     Route::get('/reports/maintenance', [HomeController::class, 'index']);
     Route::get('/reports/fuel', [HomeController::class, 'index']);
@@ -128,4 +137,7 @@ Route::middleware(['auth','page.access'])->group(function () {
     Route::get('/timeline/vehicle/{vehicleId}', [TimeLineController::class, 'vehicle'])->name('timeline.vehicle');
     Route::get('/timeline/module/{moduleName}', [TimeLineController::class, 'module'])->name('timeline.module');
     Route::get('/timeline/{timeLine}', [TimeLineController::class, 'show'])->name('timeline.show');
+
 });
+
+

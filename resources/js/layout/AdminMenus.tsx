@@ -77,7 +77,7 @@ export const AdminMenus : NavItem[] = [
         name: "Reports",
         allowedRoles: ["Admin", "Manager"],
         subItems: [
-          { name: "Monthly Maintenance Reports (MMR)", path: "/reports/monthly-maintenance", pro: false, allowedRoles: ["Admin", "Manager"] },
+          { name: "Monthly Maintenance Reports (MMR)", path: "/reports/mmr", pro: false, allowedRoles: ["Admin", "Manager"] },
           { name: "Maintenance Report", path: "/reports/maintenance", pro: false, allowedRoles: ["Admin", "Manager"] },
           { name: "Fuel Report", path: "/reports/fuel", pro: false, allowedRoles: ["Admin", "Manager"] },
         ],

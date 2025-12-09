@@ -2,45 +2,26 @@ import React, { useState, useEffect, useMemo, useCallback } from "react";
 import Chart from "react-apexcharts";
 import { ApexOptions } from "apexcharts";
 import api from '../../services/api';
-import Select from '../form/Select';
 
 interface MonthlyPerformanceData {
     month: number;
-    issues_count: number;
-    work_orders_count: number;
+    inactive_count: number;
+    available_count: number;
 }
 
 interface FleetPerformanceResponse {
     status: boolean;
     data: MonthlyPerformanceData[];
-    year: number;
 }
 
 export default function FleetPerformanceChart() {
     const [loading, setLoading] = useState(true);
     const [monthlyData, setMonthlyData] = useState<MonthlyPerformanceData[]>([]);
-    const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
-
-    const availableYears = useMemo(() => {
-        const currentYear = new Date().getFullYear();
-        const years = [];
-        for (let i = 0; i < 10; i++) {
-            years.push({
-                value: (currentYear - i).toString(),
-                label: (currentYear - i).toString(),
-            });
-        }
-        return years;
-    }, []);
 
     const fetchFleetPerformance = useCallback(async () => {
         setLoading(true);
         try {
-            const response = await api.get<FleetPerformanceResponse>('/get-fleet-performance', {
-                params: {
-                    year: currentYear
-                }
-            });
+            const response = await api.get<FleetPerformanceResponse>('/get-fleet-performance');
 
             if (response.data.status && response.data.data) {
                 setMonthlyData(response.data.data);
@@ -50,18 +31,18 @@ export default function FleetPerformanceChart() {
         } finally {
             setLoading(false);
         }
-    }, [currentYear]);
+    }, []);
 
     useEffect(() => {
         fetchFleetPerformance();
     }, [fetchFleetPerformance]);
 
-    const issuesData = useMemo(() => {
-        return monthlyData.map(item => item.issues_count);
+    const inactiveData = useMemo(() => {
+        return monthlyData.map(item => item.inactive_count);
     }, [monthlyData]);
 
-    const workOrdersData = useMemo(() => {
-        return monthlyData.map(item => item.work_orders_count);
+    const availableData = useMemo(() => {
+        return monthlyData.map(item => item.available_count);
     }, [monthlyData]);
 
     const options: ApexOptions = {
@@ -69,7 +50,7 @@ export default function FleetPerformanceChart() {
             position: "top",
             horizontalAlign: "right",
         },
-        colors: ["#EB5757", "#3C247D"],
+        colors: ["#EB5757", "#10B981"],
         chart: {
             fontFamily: "Outfit, sans-serif",
             height: 310,
@@ -159,35 +140,20 @@ export default function FleetPerformanceChart() {
 
     const series = [
         {
-            name: "Issues",
-            data: issuesData,
+            name: "Inactive (In Maintenance)",
+            data: inactiveData,
         },
         {
-            name: "Work Orders",
-            data: workOrdersData,
+            name: "Available",
+            data: availableData,
         },
     ];
     return (
         <div className="rounded-2xl border border-gray-200 bg-white px-5 pb-5 pt-5 dark:border-gray-800 sm:px-6 sm:pt-6 min-h-[422px]">
             <div className="flex flex-col gap-5 mb-2 sm:flex-row sm:justify-between">
-
-                    <h3 className="text-base font-semibold text-gray-800 mb-2">
-                        Fleet Management
-                    </h3>
-
-                    <div className="flex flex-col sm:flex-row gap-2 justify-end">
-                        <div className="">
-                            <Select
-                                variant="outline"
-                                options={availableYears}
-                                placeholder="Select Year"
-                                onChange={(value) => setCurrentYear(parseInt(value))}
-                                defaultValue={currentYear.toString()}
-                            />
-                        </div>
-                    </div>
-
-
+                <h3 className="text-base font-semibold text-gray-800 mb-2">
+                    Fleet Management
+                </h3>
             </div>
 
             <div className="max-w-full overflow-x-auto custom-scrollbar">

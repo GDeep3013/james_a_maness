@@ -1,15 +1,214 @@
-import React from "react";
-import PageMeta from "../../components/common/PageMeta";
+import React, { useState, useEffect } from "react";
+import PageMeta from "../../../components/common/PageMeta";
+import { vehicleService } from "../../../services/vehicleService";
+import { mmrReportService } from "../../../services/mmrReportService";
+import Button from "../../../components/ui/button/Button";
+
+interface Vehicle {
+  id: number;
+  vehicle_name: string;
+  current_mileage?: string | number;
+}
+
+interface VehiclesResponse {
+  status: boolean;
+  vehical: Vehicle[] | {
+    data: Vehicle[];
+    current_page: number;
+    last_page: number;
+    per_page: number;
+    total: number;
+  };
+}
 
 export default function MonthlyMaintenanceReport() {
-  const handleInputFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+  const [formData, setFormData] = useState({
+    date: "",
+    domicile_station: "",
+    provider_company_name: "",
+    current_mileage: "",
+    vehicle_id: "",
+    preventative_maintenance: null as boolean | null,
+    out_of_service: null as boolean | null,
+    signature: "",
+    completed_date: "",
+  });
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [generalError, setGeneralError] = useState<string>("");
+  const [successMessage, setSuccessMessage] = useState<string>("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    const fetchVehicles = async () => {
+      try {
+        const response = await vehicleService.getAll();
+        const data = response.data as VehiclesResponse;
+        
+        if (data.status && data.vehical) {
+          if (Array.isArray(data.vehical)) {
+            setVehicles(data.vehical);
+          } else {
+            setVehicles(data.vehical.data || []);
+          }
+        }
+      } catch {
+        setVehicles([]);
+      }
+    };
+
+    fetchVehicles();
+  }, []);
+
+  const handleInputFocus = (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement>) => {
     e.target.style.backgroundColor = "transparent";
     e.target.style.outline = "none";
     e.target.style.boxShadow = "none";
   };
 
-  const handleInputBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+  const handleInputBlur = (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement>) => {
     e.target.style.backgroundColor = "#f1f4ff";
+  };
+
+  const handleVehicleChange = async (vehicleId: string) => {
+    setFormData({ ...formData, vehicle_id: vehicleId });
+    
+    if (vehicleId) {
+      const selectedVehicleData = vehicles.find((v) => v.id === Number(vehicleId));
+      
+      if (selectedVehicleData?.current_mileage) {
+        setFormData({ ...formData, vehicle_id: vehicleId, current_mileage: String(selectedVehicleData.current_mileage) });
+      } else {
+        try {
+          const response = await vehicleService.getById(Number(vehicleId));
+          const vehicleData = response.data as { status: boolean; vehicle?: Vehicle };
+          
+          if (vehicleData.status && vehicleData.vehicle?.current_mileage) {
+            setFormData({ ...formData, vehicle_id: vehicleId, current_mileage: String(vehicleData.vehicle.current_mileage) });
+          } else {
+            setFormData({ ...formData, vehicle_id: vehicleId, current_mileage: "" });
+          }
+        } catch {
+          setFormData({ ...formData, vehicle_id: vehicleId, current_mileage: "" });
+        }
+      }
+    } else {
+      setFormData({ ...formData, vehicle_id: "", current_mileage: "" });
+    }
+  };
+
+  const handleInputChange = (field: string, value: string | boolean | null) => {
+    setFormData({ ...formData, [field]: value });
+    if (errors[field]) {
+      setErrors({ ...errors, [field]: "" });
+    }
+  };
+
+  const validateForm = () => {
+    const newErrors: Record<string, string> = {};
+
+    if (!formData.date) {
+      newErrors.date = "Date is required";
+    }
+
+    if (!formData.vehicle_id) {
+      newErrors.vehicle_id = "Vehicle is required";
+    }
+
+    if (!formData.domicile_station || formData.domicile_station.trim() === "") {
+      newErrors.domicile_station = "Domicile Station/Hub is required";
+    }
+
+    if (!formData.provider_company_name || formData.provider_company_name.trim() === "") {
+      newErrors.provider_company_name = "Service Provider Company Name is required";
+    }
+
+    if (!formData.completed_date) {
+      newErrors.completed_date = "Date Completed is required";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setGeneralError("");
+    setSuccessMessage("");
+    setErrors({});
+
+    if (!validateForm()) {
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const submitData = {
+        date: formData.date,
+        domicile_station: formData.domicile_station,
+        provider_company_name: formData.provider_company_name,
+        current_mileage: formData.current_mileage || undefined,
+        vehicle_id: Number(formData.vehicle_id),
+        preventative_maintenance: formData.preventative_maintenance ?? undefined,
+        out_of_service: formData.out_of_service ?? undefined,
+        signature: formData.signature || undefined,
+        completed_date: formData.completed_date,
+      };
+
+      const response = await mmrReportService.create(submitData);
+
+      if (response.data?.status === true || response.status === 200 || response.status === 201) {
+        setSuccessMessage("MMR report saved successfully!");
+        setFormData({
+          date: "",
+          domicile_station: "",
+          provider_company_name: "",
+          current_mileage: "",
+          vehicle_id: "",
+          preventative_maintenance: null,
+          out_of_service: null,
+          signature: "",
+          completed_date: "",
+        });
+      } else {
+        setGeneralError(response.data?.message || "Failed to save MMR report. Please try again.");
+      }
+    } catch (error: unknown) {
+      if (error && typeof error === "object" && "response" in error) {
+        const axiosError = error as {
+          response?: {
+            status?: number;
+            data?: {
+              message?: string;
+              errors?: Record<string, string[]>;
+              error?: string;
+            };
+          };
+        };
+
+        if (axiosError.response?.data?.errors) {
+          const validationErrors: Record<string, string> = {};
+          Object.keys(axiosError.response.data.errors).forEach((key) => {
+            const errorMessages = axiosError.response?.data?.errors?.[key];
+            if (errorMessages && errorMessages.length > 0) {
+              validationErrors[key] = errorMessages[0];
+            }
+          });
+          setErrors(validationErrors);
+        } else {
+          setGeneralError(
+            axiosError.response?.data?.message ||
+            axiosError.response?.data?.error ||
+            "An error occurred while saving the MMR report. Please try again."
+          );
+        }
+      } else {
+        setGeneralError("Network error. Please check your connection and try again.");
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -25,8 +224,14 @@ export default function MonthlyMaintenanceReport() {
           </h2>
         </div>
 
-        <div className="">
+        <div className="w-full max-w-5xl mx-auto border border-gray-200 rounded-xl p-6">
+          {(generalError || successMessage) && (
+            <div className={`mb-4 p-4 rounded-lg ${generalError ? 'bg-red-50 border border-red-200 text-red-700' : 'bg-green-50 border border-green-200 text-green-700'}`}>
+              {generalError || successMessage}
+            </div>
+          )}
           <div id="mmr-form-container" style={{ width: "100%", fontFamily: "Arial, sans-serif" }}>
+            <form onSubmit={handleSubmit}>
             <table style={{ width: "100%", borderCollapse: "collapse", margin: "0 auto" }} cellPadding="0" cellSpacing="0">
               <tbody>
                 <tr>
@@ -61,27 +266,77 @@ export default function MonthlyMaintenanceReport() {
                         <tr>
                           <td style={{ fontSize: "12px", padding: "8px 20px 8px 8px", verticalAlign: "top", width: "35%" }}>
                             <span style={{ fontWeight: "bold", paddingLeft: "10px", paddingBottom: "5px", fontSize: "14px" }}>Maintenance Record for the Month and Year of:</span>
-                            <input type="text" style={{ width: "100%", backgroundColor: "#f1f4ff", border: "1px solid #000", padding: "5px", fontSize: "12px", minHeight: "25px", boxSizing: "border-box", outline: "none" }} onFocus={handleInputFocus} onBlur={handleInputBlur} autoComplete="off" />
+                            <input 
+                              type="month" 
+                              value={formData.date}
+                              onChange={(e) => handleInputChange("date", e.target.value)}
+                              style={{ width: "100%", backgroundColor: errors.date ? "#fee" : "#f1f4ff", border: errors.date ? "1px solid #f00" : "1px solid #000", padding: "5px", fontSize: "12px", minHeight: "25px", boxSizing: "border-box", outline: "none" }} 
+                              onFocus={handleInputFocus} 
+                              onBlur={handleInputBlur} 
+                              autoComplete="off" 
+                            />
+                            {errors.date && <div style={{ color: "#f00", fontSize: "11px", paddingTop: "2px" }}>{errors.date}</div>}
                           </td>
                           <td style={{ fontSize: "12px", padding: "8px 5px 8px 20px", verticalAlign: "top", width: "35%" }}>
-                            <span style={{ fontWeight: "bold", paddingLeft: "10px", paddingBottom: "5px", fontSize: "14px" }}>Domicile Station/Hub:</span>
-                            <input type="text" style={{ width: "100%", backgroundColor: "#f1f4ff", border: "1px solid #000", padding: "5px", fontSize: "12px", minHeight: "25px", boxSizing: "border-box", outline: "none" }} onFocus={handleInputFocus} onBlur={handleInputBlur} autoComplete="off" />
+                            <span style={{ fontWeight: "bold", paddingLeft: "10px", paddingBottom: "5px", fontSize: "14px" }}>Domicile Station/Hub: <span style={{ color: "#f00" }}>*</span></span>
+                            <input 
+                              type="text" 
+                              value={formData.domicile_station}
+                              onChange={(e) => handleInputChange("domicile_station", e.target.value)}
+                              style={{ width: "100%", backgroundColor: errors.domicile_station ? "#fee" : "#f1f4ff", border: errors.domicile_station ? "1px solid #f00" : "1px solid #000", padding: "5px", fontSize: "12px", minHeight: "25px", boxSizing: "border-box", outline: "none" }} 
+                              onFocus={handleInputFocus} 
+                              onBlur={handleInputBlur} 
+                              autoComplete="off" 
+                            />
+                            {errors.domicile_station && <div style={{ color: "#f00", fontSize: "11px", paddingTop: "2px" }}>{errors.domicile_station}</div>}
                           </td>
                         </tr>
                         <tr>
                           <td style={{ fontSize: "12px", padding: "8px 20px 8px 8px", verticalAlign: "top", width: "35%" }}>
-                            <span style={{ fontWeight: "bold", paddingLeft: "10px", paddingBottom: "5px", fontSize: "14px" }}>Service Provider Company Name:</span>
-                            <input type="text" style={{ width: "100%", backgroundColor: "#f1f4ff", border: "1px solid #000", padding: "5px", fontSize: "12px", minHeight: "25px", boxSizing: "border-box", outline: "none" }} onFocus={handleInputFocus} onBlur={handleInputBlur} autoComplete="off" />
+                            <span style={{ fontWeight: "bold", paddingLeft: "10px", paddingBottom: "5px", fontSize: "14px" }}>Service Provider Company Name: <span style={{ color: "#f00" }}>*</span></span>
+                            <input 
+                              type="text" 
+                              value={formData.provider_company_name}
+                              onChange={(e) => handleInputChange("provider_company_name", e.target.value)}
+                              style={{ width: "100%", backgroundColor: errors.provider_company_name ? "#fee" : "#f1f4ff", border: errors.provider_company_name ? "1px solid #f00" : "1px solid #000", padding: "5px", fontSize: "12px", minHeight: "25px", boxSizing: "border-box", outline: "none" }} 
+                              onFocus={handleInputFocus} 
+                              onBlur={handleInputBlur} 
+                              autoComplete="off" 
+                            />
+                            {errors.provider_company_name && <div style={{ color: "#f00", fontSize: "11px", paddingTop: "2px" }}>{errors.provider_company_name}</div>}
                           </td>
                           <td style={{ fontSize: "12px", padding: "8px 5px 8px 20px", verticalAlign: "top", width: "35%" }}>
                             <span style={{ fontWeight: "bold", paddingLeft: "10px", paddingBottom: "5px", fontSize: "14px" }}>Current Mileage* (Odometer Reading)</span>
-                            <input type="text" style={{ width: "100%", backgroundColor: "#f1f4ff", border: "1px solid #000", padding: "5px", fontSize: "12px", minHeight: "25px", boxSizing: "border-box", outline: "none" }} onFocus={handleInputFocus} onBlur={handleInputBlur} autoComplete="off" />
+                            <input 
+                              type="text" 
+                              value={formData.current_mileage}
+                              onChange={(e) => handleInputChange("current_mileage", e.target.value)}
+                              style={{ width: "100%", backgroundColor: errors.current_mileage ? "#fee" : "#f1f4ff", border: errors.current_mileage ? "1px solid #f00" : "1px solid #000", padding: "5px", fontSize: "12px", minHeight: "25px", boxSizing: "border-box", outline: "none" }} 
+                              onFocus={handleInputFocus} 
+                              onBlur={handleInputBlur} 
+                              autoComplete="off" 
+                            />
+                            {errors.current_mileage && <div style={{ color: "#f00", fontSize: "11px", paddingTop: "2px" }}>{errors.current_mileage}</div>}
                           </td>
                         </tr>
                         <tr>
                           <td style={{ fontSize: "12px", padding: "8px 20px 8px 8px", verticalAlign: "top", width: "35%" }}>
                             <span style={{ fontWeight: "bold", paddingLeft: "10px", paddingBottom: "5px", fontSize: "14px" }}>Vehicle Unit #:</span>
-                            <input type="text" style={{ width: "100%", backgroundColor: "#f1f4ff", border: "1px solid #000", padding: "5px", fontSize: "12px", minHeight: "25px", boxSizing: "border-box", outline: "none" }} onFocus={handleInputFocus} onBlur={handleInputBlur} autoComplete="off" />
+                            <select 
+                              value={formData.vehicle_id}
+                              onChange={(e) => handleVehicleChange(e.target.value)}
+                              style={{ width: "100%", backgroundColor: errors.vehicle_id ? "#fee" : "#f1f4ff", border: errors.vehicle_id ? "1px solid #f00" : "1px solid #000", padding: "5px", fontSize: "12px", minHeight: "25px", boxSizing: "border-box", outline: "none" }} 
+                              onFocus={handleInputFocus} 
+                              onBlur={handleInputBlur}
+                            >
+                              <option value="">Select Vehicle</option>
+                              {vehicles.map((vehicle) => (
+                                <option key={vehicle.id} value={vehicle.id}>
+                                  {vehicle.vehicle_name}
+                                </option>
+                              ))}
+                            </select>
+                            {errors.vehicle_id && <div style={{ color: "#f00", fontSize: "11px", paddingTop: "2px" }}>{errors.vehicle_id}</div>}
                           </td>
                           <td style={{ fontSize: "12px", padding: "8px 5px 8px 20px", verticalAlign: "top", width: "35%" }}>
                             <p>*If reading has decreased due to odometer repair/replacement, proof
@@ -107,11 +362,23 @@ export default function MonthlyMaintenanceReport() {
                               <tbody>
                                 <tr>
                                   <td style={{ padding: "0 10px 0 0", fontSize: "12px" }}>
-                                    <input type="checkbox" style={{ marginRight: "5px", backgroundColor: "#f1f4ff", width: "23px", height: "23px", border: "1px solid #000", verticalAlign: "middle", accentColor: "#f1f4ff" }} />
+                                    <input 
+                                      type="radio" 
+                                      name="preventative_maintenance"
+                                      checked={formData.preventative_maintenance === true}
+                                      onChange={() => handleInputChange("preventative_maintenance", true)}
+                                      style={{ marginRight: "5px", backgroundColor: "#f1f4ff", width: "23px", height: "23px", border: "1px solid #000", verticalAlign: "middle", accentColor: "#f1f4ff" }} 
+                                    />
                                     Yes
                                   </td>
                                   <td style={{ padding: "0", fontSize: "12px" }}>
-                                    <input type="checkbox" style={{ marginRight: "5px", backgroundColor: "#f1f4ff", width: "23px", height: "23px", border: "1px solid #000", verticalAlign: "middle", accentColor: "#f1f4ff" }} />
+                                    <input 
+                                      type="radio" 
+                                      name="preventative_maintenance"
+                                      checked={formData.preventative_maintenance === false}
+                                      onChange={() => handleInputChange("preventative_maintenance", false)}
+                                      style={{ marginRight: "5px", backgroundColor: "#f1f4ff", width: "23px", height: "23px", border: "1px solid #000", verticalAlign: "middle", accentColor: "#f1f4ff" }} 
+                                    />
                                     No
                                   </td>
                                 </tr>
@@ -128,11 +395,23 @@ export default function MonthlyMaintenanceReport() {
                               <tbody>
                                 <tr>
                                   <td style={{ padding: "0 10px 0 0", fontSize: "12px" }}>
-                                    <input type="checkbox" style={{ marginRight: "5px", backgroundColor: "#f1f4ff", width: "23px", height: "23px", border: "1px solid #000", verticalAlign: "middle", accentColor: "#f1f4ff" }} />
+                                    <input 
+                                      type="radio" 
+                                      name="out_of_service"
+                                      checked={formData.out_of_service === true}
+                                      onChange={() => handleInputChange("out_of_service", true)}
+                                      style={{ marginRight: "5px", backgroundColor: "#f1f4ff", width: "23px", height: "23px", border: "1px solid #000", verticalAlign: "middle", accentColor: "#f1f4ff" }} 
+                                    />
                                     Yes
                                   </td>
                                   <td style={{ padding: "0", fontSize: "12px" }}>
-                                    <input type="checkbox" style={{ marginRight: "5px", backgroundColor: "#f1f4ff", width: "23px", height: "23px", border: "1px solid #000", verticalAlign: "middle", accentColor: "#f1f4ff" }} />
+                                    <input 
+                                      type="radio" 
+                                      name="out_of_service"
+                                      checked={formData.out_of_service === false}
+                                      onChange={() => handleInputChange("out_of_service", false)}
+                                      style={{ marginRight: "5px", backgroundColor: "#f1f4ff", width: "23px", height: "23px", border: "1px solid #000", verticalAlign: "middle", accentColor: "#f1f4ff" }} 
+                                    />
                                     No
                                   </td>
                                 </tr>
@@ -261,11 +540,29 @@ export default function MonthlyMaintenanceReport() {
                                 <tr>
                                   <td style={{ fontSize: "12px", padding: "8px 20px 8px 8px", verticalAlign: "top", width: "50%" }}>
                                     <span style={{ fontWeight: "bold", paddingLeft: "10px", paddingBottom: "5px", fontSize: "14px" }}>Signature of Authorized Officer or Business Contact:</span>
-                                    <input type="text" style={{ width: "100%", border: "1px solid #000", padding: "5px", fontSize: "12px", minHeight: "25px", boxSizing: "border-box", outline: 'none', backgroundColor: '#f1f4ff' }} onFocus={handleInputFocus} onBlur={handleInputBlur} autoComplete="off" />
+                                    <input 
+                                      type="text" 
+                                      value={formData.signature}
+                                      onChange={(e) => handleInputChange("signature", e.target.value)}
+                                      style={{ width: "100%", border: errors.signature ? "1px solid #f00" : "1px solid #000", padding: "5px", fontSize: "12px", minHeight: "25px", boxSizing: "border-box", outline: 'none', backgroundColor: errors.signature ? '#fee' : '#f1f4ff' }} 
+                                      onFocus={handleInputFocus} 
+                                      onBlur={handleInputBlur} 
+                                      autoComplete="off" 
+                                    />
+                                    {errors.signature && <div style={{ color: "#f00", fontSize: "11px", paddingTop: "2px" }}>{errors.signature}</div>}
                                   </td>
                                   <td style={{ fontSize: "12px", padding: "8px 8px 8px 20px", verticalAlign: "top", width: "50%" }}>
-                                    <span style={{ fontWeight: "bold", paddingLeft: "10px", paddingBottom: "5px", fontSize: "14px" }}>Date Completed:</span>
-                                    <input type="text" style={{ width: "100%", border: "1px solid #000", padding: "5px", fontSize: "12px", minHeight: "25px", boxSizing: "border-box", outline: 'none', backgroundColor: '#f1f4ff' }} onFocus={handleInputFocus} onBlur={handleInputBlur} autoComplete="off" />
+                                    <span style={{ fontWeight: "bold", paddingLeft: "10px", paddingBottom: "5px", fontSize: "14px" }}>Date Completed: <span style={{ color: "#f00" }}>*</span></span>
+                                    <input 
+                                      type="date" 
+                                      value={formData.completed_date}
+                                      onChange={(e) => handleInputChange("completed_date", e.target.value)}
+                                      style={{ width: "100%", border: errors.completed_date ? "1px solid #f00" : "1px solid #000", padding: "5px", fontSize: "12px", minHeight: "25px", boxSizing: "border-box", outline: 'none', backgroundColor: errors.completed_date ? '#fee' : '#f1f4ff' }} 
+                                      onFocus={handleInputFocus} 
+                                      onBlur={handleInputBlur} 
+                                      autoComplete="off" 
+                                    />
+                                    {errors.completed_date && <div style={{ color: "#f00", fontSize: "11px", paddingTop: "2px" }}>{errors.completed_date}</div>}
                                   </td>
                                 </tr>
                               </tbody>
@@ -297,6 +594,18 @@ export default function MonthlyMaintenanceReport() {
                 </tr>
               </tbody>
             </table>
+            <div style={{ padding: "20px", textAlign: "right" }}>
+              <Button
+
+                type="submit"
+                size="sm"
+                disabled={isSubmitting}
+                className="px-6 py-2"
+              >
+                {isSubmitting ? "Saving..." : "Save MMR Report"}
+              </Button>
+            </div>
+            </form>
           </div>
         </div>
       </div>
