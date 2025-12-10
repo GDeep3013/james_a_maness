@@ -1,5 +1,4 @@
 import api from './api';
-
 interface MaintenanceData {
   user_id?: number;
   exp_type_id?: number;
@@ -37,7 +36,6 @@ export const maintenanceService = {
   },
 
   delete: (id: number) => api.delete(`/maintenances/${id}`),
-
   getForEdit: (id: number) => api.get(`/maintenances/${id}/edit`),
 };
 

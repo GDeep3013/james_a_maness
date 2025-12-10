@@ -74,5 +74,6 @@ class WorkOrder extends Model
     {
         return $this->hasMany(Issue::class, 'work_order_id', 'id');
     }
+
 }
 

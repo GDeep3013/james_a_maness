@@ -70,7 +70,7 @@ import { ReactComponent as PartsIcon } from "./parts.svg?react";
 import { ReactComponent as ReportsIcon } from "./reports.svg?react";
 import { ReactComponent as ContactsIcon } from "./contacts.svg?react";
 import { ReactComponent as ReopenIcon } from "./reopen.svg?react";
-
+import { ReactComponent as ServiceIcon } from "./service.svg?react";
 export {
   TickIcon,
   MaintenanceIcon,
@@ -143,5 +143,6 @@ export {
   CarIcon,
   SettingsIcon,
   IssuesIcon,
-  ReopenIcon
+  ReopenIcon,
+  ServiceIcon
 };

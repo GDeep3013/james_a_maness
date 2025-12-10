@@ -99,8 +99,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::apiResource('vendors', VendorController::class);
     Route::get('/vendors/{id}/edit', [VendorController::class, 'edit'])->where('id', '[0-9]+');
-   
-    
+
+
 
     Route::apiResource('parts', PartController::class);
     Route::get('/parts/{id}/edit', [PartController::class, 'edit'])->where('id', '[0-9]+');
