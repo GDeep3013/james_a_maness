@@ -22,11 +22,13 @@ interface WorkOrderData {
 }
 
 export const workOrderService = {
-    getAll: (params?: { search?: string; page?: number; status?: string }) => {
+    getAll: (params?: { search?: string; page?: number; status?: string; vehicle_id?: number; issue_date?: string }) => {
         const queryParams = new URLSearchParams();
         if (params?.search) queryParams.append('search', params.search);
         if (params?.page) queryParams.append('page', params.page.toString());
         if (params?.status) queryParams.append('status', params.status);
+        if (params?.vehicle_id) queryParams.append('vehicle_id', params.vehicle_id.toString());
+        if (params?.issue_date) queryParams.append('issue_date', params.issue_date);
         const queryString = queryParams.toString();
         return api.get(`/work-orders${queryString ? `?${queryString}` : ''}`);
     },

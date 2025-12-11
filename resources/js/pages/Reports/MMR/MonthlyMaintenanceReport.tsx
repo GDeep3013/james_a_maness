@@ -1,8 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
+import { useParams, useLocation, useNavigate } from "react-router";
 import PageMeta from "../../../components/common/PageMeta";
 import { vehicleService } from "../../../services/vehicleService";
 import { mmrReportService } from "../../../services/mmrReportService";
 import Button from "../../../components/ui/button/Button";
+import MMRTaskList from "./MMRTaskList";
+import { MMRReport, MaintenanceRecord } from "../../../types/MMRReportTypes";
+import { formatDate } from "../../../utilites/formatting";
 
 interface Vehicle {
   id: number;
@@ -22,6 +26,10 @@ interface VehiclesResponse {
 }
 
 export default function MonthlyMaintenanceReport() {
+  const { id } = useParams<{ id: string }>();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const isEditMode = location.pathname.includes('/edit');
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [formData, setFormData] = useState({
     date: "",
@@ -32,12 +40,16 @@ export default function MonthlyMaintenanceReport() {
     preventative_maintenance: null as boolean | null,
     out_of_service: null as boolean | null,
     signature: "",
+    declaration: null as boolean | null,
     completed_date: "",
+    maintenance_records: [] as MaintenanceRecord[],
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [generalError, setGeneralError] = useState<string>("");
   const [successMessage, setSuccessMessage] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
 
   useEffect(() => {
     const fetchVehicles = async () => {
@@ -58,7 +70,46 @@ export default function MonthlyMaintenanceReport() {
     };
 
     fetchVehicles();
-  }, []);
+
+    if (isEditMode && id) {
+      fetchMMRReport(Number(id));
+    }
+  }, [id, isEditMode]);
+
+  const fetchMMRReport = async (reportId: number) => {
+    setIsLoading(true);
+    setGeneralError("");
+    try {
+      const response = await mmrReportService.getById(reportId);
+      const data = response.data as { status: boolean; mmrReport?: MMRReport };
+
+      if (data.status && data.mmrReport) {
+        const report = data.mmrReport;
+        const dateValue = report.date ? new Date(report.date).toISOString().split('T')[0].substring(0, 7) : "";
+        const completedDateValue = report.completed_date ? new Date(report.completed_date).toISOString().split('T')[0] : "";
+        
+        setFormData({
+          date: dateValue,
+          domicile_station: report.domicile_station || "",
+          provider_company_name: report.provider_company_name || "",
+          current_mileage: report.current_mileage || "",
+          vehicle_id: report.vehicle_id?.toString() || "",
+          preventative_maintenance: report.preventative_maintenance ?? null,
+          out_of_service: report.out_of_service ?? null,
+          signature: report.signature || "",
+          declaration: report.declaration ?? null,
+          completed_date: completedDateValue,
+          maintenance_records: Array.isArray(report.maintenance_records) ? report.maintenance_records : [],
+        });
+      } else {
+        setGeneralError("MMR report not found");
+      }
+    } catch {
+      setGeneralError("Failed to load MMR report");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleInputFocus = (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement>) => {
     e.target.style.backgroundColor = "transparent";
@@ -69,6 +120,10 @@ export default function MonthlyMaintenanceReport() {
   const handleInputBlur = (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement>) => {
     e.target.style.backgroundColor = "#f1f4ff";
   };
+
+  const handleTasksChange = useCallback((tasks: MaintenanceRecord[]) => {
+    setFormData((prevFormData) => ({ ...prevFormData, maintenance_records: tasks }));
+  }, []);
 
   const handleVehicleChange = async (vehicleId: string) => {
     setFormData({ ...formData, vehicle_id: vehicleId });
@@ -153,26 +208,42 @@ export default function MonthlyMaintenanceReport() {
         preventative_maintenance: formData.preventative_maintenance ?? undefined,
         out_of_service: formData.out_of_service ?? undefined,
         signature: formData.signature || undefined,
+        declaration: formData.declaration ?? undefined,
         completed_date: formData.completed_date,
+        maintenance_records: formData.maintenance_records.length > 0 ? formData.maintenance_records : undefined,
       };
 
-      const response = await mmrReportService.create(submitData);
+      let response;
+      if (isEditMode && id) {
+        response = await mmrReportService.update(Number(id), submitData);
+      } else {
+        response = await mmrReportService.create(submitData);
+      }
 
       if (response.data?.status === true || response.status === 200 || response.status === 201) {
-        setSuccessMessage("MMR report saved successfully!");
-        setFormData({
-          date: "",
-          domicile_station: "",
-          provider_company_name: "",
-          current_mileage: "",
-          vehicle_id: "",
-          preventative_maintenance: null,
-          out_of_service: null,
-          signature: "",
-          completed_date: "",
-        });
+        setSuccessMessage(isEditMode ? "MMR report updated successfully!" : "MMR report saved successfully!");
+        
+        if (!isEditMode) {
+          setFormData({
+            date: "",
+            domicile_station: "",
+            provider_company_name: "",
+            current_mileage: "",
+            vehicle_id: "",
+            preventative_maintenance: null,
+            out_of_service: null,
+            signature: "",
+            declaration: null,
+            completed_date: "",
+            maintenance_records: [],
+          });
+        } else {
+          setTimeout(() => {
+            navigate('/reports/mmr');
+          }, 1500);
+        }
       } else {
-        setGeneralError(response.data?.message || "Failed to save MMR report. Please try again.");
+        setGeneralError(response.data?.message || (isEditMode ? "Failed to update MMR report. Please try again." : "Failed to save MMR report. Please try again."));
       }
     } catch (error: unknown) {
       if (error && typeof error === "object" && "response" in error) {
@@ -211,6 +282,55 @@ export default function MonthlyMaintenanceReport() {
     }
   };
 
+  const downloadMMRReport = async (id: number) => {
+    setIsDownloading(true);
+    setGeneralError('');
+    try {
+      const token = localStorage.getItem('auth_token');
+      if (!token) {
+        setGeneralError('Authentication token not found. Please login again.');
+        setIsDownloading(false);
+        return;
+      }
+
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+      const response = await fetch(`${API_URL}/mmr-reports/${id}/download`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/pdf',
+        },
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          setGeneralError('Authentication failed. Please login again.');
+        } else if (response.status === 404) {
+          setGeneralError('MMR report not found.');
+        } else {
+          setGeneralError('Failed to download MMR report.');
+        }
+        setIsDownloading(false);
+        return;
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `MMR_Report_${id}_${new Date().toISOString().split('T')[0]}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch {
+      setGeneralError('An error occurred while downloading the MMR report.');
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
   return (
     <>
       <PageMeta
@@ -220,8 +340,16 @@ export default function MonthlyMaintenanceReport() {
       <div className="space-y-6">
         <div className="page-actions flex flex-wrap items-center justify-between gap-3 mb-6">
           <h2 className="text-base md:text-xl font-semibold text-gray-800 dark:text-white/90">
-            Monthly Maintenance Reports (MMR)
+            {isEditMode ? "Edit Monthly Maintenance Report (MMR)" : "Monthly Maintenance Reports (MMR)"}
           </h2>
+          {isEditMode && <Button
+            variant="primary"
+            size="sm"
+            onClick={() => downloadMMRReport(Number(id))}
+            disabled={isSubmitting || isDownloading}
+          >
+            {isDownloading ? 'Downloading...' : 'Download MMR Report'}
+          </Button>}
         </div>
 
         <div className="w-full max-w-5xl mx-auto border border-gray-200 rounded-xl p-6">
@@ -230,6 +358,16 @@ export default function MonthlyMaintenanceReport() {
               {generalError || successMessage}
             </div>
           )}
+          {isLoading ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="text-center">
+                <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-brand-500"></div>
+                <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                  Loading MMR report...
+                </p>
+              </div>
+            </div>
+          ) : (
           <div id="mmr-form-container" style={{ width: "100%", fontFamily: "Arial, sans-serif" }}>
             <form onSubmit={handleSubmit}>
             <table style={{ width: "100%", borderCollapse: "collapse", margin: "0 auto" }} cellPadding="0" cellSpacing="0">
@@ -245,7 +383,7 @@ export default function MonthlyMaintenanceReport() {
                         </tr>
                         <tr>
                           <td style={{ textAlign: "right", fontSize: "14px", paddingTop: "10px", width: "150px", fontWeight: "bold", paddingLeft: "10px" }}>
-                            14 May 2025
+                            {formatDate(formData.date || "")}
                           </td>
                         </tr>
                       </tbody>
@@ -455,63 +593,17 @@ export default function MonthlyMaintenanceReport() {
 
                 <tr>
                   <td style={{ padding: "15px 20px" }}>
-                    <table style={{ width: "100%", borderCollapse: "collapse", border: "1px solid #000" }} cellPadding="5" cellSpacing="0">
-                      <thead>
-                        <tr>
-                          <th style={{ border: "1px solid #000", padding: "8px", fontSize: "12px", fontWeight: "bold", textAlign: "left", width: "25%" }}>
-                            Date of Maintenance
-                          </th>
-                          <th style={{ border: "1px solid #000", padding: "8px", fontSize: "12px", fontWeight: "bold", textAlign: "left", width: "75%" }}>
-                            Specific Description of Maintenance Performed
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td style={{ border: "1px solid #000", padding: "0",   verticalAlign: "top" }}>
-                            <input type="text" style={{ width: "100%", border: "none", padding: "5px", fontSize: "12px", minHeight: "30px", boxSizing: "border-box", textAlign: 'center', outline: 'none', backgroundColor: '#f1f4ff' }} onFocus={handleInputFocus} onBlur={handleInputBlur} autoComplete="off" />
-                          </td>
-                          <td style={{ border: "1px solid #000", padding: "0",   verticalAlign: "top" }}>
-                            <input type="text" style={{ width: "100%", border: "none", padding: "5px", fontSize: "12px", minHeight: "30px", boxSizing: "border-box", textAlign: 'center', outline: 'none', backgroundColor: '#f1f4ff' }} onFocus={handleInputFocus} onBlur={handleInputBlur} autoComplete="off" />
-                          </td>
-                        </tr>
-                        <tr>
-                          <td style={{ border: "1px solid #000", padding: "0",   verticalAlign: "top" }}>
-                            <input type="text" style={{ width: "100%", border: "none", padding: "5px", fontSize: "12px", minHeight: "30px", boxSizing: "border-box", textAlign: 'center', outline: 'none', backgroundColor: '#f1f4ff' }} onFocus={handleInputFocus} onBlur={handleInputBlur} autoComplete="off" />
-                          </td>
-                          <td style={{ border: "1px solid #000", padding: "0",   verticalAlign: "top" }}>
-                            <input type="text" style={{ width: "100%", border: "none", padding: "5px", fontSize: "12px", minHeight: "30px", boxSizing: "border-box", textAlign: 'center', outline: 'none', backgroundColor: '#f1f4ff' }} onFocus={handleInputFocus} onBlur={handleInputBlur} autoComplete="off" />
-                          </td>
-                        </tr>
-                        <tr>
-                          <td style={{ border: "1px solid #000", padding: "0",   verticalAlign: "top" }}>
-                            <input type="text" style={{ width: "100%", border: "none", padding: "5px", fontSize: "12px", minHeight: "30px", boxSizing: "border-box", textAlign: 'center', outline: 'none', backgroundColor: '#f1f4ff' }} onFocus={handleInputFocus} onBlur={handleInputBlur} autoComplete="off" />
-                          </td>
-                          <td style={{ border: "1px solid #000", padding: "0",   verticalAlign: "top" }}>
-                            <input type="text" style={{ width: "100%", border: "none", padding: "5px", fontSize: "12px", minHeight: "30px", boxSizing: "border-box", textAlign: 'center', outline: 'none', backgroundColor: '#f1f4ff' }} onFocus={handleInputFocus} onBlur={handleInputBlur} autoComplete="off" />
-                          </td>
-                        </tr>
-                        <tr>
-                          <td style={{ border: "1px solid #000", padding: "0",   verticalAlign: "top" }}>
-                            <input type="text" style={{ width: "100%", border: "none", padding: "5px", fontSize: "12px", minHeight: "30px", boxSizing: "border-box", textAlign: 'center', outline: 'none', backgroundColor: '#f1f4ff' }} onFocus={handleInputFocus} onBlur={handleInputBlur} autoComplete="off" />
-                          </td>
-                          <td style={{ border: "1px solid #000", padding: "0",   verticalAlign: "top" }}>
-                            <input type="text" style={{ width: "100%", border: "none", padding: "5px", fontSize: "12px", minHeight: "30px", boxSizing: "border-box", textAlign: 'center', outline: 'none', backgroundColor: '#f1f4ff' }} onFocus={handleInputFocus} onBlur={handleInputBlur} autoComplete="off" />
-                          </td>
-                        </tr>
-                        <tr>
-                          <td style={{ border: "1px solid #000", padding: "0",   verticalAlign: "top" }}>
-                            <input type="text" style={{ width: "100%", border: "none", padding: "5px", fontSize: "12px", minHeight: "30px", boxSizing: "border-box", textAlign: 'center', outline: 'none', backgroundColor: '#f1f4ff' }} onFocus={handleInputFocus} onBlur={handleInputBlur} autoComplete="off" />
-                          </td>
-                          <td style={{ border: "1px solid #000", padding: "0",   verticalAlign: "top" }}>
-                            <input type="text" style={{ width: "100%", border: "none", padding: "5px", fontSize: "12px", minHeight: "30px", boxSizing: "border-box", textAlign: 'center', outline: 'none', backgroundColor: '#f1f4ff' }} onFocus={handleInputFocus} onBlur={handleInputBlur} autoComplete="off" />
-                          </td>
-                        </tr>
-                        
-                      </tbody>
-                    </table>
+                    <MMRTaskList
+                      handleInputFocus={handleInputFocus}
+                      handleInputBlur={handleInputBlur}
+                      vehicleId={formData.vehicle_id}
+                      date={formData.date}
+                      onTasksChange={handleTasksChange}
+                      initialTasks={formData.maintenance_records}
+                    />
                   </td>
                 </tr>
+                
 
                 <tr>
                   <td style={{ padding: "20px" }}>
@@ -523,7 +615,7 @@ export default function MonthlyMaintenanceReport() {
                               <tbody>
                                 <tr>
                                   <td style={{ width: "30px", verticalAlign: "top", paddingTop: "3px" }}>
-                                    <input type="checkbox" style={{ width: "23px", height: "23px", verticalAlign: "top", accentColor: '#f1f4ff' }} />
+                                    <input type="checkbox" checked={formData.declaration === true} onChange={() => handleInputChange("declaration", !formData.declaration)} style={{ width: "23px", height: "23px", verticalAlign: "top", accentColor: '#f1f4ff' }} />
                                   </td>
                                   <td style={{ fontSize: "14px", lineHeight: '1.5', textAlign: "justify" }}>
                                     By checking this box, I declare that this record is true and correct. Unless otherwise clearly indicated as "out of service" on this record, I confirm that the equipment on this record is in compliance with the Federal Motor Carrier Safety Regulations 49 C.F.R. 396.3(a)(1) and 396.7 (a) and is in safe operating condition and meets all federal, state and local motor vehicle laws. Furthermore, I confirm that preventative maintenance is consistent with the interval schedule per 396.3(b)(2).
@@ -596,17 +688,29 @@ export default function MonthlyMaintenanceReport() {
             </table>
             <div style={{ padding: "20px", textAlign: "right" }}>
               <Button
-
                 type="submit"
                 size="sm"
                 disabled={isSubmitting}
-                className="px-6 py-2"
+                variant="primary"
               >
-                {isSubmitting ? "Saving..." : "Save MMR Report"}
+                {isSubmitting ? (isEditMode ? "Updating..." : "Saving...") : (isEditMode ? "Update MMR Report" : "Save MMR Report")}
+              </Button>
+
+
+            
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigate("/reports/mmr")}
+                disabled={isSubmitting}
+                className="ml-2"
+              >
+                Cancel
               </Button>
             </div>
             </form>
           </div>
+          )}
         </div>
       </div>
     </>

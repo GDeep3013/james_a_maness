@@ -8,6 +8,8 @@ use App\Models\Vehical;
 use Auth;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 
 class MMRReportController extends Controller
 {
@@ -48,7 +50,9 @@ class MMRReportController extends Controller
                 'preventative_maintenance' => 'nullable|boolean',
                 'out_of_service' => 'nullable|boolean',
                 'signature' => 'nullable|string|max:255',
+                'declaration' => 'nullable|boolean',
                 'completed_date' => 'required|date',
+                'maintenance_records' => 'nullable|array',
             ]);
 
             DB::beginTransaction();
@@ -63,7 +67,9 @@ class MMRReportController extends Controller
             $mmrReport->preventative_maintenance = $validatedData['preventative_maintenance'] ?? null;
             $mmrReport->out_of_service = $validatedData['out_of_service'] ?? null;
             $mmrReport->signature = $validatedData['signature'] ?? null;
+            $mmrReport->declaration = $validatedData['declaration'] ?? null;
             $mmrReport->completed_date = $validatedData['completed_date'] ?? null;
+            $mmrReport->maintenance_records = $validatedData['maintenance_records'] ?? null;
 
             if ($mmrReport->save()) {
                 DB::commit();
@@ -123,7 +129,9 @@ class MMRReportController extends Controller
                 'preventative_maintenance' => 'nullable|boolean',
                 'out_of_service' => 'nullable|boolean',
                 'signature' => 'nullable|string|max:255',
+                'declaration' => 'nullable|boolean',
                 'completed_date' => 'required|date',
+                'maintenance_records' => 'nullable|array',
             ]);
 
             DB::beginTransaction();
@@ -136,7 +144,9 @@ class MMRReportController extends Controller
             $mmrReport->preventative_maintenance = $validatedData['preventative_maintenance'] ?? null;
             $mmrReport->out_of_service = $validatedData['out_of_service'] ?? null;
             $mmrReport->signature = $validatedData['signature'] ?? null;
+            $mmrReport->declaration = $validatedData['declaration'] ?? null;
             $mmrReport->completed_date = $validatedData['completed_date'] ?? null;
+            $mmrReport->maintenance_records = $validatedData['maintenance_records'] ?? null;
 
             if ($mmrReport->save()) {
                 DB::commit();
@@ -186,6 +196,50 @@ class MMRReportController extends Controller
             return response()->json([
                 'status' => false,
                 'message' => 'An error occurred while deleting the MMR report',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function download($id)
+    {
+        try {
+            $mmrReport = MMRReport::with(['vehicle', 'user'])->find($id);
+            
+            if (!$mmrReport) {
+                return response()->json(['status' => false, 'message' => 'MMR report not found'], 404);
+            }
+
+            $maintenanceRecords = is_array($mmrReport->maintenance_records) 
+                ? $mmrReport->maintenance_records 
+                : (is_string($mmrReport->maintenance_records) 
+                    ? json_decode($mmrReport->maintenance_records, true) ?? [] 
+                    : []);
+
+            $dateFormatted = $mmrReport->date 
+                ? Carbon::parse($mmrReport->date)->format('F Y') 
+                : '';
+
+            $completedDateFormatted = $mmrReport->completed_date 
+                ? Carbon::parse($mmrReport->completed_date)->format('m/d/Y') 
+                : '';
+
+            $data = [
+                'mmrReport' => $mmrReport,
+                'maintenanceRecords' => $maintenanceRecords,
+                'dateFormatted' => $dateFormatted,
+                'completedDateFormatted' => $completedDateFormatted,
+            ];
+
+            $pdf = Pdf::loadView('mmr.mmrReportPdf', $data);
+            $fileName = 'MMR_Report_' . $mmrReport->id . '_' . date('Y-m-d') . '.pdf';
+            
+            return $pdf->download($fileName);
+        } catch (\Exception $e) {
+            \Log::error('MMR report download error: ' . $e->getMessage());
+            return response()->json([
+                'status' => false,
+                'message' => 'An error occurred while generating the PDF',
                 'error' => $e->getMessage()
             ], 500);
         }
