@@ -48,6 +48,7 @@ class HomeController extends Controller
             'insurance'      => 'insurance',
             'reminder'       => 'reminder',
             'reports'        => 'reports',
+            'maintenance-record' => 'maintenance-record',
             'settings'       => 'settings',
             'staff'          => 'staff',
             'company'        => 'company'

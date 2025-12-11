@@ -139,6 +139,10 @@ Route::middleware(['auth','page.access'])->group(function () {
 
     Route::get('profile', [HomeController::class, 'index']);
 
+    //Maintenance Reports
+    Route::get('/maintenance-record', [HomeController::class, 'index']);
+
+
     // TimeLine Records For the All Modules
     Route::get('/timeline', [TimeLineController::class, 'index'])->name('timeline.index');
     Route::get('/timeline/vehicle/{vehicleId}', [TimeLineController::class, 'vehicle'])->name('timeline.vehicle');
