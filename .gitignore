@@ -1,15 +1,6 @@
 /node_modules
 /public/build
-/public/hot
-/public/invoice
-/public/driver
-/public/insurance
-/public/license_proof/
-/public/proof/
-/public/refuel
-/public/users
-/public/vehical
-/public/vms
+/public/vehicle-documents
 /storage/*.key
 /storage/logs/*.log
 /storage/fonts/

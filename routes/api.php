@@ -25,6 +25,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ReminderController;
 use App\Http\Controllers\VehicleDocumentController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\MMRReportController;
 
 // use App\Http\Controllers\Apps\LoginController;
 // use App\Http\Controllers\Apps\ContactApiController;
@@ -123,6 +124,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('reports', ReportController::class);
     Route::get('/reports/{id}/download', [ReportController::class, 'download'])->where('id', '[0-9]+');
     Route::post('/reports/generate', [ReportController::class, 'store']);
+
+    Route::apiResource('mmr-reports', MMRReportController::class);
+    Route::get('/mmr-reports/{id}/edit', [MMRReportController::class, 'show'])->where('id', '[0-9]+');
 });
 
 // Route::prefix('mobileApps')->group(function () {

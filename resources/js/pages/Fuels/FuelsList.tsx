@@ -7,11 +7,10 @@ import {
     TableHeader,
     TableRow,
 } from "../../components/ui/table";
-import Input from "../../components/form/input/InputField";
 import Button from "../../components/ui/button/Button";
 import PageMeta from "../../components/common/PageMeta";
 import { fuelService } from "../../services/fuelService";
-import { PencilIcon, TrashBinIcon, ExportIcon, EyeIcon } from "../../icons";
+import { PencilIcon, TrashBinIcon, EyeIcon } from "../../icons";
 import TableFooter, { PaginationData } from "../../components/common/TableFooter";
 import { formatTypeModel } from "../../utilites/vehicleUtils";
 import { FuelRecord as Fuel , FuelsResponse } from "../../types/FuelRecordTypes";
@@ -23,7 +22,7 @@ export default function FuelsList() {
     const [fuels, setFuels] = useState<Fuel[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string>("");
-    const [searchTerm, setSearchTerm] = useState("");
+    // const [searchTerm, setSearchTerm] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
     const [pagination, setPagination] = useState<PaginationData>({
         current_page: 1,
@@ -60,14 +59,14 @@ export default function FuelsList() {
     }, []);
 
     useEffect(() => {
-        fetchFuels(currentPage, searchTerm);
-    }, [currentPage, searchTerm, fetchFuels]);
+        fetchFuels(currentPage);
+    }, [currentPage, fetchFuels]);
 
-    const handleSearch = (e: React.FormEvent) => {
-        e.preventDefault();
-        setCurrentPage(1);
-        fetchFuels(1, searchTerm);
-    };
+    // const handleSearch = (e: React.FormEvent) => {
+    //     e.preventDefault();
+    //     setCurrentPage(1);
+    //     fetchFuels(1, searchTerm);
+    // };
 
     const handleDelete = async (id: number) => {
         if (!window.confirm("Are you sure you want to delete this fuel entry?")) {
@@ -77,7 +76,7 @@ export default function FuelsList() {
         setDeletingId(id);
         try {
             await fuelService.delete(id);
-            fetchFuels(currentPage, searchTerm);
+            fetchFuels(currentPage);
         } catch {
             alert("Failed to delete fuel entry. Please try again.");
         } finally {
@@ -97,9 +96,9 @@ export default function FuelsList() {
         setCurrentPage(page);
     };
 
-    const handleExport = () => {
-        //  Implement export    
-    };
+    // const handleExport = () => {
+    //     //  Implement export    
+    // };
 
     const formatUnitType = (unitType: string) => {
         const unitTypes: Record<string, string> = {

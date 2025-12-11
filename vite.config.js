@@ -16,10 +16,21 @@ export default defineConfig({
         svgr({
             svgrOptions: {
               icon: true,
-              // This will transform your SVG to a React component
               exportType: "named",
               namedExport: "ReactComponent",
             },
         }),
     ],
+    build: {
+        outDir: 'public/build',
+        emptyOutDir: true,
+        manifest: true,
+        rollupOptions: {
+            output: {
+                entryFileNames: 'assets/[name]-[hash].js',
+                chunkFileNames: 'assets/[name]-[hash].js',
+                assetFileNames: 'assets/[name]-[hash].[ext]',
+            },
+        },
+    },
 });

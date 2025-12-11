@@ -13,6 +13,7 @@ use App\Models\Contact;
 use App\Models\Vendor;
 use App\Models\Part;
 use App\Models\Vehical;
+use App\Models\Service;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -130,51 +131,68 @@ class DashboardController extends Controller
     public function getFleetPerformance(Request $request)
     {
         try {
-            $vehicleId = $request->input('vehicle_id');
-            $year = $request->input('year', date('Y'));
-
-            if (!$vehicleId) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Vehicle ID is required'
-                ], 400);
-            }
-
-            $issues = Issue::select(
-                DB::raw('MONTH(created_at) as month'),
-                DB::raw('COUNT(*) as count')
-            )
-            ->where('vehicle_id', $vehicleId)
-            ->whereYear('created_at', $year)
-            ->groupBy(DB::raw('MONTH(created_at)'))
-            ->get();
-
-            $workOrders = WorkOrder::select(
-                DB::raw('MONTH(created_at) as month'),
-                DB::raw('COUNT(*) as count')
-            )
-            ->where('vehicle_id', $vehicleId)
-            ->whereYear('created_at', $year)
-            ->groupBy(DB::raw('MONTH(created_at)'))
-            ->get();
-
+            $currentYear = date('Y');
+            
+            $allVehicles = Vehical::pluck('id')->toArray();
+            $totalVehicles = count($allVehicles);
+            
             $monthlyData = [];
+            
             for ($month = 1; $month <= 12; $month++) {
-                $issueCount = $issues->where('month', $month)->first();
-                $workOrderCount = $workOrders->where('month', $month)->first();
+                $startDate = Carbon::create($currentYear, $month, 1)->startOfMonth();
+                $endDate = Carbon::create($currentYear, $month, 1)->endOfMonth();
+                
+                $activeWorkOrderVehicles = WorkOrder::whereIn('status', ['Open', 'In Progress'])
+                    ->whereNotNull('vehicle_id')
+                    ->where(function($query) use ($startDate, $endDate) {
+                        $query->where(function($q) use ($startDate, $endDate) {
+                            $q->whereDate('issue_date', '>=', $startDate)
+                              ->whereDate('issue_date', '<=', $endDate);
+                        });
+                    })
+                    ->pluck('vehicle_id')
+                    ->unique()
+                    ->toArray();
+
+                // if($month == 12){
+                //     dd($activeWorkOrderVehicles);
+                // }
+                
+                $activeServiceVehicles = Service::whereNotNull('vehicle_id')
+                    ->where(function($query) use ($startDate, $endDate) {
+                        $query->where(function($q) use ($startDate, $endDate) {
+                            $q->whereBetween('start_date', [$startDate, $endDate]);
+                        })
+                        ->orWhere(function($q) use ($startDate, $endDate) {
+                            $q->where('start_date', '<=', $endDate)
+                              ->where(function($subQ) use ($startDate) {
+                                  $subQ->whereNull('completion_date')
+                                       ->orWhere('completion_date', '>=', $startDate);
+                              });
+                        });
+                    })
+                    ->pluck('vehicle_id')
+                    ->unique()
+                    ->toArray();
+                    
+                // if($month == 12){
+                //     dd($activeServiceVehicles);
+                // }
+                
+                $vehiclesInMaintenance = array_unique(array_merge($activeWorkOrderVehicles, $activeServiceVehicles));
+                $inactiveCount = count($vehiclesInMaintenance);
+                $availableCount = max(0, $totalVehicles - $inactiveCount);
                 
                 $monthlyData[] = [
                     'month' => $month,
-                    'issues_count' => $issueCount ? (int)$issueCount->count : 0,
-                    'work_orders_count' => $workOrderCount ? (int)$workOrderCount->count : 0,
+                    'inactive_count' => $inactiveCount,
+                    'available_count' => $availableCount,
                 ];
             }
 
             return response()->json([
                 'status' => true,
                 'data' => $monthlyData,
-                'year' => $year,
-                'vehicle_id' => $vehicleId,
             ]);
         } catch (\Exception $e) {
             return response()->json([

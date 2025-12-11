@@ -58,6 +58,10 @@ import ExpenseHistoryDetail from "./pages/Expense/ExpenseHistoryDetail";
 import CreateAssignment from "./pages/VehicleAssignments/CreateAssignment";
 import VehicleReplacement from "./pages/VehicleReplacementAnalysis/VehicleReplacement";
 import Reports from "./pages/Reports/index";
+import MonthlyMaintenanceReport from "./pages/Reports/MMR/MonthlyMaintenanceReport";
+import MMRList from "./pages/Reports/MMR/MMRList";
+import MaintenanceReport from "./pages/Reports/MaintenanceReport";
+import FuelReport from "./pages/Reports/FuelReport";
 
 export default function App() {
   return (
@@ -163,6 +167,62 @@ export default function App() {
             element={
               <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
                 <Reports />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/reports/mmr"
+            element={
+              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                <MMRList />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/reports/mmr/create"
+            element={
+              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                <MonthlyMaintenanceReport />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/reports/mmr/:id"
+            element={
+              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                <MonthlyMaintenanceReport />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/reports/mmr/:id/edit"
+            element={
+              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                <MonthlyMaintenanceReport />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/reports/monthly-maintenance"
+            element={
+              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                <MonthlyMaintenanceReport />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/reports/maintenance"
+            element={
+              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                <MaintenanceReport />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/reports/fuel"
+            element={
+              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                <FuelReport />
               </ProtectedRoute>
             }
           />
