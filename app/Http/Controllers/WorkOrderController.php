@@ -45,6 +45,17 @@ class WorkOrderController extends Controller
             $query->where('status', $request->status);
         }
 
+        if ($request->has('vehicle_id') && !empty($request->vehicle_id)) {
+            $query->where('vehicle_id', $request->vehicle_id);
+        }
+
+        if ($request->has('issue_date') && !empty($request->issue_date)) {
+            $query->whereMonth('issue_date', date('m', strtotime($request->issue_date)));
+            $query->whereYear('issue_date', date('Y', strtotime($request->issue_date)));
+        }
+
+
+
         if (!empty($searchTerm)) {
             $query->where(function ($query) use ($tableColumns, $searchTerm) {
                 foreach ($tableColumns as $column) {
@@ -53,6 +64,9 @@ class WorkOrderController extends Controller
                     }
                 }
             });
+
+
+           
 
             $query->orWhereHas('vehicle', function ($q) use ($searchTerm) {
                 $q->where('vehicle_name', 'LIKE', '%' . $searchTerm . '%');

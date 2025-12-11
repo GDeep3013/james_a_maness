@@ -21,6 +21,7 @@ class MMRReport extends Model
         'preventative_maintenance',
         'out_of_service',
         'signature',
+        'declaration',
         'completed_date',
         'maintenance_records',
     ];
@@ -30,6 +31,7 @@ class MMRReport extends Model
         'completed_date' => 'date',
         'preventative_maintenance' => 'boolean',
         'out_of_service' => 'boolean',
+        'declaration' => 'boolean',
         'maintenance_records' => 'array',
     ];
 

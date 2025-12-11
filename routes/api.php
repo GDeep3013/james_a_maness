@@ -128,9 +128,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::apiResource('mmr-reports', MMRReportController::class);
     Route::get('/mmr-reports/{id}/edit', [MMRReportController::class, 'show'])->where('id', '[0-9]+');
-
-    Route::apiResource('maintenance-records', MaintenanceRecordController::class);
-    Route::get('/maintenance-records/${id}/edit', [MaintenanceRecordController::class, 'show'])->where('id', '[0-9]+');
+    Route::get('/mmr-reports/{id}/download', [MMRReportController::class, 'download'])->where('id', '[0-9]+');
 });
 
 // Route::prefix('mobileApps')->group(function () {
