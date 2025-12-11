@@ -4,13 +4,11 @@ import react from '@vitejs/plugin-react';
 import svgr from "vite-plugin-svgr";
 
 export default defineConfig({
-    plugins: [
+   plugins: [
         laravel({
-            input: [
-                // 'resources/sass/app.scss',
-                'resources/js/main.tsx',
-            ],
+            input: ['resources/js/main.tsx'],
             refresh: true,
+            buildDirectory: 'build',
         }),
         react(),
         svgr({
@@ -21,16 +19,15 @@ export default defineConfig({
             },
         }),
     ],
+    
     build: {
+        manifest: 'manifest.json',
         outDir: 'public/build',
         emptyOutDir: true,
-        manifest: true,
         rollupOptions: {
             output: {
-                entryFileNames: 'assets/[name]-[hash].js',
-                chunkFileNames: 'assets/[name]-[hash].js',
-                assetFileNames: 'assets/[name]-[hash].[ext]',
-            },
-        },
-    },
+                manualChunks: undefined,
+            }
+        }
+    }
 });
