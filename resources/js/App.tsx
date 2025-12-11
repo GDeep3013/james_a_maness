@@ -60,7 +60,7 @@ import VehicleReplacement from "./pages/VehicleReplacementAnalysis/VehicleReplac
 import Reports from "./pages/Reports/index";
 import MonthlyMaintenanceReport from "./pages/Reports/MMR/MonthlyMaintenanceReport";
 import MMRList from "./pages/Reports/MMR/MMRList";
-import MaintenanceReport from "./pages/Reports/MaintenanceReport";
+import MaintenanceReport from "./pages/Reports/Maintenance_Reports/MaintenanceReport";
 import FuelReport from "./pages/Reports/FuelReport";
 
 export default function App() {

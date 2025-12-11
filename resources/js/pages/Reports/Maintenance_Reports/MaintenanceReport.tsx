@@ -1,5 +1,5 @@
 import React from "react";
-import PageMeta from "../../components/common/PageMeta";
+import PageMeta from "../../../components/common/PageMeta";
 
 export default function MaintenanceReport() {
   return (
