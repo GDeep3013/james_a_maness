@@ -7,9 +7,11 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\TimeLineController;
 
 Route::middleware(['guest'])->group(function () {
-    Route::get('/', function(){  return view('auth.login');});
+    Route::get('/', function () {
+        return view('auth.login');
+    });
     // Route::get('/login', function(){  return view('auth.login');});
-    Auth::routes(['register' => false ]);
+    Auth::routes(['register' => false]);
 });
 
 
@@ -39,7 +41,12 @@ Route::middleware(['auth','page.access'])->group(function () {
     Route::get('/contacts/{id}/ContactDetail', [HomeController::class, 'index'])->where('id', '[0-9]+');
     Route::get('/contacts/{id}/edit', [HomeController::class, 'index'])->where('id', '[0-9]+');
 
-    //
+    //Maintenance
+    Route::get('/maintenances', [HomeController::class, 'index']);
+    Route::get('/maintenances/create', [HomeController::class, 'index']);
+    Route::get('/maintenances/{id}', [HomeController::class, 'index'])->where('id', '[0-9]+');
+    Route::get('/maintenances/{id}/edit', [HomeController::class, 'index'])->where('id', '[0-9]+');
+
     // Work Orders
     Route::get('/work-orders', [HomeController::class, 'index']);
     Route::get('/work-orders/create', [HomeController::class, 'index']);
@@ -80,7 +87,7 @@ Route::middleware(['auth','page.access'])->group(function () {
     Route::get('/meter-history/{id}/edit', [HomeController::class, 'index'])->where('id', '[0-9]+');
     Route::get('/meter-history/:id/MeterReadingDetail', [HomeController::class, 'index'])->where('id', '[0-9]+');
 
-     // ExpenseHistory
+    // ExpenseHistory
     Route::get('/expense-history', [HomeController::class, 'index']);
     Route::get('/expense-history/create', [HomeController::class, 'index']);
     Route::get('/expense-history/{id}', [HomeController::class, 'index'])->where('id', '[0-9]+');
@@ -139,5 +146,4 @@ Route::middleware(['auth','page.access'])->group(function () {
     Route::get('/timeline/{timeLine}', [TimeLineController::class, 'show'])->name('timeline.show');
 
 });
-
 

@@ -15,30 +15,21 @@ class TimeLineController extends Controller
         $query = TimeLine::with(['user', 'vehicle', 'vendor'])
             ->orderBy('created_at', 'desc');
 
-        // Filter by module
         if ($request->has('module')) {
             $query->where('module', $request->module);
         }
-
-        // Filter by vehicle
         if ($request->has('vehicle_id')) {
             $query->where('vehicle_id', $request->vehicle_id);
         }
-
-        // Filter by user
         if ($request->has('user_id')) {
             $query->where('user_id', $request->user_id);
         }
-
-        // Filter by date range
         if ($request->has('from_date')) {
             $query->whereDate('created_at', '>=', $request->from_date);
         }
         if ($request->has('to_date')) {
             $query->whereDate('created_at', '<=', $request->to_date);
         }
-
-        // Filter by action
         if ($request->has('action')) {
             $query->where('action', $request->action);
         }

@@ -40,7 +40,7 @@
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td style="text-align: right; font-size: 16px; padding-top: 10px; width: 150px; font-weight: bold; padding-left: 10px;">
+                                        <td style="text-align: right; font-size: 18px; padding-top: 10px; width: 150px; font-weight: bold; padding-left: 10px;">
                                             {{ $dateFormatted }}
                                         </td>
                                     </tr>
@@ -50,7 +50,7 @@
                     </tr>
 
                     <tr>
-                        <td style="padding: 0 20px 15px 20px; font-size: 16px; line-height: 1.5; text-align: justify;">
+                        <td style="padding: 0 20px 15px 20px; font-size: 18px; line-height: 1.5; text-align: justify;">
                             To comply with U.S. Federal Regulations, this form must be completed, signed, and submitted to FedEx by the 20th of the month following the month for which repairs, or maintenance were performed on any service provider-owned or -leased equipment. Submit one record for each piece of equipment, even if not regularly providing services.
                         </td>
                     </tr>
@@ -61,36 +61,36 @@
                                 <tbody>
                                     <tr>
                                         <td style="padding: 8px 20px 8px 8px; vertical-align: top; width: 35%;">
-                                            <span style="font-weight: bold; padding-left: 10px; padding-bottom: 5px; font-size: 16px;">Maintenance Record for the Month and Year of:</span>
-                                            <div style="width: 100%; background-color: #f1f4ff; border: 1px solid #000; padding: 5px; font-size: 16px; min-height: 25px; box-sizing: border-box;">
+                                            <span style="font-weight: bold; padding-left: 10px; padding-bottom: 5px; font-size: 18px;">Maintenance Record for the Month and Year of:</span>
+                                            <div style="width: 100%; background-color: #f1f4ff; border: 1px solid #000; padding: 5px; font-size: 18px; min-height: 25px; box-sizing: border-box;">
                                                 {{ $dateFormatted }}
                                             </div>
                                         </td>
                                         <td style="padding: 8px 5px 8px 20px; vertical-align: top; width: 35%;">
-                                            <span style="font-weight: bold; padding-left: 10px; padding-bottom: 5px; font-size: 16px;">Domicile Station/Hub: <span style="color: #f00;">*</span></span>
-                                            <div style="width: 100%; background-color: #f1f4ff; border: 1px solid #000; padding: 5px; font-size: 16px; min-height: 25px; box-sizing: border-box;">
+                                            <span style="font-weight: bold; padding-left: 10px; padding-bottom: 5px; font-size: 18px;">Domicile Station/Hub: <span style="color: #f00;">*</span></span>
+                                            <div style="width: 100%; background-color: #f1f4ff; border: 1px solid #000; padding: 5px; font-size: 18px; min-height: 25px; box-sizing: border-box;">
                                                 {{ $mmrReport->domicile_station ?? '' }}
                                             </div>
                                         </td>
                                     </tr>
                                     <tr>
                                         <td style="padding: 8px 20px 8px 8px; vertical-align: top; width: 35%;">
-                                            <span style="font-weight: bold; padding-left: 10px; padding-bottom: 5px; font-size: 16px;">Service Provider Company Name: <span style="color: #f00;">*</span></span>
-                                            <div style="width: 100%; background-color: #f1f4ff; border: 1px solid #000; padding: 5px; font-size: 16px; min-height: 25px; box-sizing: border-box;">
+                                            <span style="font-weight: bold; padding-left: 10px; padding-bottom: 5px; font-size: 18px;">Service Provider Company Name: <span style="color: #f00;">*</span></span>
+                                            <div style="width: 100%; background-color: #f1f4ff; border: 1px solid #000; padding: 5px; font-size: 18px; min-height: 25px; box-sizing: border-box;">
                                                 {{ $mmrReport->provider_company_name ?? '' }}
                                             </div>
                                         </td>
                                         <td style="padding: 8px 5px 8px 20px; vertical-align: top; width: 35%;">
-                                            <span style="font-weight: bold; padding-left: 10px; padding-bottom: 5px; font-size: 16px;">Current Mileage* (Odometer Reading)</span>
-                                            <div style="width: 100%; background-color: #f1f4ff; border: 1px solid #000; padding: 5px; font-size: 16px; min-height: 25px; box-sizing: border-box;">
+                                            <span style="font-weight: bold; padding-left: 10px; padding-bottom: 5px; font-size: 18px;">Current Mileage* (Odometer Reading)</span>
+                                            <div style="width: 100%; background-color: #f1f4ff; border: 1px solid #000; padding: 5px; font-size: 18px; min-height: 25px; box-sizing: border-box;">
                                                 {{ $mmrReport->current_mileage ?? '' }}
                                             </div>
                                         </td>
                                     </tr>
                                     <tr>
                                         <td style="padding: 8px 20px 8px 8px; vertical-align: top; width: 35%;">
-                                            <span style="font-weight: bold; padding-left: 10px; padding-bottom: 5px; font-size: 16px;">Vehicle Unit #:</span>
-                                            <div style="width: 100%; background-color: #f1f4ff; border: 1px solid #000; padding: 5px; font-size: 16px; min-height: 25px; box-sizing: border-box;">
+                                            <span style="font-weight: bold; padding-left: 10px; padding-bottom: 5px; font-size: 18px;">Vehicle Unit #:</span>
+                                            <div style="width: 100%; background-color: #f1f4ff; border: 1px solid #000; padding: 5px; font-size: 18px; min-height: 25px; box-sizing: border-box;">
                                                 {{ $mmrReport->vehicle->vehicle_name ?? '' }}
                                             </div>
                                         </td>
@@ -108,7 +108,7 @@
                             <table style="width: 100%; border-collapse: collapse;" cellPadding="5" cellSpacing="0">
                                 <tbody>
                                     <tr>
-                                        <td style="font-size: 16px; line-height: 1.5; padding: 8px 5px; vertical-align: top; width: 70%;">
+                                        <td style="font-size: 18px; line-height: 1.5; padding: 8px 5px; vertical-align: top; width: 70%;">
                                             Were any repairs, or preventative maintenance performed on this unit?
                                         </td>
                                         <td style="padding: 8px 5px; vertical-align: top; width: 30%;">
@@ -116,7 +116,7 @@
                                                 <tbody>
                                                     <tr>
 
-                                                        <td style="padding: 0 10px 0 0; font-size: 16px;">
+                                                        <td style="padding: 0 10px 0 0; font-size: 18px;">
                                                             <span style="margin-right: 5px;">
                                                                 @if($mmrReport->preventative_maintenance === true)
                                                                     <img src="{{$checked}}"  width='20' height='20' />
@@ -125,7 +125,7 @@
                                                                 @endif
                                                             </span> Yes
                                                         </td>
-                                                        <td style="padding: 0; font-size: 16px;">
+                                                        <td style="padding: 0; font-size: 18px;">
                                                             <span style="margin-right: 5px;">
                                                                 @if($mmrReport->preventative_maintenance === false)
                                                                     <img src="{{$checked}}" width='20' height='20' />
@@ -141,14 +141,14 @@
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td style="font-size: 16px; line-height: 1.5; padding: 8px 5px; vertical-align: top;">
+                                        <td style="font-size: 18px; line-height: 1.5; padding: 8px 5px; vertical-align: top;">
                                             If "no" maintenance was performed, was the unit out of service and unable to provide service (i.e., awaiting repair, on litigation hold, etc.)?
                                         </td>
                                         <td style="padding: 8px 5px; vertical-align: top;">
                                             <table style="width: 100%; border-collapse: collapse;" cellPadding="0" cellSpacing="0">
                                                 <tbody>
                                                     <tr>
-                                                        <td style="padding: 0 10px 0 0; font-size: 16px;">
+                                                        <td style="padding: 0 10px 0 0; font-size: 18px;">
                                                             <span style="margin-right: 5px;">
                                                                 @if($mmrReport->out_of_service === true)
                                                                     <img src="{{$checked}}"  width='20' height='20' />
@@ -157,7 +157,7 @@
                                                                 @endif
                                                             </span> Yes
                                                         </td>
-                                                        <td style="padding: 0; font-size: 16px;">
+                                                        <td style="padding: 0; font-size: 18px;">
                                                             <span style="margin-right: 5px;">
                                                                 @if($mmrReport->out_of_service === false)
                                                                     <img src="{{$checked}}" width='20' height='20' />
@@ -181,22 +181,22 @@
                             <table style="width: 100%; border-collapse: collapse;" cellPadding="0" cellSpacing="0">
                                 <tbody>
                                     <tr>
-                                        <td style="font-size: 16px; line-height: 1.5; padding-bottom: 10px; text-align: justify;">
+                                        <td style="font-size: 18px; line-height: 1.5; padding-bottom: 10px; text-align: justify;">
                                             All repairs/replacements, or maintenance performed in conformance with a vehicle's Maintenance Interval Form or any other major vehicle system must be reported on an MMR with detailed notations or attached receipts.
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td style="font-size: 16px; line-height: 1.5; padding-bottom: 10px; text-align: justify;">
+                                        <td style="font-size: 18px; line-height: 1.5; padding-bottom: 10px; text-align: justify;">
                                             All notations must provide enough detail for a DOT official to determine what component(s), location(s), and type of work was performed (e.g., replace, repair, adjust, etc.).
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td style="font-size: 16px; line-height: 1.5; padding-bottom: 10px; text-align: justify;">
+                                        <td style="font-size: 18px; line-height: 1.5; padding-bottom: 10px; text-align: justify;">
                                             Annual Federal/State and Pre/Post trip inspections must not be reported on the MMR, however repairs and maintenance of components that resulted from these inspections must be reported on an MMR.
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td style="font-size: 16px; line-height: 1.5; padding-bottom: 10px; text-align: justify;">
+                                        <td style="font-size: 18px; line-height: 1.5; padding-bottom: 10px; text-align: justify;">
                                             General maintenance (e.g., oil/filter changes, lubrication, adjustments) should be reported with adequate detail to clearly convey what components were repaired or maintained. Abbreviations such as "LOF" or "PM" cannot be used, as these do not provide adequate details.
                                         </td>
                                     </tr>
@@ -210,10 +210,10 @@
                             <table style="width: 100%; border-collapse: collapse; border: 1px solid #000;" cellPadding="5" cellSpacing="0">
                                 <thead>
                                     <tr>
-                                        <th style="border: 1px solid #000; padding: 8px; font-size: 16px; font-weight: bold; text-align: left; width: 25%;">
+                                        <th style="border: 1px solid #000; padding: 8px; font-size: 18px; font-weight: bold; text-align: left; width: 25%;">
                                             Date of Maintenance
                                         </th>
-                                        <th style="border: 1px solid #000; padding: 8px; font-size: 16px; font-weight: bold; text-align: left; width: 75%;">
+                                        <th style="border: 1px solid #000; padding: 8px; font-size: 18px; font-weight: bold; text-align: left; width: 75%;">
                                             Specific Description of Maintenance Performed
                                         </th>
                                     </tr>
@@ -222,10 +222,10 @@
                                     @if(count($maintenanceRecords) > 0)
                                         @foreach($maintenanceRecords as $record)
                                             <tr>
-                                                <td style="border: 1px solid #000; padding: 5px; vertical-align: top; text-align: left; font-size: 16px;">
+                                                <td style="border: 1px solid #000; padding: 5px; vertical-align: top; text-align: left; font-size: 18px;">
                                                     {{ $record['date'] ?? '' }}
                                                 </td>
-                                                <td style="border: 1px solid #000; padding: 5px; vertical-align: top; text-align: left; font-size: 16px;">
+                                                <td style="border: 1px solid #000; padding: 5px; vertical-align: top; text-align: left; font-size: 18px;">
                                                     {{ $record['description'] ?? '' }}
                                                 </td>
                                             </tr>
@@ -258,7 +258,7 @@
 
                                                             </span>
                                                         </td>
-                                                        <td style="font-size: 16px; line-height: 1.5; text-align: justify;">
+                                                        <td style="font-size: 18px; line-height: 1.5; text-align: justify;">
                                                             By checking this box, I declare that this record is true and correct. Unless otherwise clearly indicated as "out of service" on this record, I confirm that the equipment on this record is in compliance with the Federal Motor Carrier Safety Regulations 49 C.F.R. 396.3(a)(1) and 396.7 (a) and is in safe operating condition and meets all federal, state and local motor vehicle laws. Furthermore, I confirm that preventative maintenance is consistent with the interval schedule per 396.3(b)(2).
                                                         </td>
                                                     </tr>
@@ -271,15 +271,15 @@
                                             <table style="width: 100%; border-collapse: collapse;" cellPadding="5" cellSpacing="0">
                                                 <tbody>
                                                     <tr>
-                                                        <td style="font-size: 16px; padding: 8px 20px 8px 8px; vertical-align: top; width: 50%;">
-                                                            <span style="font-weight: bold; padding-left: 10px; padding-bottom: 5px; font-size: 16px;">Signature of Authorized Officer or Business Contact:</span>
-                                                            <div style="width: 100%; border: 1px solid #000; padding: 5px; font-size: 16px; min-height: 25px; box-sizing: border-box; background-color: #f1f4ff;">
+                                                        <td style="font-size: 18px; padding: 8px 20px 8px 8px; vertical-align: top; width: 50%;">
+                                                            <span style="font-weight: bold; padding-left: 10px; padding-bottom: 10px; font-size: 18px;">Signature of Authorized Officer or Business Contact:</span>
+                                                            <div style="width: 100%; border: 1px solid #000; padding: 5px; font-size: 18px; min-height: 25px; box-sizing: border-box; background-color: #f1f4ff;">
                                                                 {{ $mmrReport->signature ?? '' }}
                                                             </div>
                                                         </td>
-                                                        <td style="font-size: 16px; padding: 8px 8px 8px 20px; vertical-align: top; width: 50%;">
-                                                            <span style="font-weight: bold; padding-left: 10px; padding-bottom: 5px; font-size: 16px;">Date Completed: <span style="color: #f00;">*</span></span>
-                                                            <div style="width: 100%; border: 1px solid #000; padding: 5px; font-size: 16px; min-height: 25px; box-sizing: border-box; background-color: #f1f4ff;">
+                                                        <td style="font-size: 18px; padding: 8px 8px 8px 20px; vertical-align: top; width: 50%;">
+                                                            <span style="font-weight: bold; padding-left: 10px; padding-bottom: 5px; font-size: 18px;">Date Completed: <span style="color: #f00;">*</span></span>
+                                                            <div style="width: 100%; border: 1px solid #000; padding: 5px; font-size: 18px; min-height: 25px; box-sizing: border-box; background-color: #f1f4ff;">
                                                                 {{ $completedDateFormatted }}
                                                             </div>
                                                         </td>
@@ -298,7 +298,7 @@
                             <table style="width: 100%; border-collapse: collapse;" cellPadding="0" cellSpacing="0">
                                 <tbody>
                                     <tr>
-                                        <td style="font-size: 16px; line-height: 1.5; padding: 8px 0 21px 0; text-align: justify; font-style: italic;">
+                                        <td style="font-size: 18px; line-height: 1.5; padding: 8px 0 21px 0; text-align: justify; font-style: italic;">
                                             * The Monthly Maintenance Record (MMR) is FedEx's systematic method of obtaining vehicle maintenance records for service provider-owned vehicles in compliance with the Federal Motor Carrier Safety Regulations which require motor carriers to have a systematic method of causing vehicles operating under their motor carrier operating authority to be repaired and maintained. Therefore, if FedEx does not receive records for a vehicle by the 20th of the month following the month in which maintenance or repairs, were performed, packages will not be made available to this vehicle.
                                         </td>
                                     </tr>

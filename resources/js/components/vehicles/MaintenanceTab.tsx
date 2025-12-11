@@ -1,26 +1,78 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router';
 import { maintenanceService } from '../../services/maintenanceService';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHeader,
-    TableRow,
-} from "../ui/table";
 import Button from '../ui/button/Button';
 import { formatDate, formatCurrency } from '../../utilites';
-import { Maintenance } from '../../types/MaintenanceTypes';
 import { PaginationData } from '../common/TableFooter';
+import Badge from '../ui/badge/Badge';
 
 interface MaintenanceTabProps {
     activeTab: string;
 }
 
+interface Issue {
+    id: number;
+    summary: string;
+    description?: string;
+    priority?: string;
+    status?: string;
+    labels?: string;
+    work_order_id?: number | null;
+    vehicle_id?: number;
+    reported_by?: string;
+    reported_date?: string;
+    due_date?: string;
+}
+
+interface ServiceItem {
+    id: number;
+    name: string;
+    type: string;
+    value: string;
+    label: string;
+    labor_cost: number;
+}
+
+interface Vendor {
+    id: number;
+    name: string;
+}
+
+interface Vehicle {
+    id: number;
+    vehicle_name: string;
+    make?: string;
+    model?: string;
+    year?: string;
+    license_plate?: string;
+}
+
+interface WorkOrderMaintenance {
+    id: number;
+    user_id?: number;
+    vehicle_id: number;
+    vendor_id?: number;
+    status: string;
+    actual_start_date?: string;
+    actual_completion_date?: string;
+    scheduled_start_date?: string;
+    expected_completion_date?: string;
+    invoice_number?: string;
+    po_number?: string;
+    total_value?: string | number;
+    repair_priority_class?: string;
+    service_items?: ServiceItem[];
+    issues?: Issue[];
+    vendor?: Vendor | null;
+    vehicle?: Vehicle | null;
+    created_at?: string;
+    updated_at?: string;
+}
+
 export default function MaintenanceTab({ activeTab }: MaintenanceTabProps) {
     const { id } = useParams<{ id: string }>();
     const [loadingMaintenance, setLoadingMaintenance] = useState(false);
-    const [maintenanceRecords, setMaintenanceRecords] = useState<Maintenance[]>([]);
+    const [maintenanceRecords, setMaintenanceRecords] = useState<WorkOrderMaintenance[]>([]);
     const [maintenancePagination, setMaintenancePagination] = useState<PaginationData>({
         current_page: 1,
         last_page: 1,
@@ -28,6 +80,7 @@ export default function MaintenanceTab({ activeTab }: MaintenanceTabProps) {
         total: 0,
     });
     const [maintenanceCurrentPage, setMaintenanceCurrentPage] = useState(1);
+    const [error, setError] = useState<string | null>(null);
 
     const renderPagination = (
         pagination: PaginationData,
@@ -49,7 +102,7 @@ export default function MaintenanceTab({ activeTab }: MaintenanceTabProps) {
         }
 
         return (
-            <div className="flex items-center justify-between px-4 py-3 sm:px-6 border-t border-gray-200">
+            <div className="flex items-center justify-between px-4 py-3 sm:px-6">
                 <div className="flex flex-1 justify-between sm:hidden">
                     <Button
                         variant="outline"
@@ -131,30 +184,35 @@ export default function MaintenanceTab({ activeTab }: MaintenanceTabProps) {
     useEffect(() => {
         const fetchMaintenanceRecords = async () => {
             if (!id || activeTab !== 'maintenance') return;
-
             setLoadingMaintenance(true);
+            setError(null);
+
             try {
                 const response = await maintenanceService.getAll({
                     page: maintenanceCurrentPage,
                     search: '',
                     vehicle_id: Number(id),
                 });
+                console.log('Response Data:', response.data);
+
                 const data = response.data;
 
-                if (data.status && data.maintenance) {
-                    setMaintenanceRecords(data.maintenance.data || []);
+                if (data.status) {
+                    setMaintenanceRecords(data.maintenance?.data || []);
                     setMaintenancePagination({
-                        current_page: data.maintenance.current_page,
-                        last_page: data.maintenance.last_page,
-                        per_page: data.maintenance.per_page,
-                        total: data.maintenance.total,
+                        current_page: data.maintenance?.current_page || 1,
+                        last_page: data.maintenance?.last_page || 1,
+                        per_page: data.maintenance?.per_page || 10,
+                        total: data.maintenance?.total || 0,
                     });
                 } else {
                     setMaintenanceRecords([]);
+                    setError(data.message || 'Failed to fetch maintenance records');
                 }
-            } catch (error) {
+            } catch (error: any) {
                 console.error('Failed to load maintenance records:', error);
                 setMaintenanceRecords([]);
+                setError(error.response?.data?.message || 'An error occurred while fetching maintenance records');
             } finally {
                 setLoadingMaintenance(false);
             }
@@ -167,90 +225,126 @@ export default function MaintenanceTab({ activeTab }: MaintenanceTabProps) {
         return null;
     }
 
-    const getTotalAmount = (maintenance: Maintenance): number => {
-        if (!maintenance.maintenance_items || maintenance.maintenance_items.length === 0) {
-            return 0;
+    const getStatusColor = (status?: string) => {
+        switch (status) {
+            case "Open":
+                return "warning";
+            case "In Progress":
+                return "info";
+            case "Completed":
+                return "success";
+            case "Cancelled":
+                return "error";
+            default:
+                return "warning";
         }
-        return maintenance.maintenance_items.reduce((sum, item) => {
-            return sum + (item.total_amount || 0);
-        }, 0);
     };
 
     return (
-        <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
-            <div className="max-w-full overflow-x-auto">
-                {loadingMaintenance ? (
-                    <div className="flex items-center justify-center py-12">
-                        <div className="text-center">
-                            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-brand-500"></div>
-                            <p className="mt-2 text-sm text-gray-600">Loading maintenance records...</p>
+        <>
+            {loadingMaintenance ? (
+                <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
+                    <div className="p-4 sm:p-6">
+                        <div className="flex items-center justify-center py-12">
+                            <div className="text-center">
+                                <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-brand-500"></div>
+                                <p className="mt-2 text-sm text-gray-600">Loading maintenance records...</p>
+                            </div>
                         </div>
                     </div>
-                ) : maintenanceRecords.length === 0 ? (
-                    <div className="flex items-center justify-center py-12">
-                        <div className="text-center">
-                            <p className="text-gray-600">No maintenance records found</p>
+                </div>
+            ) : error ? (
+                <div className="overflow-hidden rounded-xl border border-red-200 bg-red-50">
+                    <div className="p-4 sm:p-6">
+                        <div className="flex items-center justify-center py-12">
+                            <div className="text-center">
+                                <p className="text-red-600">{error}</p>
+                                <p className="mt-2 text-sm text-gray-600">Vehicle ID: {id}</p>
+                            </div>
                         </div>
                     </div>
-                ) : (
-                    <>
-                        <Table>
-                            <TableHeader className="border-b border-gray-100">
-                                <TableRow>
-                                    <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs">
-                                        Date
-                                    </TableCell>
-                                    <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs">
-                                        Vehicle
-                                    </TableCell>
-                                    <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs">
-                                        Expense Type
-                                    </TableCell>
-                                    <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs">
-                                        Items Count
-                                    </TableCell>
-                                    <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs">
-                                        Total Amount
-                                    </TableCell>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody className="divide-y divide-gray-100">
-                                {maintenanceRecords.map((record) => (
-                                    <TableRow key={record.id}>
-                                        <TableCell className="px-4 py-3 text-start">
-                                            <div className="text-gray-800 text-theme-sm">
-                                                {record.vehicle_date ? formatDate(record.vehicle_date) : 'N/A'}
+                </div>
+            ) : maintenanceRecords.length === 0 ? (
+                <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
+                    <div className="p-4 sm:p-6">
+                        <div className="flex items-center justify-center py-12">
+                            <div className="text-center">
+                                <p className="text-gray-600">No maintenance records found</p>
+                                <p className="mt-2 text-sm text-gray-500">Vehicle ID: {id}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            ) : (
+                <>
+                    <div className="flex flex-col gap-4">
+                        {maintenanceRecords.map((record) => {
+                            const primaryService =
+                                record.service_items && record.service_items.length > 0
+                                    ? record.service_items.map(item => item.name).join(', ')
+                                    : 'Service';
+                            return (
+                                <div
+                                    key={record.id}
+                                    className="bg-gray-50 rounded-lg p-3 hover:shadow-md transition-shadow"
+                                >
+                                    <div className="flex items-start justify-between mb-2">
+                                        <div className='w-full flex'>
+                                            <p className="w-full text-base font-medium text-[#1D2939] mb-1">
+                                                {primaryService}
+                                            </p>
+                                            <div className='w-full flex justify-end'>
+                                                <Badge
+                                                    size="sm"
+                                                    color={getStatusColor(record.status)}
+                                                >
+                                                    {record.status}
+                                                </Badge>
                                             </div>
-                                        </TableCell>
-                                        <TableCell className="px-4 py-3 text-start">
-                                            <div className="text-gray-800 text-theme-sm">
-                                                {record.vehicle?.vehicle_name || record.vehicle_model || 'N/A'}
-                                            </div>
-                                        </TableCell>
-                                        <TableCell className="px-4 py-3 text-start">
-                                            <div className="text-gray-800 text-theme-sm">
-                                                {record.expense_type?.name || 'N/A'}
-                                            </div>
-                                        </TableCell>
-                                        <TableCell className="px-4 py-3 text-start">
-                                            <div className="text-gray-800 text-theme-sm">
-                                                {record.maintenance_items?.length || 0}
-                                            </div>
-                                        </TableCell>
-                                        <TableCell className="px-4 py-3 text-start">
-                                            <div className="text-gray-800 text-theme-sm">
-                                                {formatCurrency(getTotalAmount(record))}
-                                            </div>
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                        {maintenanceRecords.length > 0 && renderPagination(maintenancePagination, maintenanceCurrentPage, setMaintenanceCurrentPage, loadingMaintenance)}
-                    </>
-                )}
-            </div>
-        </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex gap-3">
+                                        <div className='w-full'>
+                                            <p className="text-sm text-gray-500 mb-1">Start Date</p>
+                                            <p className="text-sm text-gray-800">
+                                                {record.actual_start_date ? formatDate(record.actual_start_date) : 'N/A'}
+                                            </p>
+                                        </div>
+
+                                        <div className='w-full'>
+                                            <p className="text-sm text-gray-500 mb-1">Completion Date</p>
+                                            <p className="text-sm text-gray-800">
+                                                {record.actual_completion_date ? formatDate(record.actual_completion_date) : 'N/A'}
+                                            </p>
+                                        </div>
+
+                                        <div className='w-full'>
+                                            <p className="text-sm text-gray-500 mb-1">Invoice Number</p>
+                                            <p className="text-sm text-gray-800">
+                                                {record.invoice_number || 'N/A'}
+                                            </p>
+                                        </div>
+
+                                        <div className='w-full'>
+                                            <p className="text-sm text-gray-500 mb-1">Total Cost</p>
+                                            <p className="text-base text-gray-800">
+                                                {record.total_value ? formatCurrency(Number(record.total_value)) : 'N/A'}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    {/* {record.vendor && (
+                                        <div className="w-full">
+                                            <p className="text-sm text-gray-500">Vendor: <span className="text-gray-800 font-medium">{record.vendor.name}</span></p>
+                                        </div>
+                                    )} */}
+                                </div>
+                            );
+                        })}
+                    </div>
+                    {maintenanceRecords.length > 0 && renderPagination(maintenancePagination, maintenanceCurrentPage, setMaintenanceCurrentPage, loadingMaintenance)}
+                </>
+            )}
+        </>
     );
 }
-
