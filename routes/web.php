@@ -14,16 +14,12 @@ Route::middleware(['guest'])->group(function () {
     Auth::routes(['register' => false]);
 });
 
-<<<<<<< HEAD
-Route::middleware(['auth', 'page.access'])->group(function () {
-=======
 
 Route::get('/invoice/MMR_Report', function(){
     return view('invoice.MMR_Report');
 });
 
 Route::middleware(['auth','page.access'])->group(function () {
->>>>>>> 2c8661c79bf6e700c23271f5cb7488141c4b8fd2
 
     Route::get('/logout', [LoginController::class, 'logout']);
     Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -150,5 +146,4 @@ Route::middleware(['auth','page.access'])->group(function () {
     Route::get('/timeline/{timeLine}', [TimeLineController::class, 'show'])->name('timeline.show');
 
 });
-
 
