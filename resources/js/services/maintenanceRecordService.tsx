@@ -1,5 +1,4 @@
 import api from './api';
-
 interface MaintenanceRecordFormData {
   vehicle_id: number;
   vendor_id?: number;
@@ -39,11 +38,13 @@ interface MaintenanceRecordFormData {
 }
 
 export const maintenanceRecordService = {
-  getAll: (params?: { search?: string; page?: number; vehicle_id?: number }) => {
+  getAll: (params?: { search?: string; page?: number; vehicle_id?: number; actual_start_date?: string; actual_completion_date?: string }) => {
     const queryParams = new URLSearchParams();
     if (params?.search) queryParams.append('search', params.search);
     if (params?.page) queryParams.append('page', params.page.toString());
     if (params?.vehicle_id) queryParams.append('vehicle_id', params.vehicle_id.toString());
+    if (params?.actual_start_date) queryParams.append('actual_start_date', params.actual_start_date);
+    if (params?.actual_completion_date) queryParams.append('actual_completion_date', params.actual_completion_date);
     const queryString = queryParams.toString();
     return api.get(`/maintenance-records${queryString ? `?${queryString}` : ''}`);
   },

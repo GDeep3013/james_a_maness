@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\MaintenanceRecord;
+use App\Models\WorkOrder;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
@@ -26,8 +27,6 @@ class MaintenanceRecordController extends Controller
 
     public function index(Request $request)
     {
-
-        dd($request->all());
         $tableColumns = Schema::getColumnListing('maintenance_records');
         $query = MaintenanceRecord::with([
             'vehicle:id,vehicle_name,make,model,year',
@@ -35,12 +34,37 @@ class MaintenanceRecordController extends Controller
             'user:id,name'
         ])->orderBy('id', 'desc');
 
+        $workOrders = WorkOrder::with(['vehicle','vendor'])
+            ->when($request->vehicle_id, function ($q) use ($request) {
+                $q->where('vehicle_id', $request->vehicle_id);
+            })
+            ->when($request->actual_start_date, function ($q) use ($request) {
+                $q->whereDate('actual_start_date', '>=', $request->actual_start_date);
+            })
+            ->when($request->actual_completion_date, function ($q) use ($request) {
+                $q->whereDate('actual_completion_date', '<=', $request->actual_completion_date);
+            })
+            ->get(['id', 'vehicle_id', 'service_items', 'actual_start_date', 'actual_completion_date', 'total_value']);
+
         $searchTerm = $request->search;
 
+
+        // Filter by vehicle_id
         if ($request->has('vehicle_id') && !empty($request->vehicle_id)) {
             $query->where('vehicle_id', $request->vehicle_id);
         }
 
+        // Filter by actual_start_date
+        if ($request->has('actual_start_date') && !empty($request->actual_start_date)) {
+            $query->whereDate('actual_start_date', '>=', $request->actual_start_date);
+        }
+
+        // Filter by actual_completion_date
+        if ($request->has('actual_completion_date') && !empty($request->actual_completion_date)) {
+            $query->whereDate('actual_completion_date', '<=', $request->actual_completion_date);
+        }
+
+        // Search functionality
         if (!empty($searchTerm)) {
             $query->where(function ($query) use ($tableColumns, $searchTerm) {
                 foreach ($tableColumns as $column) {
@@ -61,7 +85,7 @@ class MaintenanceRecordController extends Controller
 
         $maintenanceRecords = $query->paginate(20);
 
-        return response()->json(['status' => true, 'maintenance_records' => $maintenanceRecords]);
+        return response()->json(['status' => true, 'maintenance_records' => $maintenanceRecords, 'work_orders' => $workOrders,]);
     }
 
     public function store(Request $request)

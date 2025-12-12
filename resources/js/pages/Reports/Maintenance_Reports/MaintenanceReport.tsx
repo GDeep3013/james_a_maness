@@ -5,7 +5,10 @@ import Button from "../../../components/ui/button/Button";
 import { vehicleService } from "../../../services/vehicleService";
 import { vendorService } from "../../../services/vendorService";
 import { maintenanceRecordService } from "../../../services/maintenanceRecordService";
-
+import DatePicker from "../../../components/form/date-picker";
+import DateTimePicker from "../../../components/form/date-time-picker";
+import api from "../../../services/api";
+import { formatDate } from "../../../utilites/formatting";
 interface Vehicle {
     id: number;
     vehicle_name: string;
@@ -15,6 +18,7 @@ interface Vendor {
     id: number;
     name: string;
     address?: string;
+    email?: string;
     city?: string;
     state?: string;
     zip?: string;
@@ -32,7 +36,17 @@ interface LineItem {
     net: number;
     extended: number;
 }
-
+interface ServiceItem {
+    name: string;
+}
+interface WorkOrderFilterItem {
+    id: number;
+    vehicle_id: number;
+    service_items: ServiceItem[];
+    actual_start_date?: string;
+    actual_completion_date?: string;
+    total_value?: string | number;
+}
 
 export default function MaintenanceReport() {
     const navigate = useNavigate();
@@ -42,8 +56,10 @@ export default function MaintenanceReport() {
     const [vehicles, setVehicles] = useState<Vehicle[]>([]);
     const [vendors, setVendors] = useState<Vendor[]>([]);
     const [selectedVendor, setSelectedVendor] = useState<Vendor | null>(null);
+    const [workOrders, setWorkOrders] = useState<WorkOrderFilterItem[]>([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [fetchWorkOrder, setFetchWorkOrder] = useState(false);
     const [generalError, setGeneralError] = useState<string>("");
     const [successMessage, setSuccessMessage] = useState<string>("");
 
@@ -67,7 +83,6 @@ export default function MaintenanceReport() {
         payment_method: "",
         payment_reference: "",
     });
-
     const [lineItems, setLineItems] = useState<LineItem[]>([
         { qty: 0, line: "", item_number: "", description: "", warr: "", unit: "", tax: "", list: 0, net: 0, extended: 0 },
     ]);
@@ -139,9 +154,36 @@ export default function MaintenanceReport() {
         }
     };
 
-    const handleInputChange = (field: string, value: string) => {
-        setFormData(prev => ({ ...prev, [field]: value }));
+    useEffect(() => {
+        if (formData.vehicle_id && formData.actual_start_date && formData.actual_completion_date) {
+            fetchFilteredWorkOrders();
+        }
+    }, [formData.vehicle_id, formData.actual_start_date, formData.actual_completion_date]);
+
+    const fetchFilteredWorkOrders = async () => {
+        try {
+            console.log('vehicle_id', formData.vehicle_id);
+            const res = await api.get("/maintenance-records", {
+                params: {
+                    vehicle_id: formData.vehicle_id,
+                    actual_start_date: formData.actual_start_date,
+                    actual_completion_date: formData.actual_completion_date,
+                },
+            });
+
+            setWorkOrders(res.data.work_orders || []);
+
+        } catch (error) {
+            console.error("Error loading work orders:", error);
+
+        }
     };
+    console.log(workOrders, 'Work')
+
+    const handleInputChange = (field: string, value: string) => {
+
+        setFormData(prev => ({ ...prev, [field]: value }));
+    }
 
     const handleVendorChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const vendorId = e.target.value;
@@ -200,6 +242,7 @@ export default function MaintenanceReport() {
         e.target.style.backgroundColor = "#f1f4ff";
     };
 
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setGeneralError("");
@@ -236,7 +279,7 @@ export default function MaintenanceReport() {
 
             if (response.data?.status === true || response.status === 200 || response.status === 201) {
                 setSuccessMessage("Maintenance record saved successfully!");
-                setTimeout(() => navigate("/maintenance-records"), 1500);
+                setTimeout(() => navigate("/reports/maintenance"), 1500);
             } else {
                 setGeneralError(response.data?.message || "Failed to save maintenance record.");
             }
@@ -249,16 +292,20 @@ export default function MaintenanceReport() {
 
     const selectedVehicle = vehicles.find(v => v.id === Number(formData.vehicle_id));
 
+    const handleDateTimeChange = (name: string) => (_dates: unknown, dateString: string) => {
+        setFormData((prev) => ({ ...prev, [name]: dateString }));
+
+    };
     return (
         <>
             <PageMeta
-                title={isEditMode ? "Edit Maintenance Record" : "Create Maintenance Record"}
-                description="Manage maintenance records"
+                title={isEditMode ? "Edit Maintenance Report" : "Create Maintenance Report"}
+                description="Manage maintenance reports"
             />
             <div className="space-y-6">
                 <div className="page-actions flex flex-wrap items-center justify-between gap-3 mb-6">
                     <h2 className="text-base md:text-xl font-semibold text-gray-800 dark:text-white/90">
-                        {isEditMode ? "Edit Maintenance Record" : "Create Maintenance Record"}
+                        {isEditMode ? "Edit Maintenance Report" : "Create Maintenance Report"}
                     </h2>
                 </div>
 
@@ -316,11 +363,25 @@ export default function MaintenanceReport() {
                                                                                             ))}
                                                                                         </select>
                                                                                     </div>
-                                                                                    {selectedVendor && (
+                                                                                    {/* {selectedVendor && (
                                                                                         <>
                                                                                             <div style={{ marginTop: "5px" }}>{selectedVendor.address || '.'}</div>
-                                                                                            <div>{selectedVendor.city || '.'}, {selectedVendor.state || ''} {selectedVendor.zip || ''}</div>
+                                                                                                <div>{selectedVendor.city || '.'}, {selectedVendor.state || ''} {selectedVendor.zip || ''}</div>
+                                                                                                <div>EMAIL:{selectedVendor.email || ''}</div>
                                                                                         </>
+                                                                                    )} */}
+                                                                                    {selectedVendor && (
+                                                                                        <div style={{ marginTop: "5px", fontSize: "12px", lineHeight: "1.4" }}>
+                                                                                            <div>{selectedVendor.address || "."}
+                                                                                            </div>
+                                                                                            <div>{selectedVendor.city || "."},
+                                                                                                {selectedVendor.state || ""} {selectedVendor.zip || ""}
+                                                                                            </div>
+                                                                                            <div>
+                                                                                                <span style={{ fontWeight: "bold" }}>Email:</span> {selectedVendor.email || ""}
+                                                                                            </div>
+
+                                                                                        </div>
                                                                                     )}
                                                                                 </div>
                                                                             </td>
@@ -358,17 +419,18 @@ export default function MaintenanceReport() {
                                                                                 />
                                                                             </td>
                                                                         </tr>
-                                                                        <tr>
+                                                                        <tr >
                                                                             <td style={{ fontSize: "12px", textAlign: "right", padding: "8px", borderRight: "1px solid #000", borderBottom: "1px solid #000" }}>Date</td>
                                                                             <td style={{ fontSize: "12px", padding: "8px", borderBottom: "1px solid #000" }}>
-                                                                                <input
-                                                                                    type="datetime-local"
-                                                                                    value={formData.date}
-                                                                                    onChange={(e) => handleInputChange("date", e.target.value)}
-                                                                                    style={{ width: "100%", border: "none", padding: "2px", fontSize: "12px", backgroundColor: "#f1f4ff", outline: "none" }}
-                                                                                    onFocus={handleInputFocus}
-                                                                                    onBlur={handleInputBlur}
-                                                                                />
+                                                                                <div className="date-time-picker" style={{ width: "100%", backgroundColor: "#f1f4ff", border: "none", padding: "2px", fontSize: "10px", }}>
+                                                                                    <DateTimePicker
+                                                                                        id="date"
+                                                                                        placeholder="Select date"
+                                                                                        onChange={handleDateTimeChange("date")}
+                                                                                        defaultDate={formData.date || undefined}
+                                                                                    />
+                                                                                </div>
+
                                                                             </td>
                                                                         </tr>
                                                                         <tr>
@@ -401,9 +463,94 @@ export default function MaintenanceReport() {
                                                                 </table>
                                                             </td>
                                                         </tr>
+
                                                         <tr>
                                                             <td colSpan={2} style={{ padding: "10px 0" }}>
-                                                                <table style={{ width: "100%", borderCollapse: "collapse", border: "1px solid #000" }} cellPadding="5" cellSpacing="0">
+                                                                <div className="grid grid-cols-[1fr_auto] mb-2 items-center">
+                                                                    <h3 style={{ fontSize: "14px", fontWeight: "bold", marginBottom: "10px", color: "#374151" }} > Invoice Details </h3>
+
+                                                                    <div className="date-time-picker" style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "8px" }} >
+                                                                        <select value={formData.vehicle_id} onChange={(e) => handleInputChange("vehicle_id", e.target.value)}
+                                                                            style={{ width: "100%", backgroundColor: "#fff", border: "1px solid #d1d5db", padding: "8px", fontSize: "12px", borderRadius: "6px", outline: "none" }} >
+                                                                            <option value="">Select Vehicle</option>
+                                                                            {vehicles.map((vehicle) => (
+                                                                                <option key={vehicle.id} value={vehicle.id}>
+                                                                                    {vehicle.vehicle_name}
+                                                                                </option>
+                                                                            ))}
+                                                                        </select>
+
+
+                                                                        <DatePicker
+                                                                            id="actual_start_date"
+                                                                            placeholder="Select start date"
+                                                                            onChange={handleDateTimeChange("actual_start_date")}
+                                                                            defaultDate={formData.actual_start_date || undefined}
+                                                                        />
+
+                                                                        <DatePicker
+                                                                            id="actual_completion_date"
+                                                                            placeholder="Select completion date"
+                                                                            onChange={handleDateTimeChange("actual_completion_date")}
+                                                                            defaultDate={formData.actual_completion_date || undefined}
+                                                                        />
+
+                                                                    </div>
+                                                                </div>
+
+                                                                <table style={{ width: "100%", borderCollapse: "collapse", marginTop: "15px" }}>
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th style={{ border: "1px solid #000", padding: "6px", fontSize: "12px" }}>Service Items</th>
+                                                                            <th style={{ border: "1px solid #000", padding: "6px", fontSize: "12px" }}>Start Date</th>
+                                                                            <th style={{ border: "1px solid #000", padding: "6px", fontSize: "12px" }}>Completion Date</th>
+                                                                            <th style={{ border: "1px solid #000", padding: "6px", fontSize: "12px" }}>Total Value</th>
+                                                                        </tr>
+                                                                    </thead>
+
+                                                                    <tbody>
+                                                                        {workOrders.length === 0 && (
+                                                                            <tr>
+                                                                                <td colSpan={4} style={{ textAlign: "center", padding: "10px" }}>
+                                                                                </td>
+                                                                            </tr>
+                                                                        )}
+
+                                                                        {workOrders && workOrders.map((record) => {
+
+                                                                            const primaryService =
+                                                                                record?.service_items?.length > 0
+                                                                                    ? record.service_items.map((si) => si.name).join(", ")
+                                                                                    : "Service";
+
+                                                                            return (
+                                                                                <tr key={record.id}>
+                                                                                    <td className="max-w-[268px]" style={{ border: "1px solid #000", padding: "6px", fontSize: "12px" }}>
+                                                                                        {primaryService}
+                                                                                    </td>
+
+                                                                                    <td style={{ border: "1px solid #000", padding: "6px", fontSize: "12px" }}>
+                                                                                        {formatDate(record?.actual_start_date || "-")}
+                                                                                    </td>
+
+                                                                                    <td style={{ border: "1px solid #000", padding: "6px", fontSize: "12px" }}>
+                                                                                        {formatDate(record?.actual_completion_date || "-")}
+                                                                                    </td>
+
+                                                                                    <td style={{ border: "1px solid #000", padding: "6px", fontSize: "12px" }}>
+                                                                                        {record?.total_value || 0}
+                                                                                    </td>
+                                                                                </tr>
+                                                                            );
+                                                                        })}
+
+
+                                                                    </tbody>
+                                                                </table>
+
+
+                                                                <table style={{ width: "100%", borderCollapse: "collapse", border: "1px solid #000", marginTop: "10px" }} cellPadding="5" cellSpacing="0">
+
                                                                     <tbody>
                                                                         <tr>
                                                                             <td style={{ border: "1px solid #000", fontSize: "12px", padding: "3px", width: "25%", textAlign: "center" }}>Counter #</td>
@@ -543,7 +690,7 @@ export default function MaintenanceReport() {
                                                                 <td style={{ border: "none", fontSize: "12px", padding: "4px 2px", textAlign: "right" }}>
                                                                     <input
                                                                         type="number"
-                                                                        step="0.01"
+                                                                        // step="0.01"
                                                                         value={item.list}
                                                                         onChange={(e) => handleLineItemChange(index, "list", Number(e.target.value))}
                                                                         style={{ width: "60px", border: "1px solid #ccc", padding: "2px", fontSize: "12px", textAlign: "right", backgroundColor: "#f1f4ff" }}
@@ -552,7 +699,7 @@ export default function MaintenanceReport() {
                                                                 <td style={{ border: "none", fontSize: "12px", padding: "4px 2px", textAlign: "right" }}>
                                                                     <input
                                                                         type="number"
-                                                                        step="0.01"
+                                                                        // step="0.01"
                                                                         value={item.net}
                                                                         onChange={(e) => handleLineItemChange(index, "net", Number(e.target.value))}
                                                                         style={{ width: "60px", border: "1px solid #ccc", padding: "2px", fontSize: "12px", textAlign: "right", backgroundColor: "#f1f4ff" }}
@@ -676,21 +823,24 @@ export default function MaintenanceReport() {
                                 </table>
                                 <div style={{ padding: "20px", textAlign: "right" }}>
                                     <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => navigate(-1)}
-                                        disabled={isSubmitting}
-                                        className="mr-3"
-                                    >
-                                        Cancel
-                                    </Button>
-                                    <Button
                                         type="submit"
                                         size="sm"
                                         disabled={isSubmitting}
-                                        className="px-6 py-2"
+                                        variant="primary"
                                     >
-                                        {isSubmitting ? "Saving..." : isEditMode ? "Update Record" : "Save Record"}
+                                        {isSubmitting ? (isEditMode ? "Updating..." : "Saving...") : (isEditMode ? "Update Maintenance Report" : "Save Maintenance Report")}
+                                    </Button>
+
+
+
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => navigate("/reports/maintenance")}
+                                        disabled={isSubmitting}
+                                        className="ml-2"
+                                    >
+                                        Cancel
                                     </Button>
                                 </div>
                             </form>
