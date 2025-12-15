@@ -11,7 +11,7 @@ import Input from "../../../components/form/input/InputField";
 import Button from "../../../components/ui/button/Button";
 import PageMeta from "../../../components/common/PageMeta";
 import { maintenanceRecordService } from "../../../services/maintenanceRecordService";
-import { EyeIcon, PencilIcon, TrashBinIcon } from "../../../icons";
+import { ExportIcon, EyeIcon, PencilIcon, TrashBinIcon } from "../../../icons";
 import TableFooter, { PaginationData } from "../../../components/common/TableFooter";
 import { formatDate, formatCurrency } from "../../../utilites";
 
@@ -66,6 +66,7 @@ export default function MaintenanceReportList() {
         total: 0,
     });
     const [deletingId, setDeletingId] = useState<number | null>(null);
+    const [downloadingId, setDownloadingId] = useState<number | null>(null);
 
     const fetchRecords = useCallback(async (page: number = 1, search: string = "") => {
         setLoading(true);
@@ -134,6 +135,55 @@ export default function MaintenanceReportList() {
 
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
+    };
+
+    const downloadMaintenanceReport = async (id: number) => {
+        setDownloadingId(id);
+        setError('');
+        try {
+            const token = localStorage.getItem('auth_token');
+            if (!token) {
+                setError('Authentication token not found. Please login again.');
+                setDownloadingId(null);
+                return;
+            }
+
+            const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+            const response = await fetch(`${API_URL}/maintenance-records/${id}/download`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Accept': 'application/pdf',
+                },
+                credentials: 'include',
+            });
+
+            if (!response.ok) {
+                if (response.status === 401) {
+                    setError('Authentication failed. Please login again.');
+                } else if (response.status === 404) {
+                    setError('Maintenance record not found.');
+                } else {
+                    setError('Failed to download maintenance report.');
+                }
+                setDownloadingId(null);
+                return;
+            }
+
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `Maintenance_Report_${id}_${new Date().toISOString().split('T')[0]}.pdf`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+        } catch {
+            setError('An error occurred while downloading the maintenance report.');
+        } finally {
+            setDownloadingId(null);
+        }
     };
 
     return (
@@ -244,6 +294,16 @@ export default function MaintenanceReportList() {
                                                 </TableCell>
                                                 <TableCell className="px-4 py-3 text-start">
                                                     <div className="">
+                                                         <Button
+                                                            variant="none"
+                                                            size="sm"
+                                                            onClick={() => downloadMaintenanceReport(record.id)}
+                                                            disabled={downloadingId === record.id}
+                                                            className="hover:scale-105 transition-all duration-300"
+                                                            startIcon={<ExportIcon />}
+                                                        >
+                                                            {""}
+                                                        </Button>
                                                         <Button
                                                             variant="none"
                                                             size="sm"

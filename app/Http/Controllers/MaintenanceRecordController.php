@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 use Auth;
 
 class MaintenanceRecordController extends Controller
@@ -30,7 +32,7 @@ class MaintenanceRecordController extends Controller
         $tableColumns = Schema::getColumnListing('maintenance_records');
         $query = MaintenanceRecord::with([
             'vehicle:id,vehicle_name,make,model,year',
-            'vendor:id,name,address,city,state,zip',
+            'vendor:id,name,address,city,state,zip,email',
             'user:id,name'
         ])->orderBy('id', 'desc');
 
@@ -47,7 +49,6 @@ class MaintenanceRecordController extends Controller
             ->get(['id', 'vehicle_id', 'service_items', 'actual_start_date', 'actual_completion_date', 'total_value']);
 
         $searchTerm = $request->search;
-
 
         // Filter by vehicle_id
         if ($request->has('vehicle_id') && !empty($request->vehicle_id)) {
@@ -193,7 +194,7 @@ class MaintenanceRecordController extends Controller
 
         $maintenanceRecord = MaintenanceRecord::with([
             'vehicle:id,vehicle_name',
-            'vendor:id,name,address,city,state,zip',
+            'vendor:id,name,address,city,state,zip,email',
             'user:id,name'
         ])->where('id', $id)->first();
 
@@ -222,7 +223,7 @@ class MaintenanceRecordController extends Controller
 
         $maintenanceRecord = MaintenanceRecord::with([
             'vehicle:id,vehicle_name',
-            'vendor:id,name,address,city,state,zip',
+            'vendor:id,name,address,city,state,zip,email',
             'user:id,name'
         ])->where('id', $id)->first();
 
@@ -409,6 +410,57 @@ class MaintenanceRecordController extends Controller
             return response()->json([
                 'status' => false,
                 'message' => 'Failed to delete maintenance record'
+            ], 500);
+        }
+    }
+
+    /**
+     * Download maintenance record as PDF
+     */
+    public function download($id)
+    {
+        try {
+            $maintenanceRecord = MaintenanceRecord::with(['vehicle', 'vendor', 'user'])->find($id);
+
+            if (!$maintenanceRecord) {
+                return response()->json(['status' => false, 'message' => 'Maintenance record not found'], 404);
+            }
+
+
+            $lineItems = is_array($maintenanceRecord->line_items)
+                ? $maintenanceRecord->line_items
+                : (is_string($maintenanceRecord->line_items)
+                    ? json_decode($maintenanceRecord->line_items, true) ?? []
+                    : []);
+
+
+            $workOrders = WorkOrder::with(['vehicle','vendor'])
+            ->when($maintenanceRecord->vehicle_id, function ($q) use ($maintenanceRecord) {
+                $q->where('vehicle_id', $maintenanceRecord->vehicle_id);
+            })
+            ->when($maintenanceRecord->actual_start_date, function ($q) use ($maintenanceRecord) {
+                $q->whereDate('actual_start_date', '>=', $maintenanceRecord->actual_start_date);
+            })
+            ->when($maintenanceRecord->actual_completion_date, function ($q) use ($maintenanceRecord) {
+                $q->whereDate('actual_completion_date', '<=', $maintenanceRecord->actual_completion_date);
+            })
+            ->get(['id', 'vehicle_id', 'service_items', 'actual_start_date', 'actual_completion_date', 'total_value']);
+
+            $data = [
+                'maintenanceRecord' => $maintenanceRecord,
+                'workOrders' => $workOrders,
+                'lineItems' => $lineItems,
+            ];
+            $pdf = Pdf::loadView('invoice.maintenanceReportPdf', $data);
+            $fileName = 'Maintenance_Report_' . $maintenanceRecord->id . '_' . date('Y-m-d') . '.pdf';
+
+            return $pdf->download($fileName);
+        } catch (\Exception $e) {
+            Log::error('Maintenance report download error: ' . $e->getMessage());
+            return response()->json([
+                'status' => false,
+                'message' => 'An error occurred while generating the PDF',
+                'error' => $e->getMessage()
             ], 500);
         }
     }

@@ -124,7 +124,7 @@ nav span.menu-item-icon-size svg {
     z-index: 99999;
     background-color: #fff;
 }
-.date-time-picker input {height: 22px;box-shadow: none;border: none;}
+.date-picker input {height: 22px;box-shadow: none;border: none;}
 
 .date-time-picker .flatpickr-wrapper span svg {
     width: 18px;

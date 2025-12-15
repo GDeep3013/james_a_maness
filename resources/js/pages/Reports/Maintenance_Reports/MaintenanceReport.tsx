@@ -223,7 +223,7 @@ export default function MaintenanceReport() {
 
     const addLineItem = () => {
         setLineItems([...lineItems, {
-            qty: 0, line: "", item_number: "", description: "",
+            qty: 1, line: "", item_number: "", description: "",
             warr: "", unit: "", tax: "", list: 0, net: 0, extended: 0
         }]);
     };
@@ -422,8 +422,8 @@ export default function MaintenanceReport() {
                                                                         <tr >
                                                                             <td style={{ fontSize: "12px", textAlign: "right", padding: "8px", borderRight: "1px solid #000", borderBottom: "1px solid #000" }}>Date</td>
                                                                             <td style={{ fontSize: "12px", padding: "8px", borderBottom: "1px solid #000" }}>
-                                                                                <div className="date-time-picker" style={{ width: "100%", backgroundColor: "#f1f4ff", border: "none", padding: "2px", fontSize: "10px", }}>
-                                                                                    <DateTimePicker
+                                                                                <div className="date-picker" style={{ width: "100%", backgroundColor: "#f1f4ff", border: "none", padding: "2px", fontSize: "10px", }}>
+                                                                                    <DatePicker
                                                                                         id="date"
                                                                                         placeholder="Select date"
                                                                                         onChange={handleDateTimeChange("date")}
