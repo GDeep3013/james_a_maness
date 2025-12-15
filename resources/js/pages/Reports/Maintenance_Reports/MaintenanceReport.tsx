@@ -728,6 +728,8 @@ export default function MaintenanceReport() {
                                                 >
                                                     Add Line Item
                                                 </button>
+                                                <div style={{ textAlign: "center", fontSize: "12px", fontWeight: "bold", marginTop: "20px" }}>**Historical Reprint**</div>
+
                                             </td>
                                         </tr>
                                     </tbody>
@@ -740,8 +742,14 @@ export default function MaintenanceReport() {
                                                             <td><div style={{ fontSize: "10px", marginBottom: "5px", borderBottom: "1px solid #000" }}>{lineItems.length} Items</div></td>
                                                         </tr>
                                                         <tr>
+                                                            <td><div style={{ fontSize: "10px", borderTop: "2px solid #000", textAlign: "right" }}>
+                                                                Chip Used: N REF #: 556891698724 AUTH CD: 175275
+                                                            </div>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
                                                             <td>
-                                                                <div style={{ fontSize: "10px", borderTop: "2px solid #000", padding: "10px 0" }}>
+                                                                <div style={{ fontSize: "10px", padding: "10px 0" }}>
                                                                     <div style={{ marginBottom: "5px" }}>
                                                                         <strong>Payment Method:</strong>
                                                                         <input
@@ -813,6 +821,20 @@ export default function MaintenanceReport() {
                                                                         </tr>
                                                                     </tbody>
                                                                 </table>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                                <table style={{ width: "100%", borderCollapse: "collapse" }} cellPadding="0" cellSpacing="0">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td style={{ width: "60%", padding: "15px 0 5px 0" }}>
+                                                                <div style={{ fontSize: "15px", marginBottom: "3px", textTransform: "uppercase", letterSpacing: "2px" }}>WWW.OREILLYPRO.COM</div>
+                                                                <div style={{ fontSize: "10px", marginBottom: "8px" }}>Warranty/Garantia: www.oreillypro.com/warranty</div>
+                                                            </td>
+                                                            <td style={{ width: "30%", padding: "15px 0 5px 0" }}>
+                                                                <div style={{ fontSize: "15px", marginBottom: "3px", textTransform: "uppercase", letterSpacing: "2px" }}>WE APPRECIATE YOUR BUSINESS!</div>
+                                                                <div style={{ fontSize: "10px" }}>464WS167 Remit To: PO BOX 9464, SPRINGFIELD, MO 65801-9464</div>
                                                             </td>
                                                         </tr>
                                                     </tbody>

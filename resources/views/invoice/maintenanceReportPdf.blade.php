@@ -110,7 +110,7 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <td style="padding: 10px 0 0 0; height:55%; vertical-align:top;">
+                        <td style="padding: 10px 0 0 0; height:57%; vertical-align:top;">
                             <table style="width: 100%; border-collapse: collapse; border: none;" cellPadding="0" cellSpacing="0">
                                 <tr>
                                     <td colspan="2" style="padding: 5px 0;">
@@ -258,7 +258,7 @@
                                     <tr>
                                         <td>
                                             <div style="font-size: 14px; border-top: 2px solid #000; padding-top:5px; text-align: right">
-                                                Chip Used: N REF #: 556891698724 AUTH CD: 175275
+                                                Chip Used: N {{ $maintenanceRecord->payment_reference ?? '' }} AUTH CD: 175275
                                             </div>
                                         </td>
                                     </tr>
