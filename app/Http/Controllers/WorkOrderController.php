@@ -49,12 +49,22 @@ class WorkOrderController extends Controller
             $query->where('vehicle_id', $request->vehicle_id);
         }
 
+        if ($request->has('vendor_id') && !empty($request->vendor_id)) {
+            $query->where('vendor_id', $request->vendor_id);
+        }
+
         if ($request->has('issue_date') && !empty($request->issue_date)) {
             $query->whereMonth('issue_date', date('m', strtotime($request->issue_date)));
             $query->whereYear('issue_date', date('Y', strtotime($request->issue_date)));
         }
 
+        if ($request->has('actual_start_date') && !empty($request->actual_start_date)) {
+            $query->whereDate('actual_start_date', '>=', $request->actual_start_date);
+        }
 
+        if ($request->has('actual_completion_date') && !empty($request->actual_completion_date)) {
+            $query->whereDate('actual_completion_date', '<=', $request->actual_completion_date);
+        }
 
         if (!empty($searchTerm)) {
             $query->where(function ($query) use ($tableColumns, $searchTerm) {

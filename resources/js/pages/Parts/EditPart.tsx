@@ -8,22 +8,10 @@ import MultiSelect from "../../components/form/MultiSelect";
 import Button from "../../components/ui/button/Button";
 import PageMeta from "../../components/common/PageMeta";
 import { ChevronLeftIcon } from "../../icons";
-import { partService } from "../../services/partService";
-import { vendorService } from "../../services/vendorService";
+import { partService , PartFormData } from "../../services/partService";
+import { vendorService , } from "../../services/vendorService";
 import { typeOptions } from "../../constants/vehicleConstants";
-
-export interface PartFormData {
-    part_name: string;
-    part_code: string;
-    description: string;
-    vehical_types: string[];
-    manufacturer_name: string;
-    unit_price: string;
-    purchase_price: string;
-    vendor_id: string;
-    warranty_period_months: string;
-    status: "Active" | "Inactive";
-}
+import { WARRANTY_OPTIONS } from "../../constants/selectOptions";
 
 interface Vendor {
     id: number;
@@ -40,9 +28,9 @@ export default function EditPart() {
         description: "",
         vehical_types: [],
         manufacturer_name: "",
-        unit_price: "",
-        purchase_price: "",
-        vendor_id: "",
+        unit_price: 0,
+        purchase_price: 0,
+        vendor_id: 0,
         warranty_period_months: "",
         status: "Active",
     });
@@ -83,7 +71,21 @@ export default function EditPart() {
         setGeneralError("");
         try {
             const response = await partService.getForEdit(partId);
-            const data = response.data as { status: boolean; data?: any };
+            const data = response.data as { 
+                status: boolean; 
+                data?: {
+                    part_name?: string;
+                    part_code?: string;
+                    description?: string;
+                    vehical_types?: string[];
+                    manufacturer_name?: string;
+                    unit_price?: number | string;
+                    purchase_price?: number | string;
+                    vendor_id?: number;
+                    warranty_period_months?: string | undefined;
+                    status?: "Active" | "Inactive";
+                };
+            };
 
             if (data.status && data.data) {
                 const part = data.data;
@@ -93,11 +95,11 @@ export default function EditPart() {
                     description: part.description || "",
                     vehical_types: Array.isArray(part.vehical_types) ? part.vehical_types : [],
                     manufacturer_name: part.manufacturer_name || "",
-                    unit_price: part.unit_price ? parseFloat(String(part.unit_price)).toString() : "",
-                    purchase_price: part.purchase_price ? parseFloat(String(part.purchase_price)).toString() : "",
-                    vendor_id: part.vendor_id ? part.vendor_id.toString() : "",
-                    warranty_period_months: part.warranty_period_months ? part.warranty_period_months.toString() : "",
-                    status: part.status || "Active",
+                    unit_price: part.unit_price ? parseFloat(String(part.unit_price)) : 0,
+                    purchase_price: part.purchase_price ? parseFloat(String(part.purchase_price)) : 0,
+                    vendor_id: part.vendor_id ? part.vendor_id : 0,
+                    warranty_period_months: part.warranty_period_months ? part.warranty_period_months : "",
+                    status: part.status || "Active" as "Active" | "Inactive",
                 });
             } else {
                 setGeneralError("Part not found");
@@ -160,15 +162,15 @@ export default function EditPart() {
             newErrors.part_code = "Part code is required";
         }
 
-        if (!formData.unit_price.trim()) {
+        if (!formData.unit_price) {
             newErrors.unit_price = "Unit price is required";
-        } else if (isNaN(parseFloat(formData.unit_price)) || parseFloat(formData.unit_price) < 0) {
+        } else if (isNaN(formData.unit_price) || formData.unit_price < 0) {
             newErrors.unit_price = "Please enter a valid unit price";
         }
 
-        if (!formData.purchase_price.trim()) {
+        if (!formData.purchase_price) {
             newErrors.purchase_price = "Purchase price is required";
-        } else if (isNaN(parseFloat(formData.purchase_price)) || parseFloat(formData.purchase_price) < 0) {
+        } else if (isNaN(formData.purchase_price) || formData.purchase_price < 0) {
             newErrors.purchase_price = "Please enter a valid purchase price";
         }
 
@@ -191,16 +193,16 @@ export default function EditPart() {
         setIsSubmitting(true);
 
         try {
-            const partData = {
+            const partData: PartFormData = {
                 part_name: formData.part_name,
                 part_code: formData.part_code,
-                description: formData.description || undefined,
-                vehical_types: formData.vehical_types.length > 0 ? formData.vehical_types : undefined,
-                manufacturer_name: formData.manufacturer_name || undefined,
-                unit_price: parseFloat(formData.unit_price),
-                purchase_price: parseFloat(formData.purchase_price),
-                vendor_id: formData.vendor_id ? parseInt(formData.vendor_id) : undefined,
-                warranty_period_months: formData.warranty_period_months ? parseInt(formData.warranty_period_months) : undefined,
+                description: formData.description,
+                vehical_types: formData.vehical_types,
+                manufacturer_name: formData.manufacturer_name,
+                unit_price: formData.unit_price,
+                purchase_price: formData.purchase_price,
+                vendor_id: formData.vendor_id,
+                warranty_period_months: formData.warranty_period_months,
                 status: formData.status,
             };
 
@@ -361,7 +363,7 @@ export default function EditPart() {
                                                 options={vendorOptions}
                                                 placeholder="Select vendor"
                                                 onChange={handleSelectChange("vendor_id")}
-                                                defaultValue={formData.vendor_id}
+                                                defaultValue={formData.vendor_id.toString()}
                                                 disabled={isLoadingVendors}
                                             />
                                         </div>
@@ -405,14 +407,12 @@ export default function EditPart() {
                                         </div>
 
                                         <div>
-                                            <Label htmlFor="warranty_period_months">Warranty Period (Months)</Label>
-                                            <Input
-                                                type="number"
-                                                id="warranty_period_months"
-                                                value={formData.warranty_period_months}
-                                                onChange={(e) => handleInputChange("warranty_period_months", e.target.value)}
-                                                placeholder="Enter warranty period in months"
-                                                min="0"
+                                            <Label htmlFor="warranty_period_months">Warranty Period</Label>
+                                            <Select
+                                                options={WARRANTY_OPTIONS}
+                                                placeholder="Select warranty period"
+                                                onChange={handleSelectChange("warranty_period_months")}
+                                                defaultValue={formData.warranty_period_months}
                                             />
                                         </div>
 

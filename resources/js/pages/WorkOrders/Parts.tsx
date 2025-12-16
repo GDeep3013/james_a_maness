@@ -63,6 +63,7 @@ export default function Parts({
           description: (option.description as string) || undefined,
           unit_price: (option.unit_price as number) || undefined,
           purchase_price: (option.purchase_price as number) || undefined,
+          warranty_period_months: (option.warranty_period_months as unknown as number) || undefined,
         });
       }
     });

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate, useParams } from "react-router";
 import PageMeta from "../../../components/common/PageMeta";
 import Button from "../../../components/ui/button/Button";
@@ -6,9 +6,9 @@ import { vehicleService } from "../../../services/vehicleService";
 import { vendorService } from "../../../services/vendorService";
 import { maintenanceRecordService } from "../../../services/maintenanceRecordService";
 import DatePicker from "../../../components/form/date-picker";
-import DateTimePicker from "../../../components/form/date-time-picker";
-import api from "../../../services/api";
-import { formatDate } from "../../../utilites/formatting";
+import { workOrderService } from "../../../services/workOrderService";
+import { WARRANTY_OPTIONS, TAX_OPTIONS } from "../../../constants/selectOptions";
+
 interface Vehicle {
     id: number;
     vehicle_name: string;
@@ -36,32 +36,25 @@ interface LineItem {
     net: number;
     extended: number;
 }
-interface ServiceItem {
-    name: string;
-}
-interface PartData {
-    part_name: string;
-    part_code: string;
-    description?: string;
-    vehical_types?: string[];
-    manufacturer_name?: string;
-    unit_price: number;
-    purchase_price: number;
-    vendor_id?: number;
+
+interface WorkOrderPart {
     warranty_period_months?: number;
-    status?: 'Active' | 'Inactive';
+    part_code?: string;
+    label?: string;
+    value?: string | number;
+    unit_price?: string | number;
+    purchase_price?: string | number;
 }
 
-interface WorkOrderFilterItem {
-    id: number;
-    vehicle_id: number;
-    parts: PartData[];
-    service_items: ServiceItem[];
+interface WorkOrder {
+    id?: number;
+    vehicle_id?: number;
+    parts?: WorkOrderPart[];
+    service_items?: unknown[];
     actual_start_date?: string;
     actual_completion_date?: string;
-    total_value?: string | number;
+    total_value?: number;
 }
-
 
 export default function MaintenanceReport() {
     const navigate = useNavigate();
@@ -71,10 +64,8 @@ export default function MaintenanceReport() {
     const [vehicles, setVehicles] = useState<Vehicle[]>([]);
     const [vendors, setVendors] = useState<Vendor[]>([]);
     const [selectedVendor, setSelectedVendor] = useState<Vendor | null>(null);
-    const [workOrders, setWorkOrders] = useState<WorkOrderFilterItem[]>([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-    const [fetchWorkOrder, setFetchWorkOrder] = useState(false);
     const [generalError, setGeneralError] = useState<string>("");
     const [successMessage, setSuccessMessage] = useState<string>("");
 
@@ -99,17 +90,10 @@ export default function MaintenanceReport() {
         payment_reference: "",
     });
     const [lineItems, setLineItems] = useState<LineItem[]>([
-        { qty: 0, line: "", item_number: "", description: "", warr: "", unit: "", tax: "", list: 0, net: 0, extended: 0 },
+        { qty: 0, line: "", item_number: "", description: "", warr: "", unit: "", tax: "Y", list: 0, net: 0, extended: 0 },
     ]);
 
-    useEffect(() => {
-        fetchDropdownData();
-        if (isEditMode && id) {
-            fetchMaintenanceRecord(parseInt(id));
-        }
-    }, [isEditMode, id]);
-
-    const fetchDropdownData = async () => {
+    const fetchDropdownData = useCallback(async () => {
         try {
             const [vehiclesRes, vendorsRes] = await Promise.all([
                 vehicleService.getAll({ page: 1 }),
@@ -126,9 +110,9 @@ export default function MaintenanceReport() {
         } catch {
             setGeneralError("Failed to load data");
         }
-    };
+    }, []);
 
-    const fetchMaintenanceRecord = async (recordId: number) => {
+    const fetchMaintenanceRecord = useCallback(async (recordId: number) => {
         setIsLoading(true);
         try {
             const response = await maintenanceRecordService.getById(recordId);
@@ -167,37 +151,41 @@ export default function MaintenanceReport() {
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [vendors]);
 
     useEffect(() => {
-        if (formData.vehicle_id && formData.actual_start_date && formData.actual_completion_date) {
-            fetchFilteredWorkOrders();
-        }
-    }, [formData.vehicle_id, formData.actual_start_date, formData.actual_completion_date]);
+        fetchDropdownData();
+    }, [fetchDropdownData]);
 
-    const fetchFilteredWorkOrders = async () => {
+    useEffect(() => {   
+        if (isEditMode && id) {
+            fetchMaintenanceRecord(parseInt(id));
+        }
+    }, [isEditMode, id, fetchMaintenanceRecord]);
+
+    const fetchFilteredWorkOrders = useCallback(async () => {
         try {
-            const res = await api.get("/maintenance-records", {
-                params: {
-                    vehicle_id: formData.vehicle_id,
-                    actual_start_date: formData.actual_start_date,
-                    actual_completion_date: formData.actual_completion_date,
-                },
+            const res = await workOrderService.getAll({
+                vehicle_id: Number(formData.vehicle_id),
+                vendor_id: Number(formData.vendor_id),
+                actual_start_date: formData.actual_start_date,
+                actual_completion_date: formData.actual_completion_date,
             });
 
-            const workOrders = res.data.work_orders || [];
-            console.log(workOrders)
-            const mappedLineItems: LineItem[] = workOrders.flatMap((wo: any) => {
-                if (!wo.parts || wo.parts.length === 0) return [];
+            const workOrders = (res.data?.work_orders?.data as WorkOrder[] || []) as WorkOrder[];
 
-                return wo.parts.map((part: any) => ({
+            const mappedLineItems: LineItem[] = workOrders.flatMap((wo: WorkOrder) => {
+
+                if (!wo.parts || wo.parts?.length === 0) return [];
+
+                return wo.parts.map((part: WorkOrderPart) => ({
                     qty: 1,
                     line: "",
                     item_number: part.part_code || "",
                     description: part.label || "",
-                    warr: "",
-                    unit: part.value || "",
-                    tax: "",
+                    warr: part.warranty_period_months ? part.warranty_period_months.toString() : "",
+                    unit: "",
+                    tax: "Y",
                     list: Number(part.unit_price) || 0,
                     net: Number(part.purchase_price) || 0,
                     extended:
@@ -205,23 +193,18 @@ export default function MaintenanceReport() {
                 }));
             });
 
-            setLineItems(prev => {
-                const existingCodes = new Set(prev.map(item => item.item_number));
+            setLineItems([...mappedLineItems]);
 
-                const filteredNewItems = mappedLineItems.filter(
-                    item => !existingCodes.has(item.item_number)
-                );
-
-                return [...prev, ...filteredNewItems];
-            });
-
-            setWorkOrders(res.data.work_orders || []);
-
-        } catch (error) {
-            console.error("Error loading work orders:", error);
-
+        } catch {
+            setGeneralError("Failed to load work orders data");
         }
-    };
+    }, [formData.vehicle_id, formData.actual_start_date, formData.actual_completion_date, formData.vendor_id]);
+
+    useEffect(() => {
+        if (formData.vehicle_id && formData.actual_start_date && formData.actual_completion_date) {
+            fetchFilteredWorkOrders();
+        }
+    }, [formData.vehicle_id, formData.actual_start_date, formData.actual_completion_date, fetchFilteredWorkOrders]);
 
     const handleInputChange = (field: string, value: string) => {
 
@@ -267,7 +250,7 @@ export default function MaintenanceReport() {
     const addLineItem = () => {
         setLineItems([...lineItems, {
             qty: 1, line: "", item_number: "", description: "",
-            warr: "", unit: "", tax: "", list: 0, net: 0, extended: 0
+            warr: "", unit: "", tax: "Y", list: 0, net: 0, extended: 0
         }]);
     };
 
@@ -326,14 +309,16 @@ export default function MaintenanceReport() {
             } else {
                 setGeneralError(response.data?.message || "Failed to save maintenance record.");
             }
-        } catch (error: any) {
-            setGeneralError(error.response?.data?.message || "An error occurred while saving.");
+        } catch (error: unknown) {
+            const errorMessage = error && typeof error === 'object' && 'response' in error
+                ? (error as { response?: { data?: { message?: string } } }).response?.data?.message
+                : undefined;
+            setGeneralError(errorMessage || "An error occurred while saving.");
         } finally {
             setIsSubmitting(false);
         }
     };
 
-    const selectedVehicle = vehicles.find(v => v.id === Number(formData.vehicle_id));
 
     const handleDateTimeChange = (name: string) => (_dates: unknown, dateString: string) => {
         setFormData((prev) => ({ ...prev, [name]: dateString }));
@@ -656,12 +641,19 @@ export default function MaintenanceReport() {
                                                                     />
                                                                 </td>
                                                                 <td style={{ border: "none", fontSize: "12px", padding: "4px 2px", textAlign: "center" }}>
-                                                                    <input
-                                                                        type="text"
-                                                                        value={item.warr}
+                                                                    <select
+                                                                        value={item.warr || ""}
                                                                         onChange={(e) => handleLineItemChange(index, "warr", e.target.value)}
-                                                                        style={{ width: "40px", border: "1px solid #ccc", padding: "2px", fontSize: "12px", textAlign: "center", backgroundColor: "#f1f4ff" }}
-                                                                    />
+                                                                        style={{ width: "50px", border: "1px solid #ccc", padding: "2px", fontSize: "12px", textAlign: "center", backgroundColor: "#f1f4ff", outline: "none" }}
+                                                                        onFocus={handleInputFocus}
+                                                                        onBlur={handleInputBlur}
+                                                                    >
+                                                                        {WARRANTY_OPTIONS.map((option) => (
+                                                                            <option key={option.value} value={option.value}>
+                                                                                {option.label}
+                                                                            </option>
+                                                                        ))}
+                                                                    </select>
                                                                 </td>
                                                                 <td style={{ border: "none", fontSize: "12px", padding: "4px 2px", textAlign: "center" }}>
                                                                     <input
@@ -672,12 +664,19 @@ export default function MaintenanceReport() {
                                                                     />
                                                                 </td>
                                                                 <td style={{ border: "none", fontSize: "12px", padding: "4px 2px", textAlign: "center" }}>
-                                                                    <input
-                                                                        type="text"
-                                                                        value={item.tax}
+                                                                    <select
+                                                                        value={item.tax || "Y"}
                                                                         onChange={(e) => handleLineItemChange(index, "tax", e.target.value)}
-                                                                        style={{ width: "40px", border: "1px solid #ccc", padding: "2px", fontSize: "12px", textAlign: "center", backgroundColor: "#f1f4ff" }}
-                                                                    />
+                                                                        style={{ width: "40px", border: "1px solid #ccc", padding: "2px", fontSize: "12px", textAlign: "center", backgroundColor: "#f1f4ff", outline: "none" }}
+                                                                        onFocus={handleInputFocus}
+                                                                        onBlur={handleInputBlur}
+                                                                    >
+                                                                        {TAX_OPTIONS.map((option) => (
+                                                                            <option key={option.value} value={option.value}>
+                                                                                {option.label}
+                                                                            </option>
+                                                                        ))}
+                                                                    </select>
                                                                 </td>
                                                                 <td style={{ border: "none", fontSize: "12px", padding: "4px 2px", textAlign: "right" }}>
                                                                     <input

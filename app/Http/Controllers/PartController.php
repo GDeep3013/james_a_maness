@@ -54,7 +54,7 @@ class PartController extends Controller
                 'unit_price' => 'required|numeric|min:0',
                 'purchase_price' => 'required|numeric|min:0',
                 'vendor_id' => 'nullable|exists:vendors,id',
-                'warranty_period_months' => 'nullable|integer|min:0',
+                'warranty_period_months' => 'nullable|string',
                 'status' => 'nullable|in:Active,Inactive',
             ]);
 
@@ -184,7 +184,7 @@ class PartController extends Controller
                 'unit_price' => 'nullable|numeric|min:0',
                 'purchase_price' => 'nullable|numeric|min:0',
                 'vendor_id' => 'nullable|exists:vendors,id',
-                'warranty_period_months' => 'nullable|integer|min:0',
+                'warranty_period_months' => 'nullable|string',
                 'status' => 'nullable|in:Active,Inactive',
             ]);
 

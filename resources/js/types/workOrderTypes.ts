@@ -22,6 +22,7 @@ export interface Part {
   total?: number;
   value?: string;
   label?: string;
+  warranty_period_months?: number;
   created_at?: string;
 }
 

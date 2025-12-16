@@ -56,3 +56,29 @@ export const ISSUE_STATUS_FILTER_OPTIONS: SelectOption[] = [
   { value: "Closed", label: "Closed" },
 ];
 
+export const WARRANTY_OPTIONS: SelectOption[] = [
+  { value: "", label: "—" },
+  { value: "1M", label: "1M" },
+  { value: "3M", label: "3M" },
+  { value: "6M", label: "6M" },
+  { value: "1Y", label: "1Y" },
+  { value: "2Y", label: "2Y" },
+  { value: "3Y", label: "3Y" },
+  { value: "5Y", label: "5Y" },
+  { value: "6Y", label: "6Y" },
+  { value: "7Y", label: "7Y" },
+  { value: "8Y", label: "8Y" },
+  { value: "9Y", label: "9Y" },
+  { value: "10Y", label: "10Y" },
+  { value: "11Y", label: "11Y" },
+  { value: "12Y", label: "12Y" },
+  { value: "13Y", label: "13Y" },
+  { value: "14Y", label: "14Y" },
+  { value: "15Y", label: "15Y" },
+];
+
+export const TAX_OPTIONS: SelectOption[] = [
+  { value: "Y", label: "Y" },
+  { value: "N", label: "N" },
+];
+

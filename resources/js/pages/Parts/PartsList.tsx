@@ -30,7 +30,7 @@ interface Part {
     name?: string;
     first_name?: string;
   };
-  warranty_period_months?: number;
+  warranty_period_months?: string;
   status?: string;
   created_at?: string;
   updated_at?: string;
@@ -379,7 +379,7 @@ export default function PartsList() {
                         isHeader
                         className="px-5 py-3 font-medium text-gray-500 text-start text-sm"
                       >
-                        Warranty (Months)
+                        Warranty
                       </TableCell>
                       <TableCell
                         isHeader
@@ -453,9 +453,7 @@ export default function PartsList() {
                         </TableCell>
                         <TableCell className="px-5 py-4 text-start">
                           <div className="text-gray-800 text-theme-sm">
-                            {part.warranty_period_months !== undefined && part.warranty_period_months !== null
-                              ? part.warranty_period_months
-                              : "—"}
+                            {part.warranty_period_months ? part.warranty_period_months : "—"}
                           </div>
                         </TableCell>
                         <TableCell className="px-5 py-4 text-start">

@@ -1,16 +1,16 @@
 import api from './api';
 
-interface PartData {
+export interface PartFormData {
   part_name: string;
   part_code: string;
-  description?: string;
-  vehical_types?: string[];
-  manufacturer_name?: string;
+  description: string;
+  vehical_types: string[];
+  manufacturer_name: string;
   unit_price: number;
   purchase_price: number;
-  vendor_id?: number;
-  warranty_period_months?: number;
-  status?: 'Active' | 'Inactive';
+  vendor_id: number;
+  warranty_period_months: string;
+  status: "Active" | "Inactive";
 }
 
 export const partService = {
@@ -26,7 +26,7 @@ export const partService = {
   getById: (id: number) =>
     api.get(`/parts/${id}`),
 
-  create: (data: PartData) => {
+  create: (data: PartFormData) => {
     const formData = new FormData();
     
     formData.append('part_name', data.part_name);
@@ -65,7 +65,7 @@ export const partService = {
     });
   },
 
-  update: (id: number, data: Partial<PartData>) => {
+  update: (id: number, data: PartFormData) => {
     const formData = new FormData();
     
     if (data.part_name) {
@@ -75,17 +75,17 @@ export const partService = {
       formData.append('part_code', data.part_code);
     }
     if (data.description !== undefined) {
-      formData.append('description', data.description || '');
+      formData.append('description', data.description);
     }
     if (data.vehical_types !== undefined) {
       if (data.vehical_types.length > 0) {
-        data.vehical_types.forEach((type) => {
+        data.vehical_types.forEach((type: string) => {
           formData.append('vehical_types[]', type);
         });
       }
     }
     if (data.manufacturer_name !== undefined) {
-      formData.append('manufacturer_name', data.manufacturer_name || '');
+      formData.append('manufacturer_name', data.manufacturer_name);
     }
     if (data.unit_price !== undefined && data.unit_price !== null) {
       formData.append('unit_price', data.unit_price.toString());
@@ -95,14 +95,14 @@ export const partService = {
     }
     if (data.vendor_id !== undefined) {
       if (data.vendor_id) {
-        formData.append('vendor_id', data.vendor_id.toString());
+        formData.append('vendor_id', data.vendor_id.toString()  );
       }
     }
     if (data.warranty_period_months !== undefined && data.warranty_period_months !== null) {
-      formData.append('warranty_period_months', data.warranty_period_months.toString());
+      formData.append('warranty_period_months', data.warranty_period_months);
     }
     if (data.status !== undefined) {
-      formData.append('status', data.status || '');
+      formData.append('status', data.status);
     }
 
     formData.append('_method', 'PUT');

@@ -29,7 +29,6 @@ class Part extends Model
         'vehical_types' => 'array',
         'unit_price' => 'decimal:2',
         'purchase_price' => 'decimal:2',
-        'warranty_period_months' => 'integer',
     ];
 
     public function vendor()
