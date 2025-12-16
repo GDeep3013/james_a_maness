@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\MaintenanceRecord;
+use App\Models\Part;
 use App\Models\WorkOrder;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Schema;
@@ -35,7 +36,6 @@ class MaintenanceRecordController extends Controller
             'vendor:id,name,address,city,state,zip,email',
             'user:id,name'
         ])->orderBy('id', 'desc');
-
         $workOrders = WorkOrder::with(['vehicle','vendor'])
             ->when($request->vehicle_id, function ($q) use ($request) {
                 $q->where('vehicle_id', $request->vehicle_id);
@@ -46,7 +46,7 @@ class MaintenanceRecordController extends Controller
             ->when($request->actual_completion_date, function ($q) use ($request) {
                 $q->whereDate('actual_completion_date', '<=', $request->actual_completion_date);
             })
-            ->get(['id', 'vehicle_id', 'service_items', 'actual_start_date', 'actual_completion_date', 'total_value']);
+            ->get(['id', 'vehicle_id', 'service_items', 'actual_start_date', 'actual_completion_date', 'total_value' ,"parts"]);
 
         $searchTerm = $request->search;
 

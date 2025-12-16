@@ -113,64 +113,6 @@
                         <td style="padding: 10px 0 0 0; height:57%; vertical-align:top;">
                             <table style="width: 100%; border-collapse: collapse; border: none;" cellPadding="0" cellSpacing="0">
                                 <tr>
-                                    <td colspan="2" style="padding: 5px 0;">
-                                        <table style="width: 100%; border-collapse: collapse; border: 1px solid #000; margin-top: 10px;" cellpadding="5" cellspacing="0">
-                                            <thead>
-                                                <tr>
-                                                    <th style="border: 1px solid #000; font-weight:normal; font-size: 18px; padding: 3px; width: 25%; text-align: center;">
-                                                        Service Items
-                                                    </th>
-                                                    <th style="border: 1px solid #000; font-weight:normal; font-size: 18px; padding: 3px; width: 25%; text-align: center;">
-                                                        Start Date
-                                                    </th>
-                                                    <th style="border: 1px solid #000; font-weight:normal; font-size: 18px; padding: 3px; width: 25%; text-align: center;">
-                                                        Completion Date
-                                                    </th>
-                                                    <th style="border: 1px solid #000; font-weight:normal; font-size: 18px; padding: 3px; width: 25%; text-align: center;">
-                                                        Total Value
-                                                    </th>
-                                                </tr>
-                                            </thead>
-
-                                            <tbody>
-                                                @if(empty($workOrders) || count($workOrders) === 0)
-                                                <tr>
-                                                    <td colspan="4" style="text-align: center; padding: 10px;">
-                                                        No Records Found
-                                                    </td>
-                                                </tr>
-                                                @endif
-
-                                                @foreach($workOrders as $record)
-                                                @php
-                                                $primaryService = !empty($record['service_items'])
-                                                ? collect($record['service_items'])->pluck('name')->implode(', ')
-                                                : 'Service';
-                                                @endphp
-
-                                                <tr>
-                                                    <td style=" width:100%; max-width :268px; background-color: #f1f4ff; border: 1px solid #000; padding: 6px; font-size: 16px;">
-                                                        {{ $primaryService }}
-                                                    </td>
-
-                                                    <td style="border: 1px solid #000; padding: 6px; text-align: center; background-color: #f1f4ff; font-size: 16px;">
-                                                        {{ !empty($record['actual_start_date']) ? \Carbon\Carbon::parse($record['actual_start_date'])->format('d-m-Y') : '-' }}
-                                                    </td>
-
-                                                    <td style="border: 1px solid #000; padding: 6px; text-align: center; background-color: #f1f4ff; font-size: 16px;">
-                                                        {{ !empty($record['actual_completion_date']) ? \Carbon\Carbon::parse($record['actual_completion_date'])->format('d-m-Y') : '-' }}
-                                                    </td>
-
-                                                    <td style="border: 1px solid #000; padding: 6px;text-align: center; background-color: #f1f4ff; font-size: 16px;">
-                                                        {{ $record['total_value'] ?? 0 }}
-                                                    </td>
-                                                </tr>
-                                                @endforeach
-                                            </tbody>
-                                        </table>
-                                    </td>
-                                </tr>
-                                <tr>
                                     <td colSpan="2" style="padding: 10px 0;">
                                         <table style="width: 100%; border-collapse: collapse; border: 1px solid #000; margin-top: 10px;" cellPadding="5" cellSpacing="0">
                                             <tbody>

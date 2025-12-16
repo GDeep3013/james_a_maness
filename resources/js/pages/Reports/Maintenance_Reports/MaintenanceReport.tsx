@@ -39,14 +39,29 @@ interface LineItem {
 interface ServiceItem {
     name: string;
 }
+interface PartData {
+    part_name: string;
+    part_code: string;
+    description?: string;
+    vehical_types?: string[];
+    manufacturer_name?: string;
+    unit_price: number;
+    purchase_price: number;
+    vendor_id?: number;
+    warranty_period_months?: number;
+    status?: 'Active' | 'Inactive';
+}
+
 interface WorkOrderFilterItem {
     id: number;
     vehicle_id: number;
+    parts: PartData[];
     service_items: ServiceItem[];
     actual_start_date?: string;
     actual_completion_date?: string;
     total_value?: string | number;
 }
+
 
 export default function MaintenanceReport() {
     const navigate = useNavigate();
@@ -162,13 +177,42 @@ export default function MaintenanceReport() {
 
     const fetchFilteredWorkOrders = async () => {
         try {
-            console.log('vehicle_id', formData.vehicle_id);
             const res = await api.get("/maintenance-records", {
                 params: {
                     vehicle_id: formData.vehicle_id,
                     actual_start_date: formData.actual_start_date,
                     actual_completion_date: formData.actual_completion_date,
                 },
+            });
+
+            const workOrders = res.data.work_orders || [];
+            console.log(workOrders)
+            const mappedLineItems: LineItem[] = workOrders.flatMap((wo: any) => {
+                if (!wo.parts || wo.parts.length === 0) return [];
+
+                return wo.parts.map((part: any) => ({
+                    qty: 1,
+                    line: "",
+                    item_number: part.part_code || "",
+                    description: part.label || "",
+                    warr: "",
+                    unit: part.value || "",
+                    tax: "",
+                    list: Number(part.unit_price) || 0,
+                    net: Number(part.purchase_price) || 0,
+                    extended:
+                        (Number(part.value) || 1) * (Number(part.purchase_price) || 0),
+                }));
+            });
+
+            setLineItems(prev => {
+                const existingCodes = new Set(prev.map(item => item.item_number));
+
+                const filteredNewItems = mappedLineItems.filter(
+                    item => !existingCodes.has(item.item_number)
+                );
+
+                return [...prev, ...filteredNewItems];
             });
 
             setWorkOrders(res.data.work_orders || []);
@@ -178,7 +222,6 @@ export default function MaintenanceReport() {
 
         }
     };
-    console.log(workOrders, 'Work')
 
     const handleInputChange = (field: string, value: string) => {
 
@@ -497,57 +540,6 @@ export default function MaintenanceReport() {
 
                                                                     </div>
                                                                 </div>
-
-                                                                <table style={{ width: "100%", borderCollapse: "collapse", marginTop: "15px" }}>
-                                                                    <thead>
-                                                                        <tr>
-                                                                            <th style={{ border: "1px solid #000", padding: "6px", fontSize: "12px" }}>Service Items</th>
-                                                                            <th style={{ border: "1px solid #000", padding: "6px", fontSize: "12px" }}>Start Date</th>
-                                                                            <th style={{ border: "1px solid #000", padding: "6px", fontSize: "12px" }}>Completion Date</th>
-                                                                            <th style={{ border: "1px solid #000", padding: "6px", fontSize: "12px" }}>Total Value</th>
-                                                                        </tr>
-                                                                    </thead>
-
-                                                                    <tbody>
-                                                                        {workOrders.length === 0 && (
-                                                                            <tr>
-                                                                                <td colSpan={4} style={{ textAlign: "center", padding: "10px" }}>
-                                                                                </td>
-                                                                            </tr>
-                                                                        )}
-
-                                                                        {workOrders && workOrders.map((record) => {
-
-                                                                            const primaryService =
-                                                                                record?.service_items?.length > 0
-                                                                                    ? record.service_items.map((si) => si.name).join(", ")
-                                                                                    : "Service";
-
-                                                                            return (
-                                                                                <tr key={record.id}>
-                                                                                    <td className="max-w-[268px]" style={{ border: "1px solid #000", padding: "6px", fontSize: "12px" }}>
-                                                                                        {primaryService}
-                                                                                    </td>
-
-                                                                                    <td style={{ border: "1px solid #000", padding: "6px", fontSize: "12px" }}>
-                                                                                        {formatDate(record?.actual_start_date || "-")}
-                                                                                    </td>
-
-                                                                                    <td style={{ border: "1px solid #000", padding: "6px", fontSize: "12px" }}>
-                                                                                        {formatDate(record?.actual_completion_date || "-")}
-                                                                                    </td>
-
-                                                                                    <td style={{ border: "1px solid #000", padding: "6px", fontSize: "12px" }}>
-                                                                                        {record?.total_value || 0}
-                                                                                    </td>
-                                                                                </tr>
-                                                                            );
-                                                                        })}
-
-
-                                                                    </tbody>
-                                                                </table>
-
 
                                                                 <table style={{ width: "100%", borderCollapse: "collapse", border: "1px solid #000", marginTop: "10px" }} cellPadding="5" cellSpacing="0">
 
