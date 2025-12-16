@@ -103,7 +103,7 @@ class MMRReportController extends Controller
     public function show($id)
     {
         $mmrReport = MMRReport::with(['vehicle', 'user'])->find($id);
-        
+
         if ($mmrReport) {
             return response()->json(['status' => true, 'mmrReport' => $mmrReport]);
         } else {
@@ -115,7 +115,7 @@ class MMRReportController extends Controller
     {
         try {
             $mmrReport = MMRReport::find($id);
-            
+
             if (!$mmrReport) {
                 return response()->json(['status' => false, 'message' => 'MMR report not found'], 404);
             }
@@ -181,7 +181,7 @@ class MMRReportController extends Controller
     {
         try {
             $mmrReport = MMRReport::find($id);
-            
+
             if (!$mmrReport) {
                 return response()->json(['status' => false, 'message' => 'MMR report not found'], 404);
             }
@@ -205,23 +205,23 @@ class MMRReportController extends Controller
     {
         try {
             $mmrReport = MMRReport::with(['vehicle', 'user'])->find($id);
-            
+
             if (!$mmrReport) {
                 return response()->json(['status' => false, 'message' => 'MMR report not found'], 404);
             }
 
-            $maintenanceRecords = is_array($mmrReport->maintenance_records) 
-                ? $mmrReport->maintenance_records 
-                : (is_string($mmrReport->maintenance_records) 
-                    ? json_decode($mmrReport->maintenance_records, true) ?? [] 
+            $maintenanceRecords = is_array($mmrReport->maintenance_records)
+                ? $mmrReport->maintenance_records
+                : (is_string($mmrReport->maintenance_records)
+                    ? json_decode($mmrReport->maintenance_records, true) ?? []
                     : []);
 
-            $dateFormatted = $mmrReport->date 
-                ? Carbon::parse($mmrReport->date)->format('F Y') 
+            $dateFormatted = $mmrReport->date
+                ? Carbon::parse($mmrReport->date)->format('F Y')
                 : '';
 
-            $completedDateFormatted = $mmrReport->completed_date 
-                ? Carbon::parse($mmrReport->completed_date)->format('m/d/Y') 
+            $completedDateFormatted = $mmrReport->completed_date
+                ? Carbon::parse($mmrReport->completed_date)->format('m/d/Y')
                 : '';
 
             $data = [
@@ -233,7 +233,7 @@ class MMRReportController extends Controller
 
             $pdf = Pdf::loadView('mmr.mmrReportPdf', $data);
             $fileName = 'MMR_Report_' . $mmrReport->id . '_' . date('Y-m-d') . '.pdf';
-            
+
             return $pdf->download($fileName);
         } catch (\Exception $e) {
             \Log::error('MMR report download error: ' . $e->getMessage());

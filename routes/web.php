@@ -15,11 +15,11 @@ Route::middleware(['guest'])->group(function () {
 });
 
 
-Route::get('/invoice/MMR_Report', function(){
+Route::get('/invoice/MMR_Report', function () {
     return view('invoice.MMR_Report');
 });
 
-Route::middleware(['auth','page.access'])->group(function () {
+Route::middleware(['auth', 'page.access'])->group(function () {
 
     Route::get('/logout', [LoginController::class, 'logout']);
     Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -134,16 +134,21 @@ Route::middleware(['auth','page.access'])->group(function () {
     Route::get('/reports/mmr/{id}', [HomeController::class, 'index'])->where('id', '[0-9]+');
     Route::get('/reports/mmr/{id}/edit', [HomeController::class, 'index'])->where('id', '[0-9]+');
     Route::get('/reports/monthly-maintenance', [HomeController::class, 'index']);
-    Route::get('/reports/maintenance', [HomeController::class, 'index']);
+    // Route::get('/reports/maintenance', [HomeController::class, 'index']);
     Route::get('/reports/fuel', [HomeController::class, 'index']);
 
     Route::get('profile', [HomeController::class, 'index']);
+
+    //Maintenance Reports
+    Route::get('/reports/maintenance', [HomeController::class, 'index']);
+    Route::get('/reports/maintenance/create', [HomeController::class, 'index']);
+    Route::get('/reports/maintenance/{id}', [HomeController::class, 'index'])->where('id', '[0-9]+');
+    Route::get('/reports/maintenance/{id}/edit', [HomeController::class, 'index'])->where('id', '[0-9]+');
+
 
     // TimeLine Records For the All Modules
     Route::get('/timeline', [TimeLineController::class, 'index'])->name('timeline.index');
     Route::get('/timeline/vehicle/{vehicleId}', [TimeLineController::class, 'vehicle'])->name('timeline.vehicle');
     Route::get('/timeline/module/{moduleName}', [TimeLineController::class, 'module'])->name('timeline.module');
     Route::get('/timeline/{timeLine}', [TimeLineController::class, 'show'])->name('timeline.show');
-
 });
-

@@ -61,558 +61,585 @@ import Reports from "./pages/Reports/index";
 import MonthlyMaintenanceReport from "./pages/Reports/MMR/MonthlyMaintenanceReport";
 import MMRList from "./pages/Reports/MMR/MMRList";
 import MaintenanceReport from "./pages/Reports/Maintenance_Reports/MaintenanceReport";
+import MaintenanceReportList from "./pages/Reports/Maintenance_Reports/MaintenanceReportList";
 import FuelReport from "./pages/Reports/FuelReport";
 
+
 export default function App() {
-  return (
-    <>
-      <Router>
-        <ScrollToTop />
-        <Routes>
-          {/* Dashboard Layout - Protected Routes */}
-          <Route
-            element={
-              <ProtectedRoute>
-                <AppLayout />
-              </ProtectedRoute>
-            }
-          >
-          <Route index path="/" element={<Home />} />
-          <Route index path="/home" element={<Home />} />
+    return (
+        <>
+            <Router>
+                <ScrollToTop />
+                <Routes>
+                    {/* Dashboard Layout - Protected Routes */}
+                    <Route
+                        element={
+                            <ProtectedRoute>
+                                <AppLayout />
+                            </ProtectedRoute>
+                        }
+                    >
+                        <Route index path="/" element={<Home />} />
+                        <Route index path="/home" element={<Home />} />
 
-          <Route
-            path="/contacts"
-            element={
-              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
-                <Contacts />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/contacts/create"
-            element={
-              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
-                <CreateContacts />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/contacts/:id"
-            element={
-              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
-                <CreateContacts />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/contacts/:id/ContactDetail"
-            element={
-              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
-                <ContactDetail />
-              </ProtectedRoute>
-            }
-          />
+                        <Route
+                            path="/contacts"
+                            element={
+                                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                                    <Contacts />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/contacts/create"
+                            element={
+                                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                                    <CreateContacts />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/contacts/:id"
+                            element={
+                                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                                    <CreateContacts />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/contacts/:id/ContactDetail"
+                            element={
+                                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                                    <ContactDetail />
+                                </ProtectedRoute>
+                            }
+                        />
 
-          <Route
-            path="/vehicles"
-            element={
-              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
-                <Vehicles />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/vehicles/create"
-            element={
-              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
-                <AddVehicle />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/vehicles/add"
-            element={
-              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
-                <AddVehicle />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/vehicles/:id/edit"
-            element={
-              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
-                <EditVehicle />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/vehicles/:id/VehicleDetail"
-            element={
-              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
-                <VehicleDetail />
-              </ProtectedRoute>
-            }
-          />
+                        <Route
+                            path="/vehicles"
+                            element={
+                                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                                    <Vehicles />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/vehicles/create"
+                            element={
+                                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                                    <AddVehicle />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/vehicles/add"
+                            element={
+                                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                                    <AddVehicle />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/vehicles/:id/edit"
+                            element={
+                                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                                    <EditVehicle />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/vehicles/:id/VehicleDetail"
+                            element={
+                                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                                    <VehicleDetail />
+                                </ProtectedRoute>
+                            }
+                        />
 
-          <Route
-            path="/work-orders"
-            element={
-              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
-                <WorkOrdersList />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/reports"
-            element={
-              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
-                <Reports />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/reports/mmr"
-            element={
-              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
-                <MMRList />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/reports/mmr/create"
-            element={
-              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
-                <MonthlyMaintenanceReport />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/reports/mmr/:id"
-            element={
-              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
-                <MonthlyMaintenanceReport />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/reports/mmr/:id/edit"
-            element={
-              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
-                <MonthlyMaintenanceReport />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/reports/monthly-maintenance"
-            element={
-              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
-                <MonthlyMaintenanceReport />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/reports/maintenance"
-            element={
-              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
-                <MaintenanceReport />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/reports/fuel"
-            element={
-              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
-                <FuelReport />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/work-orders/create"
-            element={
-              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
-                <CreateWorkOrder />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/work-orders/:id"
-            element={
-              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
-                <CreateWorkOrder />
-              </ProtectedRoute>
-            }
-          />
+                        <Route
+                            path="/work-orders"
+                            element={
+                                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                                    <WorkOrdersList />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/reports"
+                            element={
+                                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                                    <Reports />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/reports/mmr"
+                            element={
+                                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                                    <MMRList />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/reports/mmr/create"
+                            element={
+                                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                                    <MonthlyMaintenanceReport />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/reports/mmr/:id"
+                            element={
+                                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                                    <MonthlyMaintenanceReport />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/reports/mmr/:id/edit"
+                            element={
+                                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                                    <MonthlyMaintenanceReport />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/reports/monthly-maintenance"
+                            element={
+                                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                                    <MonthlyMaintenanceReport />
+                                </ProtectedRoute>
+                            }
+                        />
 
-          <Route
-            path="/service-tasks"
-            element={
-              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
-                <ServiceTasksList />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/service-tasks/create"
-            element={
-              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
-                <CreateServiceTask />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/service-tasks/:id"
-            element={
-              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
-                <ViewServiceTask />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/service-tasks/:id/edit"
-            element={
-              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
-                <CreateServiceTask />
-              </ProtectedRoute>
-            }
-          />
+                        <Route
+                            path="/reports/maintenance"
+                            element={
+                                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                                    <MaintenanceReportList />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/reports/maintenance/create"
+                            element={
+                                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                                    <MaintenanceReport />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/reports/maintenance/:id"
+                            element={
+                                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                                    <MaintenanceReport />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/reports/maintenance/:id/edit"
+                            element={
+                                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                                    <MaintenanceReport />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/reports/fuel"
+                            element={
+                                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                                    <FuelReport />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/work-orders/create"
+                            element={
+                                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                                    <CreateWorkOrder />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/work-orders/:id"
+                            element={
+                                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                                    <CreateWorkOrder />
+                                </ProtectedRoute>
+                            }
+                        />
 
-          <Route
-            path="/issues"
-            element={
-              <ProtectedRoute requiredRoles={["Admin", "Manager" , "Contact" ]}>
-                <IssuesList />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/issues/create"
-            element={
-              <ProtectedRoute requiredRoles={["Admin", "Manager" ,"Contact"]}>
-                <CreateIssue />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/issues/:id"
-            element={
-              <ProtectedRoute requiredRoles={["Admin", "Manager" ,"Contact"]}>
-                <IssueDetails />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/issues/:id/edit"
-            element={
-              <ProtectedRoute requiredRoles={["Admin", "Manager" ,"Contact"]}>
-                <CreateIssue />
-              </ProtectedRoute>
-            }
-          />
+                        <Route
+                            path="/service-tasks"
+                            element={
+                                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                                    <ServiceTasksList />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/service-tasks/create"
+                            element={
+                                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                                    <CreateServiceTask />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/service-tasks/:id"
+                            element={
+                                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                                    <ViewServiceTask />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/service-tasks/:id/edit"
+                            element={
+                                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                                    <CreateServiceTask />
+                                </ProtectedRoute>
+                            }
+                        />
 
-          <Route
-            path="/vendors"
-            element={
-              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
-                <Vendors />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/vendors/create"
-            element={
-              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
-                <CreateVendor />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/vendors/:id"
-            element={
-              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
-                <CreateVendor />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/vendors/:id/edit"
-            element={
-              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
-                <CreateVendor />
-              </ProtectedRoute>
-            }
-          />
+                        <Route
+                            path="/issues"
+                            element={
+                                <ProtectedRoute requiredRoles={["Admin", "Manager", "Contact"]}>
+                                    <IssuesList />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/issues/create"
+                            element={
+                                <ProtectedRoute requiredRoles={["Admin", "Manager", "Contact"]}>
+                                    <CreateIssue />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/issues/:id"
+                            element={
+                                <ProtectedRoute requiredRoles={["Admin", "Manager", "Contact"]}>
+                                    <IssueDetails />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/issues/:id/edit"
+                            element={
+                                <ProtectedRoute requiredRoles={["Admin", "Manager", "Contact"]}>
+                                    <CreateIssue />
+                                </ProtectedRoute>
+                            }
+                        />
 
-            <Route
-            path="/meter-history"
-            element={
-              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
-                <Meters />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/meter-history/create"
-            element={
-              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
-                <CreateMeterReading />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/meter-history/:id"
-            element={
-              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
-                <CreateMeterReading />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/meter-history/:id/edit"
-            element={
-              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
-                <CreateMeterReading />
-              </ProtectedRoute>
-            }
-            />
-            <Route
-              path="/meter-history/:id/MeterReadingDetail"
-              element={
-                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
-                  <MeterReadingDetail />
-                </ProtectedRoute>
-              }
-            />
+                        <Route
+                            path="/vendors"
+                            element={
+                                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                                    <Vendors />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/vendors/create"
+                            element={
+                                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                                    <CreateVendor />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/vendors/:id"
+                            element={
+                                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                                    <CreateVendor />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/vendors/:id/edit"
+                            element={
+                                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                                    <CreateVendor />
+                                </ProtectedRoute>
+                            }
+                        />
 
-            <Route
-            path="/expense-history"
-            element={
-              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
-                <Expense />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/expense-history/create"
-            element={
-              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
-                <CreateExpenseHistory />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/expense-history/:id"
-            element={
-              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
-                <CreateExpenseHistory />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/expense-history/:id/edit"
-            element={
-              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
-                <CreateExpenseHistory />
-              </ProtectedRoute>
-            }
-            />
-          <Route
-              path="/expense-history/:id/ExpenseHistoryDetail"
-              element={
-                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
-                  <ExpenseHistoryDetail />
-                </ProtectedRoute>
-              }
-          />
+                        <Route
+                            path="/meter-history"
+                            element={
+                                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                                    <Meters />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/meter-history/create"
+                            element={
+                                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                                    <CreateMeterReading />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/meter-history/:id"
+                            element={
+                                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                                    <CreateMeterReading />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/meter-history/:id/edit"
+                            element={
+                                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                                    <CreateMeterReading />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/meter-history/:id/MeterReadingDetail"
+                            element={
+                                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                                    <MeterReadingDetail />
+                                </ProtectedRoute>
+                            }
+                        />
 
-          <Route
-              path="/vehicle-replacement-analysis"
-              element={
-                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
-                  <VehicleReplacement />
-                </ProtectedRoute>
-              }
-          />
+                        <Route
+                            path="/expense-history"
+                            element={
+                                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                                    <Expense />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/expense-history/create"
+                            element={
+                                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                                    <CreateExpenseHistory />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/expense-history/:id"
+                            element={
+                                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                                    <CreateExpenseHistory />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/expense-history/:id/edit"
+                            element={
+                                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                                    <CreateExpenseHistory />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/expense-history/:id/ExpenseHistoryDetail"
+                            element={
+                                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                                    <ExpenseHistoryDetail />
+                                </ProtectedRoute>
+                            }
+                        />
 
-
-            <Route
-              path="/fuels"
-              element={
-                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
-                  <Fuels/>
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/fuels/create"
-              element={
-                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
-                  <CreateFuel/>
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/fuels/:id"
-              element={
-                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
-                  <CreateFuel />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/fuels/:id/FuelDetail"
-              element={
-                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
-                  <FuelDetail />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/fuels/:id/edit"
-              element={
-                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
-                  <CreateFuel />
-                </ProtectedRoute>
-              }
-            />
-
-          <Route
-            path="/parts"
-            element={
-              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
-                <PartsList />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/parts/create"
-            element={
-              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
-                <CreatePart />
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path="/parts/:id/edit"
-            element={
-              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
-                <EditPart />
-              </ProtectedRoute>
-            }
-          />
+                        <Route
+                            path="/vehicle-replacement-analysis"
+                            element={
+                                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                                    <VehicleReplacement />
+                                </ProtectedRoute>
+                            }
+                        />
 
 
-          <Route
-            path="/service-reminders"
-            element={
-              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
-                <ServiceReminderList />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/service-reminders/create"
-            element={
-              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
-                <CreateServiceReminder />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/service-reminders/:id"
-            element={
-              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
-                <CreateServiceReminder />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/service-reminders/:id/edit"
-            element={
-              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
-                <CreateServiceReminder />
-              </ProtectedRoute>
-            }
-          />
+                        <Route
+                            path="/fuels"
+                            element={
+                                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                                    <Fuels />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/fuels/create"
+                            element={
+                                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                                    <CreateFuel />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/fuels/:id"
+                            element={
+                                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                                    <CreateFuel />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/fuels/:id/FuelDetail"
+                            element={
+                                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                                    <FuelDetail />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/fuels/:id/edit"
+                            element={
+                                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                                    <CreateFuel />
+                                </ProtectedRoute>
+                            }
+                        />
 
-          <Route
-            path="/schedules"
-            element={
-              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
-                <ScheduleList />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/schedules/create"
-            element={
-              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
-                <CreateSchedule />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/schedules/:id"
-            element={
-              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
-                <CreateSchedule />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/schedules/:id/edit"
-            element={
-              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
-                <CreateSchedule />
-              </ProtectedRoute>
-            }
-          />
+                        <Route
+                            path="/parts"
+                            element={
+                                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                                    <PartsList />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/parts/create"
+                            element={
+                                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                                    <CreatePart />
+                                </ProtectedRoute>
+                            }
+                        />
 
-          <Route
-            path="/services"
-            element={
-              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
-                <ServiceList />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/services/create"
-            element={
-              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
-                <CreateService />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/services/:id"
-            element={
-              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
-                <CreateService />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/services/:id/edit"
-            element={
-              <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
-                <CreateService />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-              path="/profile"
-              element={
-                <ProtectedRoute>
-                  <UserProfiles />
-                </ProtectedRoute>
-              }
-          />
+                        <Route
+                            path="/parts/:id/edit"
+                            element={
+                                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                                    <EditPart />
+                                </ProtectedRoute>
+                            }
+                        />
 
-          <Route path="/calendar" element={<Calendar />} />
-          <Route path="/vehicle-assignments" element={<CreateAssignment />} />
 
-          {/*
+                        <Route
+                            path="/service-reminders"
+                            element={
+                                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                                    <ServiceReminderList />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/service-reminders/create"
+                            element={
+                                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                                    <CreateServiceReminder />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/service-reminders/:id"
+                            element={
+                                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                                    <CreateServiceReminder />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/service-reminders/:id/edit"
+                            element={
+                                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                                    <CreateServiceReminder />
+                                </ProtectedRoute>
+                            }
+                        />
+
+                        <Route
+                            path="/schedules"
+                            element={
+                                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                                    <ScheduleList />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/schedules/create"
+                            element={
+                                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                                    <CreateSchedule />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/schedules/:id"
+                            element={
+                                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                                    <CreateSchedule />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/schedules/:id/edit"
+                            element={
+                                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                                    <CreateSchedule />
+                                </ProtectedRoute>
+                            }
+                        />
+
+                        <Route
+                            path="/services"
+                            element={
+                                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                                    <ServiceList />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/services/create"
+                            element={
+                                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                                    <CreateService />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/services/:id"
+                            element={
+                                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                                    <CreateService />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/services/:id/edit"
+                            element={
+                                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                                    <CreateService />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/profile"
+                            element={
+                                <ProtectedRoute>
+                                    <UserProfiles />
+                                </ProtectedRoute>
+                            }
+                        />
+
+                        <Route path="/calendar" element={<Calendar />} />
+                        <Route path="/vehicle-assignments" element={<CreateAssignment />} />
+
+                        {/*
             <Route path="/blank" element={<Blank />} />
             <Route path="/form-elements" element={<FormElements />} />
             <Route path="/basic-tables" element={<BasicTables />} />
@@ -626,12 +653,12 @@ export default function App() {
             <Route path="/bar-chart" element={<BarChart />} />
           */}
 
-          </Route>
+                    </Route>
 
-          {/* Fallback Route */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </Router>
-    </>
-  );
+                    {/* Fallback Route */}
+                    <Route path="*" element={<NotFound />} />
+                </Routes>
+            </Router>
+        </>
+    );
 }
