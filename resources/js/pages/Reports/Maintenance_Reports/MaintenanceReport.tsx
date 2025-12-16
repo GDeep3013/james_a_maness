@@ -175,6 +175,11 @@ export default function MaintenanceReport() {
         }
     }, [isEditMode, id, fetchMaintenanceRecord]);
 
+
+    useEffect(() => {
+        calculateTotals(lineItems);
+    }, [lineItems]);
+
     const fetchFilteredWorkOrders = useCallback(async () => {
         try {
             const [workOrdersRes, servicesRes] = await Promise.all([
@@ -309,9 +314,7 @@ export default function MaintenanceReport() {
             const net = field === 'net' ? Number(value) : newLineItems[index].net;
             newLineItems[index].extended = qty * net;
         }
-
         setLineItems(newLineItems);
-        calculateTotals(newLineItems);
     };
 
     const calculateTotals = (items: LineItem[]) => {
