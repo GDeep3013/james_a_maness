@@ -71,6 +71,7 @@ import { ReactComponent as ReportsIcon } from "./reports.svg?react";
 import { ReactComponent as ContactsIcon } from "./contacts.svg?react";
 import { ReactComponent as ReopenIcon } from "./reopen.svg?react";
 import { ReactComponent as ServiceIcon } from "./service.svg?react";
+import { ReactComponent as ServiceTaskIcon } from "./servicetask.svg?react";
 export {
   TickIcon,
   MaintenanceIcon,
@@ -144,5 +145,6 @@ export {
   SettingsIcon,
   IssuesIcon,
   ReopenIcon,
-  ServiceIcon
+  ServiceIcon,
+  ServiceTaskIcon
 };

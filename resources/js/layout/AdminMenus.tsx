@@ -7,7 +7,7 @@ import {
     GasStationIcon,
     PartsIcon,
     ReportsIcon,
-    ServiceIcon
+    ServiceTaskIcon
 } from "../icons";
 
 type NavItem = {
@@ -74,7 +74,7 @@ export const AdminMenus: NavItem[] = [
         allowedRoles: ["Admin", "Manager"],
     },
     {
-        icon: <ServiceIcon/>,
+        icon: <ServiceTaskIcon className="service-task-icon" />,
         name: "Service Tasks",
         path: "/service-tasks",
         allowedRoles: ["Admin", "Manager"],

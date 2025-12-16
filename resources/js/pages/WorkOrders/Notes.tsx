@@ -169,7 +169,7 @@ export default function Notes({
 
           <div className="flex justify-between items-center text-sm gap-2">
             <div className="flex items-center gap-2 flex-1">
-              <span className="text-gray-700 0 whitespace-nowrap">Discount</span>
+              <span className="text-gray-700 0 whitespace-nowrap min-w-[91px]">Discount</span>
               <select
                 value={discountType}
                 onChange={(e) => setDiscountType?.(e.target.value as "percentage" | "fixed")}
@@ -193,7 +193,7 @@ export default function Notes({
 
           <div className="flex justify-between items-center text-sm gap-2">
             <div className="flex items-center gap-2 flex-1">
-              <span className="text-gray-700 0 whitespace-nowrap">Tax</span>
+              <span className="text-gray-700 0 whitespace-nowrap min-w-[91px]">Tax</span>
               <select
                 value={taxType}
                 onChange={(e) => setTaxType?.(e.target.value as "percentage" | "fixed")}
