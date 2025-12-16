@@ -43,6 +43,7 @@ interface WorkOrderPart {
     part_code?: string;
     label?: string;
     value?: string | number;
+    quantity?: number;
     unit_price?: string | number;
     purchase_price?: string | number;
 }
@@ -215,37 +216,41 @@ export default function MaintenanceReport() {
             const workOrderLineItems: LineItem[] = workOrders.flatMap((wo: WorkOrder) => {
                 if (!wo.parts || wo.parts?.length === 0) return [];
 
-                return wo.parts.map((part: WorkOrderPart) => ({
-                    qty: 1,
-                    line: "",
-                    item_number: part.part_code || "",
-                    description: part.label || "",
-                    warr: part.warranty_period_months ? (part.warranty_period_months) : "",
-                    unit: String(part.value || ""),
-                    tax: "Y",
-                    list: Number(part.unit_price) || 0,
-                    net: Number(part.purchase_price) || 0,
-                    extended:
-                        (Number(part.value) || 1) * (Number(part.purchase_price) || 0),
-                }));
+                return wo.parts.map((part: WorkOrderPart) => {
+                    const quantity = part.quantity || Number(part.value) || 1;
+                    return {
+                        qty: quantity,
+                        line: "",
+                        item_number: part.part_code || "",
+                        description: part.label || "",
+                        warr: part.warranty_period_months ? (part.warranty_period_months) : "",
+                        unit: String(part.value || ""),
+                        tax: "Y",
+                        list: Number(part.unit_price) || 0,
+                        net: Number(part.unit_price) || 0,
+                        extended: quantity * (Number(part.unit_price) || 0),
+                    };
+                });
             });
 
             const serviceLineItems: LineItem[] = filteredServices.flatMap((service: Service) => {
                 if (!service.parts || service.parts?.length === 0) return [];
 
-                return service.parts.map((part: WorkOrderPart & { quantity?: number }) => ({
-                    qty: part.quantity || 1,
-                    line: "",
-                    item_number: part.part_code || "",
-                    description: part.label || "",
-                    warr: part.warranty_period_months ? part.warranty_period_months : "",
-                    unit: String(part.value || ""),
-                    tax: "Y",
-                    list: Number(part.unit_price) || 0,
-                    net: Number(part.purchase_price) || 0,
-                    extended:
-                        (Number(part.quantity || 1)) * (Number(part.purchase_price) || 0),
-                }));
+                return service.parts.map((part: WorkOrderPart & { quantity?: number }) => {
+                    const quantity = part.quantity || Number(part.value) || 1;
+                    return {
+                        qty: quantity,
+                        line: "",
+                        item_number: part.part_code || "",
+                        description: part.label || "",
+                        warr: part.warranty_period_months ? part.warranty_period_months : "",
+                        unit: String(part.value || ""),
+                        tax: "Y",
+                        list: Number(part.unit_price) || 0,
+                        net: Number(part.unit_price) || 0,
+                        extended: quantity * (Number(part.unit_price) || 0),
+                    };
+                });
             });
 
             const allLineItems = [...workOrderLineItems, ...serviceLineItems];
