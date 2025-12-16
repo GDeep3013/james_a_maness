@@ -8,7 +8,7 @@ import { maintenanceRecordService } from "../../../services/maintenanceRecordSer
 import DatePicker from "../../../components/form/date-picker";
 import { workOrderService } from "../../../services/workOrderService";
 import { serviceService } from "../../../services/serviceService";
-import { WARRANTY_OPTIONS, TAX_OPTIONS } from "../../../constants/selectOptions";
+import { WARRANTY_OPTIONS, TAX_OPTIONS, Unit_OPTIONS } from "../../../constants/selectOptions";
 
 interface Vehicle {
     id: number;
@@ -168,7 +168,7 @@ export default function MaintenanceReport() {
         fetchDropdownData();
     }, [fetchDropdownData]);
 
-    useEffect(() => {   
+    useEffect(() => {
         if (isEditMode && id) {
             fetchMaintenanceRecord(parseInt(id));
         }
@@ -344,7 +344,7 @@ export default function MaintenanceReport() {
         e.preventDefault();
         setGeneralError("");
         setSuccessMessage("");
-        
+
         if (!validateForm()) {
             return;
         }
@@ -785,12 +785,19 @@ export default function MaintenanceReport() {
                                                                     </select>
                                                                 </td>
                                                                 <td style={{ border: "none", fontSize: "12px", padding: "4px 2px", textAlign: "center" }}>
-                                                                    <input
-                                                                        type="text"
-                                                                        value={item.unit}
+                                                                    <select
+                                                                        value={item.unit || ""}
                                                                         onChange={(e) => handleLineItemChange(index, "unit", e.target.value)}
-                                                                        style={{ width: "40px", border: "1px solid #ccc", padding: "2px", fontSize: "12px", textAlign: "center", backgroundColor: "#f1f4ff" }}
-                                                                    />
+                                                                        style={{ width: "50px", border: "1px solid #ccc", padding: "2px", fontSize: "12px", textAlign: "center", backgroundColor: "#f1f4ff", outline: "none" }}
+                                                                        onFocus={handleInputFocus}
+                                                                        onBlur={handleInputBlur}
+                                                                    >
+                                                                        {Unit_OPTIONS.map((option) => (
+                                                                            <option key={option.value} value={option.value}>
+                                                                                {option.label}
+                                                                            </option>
+                                                                        ))}
+                                                                    </select>
                                                                 </td>
                                                                 <td style={{ border: "none", fontSize: "12px", padding: "4px 2px", textAlign: "center" }}>
                                                                     <select
@@ -819,7 +826,6 @@ export default function MaintenanceReport() {
                                                                 <td style={{ border: "none", fontSize: "12px", padding: "4px 2px", textAlign: "right" }}>
                                                                     <input
                                                                         type="number"
-                                                                        // step="0.01"
                                                                         value={item.net}
                                                                         onChange={(e) => handleLineItemChange(index, "net", Number(e.target.value))}
                                                                         style={{ width: "60px", border: "1px solid #ccc", padding: "2px", fontSize: "12px", textAlign: "right", backgroundColor: "#f1f4ff" }}
@@ -899,10 +905,10 @@ export default function MaintenanceReport() {
                                                     <tbody>
                                                         <tr>
                                                             <td style={{ verticalAlign: "bottom", width: "35%" }}>
-                                                                <img src="/images/qr-code-img.jpg" alt="QR code" style={{ width: "100%", maxWidth: "90%", height: "auto" }} />
+                                                                <img src="/images/qr-code-img.jpg" alt="QR code" style={{ width: "100%", maxWidth: "60%", height: "75px" }} />
                                                             </td>
                                                             <td style={{ verticalAlign: "bottom", width: "35%" }}>
-                                                                <img src="/images/bar-code-img.jpg" alt="Bar Code" style={{ width: "100%", maxWidth: "90%", height: "auto" }} />
+                                                                <img src="/images/bar-code-img.jpg" alt="Bar Code" style={{ width: "100%", maxWidth: "63%", height: "auto" }} />
                                                             </td>
                                                             <td style={{ verticalAlign: "top", textAlign: "right", width: "30%" }}>
                                                                 <table style={{ width: "100%", borderCollapse: "collapse", marginLeft: "auto" }} cellPadding="2" cellSpacing="0">

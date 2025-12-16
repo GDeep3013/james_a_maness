@@ -23,7 +23,7 @@ return new class extends Migration
             $table->decimal('unit_price', 10, 2);
             $table->decimal('purchase_price', 10, 2);
             $table->unsignedBigInteger('vendor_id')->nullable();
-            $table->integer('warranty_period_months')->nullable();
+            $table->string('warranty_period_months')->nullable();
             $table->enum('status', ['Active', 'Inactive'])->default('Active');
             $table->timestamps();
 

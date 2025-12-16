@@ -71,31 +71,31 @@
                                                 <tbody>
                                                     <tr>
                                                         <td style="font-size: 18px; text-align: right; padding: 8px; border-right: 1px solid #000; border-bottom: 1px solid #000; width: 103px;">Invoice:</td>
-                                                        <td style="font-size: 16px; padding: 8px; border-bottom: 1px solid #000; background-color: #f1f4ff;">
+                                                        <td style="font-size: 16px; padding: 8px; border-bottom: 1px solid #000;">
                                                             {{ $maintenanceRecord->invoice_number ?? '' }}
                                                         </td>
                                                     </tr>
                                                     <tr>
                                                         <td style="font-size: 18px; text-align: right; padding: 8px; border-right: 1px solid #000; border-bottom: 1px solid #000;">Sale Type</td>
-                                                        <td style="font-size: 16px; padding: 8px; border-bottom: 1px solid #000; background-color: #f1f4ff;">
+                                                        <td style="font-size: 16px; padding: 8px; border-bottom: 1px solid #000;">
                                                             {{ $maintenanceRecord->sale_type ?? '' }}
                                                         </td>
                                                     </tr>
                                                     <tr>
                                                         <td style="font-size: 18px; text-align: right; padding: 8px; border-right: 1px solid #000; border-bottom: 1px solid #000;">Date</td>
-                                                        <td style="font-size: 16px; padding: 8px; border-bottom: 1px solid #000; background-color: #f1f4ff;">
+                                                        <td style="font-size: 16px; padding: 8px; border-bottom: 1px solid #000;">
                                                             {{ $maintenanceRecord->date ? \Carbon\Carbon::parse($maintenanceRecord->date)->format('m/d/Y') : '' }}
                                                         </td>
                                                     </tr>
                                                     <tr>
                                                         <td style="font-size: 18px; text-align: right; padding: 8px; border-right: 1px solid #000; border-bottom: 1px solid #000;">Ship Via</td>
-                                                        <td style="font-size: 16px; padding: 8px; border-bottom: 1px solid #000; background-color: #f1f4ff;">
+                                                        <td style="font-size: 16px; padding: 8px; border-bottom: 1px solid #000;">
                                                             {{ $maintenanceRecord->ship_via ?? '' }}
                                                         </td>
                                                     </tr>
                                                     <tr>
                                                         <td style="font-size: 18px; text-align: right; padding: 8px; border-right: 1px solid #000; border-bottom: 1px solid #000;">PO Number</td>
-                                                        <td style="font-size: 16px; padding: 8px; border-bottom: 1px solid #000; background-color: #f1f4ff;">
+                                                        <td style="font-size: 16px; padding: 8px; border-bottom: 1px solid #000;">
                                                             {{ $maintenanceRecord->po_number ?? '' }}
                                                         </td>
                                                     </tr>
@@ -123,16 +123,16 @@
                                                     <td style="border: 1px solid #000; font-size: 18px; padding: 3px; width: 25%; text-align: center;">Special Instructions</td>
                                                 </tr>
                                                 <tr>
-                                                    <td style="border: 1px solid #000; padding: 5px; background-color: #f1f4ff; font-size: 16px; text-align: center;">
+                                                    <td style="border: 1px solid #000; padding: 5px; font-size: 16px; text-align: center;">
                                                         {{ $maintenanceRecord->counter_number ?? '' }}
                                                     </td>
-                                                    <td style="border: 1px solid #000; padding: 5px; background-color: #f1f4ff; font-size: 16px; text-align: center;">
+                                                    <td style="border: 1px solid #000; padding: 5px; font-size: 16px; text-align: center;">
                                                         {{ $maintenanceRecord->customer_account ?? '' }}
                                                     </td>
-                                                    <td style="border: 1px solid #000; padding: 5px; background-color: #f1f4ff; font-size: 16px; text-align: center;">
+                                                    <td style="border: 1px solid #000; padding: 5px; font-size: 16px; text-align: center;">
                                                         {{ $maintenanceRecord->ordered_by ?? '' }}
                                                     </td>
-                                                    <td style="border: 1px solid #000; padding: 5px; background-color: #f1f4ff; font-size: 16px; text-align: center;">
+                                                    <td style="border: 1px solid #000; padding: 5px; font-size: 16px; text-align: center;">
                                                         {{ $maintenanceRecord->special_instructions ?? '' }}
                                                     </td>
                                                 </tr>
@@ -222,10 +222,10 @@
                                 <tbody>
                                     <tr>
                                         <td style="vertical-align: bottom; width: 35%;">
-                                            <img src="{{ public_path('images/qr-code-img.jpg') }}" alt="QR code" style="width: 100%; max-width: 90%; height: auto;" />
+                                            <img src="{{ public_path('images/qr-code-img.jpg') }}" alt="QR code" style="width: 100%; max-width: 60%; height: 75px;" />
                                         </td>
                                         <td style="vertical-align: bottom; width: 35%;">
-                                            <img src="{{ public_path('images/bar-code-img.jpg') }}" alt="Bar Code" style="width: 100%; max-width: 90%; height: auto;" />
+                                            <img src="{{ public_path('images/bar-code-img.jpg') }}" alt="Bar Code" style="width: 100%; max-width: 63%; height: auto;" />
                                         </td>
                                         <td style="vertical-align: top; text-align: right; width: 30%;">
                                             <table style="width: 100%; border-collapse: collapse; margin-left: auto;" cellPadding="2" cellSpacing="0">
@@ -266,13 +266,13 @@
                             <table style="width: 100%; border-collapse: collapse;" cellPadding:0; cellSpacing:0>
                                 <tbody>
                                     <tr>
-                                        <td style="width:65%; padding: 15px 0 5px 0">
-                                            <div style="font-size: 18px; margin-bottom: 3px; text-transform: uppercase; letter-spacing: 2px;">WWW.OREILLYPRO.COM</div>
-                                            <div style="font-size:10px; margin-bottom:8px;">Warranty/Garantia: www.oreillypro.com/warranty</div>
+                                        <td style="width:60%; padding: 15px 0 5px 0">
+                                            <div style="font-size: 19px; margin-bottom: 3px; text-transform: uppercase; letter-spacing: 2px;">WWW.OREILLYPRO.COM</div>
+                                            <div style="font-size:12px; margin-bottom:8px;">Warranty/Garantia: www.oreillypro.com/warranty</div>
                                         </td>
                                         <td sstyle="width:25%; padding: 15px 0 5px 0">
-                                            <div style="font-size: 18px; margin-bottom: 3px; text-transform: uppercase; letter-spacing: 2px;">WE APPRECIATE YOUR BUSINESS!</div>
-                                            <div style="font-size:10px; margin-bottom:8px;">464WS167 Remit To: PO BOX 9464, SPRINGFIELD, MO 65801-9464</div>
+                                            <div style="font-size: 19px; margin-bottom: 3px; text-transform: uppercase; letter-spacing: 2px;">WE APPRECIATE YOUR BUSINESS!</div>
+                                            <div style="font-size:12px; margin-bottom:8px;">464WS167 Remit To: PO BOX 9464, SPRINGFIELD, MO 65801-9464</div>
                                         </td>
                                     </tr>
                                 </tbody>
