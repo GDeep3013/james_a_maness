@@ -303,7 +303,7 @@ export default function ServiceList() {
                         <TableCell className="px-4 py-3 text-start">
                           <div className="text-gray-800 text-theme-sm">
                             {service.primary_meter !== null && service.primary_meter !== undefined
-                              ? `${service.primary_meter} hr`
+                              ? `${service.primary_meter} mi`
                               : "N/A"}
                           </div>
                         </TableCell>

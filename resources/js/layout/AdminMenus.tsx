@@ -68,18 +68,6 @@ export const AdminMenus: NavItem[] = [
         allowedRoles: ["Admin", "Manager"],
     },
     {
-        icon: <PartsIcon className="svg-no-fill" />,
-        name: "Parts",
-        path: "/parts",
-        allowedRoles: ["Admin", "Manager"],
-    },
-    {
-        icon: <ServiceTaskIcon className="service-task-icon" />,
-        name: "Service Tasks",
-        path: "/service-tasks",
-        allowedRoles: ["Admin", "Manager"],
-    },
-    {
         icon: <ReportsIcon className="svg-no-fill" />,
         name: "Reports",
         allowedRoles: ["Admin", "Manager"],
@@ -88,6 +76,17 @@ export const AdminMenus: NavItem[] = [
           { name: "Maintenance Report", path: "/reports/maintenance", pro: false, allowedRoles: ["Admin", "Manager"] },
           { name: "Fuel Report", path: "/reports/fuel", pro: false, allowedRoles: ["Admin", "Manager"] },
         ],
-      }
-
+    },
+    {
+        icon: <ServiceTaskIcon className="service-task-icon" />,
+        name: "Service Tasks",
+        path: "/service-tasks",
+        allowedRoles: ["Admin", "Manager"],
+    },
+    {
+        icon: <PartsIcon className="svg-no-fill" />,
+        name: "Parts",
+        path: "/parts",
+        allowedRoles: ["Admin", "Manager"],
+    }
 ]
