@@ -22,7 +22,7 @@ interface WorkOrderData {
 }
 
 export const workOrderService = {
-    getAll: (params?: { search?: string; page?: number; status?: string; vehicle_id?: number; vendor_id?: number; issue_date?: string; actual_start_date?: string; actual_completion_date?: string }) => {
+    getAll: (params?: { search?: string; page?: number; status?: string; vehicle_id?: number; vendor_id?: number; issue_date?: string; start_date?: string; end_date?: string }) => {
         const queryParams = new URLSearchParams();
         if (params?.search) queryParams.append('search', params.search);
         if (params?.page) queryParams.append('page', params.page.toString());
@@ -30,8 +30,8 @@ export const workOrderService = {
         if (params?.vehicle_id) queryParams.append('vehicle_id', params.vehicle_id.toString());
         if (params?.vendor_id) queryParams.append('vendor_id', params.vendor_id.toString());
         if (params?.issue_date) queryParams.append('issue_date', params.issue_date || '');
-        if (params?.actual_start_date) queryParams.append('actual_start_date', params.actual_start_date || '');
-        if (params?.actual_completion_date) queryParams.append('actual_completion_date', params.actual_completion_date || '');
+        if (params?.start_date) queryParams.append('start_date', params.start_date || '');
+        if (params?.end_date) queryParams.append('end_date', params.end_date || '');
         const queryString = queryParams.toString();
         return api.get(`/work-orders${queryString ? `?${queryString}` : ''}`);
     },

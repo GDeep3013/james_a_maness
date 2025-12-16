@@ -93,6 +93,19 @@ class ServiceController extends Controller
         
         $searchTerm = $request->search;
 
+
+        if ($request->has('vehicle_id') && !empty($request->vehicle_id)) {
+            $query->where('vehicle_id', $request->vehicle_id);
+        }
+
+        if ($request->has('vendor_id') && !empty($request->vendor_id)) {
+            $query->where('vendor_id', $request->vendor_id);
+        }
+
+        if ($request->has('start_date') && !empty($request->start_date) && $request->has('end_date') && !empty($request->end_date)) {
+            $query->whereBetween('completion_date', [$request->start_date, $request->end_date]);
+        }
+
         if (!empty($searchTerm)) {
             $query->where(function ($query) use ($tableColumns, $searchTerm) {
                 foreach ($tableColumns as $column) {

@@ -58,12 +58,8 @@ class WorkOrderController extends Controller
             $query->whereYear('issue_date', date('Y', strtotime($request->issue_date)));
         }
 
-        if ($request->has('actual_start_date') && !empty($request->actual_start_date)) {
-            $query->whereDate('actual_start_date', '>=', $request->actual_start_date);
-        }
-
-        if ($request->has('actual_completion_date') && !empty($request->actual_completion_date)) {
-            $query->whereDate('actual_completion_date', '<=', $request->actual_completion_date);
+        if ($request->has('start_date') && !empty($request->start_date) && $request->has('end_date') && !empty($request->end_date)) {
+            $query->whereBetween('actual_completion_date', [$request->start_date, $request->end_date]);
         }
 
         if (!empty($searchTerm)) {

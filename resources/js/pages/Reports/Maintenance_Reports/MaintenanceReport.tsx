@@ -7,6 +7,7 @@ import { vendorService } from "../../../services/vendorService";
 import { maintenanceRecordService } from "../../../services/maintenanceRecordService";
 import DatePicker from "../../../components/form/date-picker";
 import { workOrderService } from "../../../services/workOrderService";
+import { serviceService } from "../../../services/serviceService";
 import { WARRANTY_OPTIONS, TAX_OPTIONS } from "../../../constants/selectOptions";
 
 interface Vehicle {
@@ -38,7 +39,7 @@ interface LineItem {
 }
 
 interface WorkOrderPart {
-    warranty_period_months?: number;
+    warranty_period_months?: string;
     part_code?: string;
     label?: string;
     value?: string | number;
@@ -56,6 +57,15 @@ interface WorkOrder {
     total_value?: number;
 }
 
+interface Service {
+    id?: number;
+    vehicle_id?: number;
+    vendor_id?: number;
+    parts?: WorkOrderPart[];
+    completion_date?: string;
+    start_date?: string;
+}
+
 export default function MaintenanceReport() {
     const navigate = useNavigate();
     const { id } = useParams<{ id?: string }>();
@@ -68,6 +78,7 @@ export default function MaintenanceReport() {
     const [isLoading, setIsLoading] = useState(false);
     const [generalError, setGeneralError] = useState<string>("");
     const [successMessage, setSuccessMessage] = useState<string>("");
+    const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
     const [formData, setFormData] = useState({
         vehicle_id: "",
@@ -165,17 +176,43 @@ export default function MaintenanceReport() {
 
     const fetchFilteredWorkOrders = useCallback(async () => {
         try {
-            const res = await workOrderService.getAll({
-                vehicle_id: Number(formData.vehicle_id),
-                vendor_id: Number(formData.vendor_id),
-                actual_start_date: formData.actual_start_date,
-                actual_completion_date: formData.actual_completion_date,
+            const [workOrdersRes, servicesRes] = await Promise.all([
+                workOrderService.getAll({
+                    vehicle_id: Number(formData.vehicle_id),
+                    vendor_id: Number(formData.vendor_id),
+                    start_date: formData.actual_start_date,
+                    end_date: formData.actual_completion_date,
+                }),
+                serviceService.getAll({
+                    page: 1,
+                    vehicle_id: Number(formData.vehicle_id),
+                    vendor_id: Number(formData.vendor_id),
+                    start_date: formData.actual_start_date,
+                    end_date: formData.actual_completion_date,
+
+                }),
+            ]);
+
+            const workOrders = (workOrdersRes.data?.work_orders?.data as WorkOrder[] || []) as WorkOrder[];
+            const services = (servicesRes.data?.services?.data as Service[] || []) as Service[];
+
+            const filteredServices = services.filter((service: Service) => {
+                if (service.vehicle_id !== Number(formData.vehicle_id)) return false;
+                if (formData.vendor_id && service.vendor_id !== Number(formData.vendor_id)) return false;
+                if (formData.actual_start_date && service.start_date) {
+                    const serviceStartDate = new Date(service.start_date);
+                    const filterStartDate = new Date(formData.actual_start_date);
+                    if (serviceStartDate < filterStartDate) return false;
+                }
+                if (formData.actual_completion_date && service.completion_date) {
+                    const serviceCompletionDate = new Date(service.completion_date);
+                    const filterCompletionDate = new Date(formData.actual_completion_date);
+                    if (serviceCompletionDate > filterCompletionDate) return false;
+                }
+                return true;
             });
 
-            const workOrders = (res.data?.work_orders?.data as WorkOrder[] || []) as WorkOrder[];
-
-            const mappedLineItems: LineItem[] = workOrders.flatMap((wo: WorkOrder) => {
-
+            const workOrderLineItems: LineItem[] = workOrders.flatMap((wo: WorkOrder) => {
                 if (!wo.parts || wo.parts?.length === 0) return [];
 
                 return wo.parts.map((part: WorkOrderPart) => ({
@@ -183,8 +220,8 @@ export default function MaintenanceReport() {
                     line: "",
                     item_number: part.part_code || "",
                     description: part.label || "",
-                    warr: part.warranty_period_months ? part.warranty_period_months.toString() : "",
-                    unit: "",
+                    warr: part.warranty_period_months ? (part.warranty_period_months) : "",
+                    unit: String(part.value || ""),
                     tax: "Y",
                     list: Number(part.unit_price) || 0,
                     net: Number(part.purchase_price) || 0,
@@ -193,10 +230,30 @@ export default function MaintenanceReport() {
                 }));
             });
 
-            setLineItems([...mappedLineItems]);
+            const serviceLineItems: LineItem[] = filteredServices.flatMap((service: Service) => {
+                if (!service.parts || service.parts?.length === 0) return [];
+
+                return service.parts.map((part: WorkOrderPart & { quantity?: number }) => ({
+                    qty: part.quantity || 1,
+                    line: "",
+                    item_number: part.part_code || "",
+                    description: part.label || "",
+                    warr: part.warranty_period_months ? part.warranty_period_months : "",
+                    unit: String(part.value || ""),
+                    tax: "Y",
+                    list: Number(part.unit_price) || 0,
+                    net: Number(part.purchase_price) || 0,
+                    extended:
+                        (Number(part.quantity || 1)) * (Number(part.purchase_price) || 0),
+                }));
+            });
+
+            const allLineItems = [...workOrderLineItems, ...serviceLineItems];
+
+            setLineItems([...allLineItems]);
 
         } catch {
-            setGeneralError("Failed to load work orders data");
+            setGeneralError("Failed to load work orders and services data");
         }
     }, [formData.vehicle_id, formData.actual_start_date, formData.actual_completion_date, formData.vendor_id]);
 
@@ -207,13 +264,27 @@ export default function MaintenanceReport() {
     }, [formData.vehicle_id, formData.actual_start_date, formData.actual_completion_date, fetchFilteredWorkOrders]);
 
     const handleInputChange = (field: string, value: string) => {
-
         setFormData(prev => ({ ...prev, [field]: value }));
+        if (fieldErrors[field]) {
+            setFieldErrors(prev => {
+                const newErrors = { ...prev };
+                delete newErrors[field];
+                return newErrors;
+            });
+        }
     }
 
     const handleVendorChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const vendorId = e.target.value;
         setFormData(prev => ({ ...prev, vendor_id: vendorId }));
+
+        if (fieldErrors.vendor_id) {
+            setFieldErrors(prev => {
+                const newErrors = { ...prev };
+                delete newErrors.vendor_id;
+                return newErrors;
+            });
+        }
 
         if (vendorId) {
             const vendor = vendors.find(v => v.id === Number(vendorId));
@@ -273,8 +344,12 @@ export default function MaintenanceReport() {
         e.preventDefault();
         setGeneralError("");
         setSuccessMessage("");
-        setIsSubmitting(true);
+        
+        if (!validateForm()) {
+            return;
+        }
 
+        setIsSubmitting(true);
 
         try {
             const submitData = {
@@ -322,7 +397,44 @@ export default function MaintenanceReport() {
 
     const handleDateTimeChange = (name: string) => (_dates: unknown, dateString: string) => {
         setFormData((prev) => ({ ...prev, [name]: dateString }));
+        if (fieldErrors[name]) {
+            setFieldErrors(prev => {
+                const newErrors = { ...prev };
+                delete newErrors[name];
+                return newErrors;
+            });
+        }
+    };
 
+    const validateForm = (): boolean => {
+        const errors: Record<string, string> = {};
+
+        if (!formData.invoice_number?.trim()) {
+            errors.invoice_number = "Invoice number is required";
+        }
+
+        if (!formData.sale_type?.trim()) {
+            errors.sale_type = "Sale type is required";
+        }
+
+        if (!formData.date?.trim()) {
+            errors.date = "Date is required";
+        }
+
+        if (!formData.ship_via?.trim()) {
+            errors.ship_via = "Ship Via is required";
+        }
+
+        if (!formData.po_number?.trim()) {
+            errors.po_number = "PO Number is required";
+        }
+
+        if (!formData.vendor_id?.trim()) {
+            errors.vendor_id = "Vendor is required";
+        }
+
+        setFieldErrors(errors);
+        return Object.keys(errors).length === 0;
     };
     return (
         <>
@@ -374,12 +486,12 @@ export default function MaintenanceReport() {
                                                                         <tr>
                                                                             <td style={{ padding: "10px 0", verticalAlign: "top" }}>
                                                                                 <div style={{ fontSize: "11px", lineHeight: "1.5" }}>
-                                                                                    <div style={{ fontWeight: "bold", marginBottom: "3px", paddingBottom: "2px" }}>Bill To:</div>
+                                                                                    <div style={{ fontWeight: "bold", marginBottom: "3px", paddingBottom: "2px" }}>Bill To: <span style={{ color: "red" }}>*</span></div>
                                                                                     <div style={{ marginTop: "5px" }}>
                                                                                         <select
                                                                                             value={formData.vendor_id}
                                                                                             onChange={handleVendorChange}
-                                                                                            style={{ width: "50%", backgroundColor: "#f1f4ff", border: "1px solid #000", padding: "5px", fontSize: "12px", minHeight: "25px", boxSizing: "border-box", outline: "none", fontWeight: "bold" }}
+                                                                                            style={{ width: "50%", backgroundColor: "#f1f4ff", border: fieldErrors.vendor_id ? "1px solid red" : "1px solid #000", padding: "5px", fontSize: "12px", minHeight: "25px", boxSizing: "border-box", outline: "none", fontWeight: "bold" }}
                                                                                             onFocus={handleInputFocus}
                                                                                             onBlur={handleInputBlur}
                                                                                         >
@@ -390,6 +502,9 @@ export default function MaintenanceReport() {
                                                                                                 </option>
                                                                                             ))}
                                                                                         </select>
+                                                                                        {fieldErrors.vendor_id && (
+                                                                                            <div style={{ fontSize: "10px", color: "red", marginTop: "2px" }}>{fieldErrors.vendor_id}</div>
+                                                                                        )}
                                                                                     </div>
                                                                                     {/* {selectedVendor && (
                                                                                         <>
@@ -422,35 +537,41 @@ export default function MaintenanceReport() {
                                                                 <table style={{ width: "100%", border: "1px solid #000", borderCollapse: "collapse", maxWidth: "310px", marginLeft: "auto" }} cellPadding="2" cellSpacing="0">
                                                                     <tbody>
                                                                         <tr>
-                                                                            <td style={{ fontSize: "12px", textAlign: "right", padding: "8px", borderRight: "1px solid #000", borderBottom: "1px solid #000", width: "103px" }}>Invoice:</td>
+                                                                            <td style={{ fontSize: "12px", textAlign: "right", padding: "8px", borderRight: "1px solid #000", borderBottom: "1px solid #000", width: "103px" }}>Invoice: <span style={{ color: "red" }}>*</span></td>
                                                                             <td style={{ fontSize: "12px", padding: "8px", borderBottom: "1px solid #000" }}>
                                                                                 <input
                                                                                     type="text"
                                                                                     value={formData.invoice_number}
                                                                                     onChange={(e) => handleInputChange("invoice_number", e.target.value)}
-                                                                                    style={{ width: "100%", border: "none", padding: "2px", fontSize: "12px", backgroundColor: "#f1f4ff", outline: "none" }}
+                                                                                    style={{ width: "100%", border: fieldErrors.invoice_number ? "1px solid red" : "none", padding: "2px", fontSize: "12px", backgroundColor: "#f1f4ff", outline: "none" }}
                                                                                     onFocus={handleInputFocus}
                                                                                     onBlur={handleInputBlur}
                                                                                 />
+                                                                                {fieldErrors.invoice_number && (
+                                                                                    <div style={{ fontSize: "10px", color: "red", marginTop: "2px" }}>{fieldErrors.invoice_number}</div>
+                                                                                )}
                                                                             </td>
                                                                         </tr>
                                                                         <tr>
-                                                                            <td style={{ fontSize: "12px", textAlign: "right", padding: "8px", borderRight: "1px solid #000", borderBottom: "1px solid #000" }}>Sale Type</td>
+                                                                            <td style={{ fontSize: "12px", textAlign: "right", padding: "8px", borderRight: "1px solid #000", borderBottom: "1px solid #000" }}>Sale Type <span style={{ color: "red" }}>*</span></td>
                                                                             <td style={{ fontSize: "12px", padding: "8px", borderBottom: "1px solid #000" }}>
                                                                                 <input
                                                                                     type="text"
                                                                                     value={formData.sale_type}
                                                                                     onChange={(e) => handleInputChange("sale_type", e.target.value)}
-                                                                                    style={{ width: "100%", border: "none", padding: "2px", fontSize: "12px", backgroundColor: "#f1f4ff", outline: "none" }}
+                                                                                    style={{ width: "100%", border: fieldErrors.sale_type ? "1px solid red" : "none", padding: "2px", fontSize: "12px", backgroundColor: "#f1f4ff", outline: "none" }}
                                                                                     onFocus={handleInputFocus}
                                                                                     onBlur={handleInputBlur}
                                                                                 />
+                                                                                {fieldErrors.sale_type && (
+                                                                                    <div style={{ fontSize: "10px", color: "red", marginTop: "2px" }}>{fieldErrors.sale_type}</div>
+                                                                                )}
                                                                             </td>
                                                                         </tr>
                                                                         <tr >
-                                                                            <td style={{ fontSize: "12px", textAlign: "right", padding: "8px", borderRight: "1px solid #000", borderBottom: "1px solid #000" }}>Date</td>
+                                                                            <td style={{ fontSize: "12px", textAlign: "right", padding: "8px", borderRight: "1px solid #000", borderBottom: "1px solid #000" }}>Date <span style={{ color: "red" }}>*</span></td>
                                                                             <td style={{ fontSize: "12px", padding: "8px", borderBottom: "1px solid #000" }}>
-                                                                                <div className="date-picker" style={{ width: "100%", backgroundColor: "#f1f4ff", border: "none", padding: "2px", fontSize: "10px", }}>
+                                                                                <div className="date-picker" style={{ width: "100%", backgroundColor: "#f1f4ff", border: fieldErrors.date ? "1px solid red" : "none", padding: "2px", fontSize: "10px", borderRadius: "2px" }}>
                                                                                     <DatePicker
                                                                                         id="date"
                                                                                         placeholder="Select date"
@@ -458,33 +579,41 @@ export default function MaintenanceReport() {
                                                                                         defaultDate={formData.date || undefined}
                                                                                     />
                                                                                 </div>
-
+                                                                                {fieldErrors.date && (
+                                                                                    <div style={{ fontSize: "10px", color: "red", marginTop: "2px" }}>{fieldErrors.date}</div>
+                                                                                )}
                                                                             </td>
                                                                         </tr>
                                                                         <tr>
-                                                                            <td style={{ fontSize: "12px", textAlign: "right", padding: "8px", borderRight: "1px solid #000", borderBottom: "1px solid #000" }}>Ship Via</td>
+                                                                            <td style={{ fontSize: "12px", textAlign: "right", padding: "8px", borderRight: "1px solid #000", borderBottom: "1px solid #000" }}>Ship Via <span style={{ color: "red" }}>*</span></td>
                                                                             <td style={{ fontSize: "12px", padding: "8px", borderBottom: "1px solid #000" }}>
                                                                                 <input
                                                                                     type="text"
                                                                                     value={formData.ship_via}
                                                                                     onChange={(e) => handleInputChange("ship_via", e.target.value)}
-                                                                                    style={{ width: "100%", border: "none", padding: "2px", fontSize: "12px", backgroundColor: "#f1f4ff", outline: "none" }}
+                                                                                    style={{ width: "100%", border: fieldErrors.ship_via ? "1px solid red" : "none", padding: "2px", fontSize: "12px", backgroundColor: "#f1f4ff", outline: "none" }}
                                                                                     onFocus={handleInputFocus}
                                                                                     onBlur={handleInputBlur}
                                                                                 />
+                                                                                {fieldErrors.ship_via && (
+                                                                                    <div style={{ fontSize: "10px", color: "red", marginTop: "2px" }}>{fieldErrors.ship_via}</div>
+                                                                                )}
                                                                             </td>
                                                                         </tr>
                                                                         <tr>
-                                                                            <td style={{ fontSize: "12px", textAlign: "right", padding: "8px", borderRight: "1px solid #000", borderBottom: "1px solid #000" }}>PO Number</td>
+                                                                            <td style={{ fontSize: "12px", textAlign: "right", padding: "8px", borderRight: "1px solid #000", borderBottom: "1px solid #000" }}>PO Number <span style={{ color: "red" }}>*</span></td>
                                                                             <td style={{ fontSize: "12px", padding: "8px", borderBottom: "1px solid #000" }}>
                                                                                 <input
                                                                                     type="text"
                                                                                     value={formData.po_number}
                                                                                     onChange={(e) => handleInputChange("po_number", e.target.value)}
-                                                                                    style={{ width: "100%", border: "none", padding: "2px", fontSize: "12px", backgroundColor: "#f1f4ff", outline: "none" }}
+                                                                                    style={{ width: "100%", border: fieldErrors.po_number ? "1px solid red" : "none", padding: "2px", fontSize: "12px", backgroundColor: "#f1f4ff", outline: "none" }}
                                                                                     onFocus={handleInputFocus}
                                                                                     onBlur={handleInputBlur}
                                                                                 />
+                                                                                {fieldErrors.po_number && (
+                                                                                    <div style={{ fontSize: "10px", color: "red", marginTop: "2px" }}>{fieldErrors.po_number}</div>
+                                                                                )}
                                                                             </td>
                                                                         </tr>
                                                                     </tbody>
