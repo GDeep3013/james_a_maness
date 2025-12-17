@@ -9,6 +9,7 @@ import Button from '../../components/ui/button/Button';
 import VehicleReplacementChart from '../../components/ecommerce/VehicleReplacementChart';
 import { vehicleService } from '../../services/vehicleService';
 import { vehicleReplacementService } from '../../services/vehicleReplacementService';
+import PageBreadcrumb from '../../components/common/PageBreadCrumb';
 
 interface FormData {
   vehicleId: string;
@@ -370,12 +371,12 @@ export default function VehicleReplacement() {
         title="Lifecycle Estimates - Vehicle Replacement Analysis"
         description="Calculate vehicle lifecycle costs and replacement analysis"
       />
-
+      <PageBreadcrumb pageTitle="Replacement Analysis" />
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-semibold text-gray-800 dark:text-white/90">
+          <h2 className="text-2xl font-semibold text-gray-800 dark:text-white/90">
             Lifecycle Estimates
-          </h1>
+          </h2>
         </div>
 
         <form onSubmit={handleSubmit} className="w-full">

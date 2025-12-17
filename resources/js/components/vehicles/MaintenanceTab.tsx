@@ -270,7 +270,6 @@ export default function MaintenanceTab({ activeTab }: MaintenanceTabProps) {
                         <div className="flex items-center justify-center py-12">
                             <div className="text-center">
                                 <p className="text-gray-600">No maintenance records found</p>
-                                <p className="mt-2 text-sm text-gray-500">Vehicle ID: {id}</p>
                             </div>
                         </div>
                     </div>

@@ -14,6 +14,7 @@ import PageMeta from "../../components/common/PageMeta";
 import Select from "../../components/form/Select";
 import { partService } from "../../services/partService";
 import { EyeIcon, PencilIcon, TrashBinIcon } from "../../icons";
+import PageBreadcrumb from "../../components/common/PageBreadCrumb";
 
 interface Part {
   id: number;
@@ -82,7 +83,7 @@ export default function PartsList() {
     try {
       const response = await partService.getAll({ page, search, status });
       const data = response.data as PartsResponse;
-      
+
       if (data.status && data.parts) {
         setParts(data.parts.data || []);
         setPagination({
@@ -258,7 +259,7 @@ export default function PartsList() {
         title="Parts List"
         description="Manage and view all parts"
       />
-
+     <PageBreadcrumb pageTitle="Parts" />
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-semibold text-gray-800   ">Parts</h1>

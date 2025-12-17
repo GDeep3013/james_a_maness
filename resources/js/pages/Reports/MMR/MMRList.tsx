@@ -14,6 +14,7 @@ import { mmrReportService } from "../../../services/mmrReportService";
 import { ExportIcon, EyeIcon, PencilIcon, TrashBinIcon } from "../../../icons";
 import TableFooter, { PaginationData } from "../../../components/common/TableFooter";
 import { formatDate } from "../../../utilites";
+import PageBreadcrumb from "../../../components/common/PageBreadCrumb";
 
 interface MMRReport {
   id: number;
@@ -101,9 +102,9 @@ export default function MMRList() {
     fetchReports(1, searchTerm);
   };
 
-  const handleView = (id: number) => {
-    navigate(`/reports/mmr/${id}`);
-  };
+//   const handleView = (id: number) => {
+//     navigate(`/reports/mmr/${id}`);
+//   };
 
   const handleEdit = (id: number) => {
     navigate(`/reports/mmr/${id}/edit`);
@@ -188,7 +189,7 @@ export default function MMRList() {
         title="MMR Reports List"
         description="View and manage Monthly Maintenance Reports"
       />
-
+     <PageBreadcrumb pageTitle="MMR Reports" />
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-semibold text-gray-800">MMR Reports</h1>
@@ -312,16 +313,6 @@ export default function MMRList() {
                               disabled={downloadingId === report.id}
                               className="hover:scale-105 transition-all duration-300"
                               startIcon={<ExportIcon />}
-                            >
-                              {""}
-                            </Button>
-
-                            <Button
-                              variant="none"
-                              size="sm"
-                              onClick={() => handleView(report.id)}
-                              className="view-button hover:scale-105 transition-all duration-300"
-                              startIcon={<EyeIcon />}
                             >
                               {""}
                             </Button>

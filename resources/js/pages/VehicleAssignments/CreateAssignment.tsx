@@ -12,6 +12,7 @@ import { vehicleService } from "../../services/vehicleService";
 import { vehicleAssignmentService } from "../../services/vehicleAssignmentService";
 import Button from "../../components/ui/button/Button";
 import DatePicker from "../../components/form/date-picker";
+import PageBreadcrumb from "../../components/common/PageBreadCrumb";
 
 interface AssignmentEvent extends EventInput {
   extendedProps: {
@@ -576,7 +577,8 @@ const CreateAssignment: React.FC = () => {
       <PageMeta
         title="React.js Calendar Dashboard | TailAdmin - Next.js Admin Dashboard Template"
         description="This is React.js Calendar Dashboard page for TailAdmin - React.js Tailwind CSS Admin Dashboard Template"
-      />
+          />
+          <PageBreadcrumb pageTitle="Vehicle Assignments" />
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 rounded-2xl border border-gray-200 bg-white">
           <div className="custom-calendar">

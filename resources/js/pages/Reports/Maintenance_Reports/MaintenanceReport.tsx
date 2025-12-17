@@ -450,6 +450,7 @@ export default function MaintenanceReport() {
                 title={isEditMode ? "Edit Maintenance Report" : "Create Maintenance Report"}
                 description="Manage maintenance reports"
             />
+
             <div className="space-y-6">
                 <div className="page-actions flex flex-wrap items-center justify-between gap-3 mb-6">
                     <h2 className="text-base md:text-xl font-semibold text-gray-800 dark:text-white/90">
@@ -514,13 +515,6 @@ export default function MaintenanceReport() {
                                                                                             <div style={{ fontSize: "10px", color: "red", marginTop: "2px" }}>{fieldErrors.vendor_id}</div>
                                                                                         )}
                                                                                     </div>
-                                                                                    {/* {selectedVendor && (
-                                                                                        <>
-                                                                                            <div style={{ marginTop: "5px" }}>{selectedVendor.address || '.'}</div>
-                                                                                                <div>{selectedVendor.city || '.'}, {selectedVendor.state || ''} {selectedVendor.zip || ''}</div>
-                                                                                                <div>EMAIL:{selectedVendor.email || ''}</div>
-                                                                                        </>
-                                                                                    )} */}
                                                                                     {selectedVendor && (
                                                                                         <div style={{ marginTop: "5px", fontSize: "12px", lineHeight: "1.4" }}>
                                                                                             <div>{selectedVendor.address || "."}

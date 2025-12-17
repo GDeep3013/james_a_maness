@@ -14,6 +14,7 @@ import { maintenanceRecordService } from "../../../services/maintenanceRecordSer
 import { ExportIcon, EyeIcon, PencilIcon, TrashBinIcon } from "../../../icons";
 import TableFooter, { PaginationData } from "../../../components/common/TableFooter";
 import { formatDate, formatCurrency } from "../../../utilites";
+import PageBreadcrumb from "../../../components/common/PageBreadCrumb";
 
 interface MaintenanceRecord {
     id: number;
@@ -105,9 +106,9 @@ export default function MaintenanceReportList() {
         fetchRecords(1, searchTerm);
     };
 
-    const handleView = (id: number) => {
-        navigate(`/reports/maintenance/${id}`);
-    };
+    // const handleView = (id: number) => {
+    //     navigate(`/reports/maintenance/${id}`);
+    // };
 
     const handleEdit = (id: number) => {
         navigate(`/reports/maintenance/${id}/edit`);
@@ -192,7 +193,7 @@ export default function MaintenanceReportList() {
                 title="Maintenance Records List"
                 description="View and manage maintenance records"
             />
-
+            <PageBreadcrumb pageTitle="Maintenace Reports" />
             <div className="space-y-6">
                 <div className="flex items-center justify-between">
                     <h1 className="text-2xl font-semibold text-gray-800">Maintenance Reports</h1>
@@ -301,15 +302,6 @@ export default function MaintenanceReportList() {
                                                             disabled={downloadingId === record.id}
                                                             className="hover:scale-105 transition-all duration-300"
                                                             startIcon={<ExportIcon />}
-                                                        >
-                                                            {""}
-                                                        </Button>
-                                                        <Button
-                                                            variant="none"
-                                                            size="sm"
-                                                            onClick={() => handleView(record.id)}
-                                                            className="view-button hover:scale-105 transition-all duration-300"
-                                                            startIcon={<EyeIcon />}
                                                         >
                                                             {""}
                                                         </Button>

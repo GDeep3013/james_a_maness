@@ -335,7 +335,7 @@ export default function VehicleDetail() {
                                     Maintenance History
                                 </button>
 
-                             
+
 
                                 <button
                                     onClick={() => setActiveTab('fuel')}
@@ -373,7 +373,7 @@ export default function VehicleDetail() {
                             <RemindersTab activeTab={activeTab} />
                             <MaintenanceTab activeTab={activeTab} />
                             <DocumentsTab activeTab={activeTab} />
-                            
+
                         </div>
 
                     </div>
