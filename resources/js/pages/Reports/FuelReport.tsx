@@ -1,5 +1,6 @@
 import React from "react";
 import PageMeta from "../../components/common/PageMeta";
+import PageBreadcrumb from "../../components/common/PageBreadCrumb";
 
 export default function FuelReport() {
   return (
@@ -7,7 +8,8 @@ export default function FuelReport() {
       <PageMeta
         title="Fuel Report"
         description="View and generate fuel reports"
-      />
+          />
+        <PageBreadcrumb pageTitle="Fuel Report" />
       <div className="space-y-6">
         <div className="page-actions flex flex-wrap items-center justify-between gap-3 mb-6">
           <h2 className="text-base md:text-xl font-semibold text-gray-800 dark:text-white/90">

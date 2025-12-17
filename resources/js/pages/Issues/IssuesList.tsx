@@ -18,6 +18,7 @@ import Select from "../../components/form/Select";
 import { contactService } from "../../services/contactService";
 import TableFooter, { PaginationData } from "../../components/common/TableFooter";
 import { formatTypeModel } from "../../utilites";
+import PageBreadcrumb from "../../components/common/PageBreadCrumb";
 
 interface Issue {
   id: number;
@@ -222,7 +223,7 @@ export default function IssuesList() {
         title="Issues List"
         description="Manage and view all issues"
       />
-
+      <PageBreadcrumb pageTitle="Issues"/>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-semibold text-gray-800 dark:text-white/90">Issues</h1>
@@ -422,7 +423,7 @@ export default function IssuesList() {
                             Vehicle
                           </div>
                         </TableCell>
-                       
+
                         <TableCell className="px-4 py-3 text-start">
                           <div className="text-gray-800 text-theme-sm dark:text-white/90">
                             {issue.summary || "—"}

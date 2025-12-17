@@ -14,6 +14,7 @@ import PageMeta from "../../components/common/PageMeta";
 import { serviceService } from "../../services/serviceService";
 import { PencilIcon, TrashBinIcon, ExportIcon, EyeIcon } from "../../icons";
 import TableFooter, { PaginationData } from "../../components/common/TableFooter";
+import PageBreadcrumb from "../../components/common/PageBreadCrumb";
 
 interface Service {
   id: number;
@@ -159,7 +160,7 @@ export default function ServiceList() {
         title="Services List"
         description="Manage and view all services"
       />
-
+     <PageBreadcrumb pageTitle="Services" />
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>

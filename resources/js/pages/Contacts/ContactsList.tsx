@@ -15,6 +15,7 @@ import { contactService } from "../../services/contactService";
 import { PencilIcon, TrashBinIcon, ExportIcon, EyeIcon } from "../../icons";
 import Select from "../../components/form/Select";
 
+
 interface Contact {
   id: number;
   first_name: string;

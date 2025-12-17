@@ -16,6 +16,7 @@ import { WORK_ORDER_STATUS_FILTER_OPTIONS } from "../../constants/selectOptions"
 import { PencilIcon, TrashBinIcon, ExportIcon, EyeIcon } from "../../icons";
 import Select from "../../components/form/Select";
 import TableFooter, { PaginationData } from "../../components/common/TableFooter";
+import PageBreadcrumb from "../../components/common/PageBreadCrumb";
 
 interface WorkOrder {
   id: number;
@@ -175,7 +176,7 @@ export default function WorkOrdersList() {
         title="Work Orders List"
         description="Manage and view all work orders"
       />
-
+    <PageBreadcrumb pageTitle="Work Orders" />
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
