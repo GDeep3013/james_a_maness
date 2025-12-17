@@ -23,7 +23,7 @@ return new class extends Migration
             $table->bigInteger('assigned_to')->nullable();
             $table->date('due_date')->nullable();
             $table->decimal('primary_meter_due', 10, 2)->nullable();
-            $table->enum('status', ['Open', 'Resolved', 'Closed'])->default('Open');
+            $table->enum('status', ['Pending','Open','Overdue','Resolved', 'Closed'])->default('Pending');
             $table->timestamps();
         });
     }

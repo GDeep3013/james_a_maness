@@ -1,6 +1,4 @@
-import {
-    SettingsIcon
-} from "../icons";
+import {  SettingsIcon } from "../icons";
 
 type NavItem = {
     name: string;
@@ -15,5 +13,6 @@ export const OtherMenuItems : NavItem[] = [
       icon: <SettingsIcon className="svg-no-fill"/>,
       name: "Settings",
       path: "/settings",
+      allowedRoles: ["Admin", "Manager"],
     }
 ]

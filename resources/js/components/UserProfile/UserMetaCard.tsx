@@ -1,36 +1,178 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useModal } from "../../hooks/useModal";
 import { Modal } from "../ui/modal";
 import Button from "../ui/button/Button";
 import Input from "../form/input/InputField";
 import Label from "../form/Label";
+import { profileService } from "../../services/profileService";
+import { User } from "../../types/UserTypes";
 
-export default function UserMetaCard() {
+
+export default function UserMetaCard({ user }: { user: User | null }) {
   const { isOpen, openModal, closeModal } = useModal();
-  const handleSave = () => {
-    // Handle save logic here
-    console.log("Saving changes...");
-    closeModal();
+
+  const [formData, setFormData] = useState({
+    first_name: "",
+    last_name: "",
+    email: "",
+    phone: "",
+    password: "",
+    confirm_password: "",
+  });
+
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+
+  useEffect(() => {
+    if (user) {
+      const nameParts = user.name?.split(" ") || [];
+      setFormData({
+        first_name: nameParts[0] || "",
+        last_name: nameParts.slice(1).join(" ") || "",
+        email: user.email || "",
+        phone: user.phone || "",
+        password: "",
+        confirm_password: "",
+      });
+    }
+  }, [user]);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+    if (errors[name]) {
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[name];
+        return newErrors;
+      });
+    }
+    if (successMessage) {
+      setSuccessMessage("");
+    }
+  };
+
+  const validateForm = (): boolean => {
+    const newErrors: Record<string, string> = {};
+
+    if (!formData.first_name?.trim()) {
+      newErrors.first_name = "First name is required";
+    }
+
+    if (!formData.email?.trim()) {
+      newErrors.email = "Email is required";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = "Please enter a valid email address";
+    }
+
+    if (formData.password || formData.confirm_password) {
+      if (!formData.password) {
+        newErrors.password = "Password is required";
+      } else if (formData.password.length < 6) {
+        newErrors.password = "Password must be at least 6 characters";
+      }
+
+      if (!formData.confirm_password) {
+        newErrors.confirm_password = "Confirm password is required";
+      } else if (formData.password !== formData.confirm_password) {
+        newErrors.confirm_password = "Passwords do not match";
+      }
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!validateForm()) {
+      return;
+    }
+
+    setIsSubmitting(true);
+    setErrors({});
+    setSuccessMessage("");
+
+    try {
+      const updateData: {
+        first_name: string;
+        last_name?: string;
+        email: string;
+        phone?: string;
+        password?: string;
+        confirm_password?: string;
+      } = {
+        first_name: formData.first_name,
+        email: formData.email,
+      };
+
+      if (formData.last_name) {
+        updateData.last_name = formData.last_name;
+      }
+
+      if (formData.phone) {
+        updateData.phone = formData.phone;
+      }
+
+      if (formData.password && formData.confirm_password) {
+        updateData.password = formData.password;
+        updateData.confirm_password = formData.confirm_password;
+      }
+
+      const response = await profileService.update(updateData);
+
+      if (response.data?.status === true) {
+        setSuccessMessage("Profile updated successfully!");
+        setTimeout(() => {
+          closeModal();
+          window.location.reload();
+        }, 1000);
+      } else {
+        setErrors({ general: response.data?.message || "Failed to update profile. Please try again." });
+      }
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { errors?: Record<string, string[]>; message?: string; error?: string } } };
+      if (err.response?.data?.errors) {
+        const validationErrors: Record<string, string> = {};
+        Object.keys(err.response.data.errors).forEach((key) => {
+          const errorMessages = err.response?.data?.errors?.[key];
+          if (errorMessages && errorMessages.length > 0) {
+            validationErrors[key] = errorMessages[0];
+          }
+        });
+        setErrors(validationErrors);
+      } else {
+        setErrors({ 
+          general: err.response?.data?.message || 
+                   err.response?.data?.error || 
+                   "An error occurred while updating the profile. Please try again." 
+        });
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   };
   return (
     <>
       <div className="p-5 border border-gray-200 rounded-2xl dark:border-gray-800 lg:p-6">
         <div className="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
           <div className="flex flex-col items-center w-full gap-6 xl:flex-row">
-            <div className="w-20 h-20 overflow-hidden border border-gray-200 rounded-full dark:border-gray-800">
+            {/* <div className="w-20 h-20 overflow-hidden border border-gray-200 rounded-full dark:border-gray-800">
               <img src="/images/user/owner.jpg" alt="user" />
-            </div>
+            </div> */}
             <div className="order-3 xl:order-2">
-              <h4 className="mb-2 text-lg font-semibold text-center text-gray-800 dark:text-white/90 xl:text-left">
-                Sandeep Rathore
+              <h4 className="mb-2 text-lg font-semibold text-center text-gray-800 xl:text-left">
+                {user?.name}
               </h4>
               <div className="flex flex-col items-center gap-1 text-center xl:flex-row xl:gap-3 xl:text-left">
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  Team Manager
+                <p className="text-sm text-gray-500">
+                  {user?.type}
                 </p>
-                <div className="hidden h-3.5 w-px bg-gray-300 dark:bg-gray-700 xl:block"></div>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  Arizona, United States
+                <div className="hidden h-3.5 w-px bg-gray-300 xl:block"></div>
+                <p className="text-sm text-gray-500">
+                  {user?.email}
                 </p>
               </div>
             </div>
@@ -144,7 +286,7 @@ export default function UserMetaCard() {
         </div>
       </div>
       <Modal isOpen={isOpen} onClose={closeModal} className="max-w-[700px] m-4">
-        <div className="no-scrollbar relative w-full max-w-[700px] overflow-y-auto rounded-3xl bg-white p-4 dark:bg-gray-900 lg:p-11">
+        <div className="no-scrollbar relative w-full max-w-[700px] overflow-y-auto rounded-3xl bg-white p-4 lg:p-6">
           <div className="px-2 pr-14">
             <h4 className="mb-2 text-2xl font-semibold text-gray-800 dark:text-white/90">
               Edit Personal Information
@@ -153,45 +295,114 @@ export default function UserMetaCard() {
               Update your details to keep your profile up-to-date.
             </p>
           </div>
-          <form className="flex flex-col">
-            <div className="custom-scrollbar h-[450px] overflow-y-auto px-2 pb-3">
-           
-              <div className="">
-                {/* <h5 className="mb-5 text-lg font-medium text-gray-800 dark:text-white/90 lg:mb-6">
-                  Personal Information
-                </h5> */}
+          <form className="flex flex-col" onSubmit={handleSave}>
+            <div className="custom-scrollbar h-auto overflow-y-auto px-2 pb-3">
+              {errors.general && (
+                <div className="mb-4 p-3 text-sm text-error-500 bg-error-50 border border-error-200 rounded">
+                  {errors.general}
+                </div>
+              )}
 
+              {successMessage && (
+                <div className="mb-4 p-3 text-sm text-success-500 bg-success-50 border border-success-200 rounded">
+                  {successMessage}
+                </div>
+              )}
+
+              <div className="">
                 <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
                   <div className="col-span-2 lg:col-span-1">
                     <Label>First Name</Label>
-                    <Input type="text" value="Musharof" />
+                    <Input 
+                      type="text" 
+                      name="first_name"
+                      value={formData.first_name} 
+                      onChange={handleInputChange}
+                      error={!!errors.first_name}
+                      hint={errors.first_name}
+                    />
                   </div>
 
                   <div className="col-span-2 lg:col-span-1">
                     <Label>Last Name</Label>
-                    <Input type="text" value="Chowdhury" />
+                    <Input 
+                      type="text" 
+                      name="last_name"
+                      value={formData.last_name} 
+                      onChange={handleInputChange}
+                      error={!!errors.last_name}
+                      hint={errors.last_name}
+                    />
                   </div>
 
                   <div className="col-span-2 lg:col-span-1">
                     <Label>Email Address</Label>
-                    <Input type="text" value="randomuser@pimjo.com" />
+                    <Input 
+                      type="email" 
+                      name="email"
+                      value={formData.email} 
+                      onChange={handleInputChange}
+                      error={!!errors.email}
+                      hint={errors.email}
+                    />
                   </div>
 
                   <div className="col-span-2 lg:col-span-1">
                     <Label>Phone</Label>
-                    <Input type="text" value="+09 363 398 46" />
+                    <Input 
+                      type="text" 
+                      name="phone"
+                      value={formData.phone} 
+                      onChange={handleInputChange}
+                      error={!!errors.phone}
+                      hint={errors.phone}
+                    />
                   </div>
 
+                  <div className="col-span-2 lg:col-span-1">
+                    <Label>Password</Label>
+                    <Input 
+                      type="password" 
+                      name="password"
+                      value={formData.password} 
+                      onChange={handleInputChange} 
+                      placeholder="Enter new password"
+                      error={!!errors.password}
+                      hint={errors.password}
+                    />
+                  </div>
+
+                  <div className="col-span-2 lg:col-span-1">
+                    <Label>Confirm Password</Label>
+                    <Input 
+                      type="password" 
+                      name="confirm_password"
+                      value={formData.confirm_password} 
+                      onChange={handleInputChange}
+                      error={!!errors.confirm_password}
+                      hint={errors.confirm_password}
+                    />
+                  </div>
                   
                 </div>
               </div>
             </div>
             <div className="flex items-center gap-3 px-2 mt-6 lg:justify-end">
-              <Button size="sm" variant="outline" onClick={closeModal}>
+              <Button 
+                size="sm" 
+                variant="outline" 
+                onClick={closeModal}
+                type="button"
+                disabled={isSubmitting}
+              >
                 Close
               </Button>
-              <Button size="sm" onClick={handleSave}>
-                Save Changes
+              <Button 
+                size="sm" 
+                type="submit"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? "Saving..." : "Save Changes"}
               </Button>
             </div>
           </form>

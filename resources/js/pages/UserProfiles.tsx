@@ -1,10 +1,25 @@
+import { useEffect, useState } from "react";
 import PageBreadcrumb from "../components/common/PageBreadCrumb";
 import UserMetaCard from "../components/UserProfile/UserMetaCard";
 import UserInfoCard from "../components/UserProfile/UserInfoCard";
 import UserAddressCard from "../components/UserProfile/UserAddressCard";
 import PageMeta from "../components/common/PageMeta";
+import { profileService } from "../services/profileService";
+import { User } from "../types/UserTypes";
 
 export default function UserProfiles() {
+
+  const [profile, setProfile] = useState<User | null>(null);
+
+  useEffect(() => {
+    profileService.getProfile().then((response) => {
+      if (response.data.status && response.data.data) {
+        const u = response.data.data;
+        setProfile(u.user);
+      }
+    });
+  }, []);
+
   return (
     <>
       <PageMeta
@@ -17,9 +32,9 @@ export default function UserProfiles() {
           Profile
         </h3>
         <div className="space-y-6">
-          <UserMetaCard />
-          <UserInfoCard />
-          <UserAddressCard />
+          <UserMetaCard user={profile} />
+          <UserInfoCard user={profile} />
+          <UserAddressCard user={profile} />
         </div>
       </div>
     </>

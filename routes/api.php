@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\ExpenseHistoryController;
 use App\Http\Controllers\FuelController;
@@ -46,6 +47,11 @@ Route::prefix('auth')->group(function () {
         Route::get('/user', [AuthController::class, 'user']);
         Route::post('/refresh', [AuthController::class, 'refresh']);
     });
+});
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::put('/profile', [ProfileController::class, 'update']);
+    Route::get('/profile', [ProfileController::class, 'getProfile']);
 });
 
 
