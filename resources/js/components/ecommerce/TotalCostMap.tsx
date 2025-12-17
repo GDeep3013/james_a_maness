@@ -90,7 +90,7 @@ export default function TotalCostMap() {
         if (showTotal) {
             series.push({
                 name: "Total",
-                data: monthlyData.map(item => item.total ? Math.round(item.total) : 0),
+                data: monthlyData.map(item => item.total ?  Math.round(item.total) : 0),
             });
         }
 

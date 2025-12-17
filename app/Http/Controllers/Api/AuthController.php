@@ -80,6 +80,7 @@ class AuthController extends Controller
             'name' => $user->name,
             'email' => $user->email,
             'type' => $user->type,
+            'phone' => $user->phone,
             'status' => $user->status,
             'permissions' => \App\Http\Middleware\CheckUserRole::getAllowedPages($user->type),
         ]);

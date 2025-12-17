@@ -13,6 +13,16 @@ use Illuminate\Support\Facades\Log;
 
 class ProfileController extends Controller
 {
+
+    public function getProfile(Request $request)
+    {
+        $user = Auth::user();
+        return $this->success('Profile retrieved successfully', [
+            'user' => $user,
+        ]);
+    }
+
+
     public function update(Request $request)
     {
         $user = Auth::user();
@@ -28,6 +38,11 @@ class ProfileController extends Controller
             'email' => 'email|max:255',
             'password' => 'nullable|string|min:6',
             'confirm_password' => 'nullable|string|min:6|same:password',
+            'address' => 'nullable|string|max:255',
+            'country' => 'nullable|string|max:255',
+            'state' => 'nullable|string|max:255',
+            'city' => 'nullable|string|max:255',
+            'zip' => 'nullable|string|max:20',
         ]);
 
         if ($validator->fails()) {
@@ -57,6 +72,31 @@ class ProfileController extends Controller
             if (isset($request->phone)) {
                 $userData['phone'] = $request->phone;
                 $contactData['phone'] = $request->phone;
+            }
+
+            if (isset($request->address)) {
+                $userData['address'] = $request->address;
+                $contactData['address'] = $request->address;
+            }
+
+            if (isset($request->country)) {
+                $userData['country'] = $request->country;
+                $contactData['country'] = $request->country;
+            }
+
+            if (isset($request->state)) {
+                $userData['state'] = $request->state;
+                $contactData['state'] = $request->state;
+            }
+
+            if (isset($request->city)) {
+                $userData['city'] = $request->city;
+                $contactData['city'] = $request->city;
+            }
+
+            if (isset($request->zip)) {
+                $userData['zip'] = $request->zip;
+                $contactData['zip'] = $request->zip;
             }
 
             if (isset($request->password) && isset($request->confirm_password)) {

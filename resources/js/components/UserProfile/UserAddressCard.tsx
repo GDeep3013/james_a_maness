@@ -1,17 +1,124 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useModal } from "../../hooks/useModal";
 import { Modal } from "../ui/modal";
 import Button from "../ui/button/Button";
 import Input from "../form/input/InputField";
 import Label from "../form/Label";
+import { User } from "../../types/UserTypes";
+import { profileService } from "../../services/profileService";
 
-export default function UserAddressCard() {
+export default function UserAddressCard({ user }: { user: User | null }) {
   const { isOpen, openModal, closeModal } = useModal();
-  const handleSave = () => {
-    // Handle save logic here
-    console.log("Saving changes...");
-    closeModal();
+
+  const [formData, setFormData] = useState({
+    address: "",
+    country: "",
+    state: "",
+    city: "",
+    zip: "",
+  });
+
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+
+  useEffect(() => {
+    if (user) {
+      setFormData({
+        address: user.address || "",
+        country: user.country || "",
+        state: user.state || "",
+        city: user.city || "",
+        zip: user.zip || "",
+      });
+    }
+  }, [user]);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+    if (errors[name]) {
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[name];
+        return newErrors;
+      });
+    }
+    if (successMessage) {
+      setSuccessMessage("");
+    }
   };
+
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    setIsSubmitting(true);
+    setErrors({});
+    setSuccessMessage("");
+
+    try {
+      const updateData: {
+        address?: string;
+        country?: string;
+        state?: string;
+        city?: string;
+        zip?: string;
+      } = {};
+
+      if (formData.address) {
+        updateData.address = formData.address;
+      }
+
+      if (formData.country) {
+        updateData.country = formData.country;
+      }
+
+      if (formData.state) {
+        updateData.state = formData.state;
+      }
+
+      if (formData.city) {
+        updateData.city = formData.city;
+      }
+
+      if (formData.zip) {
+        updateData.zip = formData.zip;
+      }
+
+      const response = await profileService.update(updateData);
+
+      if (response.data?.status === true) {
+        setSuccessMessage("Address updated successfully!");
+        setTimeout(() => {
+          closeModal();
+          window.location.reload();
+        }, 1000);
+      } else {
+        setErrors({ general: response.data?.message || "Failed to update address. Please try again." });
+      }
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { errors?: Record<string, string[]>; message?: string; error?: string } } };
+      if (err.response?.data?.errors) {
+        const validationErrors: Record<string, string> = {};
+        Object.keys(err.response.data.errors).forEach((key) => {
+          const errorMessages = err.response?.data?.errors?.[key];
+          if (errorMessages && errorMessages.length > 0) {
+            validationErrors[key] = errorMessages[0];
+          }
+        });
+        setErrors(validationErrors);
+      } else {
+        setErrors({ 
+          general: err.response?.data?.message || 
+                   err.response?.data?.error || 
+                   "An error occurred while updating the address. Please try again." 
+        });
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <>
       <div className="p-5 border border-gray-200 rounded-2xl dark:border-gray-800 lg:p-6">
@@ -22,21 +129,41 @@ export default function UserAddressCard() {
             </h4>
 
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-7 2xl:gap-x-32">
+              {user?.address && (
+                <div className="col-span-2">
+                  <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">
+                    Address
+                  </p>
+                  <p className="text-sm font-medium text-gray-800 dark:text-white/90">
+                    {user.address}
+                  </p>
+                </div>
+              )}
+
               <div>
                 <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">
                   Country
                 </p>
                 <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                  United States.
+                  {user?.country || "-"}
                 </p>
               </div>
 
               <div>
                 <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">
-                  City/State
+                  State
                 </p>
                 <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                  Phoenix, Arizona, United States.
+                  {user?.state || "-"}
+                </p>
+              </div>
+
+              <div>
+                <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">
+                  City
+                </p>
+                <p className="text-sm font-medium text-gray-800 dark:text-white/90">
+                  {user?.city || "-"}
                 </p>
               </div>
 
@@ -45,16 +172,7 @@ export default function UserAddressCard() {
                   Postal Code
                 </p>
                 <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                  ERT 2489
-                </p>
-              </div>
-
-              <div>
-                <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">
-                  TAX ID
-                </p>
-                <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                  AS4568384
+                  {user?.zip || "-"}
                 </p>
               </div>
             </div>
@@ -93,36 +211,98 @@ export default function UserAddressCard() {
               Update your details to keep your profile up-to-date.
             </p>
           </div>
-          <form className="flex flex-col">
+          <form className="flex flex-col" onSubmit={handleSave}>
             <div className="px-2 overflow-y-auto custom-scrollbar">
+              {errors.general && (
+                <div className="mb-4 p-3 text-sm text-error-500 bg-error-50 border border-error-200 rounded">
+                  {errors.general}
+                </div>
+              )}
+
+              {successMessage && (
+                <div className="mb-4 p-3 text-sm text-success-500 bg-success-50 border border-success-200 rounded">
+                  {successMessage}
+                </div>
+              )}
+
               <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
-                <div>
-                  <Label>Country</Label>
-                  <Input type="text" value="United States" />
+                <div className="col-span-2">
+                  <Label>Address</Label>
+                  <Input 
+                    type="text" 
+                    name="address"
+                    value={formData.address} 
+                    onChange={handleInputChange}
+                    error={!!errors.address}
+                    hint={errors.address}
+                  />
                 </div>
 
                 <div>
-                  <Label>City/State</Label>
-                  <Input type="text" value="Arizona, United States." />
+                  <Label>Country</Label>
+                  <Input 
+                    type="text" 
+                    name="country"
+                    value={formData.country} 
+                    onChange={handleInputChange}
+                    error={!!errors.country}
+                    hint={errors.country}
+                  />
+                </div>
+
+                <div>
+                  <Label>State</Label>
+                  <Input 
+                    type="text" 
+                    name="state"
+                    value={formData.state} 
+                    onChange={handleInputChange}
+                    error={!!errors.state}
+                    hint={errors.state}
+                  />
+                </div>
+
+                <div>
+                  <Label>City</Label>
+                  <Input 
+                    type="text" 
+                    name="city"
+                    value={formData.city} 
+                    onChange={handleInputChange}
+                    error={!!errors.city}
+                    hint={errors.city}
+                  />
                 </div>
 
                 <div>
                   <Label>Postal Code</Label>
-                  <Input type="text" value="ERT 2489" />
-                </div>
-
-                <div>
-                  <Label>TAX ID</Label>
-                  <Input type="text" value="AS4568384" />
+                  <Input 
+                    type="text" 
+                    name="zip"
+                    value={formData.zip} 
+                    onChange={handleInputChange}
+                    error={!!errors.zip}
+                    hint={errors.zip}
+                  />
                 </div>
               </div>
             </div>
             <div className="flex items-center gap-3 px-2 mt-6 lg:justify-end">
-              <Button size="sm" variant="outline" onClick={closeModal}>
+              <Button 
+                size="sm" 
+                variant="outline" 
+                onClick={closeModal}
+                type="button"
+                disabled={isSubmitting}
+              >
                 Close
               </Button>
-              <Button size="sm" onClick={handleSave}>
-                Save Changes
+              <Button 
+                size="sm" 
+                type="submit"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? "Saving..." : "Save Changes"}
               </Button>
             </div>
           </form>

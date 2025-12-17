@@ -1,16 +1,13 @@
 import api from './api';
-
-interface ProfileData {
-  first_name?: string;
-  last_name?: string;
-  phone?: string;
-  email?: string;
-  password?: string;
-  confirm_password?: string;
-}
+import { ProfileData, ProfileUpdateResponse, UserResponse } from '../types/UserTypes';
 
 export const profileService = {
-  update: (data: ProfileData) => {
+  update: (data: ProfileData): Promise<{ data: ProfileUpdateResponse }> => {
     return api.put('/profile', data);
   },
+  getProfile: (): Promise<{ data: UserResponse }> => {
+    return api.get('/profile');
+  },
 };
+
+

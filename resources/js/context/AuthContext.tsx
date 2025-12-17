@@ -1,14 +1,10 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from "react";
+import { AuthUser } from "../types/UserTypes";
 
-interface User {
-  id: number;
-  name: string;
-  email: string;
-  type: "Admin" | "Manager" | "Driver";
-  status: number;
-}
+type User = AuthUser;
 
 interface AuthContextType {
+  fetchUser: () => Promise<void>;
   user: User | null;
   permissions: string[];
   token: string | null;
@@ -127,6 +123,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   return (
     <AuthContext.Provider
       value={{
+        fetchUser,
         user,
         permissions,
         token,
