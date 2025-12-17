@@ -226,7 +226,7 @@ export default function IssuesList() {
       <PageBreadcrumb pageTitle="Issues"/>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-semibold text-gray-800 dark:text-white/90">Issues</h1>
+          <h2 className="text-base md:text-2xl font-semibold text-gray-800">Issues</h2>
           <Button
             variant="primary"
             size="sm"

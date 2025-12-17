@@ -81,7 +81,7 @@ export default function ScheduleList() {
     try {
       const response = await scheduleService.getAll({ page, search, status });
       const data = response.data as SchedulesResponse;
-      
+
       if (data.status && data.schedules) {
         setSchedules(data.schedules.data || []);
         setPagination({
@@ -178,7 +178,7 @@ export default function ScheduleList() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-semibold text-gray-800">Schedules</h1>
+            <h2 className="text-2xl font-semibold text-gray-800">Schedules</h2>
           </div>
           <Button
             variant="primary"

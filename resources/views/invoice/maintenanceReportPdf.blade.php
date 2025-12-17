@@ -222,7 +222,7 @@
                                 <tbody>
                                     <tr>
                                         <td style="vertical-align: bottom; width: 35%;">
-                                            <img src="{{ public_path('images/qr-code-img.jpg') }}" alt="QR code" style="width: 100%; max-width: 60%; height: 75px;" />
+                                            <img src="{{ public_path('images/qr-code-img.jpg') }}" alt="QR code" style="width: 100%; max-width: 65%; height: 75px;" />
                                         </td>
                                         <td style="vertical-align: bottom; width: 35%;">
                                             <img src="{{ public_path('images/bar-code-img.jpg') }}" alt="Bar Code" style="width: 100%; max-width: 63%; height: auto;" />
@@ -266,7 +266,7 @@
                             <table style="width: 100%; border-collapse: collapse;" cellPadding:0; cellSpacing:0>
                                 <tbody>
                                     <tr>
-                                        <td style="width:60%; padding: 15px 0 5px 0">
+                                        <td style="width:65%; padding: 15px 0 5px 0">
                                             <div style="font-size: 19px; margin-bottom: 3px; text-transform: uppercase; letter-spacing: 2px;">WWW.OREILLYPRO.COM</div>
                                             <div style="font-size:12px; margin-bottom:8px;">Warranty/Garantia: www.oreillypro.com/warranty</div>
                                         </td>

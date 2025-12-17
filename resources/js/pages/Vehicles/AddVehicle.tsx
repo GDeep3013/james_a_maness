@@ -88,7 +88,7 @@ export default function AddVehicle() {
 
   const validateStep1 = (): boolean => {
     const newErrors: Record<string, string> = {};
-    
+
     if (!formData.vehicle_name) newErrors.vehicle_name = 'Vehicle name is required';
     if (!formData.type) newErrors.type = 'Vehicle type is required';
     if (!formData.make) newErrors.make = 'Make is required';
@@ -103,7 +103,7 @@ export default function AddVehicle() {
 
   const validateStep2 = (): boolean => {
     const newErrors: Record<string, string> = {};
-    
+
     if (!formData.fuel_type) newErrors.fuel_type = 'Fuel type is required';
     if (!formData.current_mileage) newErrors.current_mileage = 'Current mileage is required';
 
@@ -152,7 +152,7 @@ export default function AddVehicle() {
         license_plate: formData.license_plate || undefined,
         color: formData.color || undefined,
         fuel_type: formData.fuel_type || undefined,
-      
+
         transmission: formData.transmission || undefined,
         purchase_date: formData.purchase_date || undefined,
         engine_size: formData.engine_size || undefined,
@@ -223,13 +223,13 @@ export default function AddVehicle() {
   return (
     <>
       <PageMeta title="Add New Vehicle" description="Add a new vehicle to your fleet" />
-      
+
       <div className="space-y-6">
         <div className="flex items-start justify-between">
           <div>
-            <h1 className="text-2xl font-semibold text-gray-900 mb-2">
+            <h2 className="text-2xl font-semibold text-gray-900 mb-2">
               Add New Vehicle
-            </h1>
+            </h2>
             <p className="text-sm text-gray-600">
               Enter vehicle details to add to your fleet
             </p>

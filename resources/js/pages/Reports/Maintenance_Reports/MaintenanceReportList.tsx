@@ -196,7 +196,7 @@ export default function MaintenanceReportList() {
             <PageBreadcrumb pageTitle="Maintenace Reports" />
             <div className="space-y-6">
                 <div className="flex items-center justify-between">
-                    <h1 className="text-2xl font-semibold text-gray-800">Maintenance Reports</h1>
+                    <h2 className="text-2xl font-semibold text-gray-800">Maintenance Reports</h2>
                     <Button
                         variant="primary"
                         size="sm"

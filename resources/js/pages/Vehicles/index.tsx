@@ -24,11 +24,8 @@ export default function Vehicles() {
       />
       <PageBreadcrumb pageTitle="Asset List" />
       <div className="page-actions flex flex-wrap items-center justify-between gap-3 mb-6">
-        <h2
-          className="text-base md:text-xl font-semibold text-gray-800 dark:text-white/90"
-          x-text="pageName"
-        >
-          Vehicles
+        <h2 className="text-2xl font-semibold text-gray-800"
+         > Vehicles
         </h2>
         <div className="flex flex-wrap items-center gap-3">
           <ImportVehicles onImportSuccess={handleImportSuccess} />

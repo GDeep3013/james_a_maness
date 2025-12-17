@@ -374,7 +374,7 @@ export default function VehicleReplacement() {
       <PageBreadcrumb pageTitle="Replacement Analysis" />
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-semibold text-gray-800 dark:text-white/90">
+          <h2 className="text-2xl font-semibold text-gray-80">
             Lifecycle Estimates
           </h2>
         </div>

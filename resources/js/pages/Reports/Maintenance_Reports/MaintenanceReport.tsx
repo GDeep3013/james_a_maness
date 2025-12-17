@@ -819,7 +819,6 @@ export default function MaintenanceReport() {
                                                                 <td style={{ border: "none", fontSize: "12px", padding: "4px 2px", textAlign: "right" }}>
                                                                     <input
                                                                         type="number"
-                                                                        // step="0.01"
                                                                         value={item.list}
                                                                         onChange={(e) => handleLineItemChange(index, "list", Number(e.target.value))}
                                                                         style={{ width: "60px", border: "1px solid #ccc", padding: "2px", fontSize: "12px", textAlign: "right", backgroundColor: "#f1f4ff" }}
@@ -907,7 +906,7 @@ export default function MaintenanceReport() {
                                                     <tbody>
                                                         <tr>
                                                             <td style={{ verticalAlign: "bottom", width: "35%" }}>
-                                                                <img src="/images/qr-code-img.jpg" alt="QR code" style={{ width: "100%", maxWidth: "60%", height: "75px" }} />
+                                                                <img src="/images/qr-code-img.jpg" alt="QR code" style={{ width: "100%", maxWidth: "65%", height: "75px" }} />
                                                             </td>
                                                             <td style={{ verticalAlign: "bottom", width: "35%" }}>
                                                                 <img src="/images/bar-code-img.jpg" alt="Bar Code" style={{ width: "100%", maxWidth: "63%", height: "auto" }} />
