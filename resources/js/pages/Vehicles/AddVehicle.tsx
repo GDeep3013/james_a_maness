@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import PageMeta from '../../components/common/PageMeta';
+import PageBreadcrumb from '../../components/common/PageBreadCrumb';
 import Label from '../../components/form/Label';
 import Input from '../../components/form/input/InputField';
 import Select from '../../components/form/Select';
@@ -220,9 +221,15 @@ export default function AddVehicle() {
     }
   };
 
+  const breadcrumbItem = [
+    { name: "Vehicles", to: "/vehicles" },
+    { name: "Add New Vehicle", to: "/vehicles/add" },
+  ];
+
   return (
     <>
       <PageMeta title="Add New Vehicle" description="Add a new vehicle to your fleet" />
+      <PageBreadcrumb pageTitle={breadcrumbItem} />
 
       <div className="space-y-6">
         <div className="flex items-start justify-between">

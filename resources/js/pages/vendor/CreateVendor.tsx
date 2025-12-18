@@ -2,12 +2,11 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router";
 import Label from "../../components/form/Label";
 import Input from "../../components/form/input/InputField";
-import Select from "../../components/form/Select";
 import TextArea from "../../components/form/input/TextArea";
 import Button from "../../components/ui/button/Button";
 import PageMeta from "../../components/common/PageMeta";
-import { ChevronLeftIcon } from "../../icons";
 import { vendorService } from "../../services/vendorService";
+import PageBreadcrumb from "../../components/common/PageBreadCrumb";
 
 export interface VendorFormData {
     name: string;
@@ -236,21 +235,20 @@ export default function CreateVendor() {
                 title={isEditMode ? "Edit Vendor" : "Create New Vendor"}
                 description={isEditMode ? "Edit vendor details" : "Create a new vendor"}
             />
+            <PageBreadcrumb pageTitle={[
+                { name: "Vendors", to: "/vendors" },
+                { name: isEditMode ? "Edit Vendor" : "Create New Vendor", to: isEditMode ? `/vendors/${id}` : "/vendors/create" },
+            ]} />
 
             <div className="space-y-6">
-                <div className="flex items-center justify-between">
+                {/* <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                        <button
-                            onClick={() => navigate("/vendors")}
-                            className="flex items-center justify-center w-10 h-10 rounded-lg border border-gray-300 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
-                        >
-                            <ChevronLeftIcon className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-                        </button>
+                       
                         <h1 className="text-base md:text-2xl font-semibold text-gray-800 dark:text-white/90">
                             {isEditMode ? "Edit Vendor" : "New Vendor"}
                         </h1>
                     </div>
-                </div>
+                </div> */}
 
                 {errors.general && (
                     <div className="p-4 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">

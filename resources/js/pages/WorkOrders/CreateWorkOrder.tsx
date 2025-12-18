@@ -638,7 +638,21 @@ export default function CreateWorkOrder() {
         title={isEditMode ? "Edit Work Order" : "Create Work Order"}
         description={isEditMode ? "Edit work order" : "Create a new work order"}
       />
-      <PageBreadcrumb pageTitle={isEditMode ? "Edit Work Order" : "Create Work Order"} />
+      <PageBreadcrumb pageTitle={[
+        { name: "Work Orders", to: "/work-orders" },
+        { name: isEditMode ? "Edit Work Order" : "Create Work Order", to: isEditMode ? `/work-orders/${id}` : "/work-orders/create" },
+      ]} />
+
+      <div className="space-y-6">
+        <div className="flex items-start justify-between">
+          <div>
+            <h2 className="text-2xl font-semibold text-gray-900 mb-2">
+            {isEditMode ? "Edit Work Order" : "Create Work Order"}
+            </h2>
+          </div>
+        </div>
+      </div>
+
 
       <div className="flex flex-col gap-6 justify-center max-w-5xl mx-auto">
         <form onSubmit={handleSubmit}>
