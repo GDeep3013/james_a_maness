@@ -97,7 +97,7 @@ export default function FuelsList() {
     };
 
     // const handleExport = () => {
-    //     //  Implement export    
+    //     //  Implement export
     // };
 
     const formatUnitType = (unitType: string) => {
@@ -130,28 +130,6 @@ export default function FuelsList() {
             />
 
             <div className="space-y-6">
-                {/* <form onSubmit={handleSearch} className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl p-4">
-                    <div className="flex flex-wrap items-center gap-4">
-                        <div className="w-full max-w-full md:max-w-[70%]">
-                            <Input
-                                type="text"
-                                placeholder="Search by vehicle, vendor, fuel type, or meter reading..."
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                className="!bg-[#F3F3F5] max-w-full border-none !rounded-[8px]"
-                            />
-                        </div>
-                        <Button
-                            variant="outline"
-                            onClick={handleExport}
-                            className="bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-white/10 hover:bg-gray-100 dark:hover:bg-gray-800 w-full max-w-100 md:max-w-[10%] min-h-[44px] !leading-[44px]"
-                        >
-                            <ExportIcon />
-                            Export
-                        </Button>
-                    </div>
-                </form> */}
-
                 {error && (
                     <div className="p-4 bg-error-50 dark:bg-error-900/20 border border-error-200 dark:border-error-800 rounded-lg">
                         <p className="text-sm text-error-600 dark:text-error-400">{error}</p>
@@ -182,7 +160,7 @@ export default function FuelsList() {
                                 <Table>
                                     <TableHeader className="border-b border-gray-100 dark:border-white/5">
                                         <TableRow className="bg-[#E5E7EB]">
-                                            
+
                                             <TableCell isHeader >
                                                 Vehicle
                                             </TableCell>
@@ -218,14 +196,6 @@ export default function FuelsList() {
                                     <TableBody className="divide-y divide-gray-100 dark:divide-white/5">
                                         {fuels.map((fuel) => (
                                             <TableRow key={fuel.id}>
-                                                {/* <TableCell className="px-5 py-4 sm:px-6 text-start">
-                                                    <span className="block font-medium text-gray-800  text-theme-sm">
-                                                        {formatDate(fuel.date)}
-                                                    </span>
-                                                    <span className="block text-gray-500 text-theme-sm">
-                                                        ID: {fuel.id}
-                                                    </span>
-                                                </TableCell> */}
                                                 <TableCell className="px-4 py-3 text-start">
                                                     <span className="text-gray-800  text-theme-sm">
                                                         { formatTypeModel(fuel.vehicle as Fuel["vehicle"]) }

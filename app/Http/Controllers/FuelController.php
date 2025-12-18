@@ -28,7 +28,6 @@ class FuelController extends Controller
         }
 
         $query->orderBy('date', 'desc');
-        // dd($query);
         if (!empty($request->page)) {
             $fuels = $query->paginate(20);
             return response()->json(['status' => true, 'fuel' => $fuels]);
@@ -40,7 +39,6 @@ class FuelController extends Controller
 
     public function store(Request $request)
     {
-        // dd($request->all());
         try {
             $validatedData = $request->validate([
                 'vehicle_id' => 'required|exists:vehicals,id',
@@ -57,7 +55,7 @@ class FuelController extends Controller
 
             $vehicleMeter = (float) $validatedData['vehicle_meter'];
             $previousMeter = (float) $validatedData['previous_meter'];
-            
+
             if ($vehicleMeter <= $previousMeter) {
                 return response()->json([
                     'status' => 'error',
@@ -142,7 +140,7 @@ class FuelController extends Controller
 
             $vehicleMeter = (float) $validatedData['vehicle_meter'];
             $previousMeter = (float) $validatedData['previous_meter'];
-            
+
             if ($vehicleMeter <= $previousMeter) {
                 return response()->json([
                     'status' => 'error',

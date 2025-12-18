@@ -134,10 +134,14 @@ Route::middleware(['auth', 'page.access'])->group(function () {
     Route::get('/reports/mmr/{id}', [HomeController::class, 'index'])->where('id', '[0-9]+');
     Route::get('/reports/mmr/{id}/edit', [HomeController::class, 'index'])->where('id', '[0-9]+');
     Route::get('/reports/monthly-maintenance', [HomeController::class, 'index']);
-    // Route::get('/reports/maintenance', [HomeController::class, 'index']);
-    Route::get('/reports/fuel', [HomeController::class, 'index']);
 
     Route::get('profile', [HomeController::class, 'index']);
+
+    // Fuel Reports
+    Route::get('/reports/fuel', [HomeController::class, 'index']);
+    Route::get('/reports/fuel/create', [HomeController::class, 'index']);
+    Route::get('/reports/fuel/{id}', [HomeController::class, 'index'])->where('id', '[0-9]+');
+    Route::get('/reports/fuel/{id}/edit', [HomeController::class, 'index'])->where('id', '[0-9]+');
 
     //Maintenance Reports
     Route::get('/reports/maintenance', [HomeController::class, 'index']);

@@ -23,6 +23,7 @@ use App\Http\Controllers\MaintenanceController;
 
 use App\Http\Controllers\PartController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\FuelReportController;
 use App\Http\Controllers\MaintenanceRecordController;
 use App\Http\Controllers\ReminderController;
 use App\Http\Controllers\VehicleDocumentController;
@@ -139,6 +140,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('maintenance-records', MaintenanceRecordController::class);
     Route::get('/maintenance-records/{id}/edit', [MaintenanceRecordController::class, 'edit'])->where('id', '[0-9]+');
     Route::get('/maintenance-records/{id}/download', [MaintenanceRecordController::class, 'download'])->where('id', '[0-9]+');
+
+    Route::apiResource('/fuel-reports', FuelReportController::class);
+    Route::get('/fuel-reports/{id}/edit', [FuelReportController::class, 'edit'])->where('id', '[0-9]+');
+    Route::get('/fuel-reports/{id}/download', [FuelReportController::class, 'download'])->where('id', '[0-9]+');
 
 });
 
