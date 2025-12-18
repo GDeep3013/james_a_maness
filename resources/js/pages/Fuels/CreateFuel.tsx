@@ -7,7 +7,6 @@ import Select from "../../components/form/Select";
 import TextArea from "../../components/form/input/TextArea";
 import DatePicker from "../../components/form/date-picker";
 import Button from "../../components/ui/button/Button";
-import { ChevronLeftIcon } from "../../icons";
 import { fuelService } from "../../services/fuelService";
 import { vehicleService } from "../../services/vehicleService";
 import { vendorService } from "../../services/vendorService";

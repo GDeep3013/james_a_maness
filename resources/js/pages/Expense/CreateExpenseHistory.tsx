@@ -11,6 +11,8 @@ import { expenseService } from "../../services/expenseService";
 import { vehicleService } from "../../services/vehicleService";
 import { vendorService } from "../../services/vendorService";
 import PageBreadcrumb from "../../components/common/PageBreadCrumb";
+import { Vehicle } from "../../types/VehicleTypes";
+import { Vendor } from "../../types/VendorTypes";
 
 export interface ExpenseFormData {
     vehicle_id: string;
@@ -96,12 +98,12 @@ export default function CreateExpenseHistory() {
                 vendorService.getAll(),
             ]);
 
-            const vehicleOptions = (vehiclesRes.data.vehical || vehiclesRes.data.vehicles || []).map((vehicle: any) => ({
+            const vehicleOptions = (vehiclesRes.data.vehical || vehiclesRes.data.vehicles || []).map((vehicle: Vehicle) => ({
                 value: String(vehicle.id),
                 label: vehicle.name || `Vehicle #${vehicle.id}`,
             }));
 
-            const vendorOptions = (vendorsRes.data.vendor || vendorsRes.data.vendors || []).map((vendor: any) => ({
+            const vendorOptions = (vendorsRes.data.vendor || vendorsRes.data.vendors || []).map((vendor: Vendor) => ({
                 value: String(vendor.id),
                 label: vendor.name || `Vendor #${vendor.id}`,
             }));
@@ -235,8 +237,8 @@ export default function CreateExpenseHistory() {
             };
 
             const response = isEditMode && id
-                ? await expenseService.update(parseInt(id), expenseData as any)
-                : await expenseService.create(expenseData as any);
+                ? await expenseService.update(parseInt(id), expenseData as ExpenseApiPayload)
+                : await expenseService.create(expenseData as ExpenseApiPayload);
 
             if (response.data?.status === true || response.status === 200 || response.status === 201) {
                 if (saveAndAddAnother && !isEditMode) {
