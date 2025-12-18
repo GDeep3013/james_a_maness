@@ -124,6 +124,24 @@ nav span.menu-item-icon-size svg {
     z-index: 99999;
     background-color: #fff;
 }
+#fuel-form-container .date-picker input {height: 22px;box-shadow: none;border: none;}
+#fuel-form-container .date-time-picker .flatpickr-wrapper span svg {
+    width: 18px;
+    height: 18px;
+}
+#fuel-form-container .date-time-picker div .date-picker {
+    background-color: rgb(255, 255, 255);
+    border: 1px solid rgb(209, 213, 219);
+    padding: 6px 8px;
+    font-size: 12px;
+    border-radius: 6px;
+}
+
+#fuel-form-container .date-time-picker div .date-picker span svg {
+    width: 18px;
+    height: 18px;
+}
+
 #maintenance-form-container .date-picker input {height: 22px;box-shadow: none;border: none;}
 
 #maintenance-form-container .date-time-picker .flatpickr-wrapper span svg {

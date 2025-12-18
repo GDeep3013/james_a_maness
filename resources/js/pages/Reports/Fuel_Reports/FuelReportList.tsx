@@ -10,13 +10,13 @@ import {
 import Input from "../../../components/form/input/InputField";
 import Button from "../../../components/ui/button/Button";
 import PageMeta from "../../../components/common/PageMeta";
-import { maintenanceRecordService } from "../../../services/maintenanceRecordService";
-import { ExportIcon, EyeIcon, PencilIcon, TrashBinIcon } from "../../../icons";
+import { fuelReportService } from "../../../services/fuelReportService";
+import { ExportIcon, PencilIcon, TrashBinIcon } from "../../../icons";
 import TableFooter, { PaginationData } from "../../../components/common/TableFooter";
 import { formatDate, formatCurrency } from "../../../utilites";
 import PageBreadcrumb from "../../../components/common/PageBreadCrumb";
 
-interface MaintenanceRecord {
+interface FuelReport {
     id: number;
     vehicle_id?: number;
     vendor_id?: number;
@@ -28,8 +28,8 @@ interface MaintenanceRecord {
         id?: number;
         name?: string;
     };
-    actual_start_date?: string;
-    actual_completion_date?: string;
+    start_date?: string;
+    end_date?: string;
     total_value?: number;
     invoice_number?: string;
     po_number?: string;
@@ -42,10 +42,10 @@ interface MaintenanceRecord {
     created_at?: string;
 }
 
-interface MaintenanceRecordsResponse {
+interface FuelReportsResponse {
     status: boolean;
-    maintenance_records: {
-        data: MaintenanceRecord[];
+    fuel_reports: {
+        data: FuelReport[];
         current_page: number;
         last_page: number;
         per_page: number;
@@ -53,9 +53,9 @@ interface MaintenanceRecordsResponse {
     };
 }
 
-export default function MaintenanceReportList() {
+export default function FuelReportList() {
     const navigate = useNavigate();
-    const [records, setRecords] = useState<MaintenanceRecord[]>([]);
+    const [reports, setReports] = useState<FuelReport[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string>("");
     const [searchTerm, setSearchTerm] = useState("");
@@ -69,72 +69,72 @@ export default function MaintenanceReportList() {
     const [deletingId, setDeletingId] = useState<number | null>(null);
     const [downloadingId, setDownloadingId] = useState<number | null>(null);
 
-    const fetchRecords = useCallback(async (page: number = 1, search: string = "") => {
+    const fetchReports = useCallback(async (page: number = 1, search: string = "") => {
         setLoading(true);
         setError("");
         try {
-            const response = await maintenanceRecordService.getAll({ page, search });
-            const data = response.data as MaintenanceRecordsResponse;
+            const response = await fuelReportService.getAll({ page, search });
+            const data = response.data as FuelReportsResponse;
 
-            if (data.status && data.maintenance_records) {
-                setRecords(data.maintenance_records.data || []);
+            if (data.status && data.fuel_reports) {
+                setReports(data.fuel_reports.data || []);
                 setPagination({
-                    current_page: data.maintenance_records.current_page,
-                    last_page: data.maintenance_records.last_page,
-                    per_page: data.maintenance_records.per_page,
-                    total: data.maintenance_records.total,
+                    current_page: data.fuel_reports.current_page,
+                    last_page: data.fuel_reports.last_page,
+                    per_page: data.fuel_reports.per_page,
+                    total: data.fuel_reports.total,
                 });
             } else {
-                setError("Failed to load maintenance records");
-                setRecords([]);
+                setError("Failed to load fuel reports");
+                setReports([]);
             }
         } catch {
-            setError("An error occurred while loading maintenance records");
-            setRecords([]);
+            setError("An error occurred while loading fuel reports");
+            setReports([]);
         } finally {
             setLoading(false);
         }
     }, []);
 
     useEffect(() => {
-        fetchRecords(currentPage, searchTerm);
-    }, [currentPage, searchTerm, fetchRecords]);
+        fetchReports(currentPage, searchTerm);
+    }, [currentPage, searchTerm, fetchReports]);
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
         setCurrentPage(1);
-        fetchRecords(1, searchTerm);
+        fetchReports(1, searchTerm);
     };
 
     const handleEdit = (id: number) => {
-        navigate(`/reports/maintenance/${id}/edit`);
+        navigate(`/reports/fuel/${id}/edit`);
     };
 
     const handleDelete = async (id: number) => {
-        if (!window.confirm("Are you sure you want to delete this maintenance record?")) {
+        if (!window.confirm("Are you sure you want to delete this fuel report?")) {
             return;
         }
 
         setDeletingId(id);
         try {
-            await maintenanceRecordService.delete(id);
-            fetchRecords(currentPage, searchTerm);
+            await fuelReportService.delete(id);
+            fetchReports(currentPage, searchTerm);
         } catch {
-            alert("Failed to delete maintenance record. Please try again.");
+            alert("Failed to delete fuel report. Please try again.");
         } finally {
             setDeletingId(null);
         }
     };
 
     const handleCreate = () => {
-        navigate("/reports/maintenance/create");
+        navigate("/reports/fuel/create");
     };
 
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
     };
 
-    const downloadMaintenanceReport = async (id: number) => {
+    const downloadFuelReport = async (id: number) => {
         setDownloadingId(id);
         setError('');
         try {
@@ -146,7 +146,7 @@ export default function MaintenanceReportList() {
             }
 
             const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
-            const response = await fetch(`${API_URL}/maintenance-records/${id}/download`, {
+            const response = await fetch(`${API_URL}/fuel-reports/${id}/download`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -159,9 +159,9 @@ export default function MaintenanceReportList() {
                 if (response.status === 401) {
                     setError('Authentication failed. Please login again.');
                 } else if (response.status === 404) {
-                    setError('Maintenance record not found.');
+                    setError('Fuel report not found.');
                 } else {
-                    setError('Failed to download maintenance report.');
+                    setError('Failed to download fuel report.');
                 }
                 setDownloadingId(null);
                 return;
@@ -171,13 +171,13 @@ export default function MaintenanceReportList() {
             const url = window.URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = url;
-            link.download = `Maintenance_Report_${id}_${new Date().toISOString().split('T')[0]}.pdf`;
+            link.download = `Fuel_Report_${id}_${new Date().toISOString().split('T')[0]}.pdf`;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
             window.URL.revokeObjectURL(url);
         } catch {
-            setError('An error occurred while downloading the maintenance report.');
+            setError('An error occurred while downloading the fuel report.');
         } finally {
             setDownloadingId(null);
         }
@@ -186,19 +186,19 @@ export default function MaintenanceReportList() {
     return (
         <>
             <PageMeta
-                title="Maintenance Records List"
-                description="View and manage maintenance records"
+                title="Fuel Reports List"
+                description="View and manage fuel reports"
             />
-            <PageBreadcrumb pageTitle="Maintenace Reports" />
+            <PageBreadcrumb pageTitle="Fuel Reports" />
             <div className="space-y-6">
                 <div className="flex items-center justify-between">
-                    <h2 className="text-2xl font-semibold text-gray-800">Maintenance Reports</h2>
+                    <h2 className="text-2xl font-semibold text-gray-800">Fuel Reports</h2>
                     <Button
                         variant="primary"
                         size="sm"
                         onClick={handleCreate}
                     >
-                        + Add Maintenance Report
+                        + Add Fuel Report
                     </Button>
                 </div>
 
@@ -229,15 +229,15 @@ export default function MaintenanceReportList() {
                                 <div className="text-center">
                                     <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-brand-500"></div>
                                     <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                                        Loading maintenance reports...
+                                        Loading fuel reports...
                                     </p>
                                 </div>
                             </div>
-                        ) : records.length === 0 ? (
+                        ) : reports.length === 0 ? (
                             <div className="flex items-center justify-center py-12">
                                 <div className="text-center">
                                     <p className="text-gray-600 dark:text-gray-400">
-                                        No maintenance reports found
+                                        No fuel reports found
                                     </p>
                                 </div>
                             </div>
@@ -246,56 +246,56 @@ export default function MaintenanceReportList() {
                                 <Table>
                                     <TableHeader className="border-b border-gray-100 dark:border-white/5">
                                         <TableRow className="bg-[#E5E7EB]">
-                                            <TableCell isHeader> Date </TableCell>
+                                            <TableCell isHeader>Date</TableCell>
                                             <TableCell isHeader>Vehicle</TableCell>
                                             <TableCell isHeader>Invoice Number</TableCell>
                                             <TableCell isHeader>Start Date</TableCell>
-                                            <TableCell isHeader>Completion Date</TableCell>
+                                            <TableCell isHeader>End Date</TableCell>
                                             <TableCell isHeader>Total Value</TableCell>
                                             <TableCell isHeader>Actions</TableCell>
                                         </TableRow>
                                     </TableHeader>
 
                                     <TableBody className="divide-y divide-gray-100 dark:divide-white/5">
-                                        {records.map((record) => (
-                                            <TableRow key={record.id}>
+                                        {reports.map((report) => (
+                                            <TableRow key={report.id}>
                                                 <TableCell className="px-4 py-3 text-start">
                                                     <span className="text-gray-800 text-theme-sm">
-                                                        {record.date ? formatDate(record.date) : "—"}
+                                                        {report.date ? formatDate(report.date) : "—"}
                                                     </span>
                                                 </TableCell>
                                                 <TableCell className="px-4 py-3 text-start">
                                                     <span className="text-gray-800 text-theme-sm">
-                                                        {record.vehicle?.vehicle_name || "—"}
+                                                        {report.vehicle?.vehicle_name || "—"}
                                                     </span>
                                                 </TableCell>
                                                 <TableCell className="px-4 py-3 text-start">
                                                     <span className="text-gray-800 text-theme-sm">
-                                                        {record.invoice_number || "—"}
+                                                        {report.invoice_number || "—"}
                                                     </span>
                                                 </TableCell>
                                                 <TableCell className="px-4 py-3 text-start">
                                                     <span className="text-gray-800 text-theme-sm">
-                                                        {record.actual_start_date ? formatDate(record.actual_start_date) : "—"}
+                                                        {report.start_date ? formatDate(report.start_date) : "—"}
                                                     </span>
                                                 </TableCell>
                                                 <TableCell className="px-4 py-3 text-start">
                                                     <span className="text-gray-800 text-theme-sm">
-                                                        {record.actual_completion_date ? formatDate(record.actual_completion_date) : "—"}
+                                                        {report.end_date ? formatDate(report.end_date) : "—"}
                                                     </span>
                                                 </TableCell>
                                                 <TableCell className="px-4 py-3 text-start">
                                                     <span className="text-gray-800 text-theme-sm">
-                                                        {record.total_value ? formatCurrency(record.total_value) : "—"}
+                                                        {report.total_value ? formatCurrency(report.total_value) : "—"}
                                                     </span>
                                                 </TableCell>
                                                 <TableCell className="px-4 py-3 text-start">
                                                     <div className="">
-                                                         <Button
+                                                        <Button
                                                             variant="none"
                                                             size="sm"
-                                                            onClick={() => downloadMaintenanceReport(record.id)}
-                                                            disabled={downloadingId === record.id}
+                                                            onClick={() => downloadFuelReport(report.id)}
+                                                            disabled={downloadingId === report.id}
                                                             className="hover:scale-105 transition-all duration-300"
                                                             startIcon={<ExportIcon />}
                                                         >
@@ -304,7 +304,7 @@ export default function MaintenanceReportList() {
                                                         <Button
                                                             variant="none"
                                                             size="sm"
-                                                            onClick={() => handleEdit(record.id)}
+                                                            onClick={() => handleEdit(report.id)}
                                                             className="edit-button hover:scale-105 transition-all duration-300"
                                                             startIcon={<PencilIcon />}
                                                         >
@@ -313,8 +313,8 @@ export default function MaintenanceReportList() {
                                                         <Button
                                                             variant="none"
                                                             size="sm"
-                                                            onClick={() => handleDelete(record.id)}
-                                                            disabled={deletingId === record.id}
+                                                            onClick={() => handleDelete(report.id)}
+                                                            disabled={deletingId === report.id}
                                                             className="delete-button hover:scale-105 transition-all duration-300"
                                                             startIcon={<TrashBinIcon />}
                                                         >
@@ -331,7 +331,7 @@ export default function MaintenanceReportList() {
                                     currentPage={currentPage}
                                     onPageChange={handlePageChange}
                                     loading={loading}
-                                    itemLabel="maintenance records"
+                                    itemLabel="fuel reports"
                                 />
                             </>
                         )}

@@ -45,6 +45,7 @@ class HomeController extends Controller
             'vehicle-panel'  => 'vehicle_mgmt',
             'vehicle'        => 'vehicle',
             'maintenance'    => 'maintenance',
+            'fuel'           => 'fuel',
             'insurance'      => 'insurance',
             'reminder'       => 'reminder',
             'reports'        => 'reports',

@@ -182,11 +182,11 @@ export default function CreateFuel() {
     const handleSelectChange = (name: keyof FuelFormData) => async (value: string) => {
         setFormData((prev) => {
             const updated = { ...prev, [name]: value };
-            
+
             if (name === "vehicle_id" && !value) {
                 updated.previous_meter = "";
             }
-            
+
             return updated;
         });
 
@@ -194,10 +194,10 @@ export default function CreateFuel() {
             try {
                 const vehicleId = parseInt(value);
                 const lastEntryResponse = await fuelService.getLastEntryByVehicle(vehicleId);
-                
+
                 if (lastEntryResponse.data?.status) {
                     const lastEntry = lastEntryResponse.data.data;
-                    
+
                     if (lastEntry?.vehicle_meter) {
                         setFormData((prev) => ({
                             ...prev,

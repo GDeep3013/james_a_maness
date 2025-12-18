@@ -62,7 +62,8 @@ import MonthlyMaintenanceReport from "./pages/Reports/MMR/MonthlyMaintenanceRepo
 import MMRList from "./pages/Reports/MMR/MMRList";
 import MaintenanceReport from "./pages/Reports/Maintenance_Reports/MaintenanceReport";
 import MaintenanceReportList from "./pages/Reports/Maintenance_Reports/MaintenanceReportList";
-import FuelReport from "./pages/Reports/FuelReport";
+import FuelReport from "./pages/Reports/Fuel_Reports/FuelReport";
+import FuelReportList from "./pages/Reports/Fuel_Reports/FuelReportList";
 
 
 export default function App() {
@@ -247,6 +248,30 @@ export default function App() {
                         />
                         <Route
                             path="/reports/fuel"
+                            element={
+                                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                                    <FuelReportList />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/reports/fuel/create"
+                            element={
+                                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                                    <FuelReport />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/reports/fuel/:id"
+                            element={
+                                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                                    <FuelReport />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/reports/fuel/:id/edit"
                             element={
                                 <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
                                     <FuelReport />
