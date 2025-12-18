@@ -12,45 +12,7 @@ import Button from "../../components/ui/button/Button";
 import PageMeta from "../../components/common/PageMeta";
 import { vendorService } from "../../services/vendorService";
 import { PencilIcon, TrashBinIcon, ExportIcon, EyeIcon } from "../../icons";
-
-interface Vendor {
-  id: number;
-  name: string;
-  phone: string;
-  email: string;
-  website?: string;
-  address?: string;
-  city?: string;
-  state?: string;
-  country?: string;
-  zip?: string;
-  contact_name?: string;
-  contact_phone?: string;
-  contact_email?: string;
-  charging?: boolean;
-  fuel?: boolean;
-  service?: boolean;
-  vehicle?: boolean;
-  created_at?: string;
-}
-
-interface PaginationData {
-  current_page: number;
-  last_page: number;
-  per_page: number;
-  total: number;
-}
-
-interface VendorsResponse {
-  status: boolean;
-  vendor: {
-    data: Vendor[];
-    current_page: number;
-    last_page: number;
-    per_page: number;
-    total: number;
-  };
-}
+import { Vendor, PaginationData, VendorsResponse } from "../../types/VendorTypes";
 
 export default function VendorsList() {
   const navigate = useNavigate();

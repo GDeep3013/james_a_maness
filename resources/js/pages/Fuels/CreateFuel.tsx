@@ -7,10 +7,10 @@ import Select from "../../components/form/Select";
 import TextArea from "../../components/form/input/TextArea";
 import DatePicker from "../../components/form/date-picker";
 import Button from "../../components/ui/button/Button";
-import { ChevronLeftIcon } from "../../icons";
 import { fuelService } from "../../services/fuelService";
 import { vehicleService } from "../../services/vehicleService";
 import { vendorService } from "../../services/vendorService";
+import PageBreadcrumb from "../../components/common/PageBreadCrumb";
 
 
 
@@ -574,21 +574,19 @@ export default function CreateFuel() {
                 title={isEditMode ? "Edit Fuel Entry" : "Create New Fuel Entry"}
                 description={isEditMode ? "Edit fuel entry details" : "Create a new fuel entry"}
             />
+            <PageBreadcrumb pageTitle={[
+                { name: "Fuel History", to: "/fuel-history" },
+                { name: isEditMode ? "Edit Fuel Entry" : "Create New Fuel Entry", to: isEditMode ? `/fuel-history/${id}` : "/fuel-history/create" },
+            ]} />
 
             <div className="space-y-6">
-                <div className="flex items-center justify-between">
+                {/* <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                        <button
-                            onClick={() => navigate("/fuels")}
-                            className="flex items-center justify-center w-10 h-10 rounded-lg border border-gray-300 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
-                        >
-                            <ChevronLeftIcon className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-                        </button>
                         <h1 className="text-base md:text-2xl font-semibold text-gray-800 dark:text-white/90">
                             {isEditMode ? "Edit Fuel Entry" : "New Fuel Entry"}
                         </h1>
                     </div>
-                </div>
+                </div> */}
 
                 <div className="flex flex-col lg:flex-row gap-6 justify-center">
                     <form onSubmit={handleSubmit} className="w-full max-w-5xl">

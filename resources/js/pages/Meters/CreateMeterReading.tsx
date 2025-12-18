@@ -6,9 +6,9 @@ import Input from "../../components/form/input/InputField";
 import Select from "../../components/form/Select";
 import DatePicker from "../../components/form/date-picker";
 import Button from "../../components/ui/button/Button";
-import { ChevronLeftIcon } from "../../icons";
 import { meterReadingService } from "../../services/meterReadingService";
 import { vehicleService } from "../../services/vehicleService";
+import PageBreadcrumb from "../../components/common/PageBreadCrumb";
 
 export interface MeterReadingFormData {
     vehicle_id: string;
@@ -303,15 +303,16 @@ export default function CreateMeterReading() {
                 description={isEditMode ? "Edit meter entry details" : "Create a new meter entry"}
             />
 
+            <PageBreadcrumb pageTitle={[
+                { name: "Meter History", to: "/meter-history" },
+                { name: isEditMode ? "Edit Meter Entry" : "Create New Meter Entry", to: isEditMode ? `/meter-history/${id}` : "/meter-history/create" },
+            ]} />
+
+
             <div className="space-y-6">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                        <button
-                            onClick={() => navigate("/meter-history")}
-                            className="flex items-center justify-center w-10 h-10 rounded-lg border border-gray-300 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
-                        >
-                            <ChevronLeftIcon className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-                        </button>
+                    
                         <h1 className="text-base md:text-2xl font-semibold text-gray-800 dark:text-white/90">
                             {isEditMode ? "Edit Meter Entry" : "New Meter Entry"}
                         </h1>
@@ -339,9 +340,9 @@ export default function CreateMeterReading() {
                                     )}
 
                                     <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-6">
-                                        <h2 className="text-base md:text-2xl font-semibold text-gray-800 dark:text-white/90 mb-6">
+                                        <h3 className="text-base md:text-2xl font-semibold text-gray-800 dark:text-white/90 mb-6">
                                             Meter History Details
-                                        </h2>
+                                        </h3>
                                         {renderMeterReadingDetailsSection()}
                                     </div>
                                     <div className="mt-8 flex items-center justify-end gap-3 border-t border-gray-200 dark:border-white/10 pt-6">

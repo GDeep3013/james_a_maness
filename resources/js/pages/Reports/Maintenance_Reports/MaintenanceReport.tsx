@@ -9,6 +9,7 @@ import DatePicker from "../../../components/form/date-picker";
 import { workOrderService } from "../../../services/workOrderService";
 import { serviceService } from "../../../services/serviceService";
 import { WARRANTY_OPTIONS, TAX_OPTIONS, Unit_OPTIONS } from "../../../constants/selectOptions";
+import PageBreadcrumb from "../../../components/common/PageBreadCrumb";
 
 interface Vehicle {
     id: number;
@@ -450,6 +451,11 @@ export default function MaintenanceReport() {
                 title={isEditMode ? "Edit Maintenance Report" : "Create Maintenance Report"}
                 description="Manage maintenance reports"
             />
+
+            <PageBreadcrumb pageTitle={[ 
+                { name: "Maintenance Reports", to: "/reports/maintenance" },
+                { name: isEditMode ? "Edit" : "Create", to: isEditMode ? `/reports/maintenance/${id}` : "/reports/maintenance/create" },
+            ]} />
 
             <div className="space-y-6">
                 <div className="page-actions flex flex-wrap items-center justify-between gap-3 mb-6">

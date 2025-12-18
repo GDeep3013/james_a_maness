@@ -2,32 +2,13 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router";
 import Label from "../../components/form/Label";
 import Input from "../../components/form/input/InputField";
-import Select from "../../components/form/Select";
 import TextArea from "../../components/form/input/TextArea";
 import Button from "../../components/ui/button/Button";
 import PageMeta from "../../components/common/PageMeta";
-import { ChevronLeftIcon } from "../../icons";
 import { vendorService } from "../../services/vendorService";
+import PageBreadcrumb from "../../components/common/PageBreadCrumb";
+import { Vendor, VendorFormData, VendorResponse } from "../../types/VendorTypes";
 
-export interface VendorFormData {
-    name: string;
-    phone: string;
-    website: string;
-    address: string;
-    address_line_2: string;
-    city: string;
-    state: string;
-    zip: string;
-    country: string;
-    notes: string;
-    contact_name: string;
-    contact_phone: string;
-    contact_email: string;
-    charging: boolean;
-    fuel: boolean;
-    service: boolean;
-    vehicle: boolean;
-}
 
 export default function CreateVendor() {
     const navigate = useNavigate();
@@ -69,33 +50,33 @@ export default function CreateVendor() {
         setErrors({});
         try {
             const response = await vendorService.getForEdit(vendorId);
-            const data = response.data as { status: boolean; data?: Record<string, unknown> };
+            const data = response.data as VendorResponse;
 
-            if (data.status && data.data) {
-                const vendor = data.data;
+            if (data.status && data.vendor) {
+                const vendor = data.vendor;
 
                 // Parse address back into street_address and address_line_2
                 // const addressStr = String(vendor.address || "");
                 // const addressParts = addressStr.split(", ");
 
                 setFormData({
-                    name: String(vendor.name || ""),
-                    phone: String(vendor.phone || ""),
-                    website: String(vendor.website || ""),
-                    address: String(vendor.address) || "",
-                    address_line_2: String(vendor.address_line_2) || "",
-                    city: String(vendor.city || ""),
-                    state: String(vendor.state || ""),
-                    zip: String(vendor.zip || ""),
-                    country: String(vendor.country || ""),
-                    notes: String(vendor.notes || ""),
-                    contact_name: String(vendor.contact_name || ""),
-                    contact_phone: String(vendor.contact_phone || ""),
-                    contact_email: String(vendor.contact_email || ""),
-                    charging: Boolean(vendor.charging),
-                    fuel: Boolean(vendor.fuel),
-                    service: Boolean(vendor.service),
-                    vehicle: Boolean(vendor.vehicle),
+                    name: vendor.name,
+                    phone: vendor.phone,
+                    website: vendor.website || "",
+                    address: vendor.address || "",
+                    address_line_2: vendor.address_line_2 || "",
+                    city: vendor.city || "",
+                    state: vendor.state || "",
+                    zip: vendor.zip || "",
+                    country: vendor.country || "",
+                    notes: vendor.notes || "",
+                    contact_name: vendor.contact_name || "",
+                    contact_phone: vendor.contact_phone || "",
+                    contact_email: vendor.contact_email || "",
+                    charging: vendor.charging || false,
+                    fuel: vendor.fuel || false,
+                    service: vendor.service || false,
+                    vehicle: vendor.vehicle || false,
                 });
             }
         } catch (error) {
@@ -236,21 +217,20 @@ export default function CreateVendor() {
                 title={isEditMode ? "Edit Vendor" : "Create New Vendor"}
                 description={isEditMode ? "Edit vendor details" : "Create a new vendor"}
             />
+            <PageBreadcrumb pageTitle={[
+                { name: "Vendors", to: "/vendors" },
+                { name: isEditMode ? "Edit Vendor" : "Create New Vendor", to: isEditMode ? `/vendors/${id}` : "/vendors/create" },
+            ]} />
 
             <div className="space-y-6">
-                <div className="flex items-center justify-between">
+                {/* <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                        <button
-                            onClick={() => navigate("/vendors")}
-                            className="flex items-center justify-center w-10 h-10 rounded-lg border border-gray-300 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
-                        >
-                            <ChevronLeftIcon className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-                        </button>
+                       
                         <h1 className="text-base md:text-2xl font-semibold text-gray-800 dark:text-white/90">
                             {isEditMode ? "Edit Vendor" : "New Vendor"}
                         </h1>
                     </div>
-                </div>
+                </div> */}
 
                 {errors.general && (
                     <div className="p-4 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">

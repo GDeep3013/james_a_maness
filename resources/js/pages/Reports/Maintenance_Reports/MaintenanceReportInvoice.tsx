@@ -10,13 +10,9 @@ export default function MaintenanceReport() {
                 title="Maintenance Report"
                 description="View and generate maintenance reports"
             />
+            
+            
             <div className="space-y-6">
-                <div className="page-actions flex flex-wrap items-center justify-between gap-3 mb-6">
-                    <h2 className="text-base md:text-2xl font-semibold text-gray-800 dark:text-white/90">
-                        Maintenance Report
-                    </h2>
-                </div>
-
                 <div className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl p-6 max-w-5xl mx-auto">
                     <div id="invoice-container" style={{ width: "100%", fontFamily: "Arial, sans-serif", border: "3px solid #000", padding: "15px", backgroundColor: "#fff" }}>
                         <table style={{ width: "100%", borderCollapse: "collapse" }} cellPadding="0" cellSpacing="0">

@@ -7,10 +7,12 @@ import Select from "../../components/form/Select";
 import TextArea from "../../components/form/input/TextArea";
 import DatePicker from "../../components/form/date-picker";
 import Button from "../../components/ui/button/Button";
-import { ChevronLeftIcon } from "../../icons";
 import { expenseService } from "../../services/expenseService";
 import { vehicleService } from "../../services/vehicleService";
 import { vendorService } from "../../services/vendorService";
+import PageBreadcrumb from "../../components/common/PageBreadCrumb";
+import { Vehicle } from "../../types/VehicleTypes";
+import { Vendor } from "../../types/VendorTypes";
 
 export interface ExpenseFormData {
     vehicle_id: string;
@@ -76,11 +78,6 @@ export default function CreateExpenseHistory() {
         { value: "other", label: "Other" },
     ];
 
-    const frequencyOptions = [
-        { value: "single", label: "Single Expense" },
-        { value: "recurring", label: "Recurring Expense" },
-    ];
-
     const recurrencePeriodOptions = [
         { value: "monthly", label: "Monthly" },
         { value: "annual", label: "Annual" },
@@ -101,12 +98,12 @@ export default function CreateExpenseHistory() {
                 vendorService.getAll(),
             ]);
 
-            const vehicleOptions = (vehiclesRes.data.vehical || vehiclesRes.data.vehicles || []).map((vehicle: any) => ({
+            const vehicleOptions = (vehiclesRes.data.vehical || vehiclesRes.data.vehicles || []).map((vehicle: Vehicle) => ({
                 value: String(vehicle.id),
                 label: vehicle.name || `Vehicle #${vehicle.id}`,
             }));
 
-            const vendorOptions = (vendorsRes.data.vendor || vendorsRes.data.vendors || []).map((vendor: any) => ({
+            const vendorOptions = (vendorsRes.data.vendor || vendorsRes.data.vendors || []).map((vendor: Vendor) => ({
                 value: String(vendor.id),
                 label: vendor.name || `Vendor #${vendor.id}`,
             }));
@@ -240,8 +237,8 @@ export default function CreateExpenseHistory() {
             };
 
             const response = isEditMode && id
-                ? await expenseService.update(parseInt(id), expenseData as any)
-                : await expenseService.create(expenseData as any);
+                ? await expenseService.update(parseInt(id), expenseData as ExpenseApiPayload)
+                : await expenseService.create(expenseData as ExpenseApiPayload);
 
             if (response.data?.status === true || response.status === 200 || response.status === 201) {
                 if (saveAndAddAnother && !isEditMode) {
@@ -514,21 +511,20 @@ export default function CreateExpenseHistory() {
                 title={isEditMode ? "Edit Expense Entry" : "Create New Expense Entry"}
                 description={isEditMode ? "Edit expense entry details" : "Create a new expense entry"}
             />
+            <PageBreadcrumb pageTitle={[
+                { name: "Expense History", to: "/expense-history" },
+                { name: isEditMode ? "Edit Expense Entry" : "Create New Expense Entry", to: isEditMode ? `/expense-history/${id}` : "/expense-history/create" },
+            ]} />
 
             <div className="space-y-6">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                        <button
-                            onClick={() => navigate("/expense-history")}
-                            className="flex items-center justify-center w-10 h-10 rounded-lg border border-gray-300 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
-                        >
-                            <ChevronLeftIcon className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-                        </button>
+                    
                         <h1 className="text-base md:text-2xl font-semibold text-gray-800 dark:text-white/90">
                             {isEditMode ? "Edit Expense Entry" : "New Expense Entry"}
                         </h1>
                     </div>
-                </div>
+                </div> 
 
                 <div className="flex flex-col lg:flex-row gap-6 justify-center">
                     <form onSubmit={handleSubmit} className="w-full max-w-5xl">

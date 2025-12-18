@@ -7,6 +7,7 @@ import Button from "../../../components/ui/button/Button";
 import MMRTaskList from "./MMRTaskList";
 import { MMRReport, MaintenanceRecord } from "../../../types/MMRReportTypes";
 import { formatDate } from "../../../utilites/formatting";
+import PageBreadcrumb from "../../../components/common/PageBreadCrumb";
 
 interface Vehicle {
   id: number;
@@ -337,6 +338,13 @@ export default function MonthlyMaintenanceReport() {
         title="Monthly Maintenance Reports (MMR)"
         description="View and generate monthly maintenance reports"
       />
+
+      <PageBreadcrumb pageTitle={[
+        { name: "Monthly Maintenance Reports (MMR)", to: "/reports/mmr" },
+        { name: isEditMode ? "Edit" : "Create", to: isEditMode ? `/reports/mmr/${id}` : "/reports/mmr/create" },
+      ]} />
+
+
       <div className="space-y-6">
         <div className="page-actions flex flex-wrap items-center justify-between gap-3 mb-6">
           <h2 className="text-base md:text-xl font-semibold text-gray-800 dark:text-white/90">
