@@ -7,10 +7,10 @@ interface BreadcrumbItem {
 }
 
 interface BreadcrumbProps {
-  pageTitle : BreadcrumbItem[];
+  pageTitle : string | BreadcrumbItem[];
 }
 
-const PageBreadcrumb: React.FC<BreadcrumbProps> = ( { pageTitle = [] } : { pageTitle: BreadcrumbItem[] } ) => {
+const PageBreadcrumb: React.FC<BreadcrumbProps> = ( { pageTitle = [] } : { pageTitle: string| BreadcrumbItem[] } ) => {
 
 
   const isString = typeof pageTitle === 'string';

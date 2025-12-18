@@ -48,6 +48,7 @@ export interface VendorFormData {
     vehicle: boolean;
 }
 
+
 export interface VendorData {
     name: string;
     phone?: string;
