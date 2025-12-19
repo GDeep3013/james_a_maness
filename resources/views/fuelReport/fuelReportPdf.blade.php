@@ -144,32 +144,34 @@
                             <table style="width: 100%; border-collapse: collapse; border: none;" cellPadding="0" cellSpacing="0">
                                 <thead>
                                     <tr>
-                                        <th style="border-top: 2px solid #000; border-bottom: 1px solid #000; font-size: 18px; font-weight: bold; padding: 2px; text-align: center;">Qty</th>
-                                        <th style="border-top: 2px solid #000; border-bottom: 1px solid #000; font-size: 18px; font-weight: bold; padding: 2px; text-align: center;">Line</th>
-                                        <th style="border-top: 2px solid #000; border-bottom: 1px solid #000; font-size: 18px; font-weight: bold; padding: 2px; text-align: center;">Fuel Type</th>
-                                        <th style="border-top: 2px solid #000; border-bottom: 1px solid #000; font-size: 18px; font-weight: bold; padding: 2px; text-align: left;">Description</th>
-                                        <th style="border-top: 2px solid #000; border-bottom: 1px solid #000; font-size: 18px; font-weight: bold; padding: 2px; text-align: center;">Unit Type</th>
+                                        <!-- <th style="border-top: 2px solid #000; border-bottom: 1px solid #000; font-size: 18px; font-weight: bold; padding: 2px; text-align: center;">Qty</th> -->
+                                        <th style="border-top: 2px solid #000; border-bottom: 1px solid #000; font-size: 18px; font-weight: bold; padding: 2px; text-align: left;">Vehicle</th>
+                                        <!-- <th style="border-top: 2px solid #000; border-bottom: 1px solid #000; font-size: 18px; font-weight: bold; padding: 2px; text-align: center;">Line</th> -->
+                                        <!-- <th style="border-top: 2px solid #000; border-bottom: 1px solid #000; font-size: 18px; font-weight: bold; padding: 2px; text-align: center;">Fuel Type</th> -->
+                                        <th style="border-top: 2px solid #000; border-bottom: 1px solid #000; font-size: 18px; font-weight: bold; padding: 2px; text-align: left;">Meter Reading</th>
+                                        <th style="border-top: 2px solid #000; border-bottom: 1px solid #000; font-size: 18px; font-weight: bold; padding: 2px; text-align: left;">Unit Type</th>
                                         <th style="border-top: 2px solid #000; border-bottom: 1px solid #000; font-size: 18px; font-weight: bold; padding: 2px; text-align: center;">Unit</th>
                                         <th style="border-top: 2px solid #000; border-bottom: 1px solid #000; font-size: 18px; font-weight: bold; padding: 2px; text-align: center;">Tax</th>
-                                        <th style="border-top: 2px solid #000; border-bottom: 1px solid #000; font-size: 18px; font-weight: bold; padding: 2px; text-align: right;">List</th>
-                                        <th style="border-top: 2px solid #000; border-bottom: 1px solid #000; font-size: 18px; font-weight: bold; padding: 2px; text-align: right;">Net</th>
-                                        <th style="border-top: 2px solid #000; border-bottom: 1px solid #000; font-size: 18px; font-weight: bold; padding: 2px; text-align: right;">Extended</th>
+                                        <!-- <th style="border-top: 2px solid #000; border-bottom: 1px solid #000; font-size: 18px; font-weight: bold; padding: 2px; text-align: right;">List</th> -->
+                                        <th style="border-top: 2px solid #000; border-bottom: 1px solid #000; font-size: 18px; font-weight: bold; padding: 2px; text-align: center;">Price Per Unit</th>
+                                        <th style="border-top: 2px solid #000; border-bottom: 1px solid #000; font-size: 18px; font-weight: bold; padding: 2px; text-align: right;">Total</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @if(isset($fuelReport->line_items) && is_array($fuelReport->line_items) && count($fuelReport->line_items) > 0)
                                     @foreach($fuelReport->line_items as $item)
                                     <tr>
-                                        <td style="border: none; font-size: 16px; padding: 4px 2px; text-align: center;">{{ $item['qty'] ?? '' }}</td>
-                                        <td style="border: none; font-size: 16px; padding: 4px 2px; text-align: center;">{{ $item['line'] ?? '' }}</td>
-                                        <td style="border: none; font-size: 16px; padding: 4px 2px; text-align: center;">{{ $item['fuel_type'] ?? '' }}</td>
-                                        <td style="border: none; font-size: 16px; padding: 4px 2px; text-align: left;">{{ $item['description'] ?? '' }}</td>
-                                        <td style="border: none; font-size: 16px; padding: 4px 2px; text-align: center;">{{ $item['unit_type'] ?? '' }}</td>
+                                        <!-- <td style="border: none; font-size: 16px; padding: 4px 2px; text-align: center;">{{ $item['qty'] ?? '' }}</td> -->
+                                        <td style="border: none; font-size: 16px; padding: 4px 2px; text-align: left;">{{ $item['vehicle_name'] ?? '' }}</td>
+                                        <!-- <td style="border: none; font-size: 16px; padding: 4px 2px; text-align: center;">{{ $item['line'] ?? '' }}</td> -->
+                                        <!-- <td style="border: none; font-size: 16px; padding: 4px 2px; text-align: center;">{{ $item['fuel_type'] ?? '' }}</td> -->
+                                        <td style="border: none; font-size: 16px; padding: 4px 2px; text-align: left;">{{ $item['meter_reading'] ?? '' }}</td>
+                                        <td style="border: none; font-size: 15px; padding: 4px 2px; text-align: left;">{{ strtoupper($item['unit_type'] ?? '') }}</td>
                                         <td style="border: none; font-size: 16px; padding: 4px 2px; text-align: center;">{{ $item['unit'] ?? '' }}</td>
                                         <td style="border: none; font-size: 16px; padding: 4px 2px; text-align: center;">{{ $item['tax'] ?? '' }}</td>
-                                        <td style="border: none; font-size: 16px; padding: 4px 2px; text-align: right;">{{ isset($item['list']) ? number_format($item['list'], 2) : '' }}</td>
-                                        <td style="border: none; font-size: 16px; padding: 4px 2px; text-align: right;">{{ isset($item['net']) ? number_format($item['net'], 2) : '' }}</td>
-                                        <td style="border: none; font-size: 16px; padding: 4px 2px; text-align: right;">{{ isset($item['extended']) ? number_format($item['extended'], 2) : '' }}</td>
+                                        <td style="border: none; font-size: 16px; padding: 4px 2px; text-align: center;">$ {{ isset($item['per_unit_price']) ? number_format($item['per_unit_price'], 2) : '' }}</td>
+                                        <td style="border: none; font-size: 16px; padding: 4px 2px; text-align: right;">$ {{ isset($item['net']) ? number_format($item['net'], 2) : '' }}</td>
+                                        <!-- <td style="border: none; font-size: 16px; padding: 4px 2px; text-align: right;">$ {{ isset($item['extended']) ? number_format($item['extended'], 2) : '' }}</td> -->
                                     </tr>
 
                                     @endforeach
@@ -223,19 +225,19 @@
                                                     <tr>
                                                         <td style="font-size: 18px; text-align: right; padding: 2px 5px;">Sub-Total</td>
                                                         <td style="font-size: 16px; text-align: right; padding: 2px 0;">
-                                                            {{ isset($fuelReport->sub_total) ? number_format($fuelReport->sub_total, 2) : '0.00' }}
+                                                            $ {{ isset($fuelReport->sub_total) ? number_format($fuelReport->sub_total, 2) : '0.00' }}
                                                         </td>
                                                     </tr>
                                                     <tr>
                                                         <td style="font-size: 18px; text-align: right; padding: 2px 5px; border-bottom: 1px solid #000;">Sales Tax</td>
                                                         <td style="font-size: 16px; text-align: right; padding: 2px 0; border-bottom: 1px solid #000;">
-                                                            {{ isset($fuelReport->sales_tax) ? number_format($fuelReport->sales_tax, 2) : '0.00' }}
+                                                            $ {{ isset($fuelReport->sales_tax) ? number_format($fuelReport->sales_tax, 2) : '0.00' }}
                                                         </td>
                                                     </tr>
                                                     <tr>
                                                         <td style="font-size: 18px; text-align: right; padding: 2px 5px; font-weight: bold;">Total</td>
                                                         <td style="font-size: 16px; text-align: right; padding: 2px 0; font-weight: bold;">
-                                                            {{ isset($fuelReport->total_value) ? number_format($fuelReport->total_value, 2) : '0.00' }}
+                                                            $ {{ isset($fuelReport->total_value) ? number_format($fuelReport->total_value, 2) : '0.00' }}
                                                         </td>
                                                     </tr>
                                                     <tr>

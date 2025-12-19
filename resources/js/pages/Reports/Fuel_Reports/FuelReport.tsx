@@ -7,7 +7,7 @@ import { vendorService } from "../../../services/vendorService";
 import { fuelReportService } from "../../../services/fuelReportService";
 import DatePicker from "../../../components/form/date-picker";
 import { fuelService } from "../../../services/fuelService";
-import { TAX_OPTIONS, Unit_OPTIONS, WARRANTY_OPTIONS, } from "../../../constants/selectOptions";
+import { TAX_OPTIONS } from "../../../constants/selectOptions";
 import { fuelTypeOptions, UnitTypeOptions } from "../../../constants/vehicleConstants";
 
 interface Vehicle {
@@ -27,15 +27,16 @@ interface Vendor {
 
 interface LineItem {
     qty: number;
-    line: string;
+    // line: string;
+    vehicle_name: string;
     fuel_type: string;
-    description: string;
+    meter_reading: string;
     unit_type: string;
     unit: string;
     tax: string;
-    list: number;
+    per_unit_price: number;
     net: number;
-    extended: number;
+    // extended: number;
 }
 
 interface Fuel {
@@ -50,6 +51,9 @@ interface Fuel {
     vehicle_meter?: string;
     previous_meter?: string;
     date?: string;
+    vehicle?: {
+        vehicle_name?: string;
+    };
 }
 
 export default function FuelReportCreate() {
@@ -88,7 +92,9 @@ export default function FuelReportCreate() {
     });
 
     const [lineItems, setLineItems] = useState<LineItem[]>([
-        { qty: 0, line: "", fuel_type: "", description: "", unit_type: "", unit: "", tax: "Y", list: 0, net: 0, extended: 0 },
+        {
+            qty: 0, vehicle_name: "", fuel_type: "", meter_reading: "", unit_type: "", unit: "", tax: "Y", per_unit_price: 0, net: 0
+        },
     ]);
 
     const fetchDropdownData = useCallback(async () => {
@@ -193,25 +199,25 @@ export default function FuelReportCreate() {
                 const quantity = 1;
                 const totalUnit = Number(fuel.units) || 0;
 
-                // sanitize price (supports decimals)
                 const pricePerUnit = Number(
                     String(fuel.price_per_volume_unit).replace(/[^0-9.]/g, '')
                 ) || 0;
 
                 // calculation
-                const extended = totalUnit * quantity * pricePerUnit;
+                const extended = totalUnit * pricePerUnit;
                 console.log(typeof (totalUnit), typeof (quantity), typeof (pricePerUnit))
                 return {
                     qty: quantity,
-                    line: "",
+                    // line: "",
+                    vehicle_name: fuel.vehicle?.vehicle_name || "",
                     fuel_type: fuel.fuel_type || "",
-                    description: `Meter Reading: ${fuel.vehicle_meter || ""}`,
+                    meter_reading: `${fuel.vehicle_meter || ""}`,
                     unit_type: fuel.unit_type || "",
                     unit: String(fuel.units || ""),
                     tax: "Y",
-                    list: pricePerUnit,
-                    net: pricePerUnit,
-                    extended: extended
+                    per_unit_price: pricePerUnit,
+                    net: extended,
+                    // extended: extended
 
                 };
             });
@@ -262,33 +268,25 @@ export default function FuelReportCreate() {
     const handleLineItemChange = (index: number, field: keyof LineItem, value: string | number) => {
         const newLineItems = [...lineItems];
         const currentItem = newLineItems[index];
-
-        if (field === "qty") {
-            const oldQty = Number(currentItem.qty) || 0;
-            const newQty = Number(value) || 0;
-            const net = Number(currentItem.net) || 0;
-
-            const diffQty = newQty - oldQty;
-            const diffAmount = diffQty * net;
+        if (field === "unit") {
+            const perPriceUnit = Number(currentItem.per_unit_price) || 0;
+            const newUnit = Number(value) || 0;
+            const NewExtended = Number(value) * perPriceUnit;
 
             newLineItems[index] = {
                 ...currentItem,
-                qty: newQty,
-                extended: Number((currentItem.extended + diffAmount).toFixed(2)),
+                unit: String(newUnit),
+                net: NewExtended,
             };
-        }
-        else if (field === "net") {
-            const qty = Number(currentItem.qty) || 0;
-            const oldNet = Number(currentItem.net) || 0;
-            const newNet = Number(value) || 0;
-
-            const diffNet = newNet - oldNet;
-            const diffAmount = qty * diffNet;
+        } else if (field === "per_unit_price") {
+            const unit = Number(currentItem.unit) || 0;
+            const perUnitPerice = Number(value) || 0;
+            const NewExtended = Number(value) * unit;
 
             newLineItems[index] = {
                 ...currentItem,
-                net: newNet,
-                extended: Number((currentItem.extended + diffAmount).toFixed(2)),
+                per_unit_price: perUnitPerice,
+                net: NewExtended,
             };
         }
         else {
@@ -299,11 +297,11 @@ export default function FuelReportCreate() {
         }
 
         setLineItems(newLineItems);
-    };;
+    };
 
 
     const calculateTotals = (items: LineItem[]) => {
-        const subTotal = items.reduce((sum, item) => sum + (item.extended || 0), 0);
+        const subTotal = items.reduce((sum, item) => sum + (item.net || 0), 0);
         setFormData(prev => ({
             ...prev,
             sub_total: subTotal.toFixed(2),
@@ -313,8 +311,7 @@ export default function FuelReportCreate() {
 
     const addLineItem = () => {
         setLineItems([...lineItems, {
-            qty: 1, line: "", fuel_type: "", description: "",
-            unit_type: "", unit: "", tax: "Y", list: 0, net: 0, extended: 0
+            qty: 1, fuel_type: "", vehicle_name: "", meter_reading: "", unit_type: "", unit: "", tax: "Y", per_unit_price: 0, net: 0
         }]);
     };
 
@@ -703,39 +700,49 @@ export default function FuelReportCreate() {
                                                 <table style={{ width: "100%", borderCollapse: "collapse", border: "none" }} cellPadding="3" cellSpacing="0">
                                                     <thead>
                                                         <tr>
-                                                            <th style={{ borderTop: "2px solid #000", borderBottom: "1px solid #000", fontSize: "12px", fontWeight: "bold", padding: "2px", textAlign: "center" }}>Qty</th>
-                                                            <th style={{ borderTop: "2px solid #000", borderBottom: "1px solid #000", fontSize: "12px", fontWeight: "bold", padding: "2px", textAlign: "center" }}>Line</th>
-                                                            <th style={{ borderTop: "2px solid #000", borderBottom: "1px solid #000", fontSize: "12px", fontWeight: "bold", padding: "2px", textAlign: "center" }}>Fuel Type</th>
-                                                            <th style={{ borderTop: "2px solid #000", borderBottom: "1px solid #000", fontSize: "12px", fontWeight: "bold", padding: "2px", textAlign: "left" }}>Description</th>
+                                                            {/* <th style={{ borderTop: "2px solid #000", borderBottom: "1px solid #000", fontSize: "12px", fontWeight: "bold", padding: "2px", textAlign: "center" }}>Qty</th> */}
+                                                            <th style={{ borderTop: "2px solid #000", borderBottom: "1px solid #000", fontSize: "12px", fontWeight: "bold", padding: "2px", textAlign: "center" }}>Vehicle</th>
+                                                            {/* <th style={{ borderTop: "2px solid #000", borderBottom: "1px solid #000", fontSize: "12px", fontWeight: "bold", padding: "2px", textAlign: "center" }}>Line</th> */}
+                                                            {/* <th style={{ borderTop: "2px solid #000", borderBottom: "1px solid #000", fontSize: "12px", fontWeight: "bold", padding: "2px", textAlign: "center" }}>Fuel Type</th> */}
+                                                            <th style={{ borderTop: "2px solid #000", borderBottom: "1px solid #000", fontSize: "12px", fontWeight: "bold", padding: "2px", textAlign: "center" }}>Meter Reading</th>
                                                             <th style={{ borderTop: "2px solid #000", borderBottom: "1px solid #000", fontSize: "12px", fontWeight: "bold", padding: "2px", textAlign: "center" }}>Unit Type</th>
                                                             <th style={{ borderTop: "2px solid #000", borderBottom: "1px solid #000", fontSize: "12px", fontWeight: "bold", padding: "2px", textAlign: "center" }}>Unit</th>
                                                             <th style={{ borderTop: "2px solid #000", borderBottom: "1px solid #000", fontSize: "12px", fontWeight: "bold", padding: "2px", textAlign: "center" }}>Tax</th>
-                                                            <th style={{ borderTop: "2px solid #000", borderBottom: "1px solid #000", fontSize: "12px", fontWeight: "bold", padding: "2px", textAlign: "right" }}>List</th>
-                                                            <th style={{ borderTop: "2px solid #000", borderBottom: "1px solid #000", fontSize: "12px", fontWeight: "bold", padding: "2px", textAlign: "right" }}>Net</th>
-                                                            <th style={{ borderTop: "2px solid #000", borderBottom: "1px solid #000", fontSize: "12px", fontWeight: "bold", padding: "2px", textAlign: "right" }}>Extended</th>
+                                                            <th style={{ borderTop: "2px solid #000", borderBottom: "1px solid #000", fontSize: "12px", fontWeight: "bold", padding: "2px", textAlign: "center" }}>Price Per Unit</th>
+                                                            {/* <th style={{ borderTop: "2px solid #000", borderBottom: "1px solid #000", fontSize: "12px", fontWeight: "bold", padding: "2px", textAlign: "center" }}>Net</th> */}
+                                                            <th style={{ borderTop: "2px solid #000", borderBottom: "1px solid #000", fontSize: "12px", fontWeight: "bold", padding: "2px", textAlign: "center" }}>Total</th>
                                                             <th style={{ borderTop: "2px solid #000", borderBottom: "1px solid #000", fontSize: "12px", fontWeight: "bold", padding: "2px", textAlign: "center" }}>Action</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
                                                         {lineItems.map((item, index) => (
                                                             <tr key={index}>
-                                                                <td style={{ border: "none", fontSize: "12px", padding: "4px 2px", textAlign: "center" }}>
+                                                                {/* <td style={{ border: "none", fontSize: "12px", padding: "4px 2px", textAlign: "center" }}>
                                                                     <input
                                                                         type="number"
                                                                         value={item.qty}
                                                                         onChange={(e) => handleLineItemChange(index, "qty", Number(e.target.value))}
                                                                         style={{ width: "50px", border: "1px solid #ccc", padding: "2px", fontSize: "12px", textAlign: "center", backgroundColor: "#f1f4ff" }}
                                                                     />
-                                                                </td>
+                                                                </td> */}
                                                                 <td style={{ border: "none", fontSize: "12px", padding: "4px 2px", textAlign: "center" }}>
+                                                                    <input
+                                                                        type="text"
+                                                                        value={item.vehicle_name}
+                                                                        onChange={(e) => handleLineItemChange(index, "vehicle_name", e.target.value)}
+                                                                        style={{ width: "100px", border: "1px solid #ccc", padding: "2px", fontSize: "12px", textAlign: "center", backgroundColor: "#f1f4ff" }}
+
+                                                                    />
+                                                                </td>
+                                                                {/* <td style={{ border: "none", fontSize: "12px", padding: "4px 2px", textAlign: "center" }}>
                                                                     <input
                                                                         type="text"
                                                                         value={item.line}
                                                                         onChange={(e) => handleLineItemChange(index, "line", e.target.value)}
                                                                         style={{ width: "60px", border: "1px solid #ccc", padding: "2px", fontSize: "12px", textAlign: "center", backgroundColor: "#f1f4ff" }}
                                                                     />
-                                                                </td>
-                                                                <td style={{ border: "none", fontSize: "12px", padding: "4px 2px", textAlign: "center" }}>
+                                                                </td> */}
+                                                                {/* <td style={{ border: "none", fontSize: "12px", padding: "4px 2px", textAlign: "center" }}>
                                                                     <select
                                                                         value={item.fuel_type || ""}
                                                                         onChange={(e) => handleLineItemChange(index, "fuel_type", e.target.value)}
@@ -750,18 +757,18 @@ export default function FuelReportCreate() {
                                                                             </option>
                                                                         ))}
                                                                     </select>
-                                                                </td>
-                                                                <td style={{ border: "none", fontSize: "12px", padding: "4px 2px", textAlign: "left" }}>
+                                                                </td> */}
+                                                                <td style={{ border: "none", fontSize: "12px", padding: "4px 2px", textAlign: "center" }}>
                                                                     <input
                                                                         type="text"
-                                                                        value={item.description}
-                                                                        onChange={(e) => handleLineItemChange(index, "description", e.target.value)}
-                                                                        style={{ width: "100%", border: "1px solid #ccc", padding: "2px", fontSize: "12px", backgroundColor: "#f1f4ff" }}
+                                                                        value={item.meter_reading}
+                                                                        onChange={(e) => handleLineItemChange(index, "meter_reading", e.target.value)}
+                                                                        style={{ width: "75%", border: "1px solid #ccc", padding: "2px", fontSize: "12px", textAlign: "center", backgroundColor: "#f1f4ff" }}
                                                                     />
                                                                 </td>
                                                                 <td style={{ border: "none", fontSize: "12px", padding: "4px 2px", textAlign: "center" }}>
                                                                     <select
-                                                                        value={item.unit_type || ""}
+                                                                        value={item.unit_type}
                                                                         onChange={(e) => handleLineItemChange(index, "unit_type", e.target.value)}
                                                                         style={{ width: "95px", border: "1px solid #ccc", padding: "2px", fontSize: "12px", textAlign: "center", backgroundColor: "#f1f4ff", outline: "none" }}
                                                                         onFocus={handleInputFocus}
@@ -777,10 +784,10 @@ export default function FuelReportCreate() {
                                                                 </td>
                                                                 <td style={{ border: "none", fontSize: "12px", padding: "4px 2px", textAlign: "center" }}>
                                                                     <input
-                                                                        type="text"
+                                                                        type="number"
                                                                         value={item.unit}
                                                                         onChange={(e) => handleLineItemChange(index, "unit", e.target.value)}
-                                                                        style={{ width: "50px", border: "1px solid #ccc", padding: "2px", fontSize: "12px", textAlign: "center", backgroundColor: "#f1f4ff" }}
+                                                                        style={{ width: "62px", border: "1px solid #ccc", padding: "2px", fontSize: "12px", textAlign: "center", backgroundColor: "#f1f4ff" }}
                                                                     />
                                                                 </td>
                                                                 <td style={{ border: "none", fontSize: "12px", padding: "4px 2px", textAlign: "center" }}>
@@ -798,26 +805,26 @@ export default function FuelReportCreate() {
                                                                         ))}
                                                                     </select>
                                                                 </td>
-                                                                <td style={{ border: "none", fontSize: "12px", padding: "4px 2px", textAlign: "right" }}>
+                                                                <td style={{ border: "none", fontSize: "12px", padding: "4px 2px", textAlign: "center" }}>
                                                                     <input
                                                                         type="number"
-                                                                        value={item.list}
-                                                                        onChange={(e) => handleLineItemChange(index, "list", Number(e.target.value))}
+                                                                        value={item.per_unit_price}
+                                                                        onChange={(e) => handleLineItemChange(index, "per_unit_price", Number(e.target.value))}
                                                                         style={{ width: "60px", border: "1px solid #ccc", padding: "2px", fontSize: "12px", textAlign: "right", backgroundColor: "#f1f4ff" }}
                                                                     />
                                                                 </td>
-                                                                <td style={{ border: "none", fontSize: "12px", padding: "4px 2px", textAlign: "right" }}>
+                                                                <td style={{ border: "none", fontSize: "12px", padding: "4px 2px", textAlign: "center" }}>
                                                                     <input
                                                                         type="number"
-                                                                        value={item.net}
+                                                                        value={item.net.toFixed(2)}
                                                                         onChange={(e) => handleLineItemChange(index, "net", Number(e.target.value))}
                                                                         style={{ width: "60px", border: "1px solid #ccc", padding: "2px", fontSize: "12px", textAlign: "right", backgroundColor: "#f1f4ff" }}
                                                                     />
                                                                 </td>
-                                                                <td style={{ border: "none", fontSize: "12px", padding: "4px 2px", textAlign: "right" }}>
+                                                                {/* <td style={{ border: "none", fontSize: "12px", padding: "4px 2px", textAlign: "right" }}>
 
-                                                                    {item.extended.toFixed(2)}
-                                                                </td>
+                                                                    {`$ ${item.extended.toFixed(2)}`}
+                                                                </td> */}
                                                                 <td style={{ border: "none", fontSize: "12px", padding: "4px 2px", textAlign: "center" }}>
                                                                     <button
                                                                         type="button"
@@ -898,7 +905,7 @@ export default function FuelReportCreate() {
                                                                     <tbody>
                                                                         <tr>
                                                                             <td style={{ fontSize: "12px", textAlign: "right", padding: "2px 5px" }}>Sub-Total</td>
-                                                                            <td style={{ fontSize: "12px", textAlign: "right", padding: "2px 0" }}>{formData.sub_total || "0.00"}</td>
+                                                                            <td style={{ fontSize: "12px", textAlign: "right", padding: "2px 0" }}>${formData.sub_total || "0.00"}</td>
                                                                         </tr>
                                                                         <tr>
                                                                             <td style={{ fontSize: "12px", textAlign: "right", padding: "2px 5px", borderBottom: "1px solid #000" }}>
@@ -921,7 +928,7 @@ export default function FuelReportCreate() {
                                                                         </tr>
                                                                         <tr>
                                                                             <td style={{ fontSize: "12px", textAlign: "right", padding: "2px 5px", fontWeight: "bold" }}>Total</td>
-                                                                            <td style={{ fontSize: "12px", textAlign: "right", padding: "2px 0", fontWeight: "bold" }}>{formData.total_value || "0.00"}</td>
+                                                                            <td style={{ fontSize: "12px", textAlign: "right", padding: "2px 0", fontWeight: "bold" }}>${formData.total_value || "0.00"}</td>
                                                                         </tr>
                                                                         <tr>
                                                                             <td colSpan={2} style={{ fontSize: "12px", textAlign: "right", padding: "2px 0" }}>

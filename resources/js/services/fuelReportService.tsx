@@ -17,15 +17,16 @@ interface FuelReportFormData {
   ship_via?: string;
   line_items?: Array<{
     qty: number;
-    line: string;
+    // line: string;
+    vehicle_name: string;
     fuel_type: string;
-    description: string;
+    meter_reading: string;
     unit_type: string;
     unit: string;
     tax: string;
-    list: number;
+    per_unit_price: number;
     net: number;
-    extended: number;
+    // extended: number;
   }>;
   sub_total?: number;
   sales_tax?: number;
