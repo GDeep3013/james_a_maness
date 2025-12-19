@@ -7,7 +7,7 @@ import Button from "../../components/ui/button/Button";
 import PageMeta from "../../components/common/PageMeta";
 import { vendorService } from "../../services/vendorService";
 import PageBreadcrumb from "../../components/common/PageBreadCrumb";
-import { Vendor, VendorFormData, VendorResponse } from "../../types/VendorTypes";
+import { VendorFormData, VendorResponse } from "../../types/VendorTypes";
 
 
 export default function CreateVendor() {
