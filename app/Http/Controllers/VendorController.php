@@ -10,6 +10,8 @@ use Auth;
 use Exception;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Log;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\VendorExport;
 class VendorController extends Controller
 {
     /**
@@ -273,6 +275,25 @@ class VendorController extends Controller
             } else {
                 return response()->json(['status' => false, 'message' => 'Vendor not found']);
             }
+        }
+    }
+
+    public function export(Request $request)
+    {
+        try {
+            $search = $request->input('search', '');
+
+            $export = new VendorExport($search);
+            
+            $fileName = 'vendors_export_' . date('Y-m-d_His') . '.xlsx';
+            
+            return Excel::download($export, $fileName);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'An error occurred while exporting vendors.',
+                'error' => $e->getMessage(),
+            ], 500);
         }
     }
 }

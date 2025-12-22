@@ -55,6 +55,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/profile', [ProfileController::class, 'getProfile']);
 });
 
+Route::get('/vehicles/export', [VehicleController::class, 'export']);
+Route::get('/con/export', [ContactController::class, 'export']);
+Route::get('/vendors/export', [VendorController::class, 'export']);
 
 Route::middleware('auth:sanctum')->group(function () {
 
@@ -75,6 +78,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::apiResource('vehicles', VehicleController::class);
     Route::post('/vehicles/import', [VehicleController::class, 'import']);
+
     Route::get('/vehicles/{id}/edit', [VehicleController::class, 'edit'])->where('id', '[0-9]+');
     Route::get('/vehicles-statistics', [VehicleController::class, 'getStatistics']);
 

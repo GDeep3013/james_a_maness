@@ -16,6 +16,8 @@ use Auth;
 use Illuminate\Support\Facades\Schema;
 use Log;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\ContactExport;
 
 class ContactController extends Controller
 {
@@ -510,6 +512,25 @@ class ContactController extends Controller
         }
     }
 
+    public function export(Request $request)
+    {
+        try {
+            $search = $request->input('search', '');
+            $status = $request->input('status', '');
+
+            $export = new ContactExport($search, $status);
+            
+            $fileName = 'contacts_export_' . date('Y-m-d_His') . '.xlsx';
+            
+            return Excel::download($export, $fileName);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'An error occurred while exporting contacts.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
 
     // public function RequestApproval(){
     //     return view('EmployeeManagement.contact.manage-req-approval');

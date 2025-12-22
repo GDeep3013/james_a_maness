@@ -119,4 +119,17 @@ export const vendorService = {
   delete: (id: number) => api.delete(`/vendors/${id}`),
 
   getForEdit: (id: number) => api.get(`/vendors/${id}/edit`),
+
+  export: (params?: { search?: string }) => {
+    const queryParams = new URLSearchParams();
+    if (params?.search) queryParams.append('search', params.search);
+    const queryString = queryParams.toString();
+    
+    return api.get(`/vendors/export${queryString ? `?${queryString}` : ''}`, {
+      responseType: 'blob',
+      headers: {
+        'Accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      },
+    });
+  },
 };

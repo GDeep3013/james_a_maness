@@ -114,4 +114,18 @@ export const contactService = {
 
   getForEdit: (id: number) =>
     api.get(`/con/${id}/edit`),
+
+  export: (params?: { search?: string; status?: string }) => {
+    const queryParams = new URLSearchParams();
+    if (params?.search) queryParams.append('search', params.search);
+    if (params?.status) queryParams.append('status', params.status);
+    const queryString = queryParams.toString();
+    
+    return api.get(`/con/export${queryString ? `?${queryString}` : ''}`, {
+      responseType: 'blob',
+      headers: {
+        'Accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      },
+    });
+  },
 };
