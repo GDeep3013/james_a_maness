@@ -96,5 +96,20 @@ export const vehicleService = {
       },
     });
   },
+
+  export: (params?: { search?: string; status?: string; fuelType?: string }) => {
+    const queryParams = new URLSearchParams();
+    if (params?.search) queryParams.append('search', params.search);
+    if (params?.status) queryParams.append('status', params.status);
+    if (params?.fuelType) queryParams.append('fuelType', params.fuelType);
+    const queryString = queryParams.toString();
+    
+    return api.get(`/vehicles/export${queryString ? `?${queryString}` : ''}`, {
+      responseType: 'blob',
+      headers: {
+        'Accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      },
+    });
+  },
   
 };

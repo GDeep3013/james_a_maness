@@ -142,7 +142,21 @@ export default function VehicleList({ importSuccess }: { importSuccess?: boolean
         navigate(`/vehicles/${id}/VehicleDetail`);
     };
 
-    const handleExport = () => {
+    const handleExport = async () => {
+        const response = await vehicleService.export({
+            search: searchTerm,
+            status: status,
+            fuelType: fuelType,
+        });
+
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', `vehicles_export_${new Date().toISOString().split('T')[0]}.xlsx`);
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.URL.revokeObjectURL(url);
     };
 
     const getStatusColor = (status?: string) => {

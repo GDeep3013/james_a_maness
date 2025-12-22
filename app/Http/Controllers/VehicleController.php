@@ -13,6 +13,7 @@ use Auth;
 use Illuminate\Support\Facades\Schema;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\VehicleImport;
+use App\Exports\VehicleExport;
 
 class VehicleController extends Controller
 {
@@ -359,5 +360,26 @@ class VehicleController extends Controller
             'available' => $availableCount,
         ]]);
        
+    }
+
+    public function export(Request $request)
+    {
+        try {
+            $search = $request->input('search', '');
+            $status = $request->input('status', '');
+            $fuelType = $request->input('fuelType', '');
+
+            $export = new VehicleExport($search, $status, $fuelType);
+            
+            $fileName = 'vehicles_export_' . date('Y-m-d_His') . '.xlsx';
+            
+            return Excel::download($export, $fileName);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'An error occurred while exporting vehicles.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 }

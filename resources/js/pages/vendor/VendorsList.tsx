@@ -90,8 +90,66 @@ export default function VendorsList() {
     navigate(`/vendors/${id}`);
   };
 
-  const handleExport = () => {
-    // TODO: Implement export functionality
+  const handleExport = async () => {
+    try {
+      const response = await vendorService.export({
+        search: searchTerm,
+      });
+
+      const blob = response.data instanceof Blob 
+        ? response.data 
+        : new Blob([response.data], {
+            type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+          });
+
+      if (blob.size === 0) {
+        alert("The exported file is empty. Please try again.");
+        return;
+      }
+
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      
+      const contentDisposition = response.headers['content-disposition'] || response.headers['Content-Disposition'];
+      let fileName = `vendors_export_${new Date().toISOString().split('T')[0]}.xlsx`;
+      
+      if (contentDisposition) {
+        const fileNameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+        if (fileNameMatch && fileNameMatch[1]) {
+          fileName = fileNameMatch[1].replace(/['"]/g, '').trim();
+        }
+      }
+      
+      link.setAttribute('download', fileName);
+      document.body.appendChild(link);
+      link.click();
+      setTimeout(() => {
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+      }, 100);
+    } catch (error: any) {
+      if (error.response?.data) {
+        const errorData = error.response.data;
+        if (errorData instanceof Blob) {
+          const reader = new FileReader();
+          reader.onload = () => {
+            try {
+              const text = reader.result as string;
+              const json = JSON.parse(text);
+              alert(json.message || "Failed to export vendors. Please try again.");
+            } catch {
+              alert("Failed to export vendors. Please try again.");
+            }
+          };
+          reader.readAsText(errorData);
+        } else {
+          alert(errorData.message || "Failed to export vendors. Please try again.");
+        }
+      } else {
+        alert("Failed to export vendors. Please try again.");
+      }
+    }
   };
 
   const getClassifications = (vendor: Vendor) => {
