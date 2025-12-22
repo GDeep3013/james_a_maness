@@ -128,8 +128,24 @@ export default function ExpenseHistoryList() {
         setCurrentPage(page);
     };
 
-    const handleExport = () => {
-        // Implement export functionality
+    const handleExport = async () => {
+        try {
+            const response = await expenseService.export({
+                search: searchTerm,
+            });
+
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `expense_history_export_${new Date().toISOString().split('T')[0]}.xlsx`);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(url);
+        } catch (error) {
+            console.error('Export failed:', error);
+            alert('Failed to export expense history. Please try again.');
+        }
     };
 
     const formatExpenseType = (type: string) => {
@@ -214,7 +230,7 @@ export default function ExpenseHistoryList() {
                                             </TableCell>
                                             <TableCell
                                                 isHeader
-                                          >
+                                            >
                                                 Vehicle
                                             </TableCell>
                                             <TableCell
@@ -234,7 +250,7 @@ export default function ExpenseHistoryList() {
                                             </TableCell>
                                             <TableCell
                                                 isHeader
-                                           >
+                                            >
                                                 Frequency
                                             </TableCell>
                                             <TableCell

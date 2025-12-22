@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHeader,
-  TableRow,
+    Table,
+    TableBody,
+    TableCell,
+    TableHeader,
+    TableRow,
 } from "../../components/ui/table";
 import Badge from "../../components/ui/badge/Badge";
 import Input from "../../components/form/input/InputField";
@@ -19,391 +19,408 @@ import TableFooter, { PaginationData } from "../../components/common/TableFooter
 import PageBreadcrumb from "../../components/common/PageBreadCrumb";
 
 interface WorkOrder {
-  id: number;
-  vehicle_id?: number;
-  vehicle?: {
-    vehicle_name?: string;
-  };
-  status?: string;
-  repair_priority_class?: string;
-  issue_date?: string;
-  scheduled_start_date?: string;
-  actual_start_date?: string;
-  expected_completion_date?: string;
-  actual_completion_date?: string;
-  assigned_to?: {
-    id?: number;
-    first_name?: string;
-    last_name?: string;
-  };
-  vendor_id?: number;
-  vendor?: {
-    first_name?: string;
-    company_contact?: string;
-  };
-  invoice_number?: string;
-  po_number?: string;
-  created_at?: string;
+    id: number;
+    vehicle_id?: number;
+    vehicle?: {
+        vehicle_name?: string;
+    };
+    status?: string;
+    repair_priority_class?: string;
+    issue_date?: string;
+    scheduled_start_date?: string;
+    actual_start_date?: string;
+    expected_completion_date?: string;
+    actual_completion_date?: string;
+    assigned_to?: {
+        id?: number;
+        first_name?: string;
+        last_name?: string;
+    };
+    vendor_id?: number;
+    vendor?: {
+        first_name?: string;
+        company_contact?: string;
+    };
+    invoice_number?: string;
+    po_number?: string;
+    created_at?: string;
 }
 
 interface WorkOrdersResponse {
-  status: boolean;
-  work_orders?: {
-    data: WorkOrder[];
-    current_page: number;
-    last_page: number;
-    per_page: number;
-    total: number;
-  };
+    status: boolean;
+    work_orders?: {
+        data: WorkOrder[];
+        current_page: number;
+        last_page: number;
+        per_page: number;
+        total: number;
+    };
 }
 
 export default function WorkOrdersList() {
-  const navigate = useNavigate();
-  const [workOrders, setWorkOrders] = useState<WorkOrder[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string>("");
-  const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pagination, setPagination] = useState<PaginationData>({
-    current_page: 1,
-    last_page: 1,
-    per_page: 20,
-    total: 0,
-  });
-  const [deletingId, setDeletingId] = useState<number | null>(null);
+    const navigate = useNavigate();
+    const [workOrders, setWorkOrders] = useState<WorkOrder[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string>("");
+    const [searchTerm, setSearchTerm] = useState("");
+    const [statusFilter, setStatusFilter] = useState("");
+    const [currentPage, setCurrentPage] = useState(1);
+    const [pagination, setPagination] = useState<PaginationData>({
+        current_page: 1,
+        last_page: 1,
+        per_page: 20,
+        total: 0,
+    });
+    const [deletingId, setDeletingId] = useState<number | null>(null);
 
-  const fetchWorkOrders = useCallback(async (page: number = 1, search: string = "", status: string = "") => {
-    setLoading(true);
-    setError("");
-    try {
-      const response = await workOrderService.getAll({ page, search, status });
-      const data = response.data as WorkOrdersResponse;
+    const fetchWorkOrders = useCallback(async (page: number = 1, search: string = "", status: string = "") => {
+        setLoading(true);
+        setError("");
+        try {
+            const response = await workOrderService.getAll({ page, search, status });
+            const data = response.data as WorkOrdersResponse;
 
-      if (data.status && data.work_orders) {
-        setWorkOrders(data.work_orders.data || []);
-        setPagination({
-          current_page: data.work_orders.current_page,
-          last_page: data.work_orders.last_page,
-          per_page: data.work_orders.per_page,
-          total: data.work_orders.total,
-        });
-      } else {
-        setError("Failed to load work orders");
-        setWorkOrders([]);
-      }
-    } catch {
-      setError("An error occurred while loading work orders");
-      setWorkOrders([]);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+            if (data.status && data.work_orders) {
+                setWorkOrders(data.work_orders.data || []);
+                setPagination({
+                    current_page: data.work_orders.current_page,
+                    last_page: data.work_orders.last_page,
+                    per_page: data.work_orders.per_page,
+                    total: data.work_orders.total,
+                });
+            } else {
+                setError("Failed to load work orders");
+                setWorkOrders([]);
+            }
+        } catch {
+            setError("An error occurred while loading work orders");
+            setWorkOrders([]);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
 
-  useEffect(() => {
-    fetchWorkOrders(currentPage, searchTerm, statusFilter);
-  }, [currentPage, searchTerm, statusFilter, fetchWorkOrders]);
+    useEffect(() => {
+        fetchWorkOrders(currentPage, searchTerm, statusFilter);
+    }, [currentPage, searchTerm, statusFilter, fetchWorkOrders]);
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    setCurrentPage(1);
-    fetchWorkOrders(1, searchTerm, statusFilter);
-  };
+    const handleSearch = (e: React.FormEvent) => {
+        e.preventDefault();
+        setCurrentPage(1);
+        fetchWorkOrders(1, searchTerm, statusFilter);
+    };
 
-  const handleDelete = async (id: number) => {
-    if (!window.confirm("Are you sure you want to delete this work order?")) {
-      return;
-    }
+    const handleDelete = async (id: number) => {
+        if (!window.confirm("Are you sure you want to delete this work order?")) {
+            return;
+        }
 
-    setDeletingId(id);
-    try {
-      await workOrderService.delete(id);
-      fetchWorkOrders(currentPage, searchTerm, statusFilter);
-    } catch {
-      alert("Failed to delete work order. Please try again.");
-    } finally {
-      setDeletingId(null);
-    }
-  };
+        setDeletingId(id);
+        try {
+            await workOrderService.delete(id);
+            fetchWorkOrders(currentPage, searchTerm, statusFilter);
+        } catch {
+            alert("Failed to delete work order. Please try again.");
+        } finally {
+            setDeletingId(null);
+        }
+    };
 
-  const handleEdit = (id: number) => {
-    navigate(`/work-orders/${id}`);
-  };
+    const handleEdit = (id: number) => {
+        navigate(`/work-orders/${id}`);
+    };
 
-  const handleView = (id: number) => {
-    navigate(`/work-orders/${id}`);
-  };
+    const handleView = (id: number) => {
+        navigate(`/work-orders/${id}`);
+    };
 
-  const handleCreate = () => {
-    navigate("/work-orders/create");
-  };
+    const handleCreate = () => {
+        navigate("/work-orders/create");
+    };
 
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-  };
+    const handlePageChange = (page: number) => {
+        setCurrentPage(page);
+    };
 
-  const handleExport = () => {
+    const handleExport = async () => {
+        try {
+            const response = await workOrderService.export({
+                search: searchTerm,
+                status: statusFilter,
+            });
 
-  };
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `work_orders_export_${new Date().toISOString().split('T')[0]}.xlsx`);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(url);
+        } catch (error) {
+            console.error('Export failed:', error);
+            alert('Failed to export work orders. Please try again.');
+        }
+    };
 
-  const formatDate = (dateString?: string) => {
-    if (!dateString) return "N/A";
-    try {
-      return new Date(dateString).toLocaleDateString();
-    } catch {
-      return dateString;
-    }
-  };
+    const formatDate = (dateString?: string) => {
+        if (!dateString) return "N/A";
+        try {
+            return new Date(dateString).toLocaleDateString();
+        } catch {
+            return dateString;
+        }
+    };
 
-  const getStatusColor = (status?: string) => {
-    switch (status) {
-      case "Open":
-        return "warning";
-      case "In Progress":
-        return "info";
-      case "Completed":
-        return "success";
-      case "Cancelled":
-        return "error";
-      default:
-        return "warning";
-    }
-  };
+    const getStatusColor = (status?: string) => {
+        switch (status) {
+            case "Open":
+                return "warning";
+            case "In Progress":
+                return "info";
+            case "Completed":
+                return "success";
+            case "Cancelled":
+                return "error";
+            default:
+                return "warning";
+        }
+    };
 
-  return (
-    <>
-      <PageMeta
-        title="Work Orders List"
-        description="Manage and view all work orders"
-      />
-    <PageBreadcrumb pageTitle="Work Orders" />
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-2xl font-semibold text-gray-800">Work Orders</h2>
-          </div>
-          <Button
-            variant="primary"
-            size="sm"
-            onClick={handleCreate}
-          >
-            + Create Work Order
-          </Button>
-        </div>
-
-        <form onSubmit={handleSearch} className="bg-white border border-gray-200 rounded-xl p-4">
-          <div className="flex flex-wrap items-center gap-4">
-            <div className="flex-1 md:max-w-[50%]">
-              <Input
-                type="text"
-                placeholder="Search by vehicle, invoice number, PO number..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="!bg-[#F3F3F5] max-w-full border-none !rounded-[8px]"
-              />
-            </div>
-            <div className="w-full sm:max-w-[50%] md:max-w-[20%]">
-              <Select
-                options={WORK_ORDER_STATUS_FILTER_OPTIONS}
-                placeholder="All Status"
-                onChange={(value) => setStatusFilter(value)}
-                defaultValue=""
-                className="!bg-[#F3F3F5] border-gray-200"
-              />
-            </div>
-            <Button
-              variant="outline"
-              onClick={handleExport}
-              className="bg-gray-50 border-gray-200 hover:bg-gray-100 w-full sm:max-w-[50%] md:max-w-[10%] min-h-[44px] !leading-[44px]"
-            >
-              <ExportIcon />
-              Export
-            </Button>
-          </div>
-        </form>
-
-        {error && (
-          <div className="p-4 bg-error-50 border border-error-200 rounded-lg">
-            <p className="text-sm text-error-600">{error}</p>
-          </div>
-        )}
-
-        <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
-          <div className="max-w-full overflow-x-auto">
-            {loading ? (
-              <div className="flex items-center justify-center py-12">
-                <div className="text-center">
-                  <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-brand-500"></div>
-                  <p className="mt-2 text-sm text-gray-600">
-                    Loading work orders...
-                  </p>
+    return (
+        <>
+            <PageMeta
+                title="Work Orders List"
+                description="Manage and view all work orders"
+            />
+            <PageBreadcrumb pageTitle="Work Orders" />
+            <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                    <div>
+                        <h2 className="text-2xl font-semibold text-gray-800">Work Orders</h2>
+                    </div>
+                    <Button
+                        variant="primary"
+                        size="sm"
+                        onClick={handleCreate}
+                    >
+                        + Create Work Order
+                    </Button>
                 </div>
-              </div>
-            ) : workOrders.length === 0 ? (
-              <div className="flex items-center justify-center py-12">
-                <div className="text-center">
-                  <p className="text-gray-600">
-                    No work orders found
-                  </p>
-                </div>
-              </div>
-            ) : (
-              <>
-                <Table>
-                  <TableHeader className="border-b border-gray-100">
-                    <TableRow className="bg-[#E5E7EB]">
-                      <TableCell
-                        isHeader
-                      >
-                        Work Order ID
-                      </TableCell>
-                      <TableCell
-                        isHeader
-                      >
-                        Vehicle
-                      </TableCell>
-                      <TableCell
-                        isHeader
-                     >
-                        Status
-                      </TableCell>
-                      <TableCell
-                        isHeader
-                      >
-                        Issue Date
-                      </TableCell>
-                      <TableCell
-                        isHeader
-                      >
-                        Assigned To
-                      </TableCell>
-                      <TableCell
-                        isHeader
-                      >
-                        Invoice/PO
-                      </TableCell>
-                      <TableCell
-                        isHeader
-                      >
-                        Actions
-                      </TableCell>
-                    </TableRow>
-                  </TableHeader>
 
-                  <TableBody className="divide-y divide-gray-100">
-                    {workOrders.map((workOrder) => (
-                      <TableRow key={workOrder.id}>
-                        <TableCell className="px-5 py-4 sm:px-6 text-start">
-                          <div className="flex items-center gap-3">
-                            <div>
-                              <span className="block font-medium text-gray-800 text-theme-sm">
-                                WO-{workOrder.id}
-                              </span>
-                              {workOrder.repair_priority_class && (
-                                <span className="block text-gray-500 text-theme-xs">
-                                  {workOrder.repair_priority_class}
-                                </span>
-                              )}
+                <form onSubmit={handleSearch} className="bg-white border border-gray-200 rounded-xl p-4">
+                    <div className="flex flex-wrap items-center gap-4">
+                        <div className="flex-1 md:max-w-[50%]">
+                            <Input
+                                type="text"
+                                placeholder="Search by vehicle, invoice number, PO number..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="!bg-[#F3F3F5] max-w-full border-none !rounded-[8px]"
+                            />
+                        </div>
+                        <div className="w-full sm:max-w-[50%] md:max-w-[20%]">
+                            <Select
+                                options={WORK_ORDER_STATUS_FILTER_OPTIONS}
+                                placeholder="All Status"
+                                onChange={(value) => setStatusFilter(value)}
+                                defaultValue=""
+                                className="!bg-[#F3F3F5] border-gray-200"
+                            />
+                        </div>
+                        <Button
+                            variant="outline"
+                            onClick={handleExport}
+                            className="bg-gray-50 border-gray-200 hover:bg-gray-100 w-full sm:max-w-[50%] md:max-w-[10%] min-h-[44px] !leading-[44px]"
+                        >
+                            <ExportIcon />
+                            Export
+                        </Button>
+                    </div>
+                </form>
+
+                {error && (
+                    <div className="p-4 bg-error-50 border border-error-200 rounded-lg">
+                        <p className="text-sm text-error-600">{error}</p>
+                    </div>
+                )}
+
+                <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
+                    <div className="max-w-full overflow-x-auto">
+                        {loading ? (
+                            <div className="flex items-center justify-center py-12">
+                                <div className="text-center">
+                                    <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-brand-500"></div>
+                                    <p className="mt-2 text-sm text-gray-600">
+                                        Loading work orders...
+                                    </p>
+                                </div>
                             </div>
-                          </div>
-                        </TableCell>
-                        <TableCell className="px-4 py-3 text-start">
-                          <div className="text-gray-800 text-theme-sm">
-                            {workOrder.vehicle?.vehicle_name || "N/A"}
-                          </div>
-                        </TableCell>
-                        <TableCell className="px-4 py-3 text-start">
-                          <Badge
-                            size="sm"
-                            color={getStatusColor(workOrder.status)}
-                          >
-                            {workOrder.status || "Open"}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="px-4 py-3 text-start">
-                          <div className="text-gray-800 text-theme-sm">
-                            {formatDate(workOrder.issue_date)}
-                          </div>
-                        </TableCell>
-                        <TableCell className="px-4 py-3 text-start">
-                          {workOrder.assigned_to ? (
-                            <div className="text-gray-800 text-theme-sm">
-                              {`${workOrder.assigned_to.first_name || ""} ${workOrder.assigned_to.last_name || ""}`.trim() || "N/A"}
+                        ) : workOrders.length === 0 ? (
+                            <div className="flex items-center justify-center py-12">
+                                <div className="text-center">
+                                    <p className="text-gray-600">
+                                        No work orders found
+                                    </p>
+                                </div>
                             </div>
-                          ) : (
-                            <div className="text-gray-500 text-theme-sm">
-                              N/A
-                            </div>
-                          )}
-                        </TableCell>
-                        <TableCell className="px-4 py-3 text-start">
-                          <div className="space-y-1">
-                            {workOrder.invoice_number && (
-                              <div className="text-gray-800 text-theme-sm">
-                                Invoice: {workOrder.invoice_number}
-                              </div>
-                            )}
-                            {workOrder.po_number && (
-                              <div className="text-gray-500 text-theme-xs">
-                                PO: {workOrder.po_number}
-                              </div>
-                            )}
-                            {!workOrder.invoice_number && !workOrder.po_number && (
-                              <div className="text-gray-500 text-theme-sm">
-                                N/A
-                              </div>
-                            )}
-                          </div>
-                        </TableCell>
-                        <TableCell className="px-4 py-3 text-start">
-                          <div className="flex items-center gap-2">
-                            <Button
-                              variant="none"
-                              size="sm"
-                              onClick={() => handleView(workOrder.id)}
-                              className="view-button hover:scale-105 transition-all duration-300"
-                              startIcon={<EyeIcon />}
-                            >
-                              {""}
-                            </Button>
-                            <Button
-                              variant="none"
-                              size="sm"
-                              onClick={() => handleEdit(workOrder.id)}
-                              className="edit-button hover:scale-105 transition-all duration-300"
-                              startIcon={<PencilIcon />}
-                            >
-                              {""}
-                            </Button>
-                            <Button
-                              variant="none"
-                              size="sm"
-                              onClick={() => handleDelete(workOrder.id)}
-                              disabled={deletingId === workOrder.id}
-                              className="delete-button hover:scale-105 transition-all duration-300"
-                              startIcon={<TrashBinIcon />}
-                            >
-                              {""}
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-                <TableFooter
-                  pagination={pagination}
-                  currentPage={currentPage}
-                  onPageChange={handlePageChange}
-                  loading={loading}
-                  itemLabel="work orders"
-                />
-              </>
-            )}
-          </div>
-        </div>
-      </div>
-    </>
-  );
+                        ) : (
+                            <>
+                                <Table>
+                                    <TableHeader className="border-b border-gray-100">
+                                        <TableRow className="bg-[#E5E7EB]">
+                                            <TableCell
+                                                isHeader
+                                            >
+                                                Work Order ID
+                                            </TableCell>
+                                            <TableCell
+                                                isHeader
+                                            >
+                                                Vehicle
+                                            </TableCell>
+                                            <TableCell
+                                                isHeader
+                                            >
+                                                Status
+                                            </TableCell>
+                                            <TableCell
+                                                isHeader
+                                            >
+                                                Issue Date
+                                            </TableCell>
+                                            <TableCell
+                                                isHeader
+                                            >
+                                                Assigned To
+                                            </TableCell>
+                                            <TableCell
+                                                isHeader
+                                            >
+                                                Invoice/PO
+                                            </TableCell>
+                                            <TableCell
+                                                isHeader
+                                            >
+                                                Actions
+                                            </TableCell>
+                                        </TableRow>
+                                    </TableHeader>
+
+                                    <TableBody className="divide-y divide-gray-100">
+                                        {workOrders.map((workOrder) => (
+                                            <TableRow key={workOrder.id}>
+                                                <TableCell className="px-5 py-4 sm:px-6 text-start">
+                                                    <div className="flex items-center gap-3">
+                                                        <div>
+                                                            <span className="block font-medium text-gray-800 text-theme-sm">
+                                                                WO-{workOrder.id}
+                                                            </span>
+                                                            {workOrder.repair_priority_class && (
+                                                                <span className="block text-gray-500 text-theme-xs">
+                                                                    {workOrder.repair_priority_class}
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell className="px-4 py-3 text-start">
+                                                    <div className="text-gray-800 text-theme-sm">
+                                                        {workOrder.vehicle?.vehicle_name || "N/A"}
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell className="px-4 py-3 text-start">
+                                                    <Badge
+                                                        size="sm"
+                                                        color={getStatusColor(workOrder.status)}
+                                                    >
+                                                        {workOrder.status || "Open"}
+                                                    </Badge>
+                                                </TableCell>
+                                                <TableCell className="px-4 py-3 text-start">
+                                                    <div className="text-gray-800 text-theme-sm">
+                                                        {formatDate(workOrder.issue_date)}
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell className="px-4 py-3 text-start">
+                                                    {workOrder.assigned_to ? (
+                                                        <div className="text-gray-800 text-theme-sm">
+                                                            {`${workOrder.assigned_to.first_name || ""} ${workOrder.assigned_to.last_name || ""}`.trim() || "N/A"}
+                                                        </div>
+                                                    ) : (
+                                                        <div className="text-gray-500 text-theme-sm">
+                                                            N/A
+                                                        </div>
+                                                    )}
+                                                </TableCell>
+                                                <TableCell className="px-4 py-3 text-start">
+                                                    <div className="space-y-1">
+                                                        {workOrder.invoice_number && (
+                                                            <div className="text-gray-800 text-theme-sm">
+                                                                Invoice: {workOrder.invoice_number}
+                                                            </div>
+                                                        )}
+                                                        {workOrder.po_number && (
+                                                            <div className="text-gray-500 text-theme-xs">
+                                                                PO: {workOrder.po_number}
+                                                            </div>
+                                                        )}
+                                                        {!workOrder.invoice_number && !workOrder.po_number && (
+                                                            <div className="text-gray-500 text-theme-sm">
+                                                                N/A
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell className="px-4 py-3 text-start">
+                                                    <div className="flex items-center gap-2">
+                                                        <Button
+                                                            variant="none"
+                                                            size="sm"
+                                                            onClick={() => handleView(workOrder.id)}
+                                                            className="view-button hover:scale-105 transition-all duration-300"
+                                                            startIcon={<EyeIcon />}
+                                                        >
+                                                            {""}
+                                                        </Button>
+                                                        <Button
+                                                            variant="none"
+                                                            size="sm"
+                                                            onClick={() => handleEdit(workOrder.id)}
+                                                            className="edit-button hover:scale-105 transition-all duration-300"
+                                                            startIcon={<PencilIcon />}
+                                                        >
+                                                            {""}
+                                                        </Button>
+                                                        <Button
+                                                            variant="none"
+                                                            size="sm"
+                                                            onClick={() => handleDelete(workOrder.id)}
+                                                            disabled={deletingId === workOrder.id}
+                                                            className="delete-button hover:scale-105 transition-all duration-300"
+                                                            startIcon={<TrashBinIcon />}
+                                                        >
+                                                            {""}
+                                                        </Button>
+                                                    </div>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                                <TableFooter
+                                    pagination={pagination}
+                                    currentPage={currentPage}
+                                    onPageChange={handlePageChange}
+                                    loading={loading}
+                                    itemLabel="work orders"
+                                />
+                            </>
+                        )}
+                    </div>
+                </div>
+            </div>
+        </>
+    );
 }
 
