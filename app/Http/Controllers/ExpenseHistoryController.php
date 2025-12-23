@@ -6,6 +6,8 @@ use App\Models\ExpenseHistory;
 use Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
+use App\Exports\ExpenseHistoryExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ExpenseHistoryController extends Controller
 {
@@ -14,7 +16,7 @@ class ExpenseHistoryController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-      public function index(Request $request)
+    public function index(Request $request)
     {
         $tableColumns = Schema::getColumnListing('expense_histories');
         $query = ExpenseHistory::with(['vehicle', 'vendor']);
@@ -58,7 +60,7 @@ class ExpenseHistoryController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-     public function store(Request $request)
+    public function store(Request $request)
     {
         try {
             $validatedData = $request->validate([
@@ -205,6 +207,25 @@ class ExpenseHistoryController extends Controller
             } else {
                 return response()->json(['status' => false, 'message' => 'Expense entry not found']);
             }
+        }
+    }
+
+    public function export(Request $request)
+    {
+        try {
+            $search = $request->input('search', '');
+
+            $export = new ExpenseHistoryExport($search);
+
+            $fileName = 'expense_history_export_' . date('Y-m-d_His') . '.xlsx';
+
+            return Excel::download($export, $fileName);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'An error occurred while exporting expense history.',
+                'error' => $e->getMessage(),
+            ], 500);
         }
     }
 }

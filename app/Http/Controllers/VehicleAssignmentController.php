@@ -20,7 +20,7 @@ class VehicleAssignmentController extends Controller
             'contact:id,first_name,last_name',
             'vehicle:id,vehicle_name'
         ])->orderBy('id', 'desc');
-        
+
         $searchTerm = $request->search;
 
         if ($request->has('vehicle_id') && !empty($request->vehicle_id)) {
@@ -40,7 +40,7 @@ class VehicleAssignmentController extends Controller
             $month = $request->month;
             $year = $request->year;
             $query->whereYear('start_date', $year)
-                  ->whereMonth('start_date', $month);
+                ->whereMonth('start_date', $month);
         }
 
         if (!empty($searchTerm)) {
@@ -215,9 +215,30 @@ class VehicleAssignmentController extends Controller
                 'vehicle_id' => 'nullable|exists:vehicals,id',
                 'event_title' => 'nullable|string|max:255',
                 'start_date' => 'nullable|date',
-                'start_time' => 'nullable|date_format:H:i:s',
+                'start_time' =>  [
+                    'nullable',
+                    function ($attribute, $value, $fail) {
+                        if (
+                            !\Carbon\Carbon::hasFormat($value, 'H:i') &&
+                            !\Carbon\Carbon::hasFormat($value, 'H:i:s')
+                        ) {
+                            $fail('The :attribute must be in HH:MM or HH:MM:SS format.');
+                        }
+                    }
+                ],
                 'end_date' => 'nullable|date',
-                'end_time' => 'nullable|date_format:H:i:s',
+                'end_time' => [
+                    'nullable',
+                    function ($attribute, $value, $fail) {
+                        if (
+                            !\Carbon\Carbon::hasFormat($value, 'H:i') &&
+                            !\Carbon\Carbon::hasFormat($value, 'H:i:s')
+                        ) {
+                            $fail('The :attribute must be in HH:MM or HH:MM:SS format.');
+                        }
+                    }
+                ],
+
                 'full_day' => 'nullable',
                 'flag' => 'nullable|string|max:255',
             ]);
@@ -317,4 +338,3 @@ class VehicleAssignmentController extends Controller
         }
     }
 }
-

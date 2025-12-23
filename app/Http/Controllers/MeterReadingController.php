@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\MeterReadingExport;
 use Illuminate\Http\Request;
 use App\Models\MeterReading;
 use App\Models\Vehical;
 use Auth;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
 
 class MeterReadingController extends Controller
 {
@@ -202,4 +204,24 @@ class MeterReadingController extends Controller
             }
         }
     }
+
+    public function export(Request $request)
+    {
+        try {
+            $search = $request->input('search', '');
+
+            $export = new MeterReadingExport($search);
+
+            $fileName = 'meter_readings_export_' . date('Y-m-d_His') . '.xlsx';
+
+            return Excel::download($export, $fileName);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'An error occurred while exporting meter readings.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
 }

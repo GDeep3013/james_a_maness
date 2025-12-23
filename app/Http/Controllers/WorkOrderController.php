@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\WorkOrderExport;
+use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Http\Request;
 use App\Models\WorkOrder;
 use Illuminate\Support\Facades\Validator;
@@ -15,17 +17,17 @@ class WorkOrderController extends Controller
     private function prepareRequestData(Request $request)
     {
         $data = $request->all();
-        
+
         if ($request->has('service_items') && is_string($request->service_items)) {
             $decoded = json_decode($request->service_items, true);
             $data['service_items'] = $decoded !== null ? $decoded : [];
         }
-        
+
         if ($request->has('parts') && is_string($request->parts)) {
             $decoded = json_decode($request->parts, true);
             $data['parts'] = $decoded !== null ? $decoded : [];
         }
-        
+
         $request->merge($data);
     }
 
@@ -38,11 +40,14 @@ class WorkOrderController extends Controller
             'vendor:id,name',
             'user:id,name'
         ])->orderBy('id', 'desc');
-        
+
         $searchTerm = $request->search;
 
         if ($request->has('status') && !empty($request->status)) {
             $query->where('status', $request->status);
+        }
+          if ($request->has('priorityStatus') && !empty($request->priorityStatus)) {
+            $query->where('repair_priority_class', $request->priorityStatus);
         }
 
         if ($request->has('vehicle_id') && !empty($request->vehicle_id)) {
@@ -72,7 +77,7 @@ class WorkOrderController extends Controller
             });
 
 
-           
+
 
             $query->orWhereHas('vehicle', function ($q) use ($searchTerm) {
                 $q->where('vehicle_name', 'LIKE', '%' . $searchTerm . '%');
@@ -84,7 +89,7 @@ class WorkOrderController extends Controller
 
             $query->orWhereHas('vendor', function ($q) use ($searchTerm) {
                 $q->where('first_name', 'LIKE', '%' . $searchTerm . '%')
-                  ->orWhere('company_contact', 'LIKE', '%' . $searchTerm . '%');
+                    ->orWhere('company_contact', 'LIKE', '%' . $searchTerm . '%');
             });
         }
 
@@ -97,7 +102,7 @@ class WorkOrderController extends Controller
     {
         try {
             $this->prepareRequestData($request);
-            
+
             $validatedData = $request->validate([
                 'vehicle_id' => 'nullable|exists:vehicals,id',
                 'status' => 'nullable|string|max:255',
@@ -139,7 +144,7 @@ class WorkOrderController extends Controller
             $workOrder->actual_completion_date = $request->actual_completion_date ?? null;
             $workOrder->use_start_odometer_for_completion_meter = $this->convertToBoolean($request->use_start_odometer_for_completion_meter, true);
             $workOrder->assigned_to = $request->assigned_to ?? null;
-            
+
             $labels = $request->labels;
             if (is_string($labels)) {
                 $decodedLabels = json_decode($labels, true);
@@ -147,7 +152,7 @@ class WorkOrderController extends Controller
             } else {
                 $workOrder->labels = $labels ?? null;
             }
-            
+
             $workOrder->vendor_id = $request->vendor_id ?? null;
             $workOrder->invoice_number = $request->invoice_number ?? null;
             $workOrder->po_number = $request->po_number ?? null;
@@ -157,7 +162,7 @@ class WorkOrderController extends Controller
             $workOrder->total_value = $request->total_value ?? null;
             $workOrder->tax_type = $request->tax_type ?? null;
             $workOrder->tax_value = $request->tax_value ?? null;
-            
+
             $serviceItems = $request->service_items;
             if (is_string($serviceItems)) {
                 $decodedServiceItems = json_decode($serviceItems, true);
@@ -165,7 +170,7 @@ class WorkOrderController extends Controller
             } else {
                 $workOrder->service_items = $serviceItems ?? [];
             }
-            
+
             $parts = $request->parts;
             if (is_string($parts)) {
                 $decodedParts = json_decode($parts, true);
@@ -177,14 +182,14 @@ class WorkOrderController extends Controller
             if ($workOrder->save()) {
                 DB::commit();
                 return response()->json([
-                    'status' => true, 
+                    'status' => true,
                     'message' => 'Work order created successfully',
                     'data' => $workOrder->load(['vehicle', 'assignedTo', 'vendor', 'user'])
                 ]);
             } else {
                 DB::rollBack();
                 return response()->json([
-                    'status' => false, 
+                    'status' => false,
                     'message' => 'Failed to create work order'
                 ], 500);
             }
@@ -193,7 +198,7 @@ class WorkOrderController extends Controller
                 DB::rollBack();
             }
             return response()->json([
-                'status' => 'error', 
+                'status' => 'error',
                 'errors' => $e->validator->errors()
             ], 422);
         } catch (\Exception $e) {
@@ -202,7 +207,7 @@ class WorkOrderController extends Controller
             }
             Log::error("Work order creation error: " . $e->getMessage());
             return response()->json([
-                'status' => false, 
+                'status' => false,
                 'message' => 'An error occurred while creating the work order. Please try again.',
                 'error' => $e->getMessage()
             ], 500);
@@ -213,7 +218,7 @@ class WorkOrderController extends Controller
     {
         if (empty($id)) {
             return response()->json([
-                'status' => false, 
+                'status' => false,
                 'message' => 'Work order ID is required'
             ], 400);
         }
@@ -222,13 +227,13 @@ class WorkOrderController extends Controller
 
         if ($workOrder) {
             return response()->json([
-                'status' => true, 
+                'status' => true,
                 'message' => 'Work order retrieved successfully',
                 'work_order' => $workOrder
             ]);
         } else {
             return response()->json([
-                'status' => false, 
+                'status' => false,
                 'message' => 'Work order not found'
             ], 404);
         }
@@ -238,7 +243,7 @@ class WorkOrderController extends Controller
     {
         if (empty($id)) {
             return response()->json([
-                'status' => false, 
+                'status' => false,
                 'message' => 'Work order ID is required'
             ], 400);
         }
@@ -252,13 +257,13 @@ class WorkOrderController extends Controller
 
         if ($workOrder) {
             return response()->json([
-                'status' => true, 
+                'status' => true,
                 'message' => 'Work order data',
                 'data' => $workOrder
             ]);
         } else {
             return response()->json([
-                'status' => false, 
+                'status' => false,
                 'message' => 'Work order not found'
             ], 404);
         }
@@ -268,7 +273,7 @@ class WorkOrderController extends Controller
     {
         if (empty($id)) {
             return response()->json([
-                'status' => false, 
+                'status' => false,
                 'message' => 'Work order ID is required'
             ], 400);
         }
@@ -276,14 +281,14 @@ class WorkOrderController extends Controller
         $workOrder = WorkOrder::find($id);
         if (!$workOrder) {
             return response()->json([
-                'status' => false, 
+                'status' => false,
                 'message' => 'Work order not found'
             ], 404);
         }
 
         try {
             $this->prepareRequestData($request);
-            
+
             $validatedData = $request->validate([
                 'vehicle_id' => 'nullable|exists:vehicals,id',
                 'status' => 'nullable|string|max:255',
@@ -403,14 +408,14 @@ class WorkOrderController extends Controller
             if ($workOrder->save()) {
                 DB::commit();
                 return response()->json([
-                    'status' => true, 
+                    'status' => true,
                     'message' => 'Work order updated successfully',
                     'data' => $workOrder->load(['vehicle', 'assignedTo', 'vendor', 'user'])
                 ]);
             } else {
                 DB::rollBack();
                 return response()->json([
-                    'status' => false, 
+                    'status' => false,
                     'message' => 'Failed to update work order'
                 ], 500);
             }
@@ -419,7 +424,7 @@ class WorkOrderController extends Controller
                 DB::rollBack();
             }
             return response()->json([
-                'status' => 'error', 
+                'status' => 'error',
                 'errors' => $e->validator->errors()
             ], 422);
         } catch (\Exception $e) {
@@ -428,7 +433,7 @@ class WorkOrderController extends Controller
             }
             Log::error("Work order update error: " . $e->getMessage());
             return response()->json([
-                'status' => false, 
+                'status' => false,
                 'message' => 'An error occurred while updating the work order. Please try again.',
                 'error' => $e->getMessage()
             ], 500);
@@ -439,7 +444,7 @@ class WorkOrderController extends Controller
     {
         if (empty($id)) {
             return response()->json([
-                'status' => false, 
+                'status' => false,
                 'message' => 'Work order ID is required'
             ], 400);
         }
@@ -447,23 +452,41 @@ class WorkOrderController extends Controller
         $workOrder = WorkOrder::find($id);
         if (!$workOrder) {
             return response()->json([
-                'status' => false, 
+                'status' => false,
                 'message' => 'Work order not found'
             ], 404);
         }
 
         if ($workOrder->delete()) {
             return response()->json([
-                'status' => true, 
+                'status' => true,
                 'message' => 'Work order deleted successfully'
             ]);
         } else {
             return response()->json([
-                'status' => false, 
+                'status' => false,
                 'message' => 'Failed to delete work order'
             ], 500);
         }
     }
 
-}
+    public function export(Request $request)
+    {
+        try {
+            $search = $request->input('search', '');
+            $status = $request->input('status', '');
 
+            $export = new WorkOrderExport($search, $status);
+
+            $fileName = 'work_orders_export_' . date('Y-m-d_His') . '.xlsx';
+
+            return Excel::download($export, $fileName);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'An error occurred while exporting work orders.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+}

@@ -137,7 +137,7 @@ class VehicleController extends Controller
             return response()->json(['status' => 'error', 'errors' => $e->validator->errors()], 422);
         } catch (\Exception $e) {
             return response()->json([
-                'status' => false, 
+                'status' => false,
                 'message' => 'An error occurred while creating the vehicle. Please try again.',
                 'error' => $e->getMessage(),
                 'line' => $e->getLine(),
@@ -211,7 +211,7 @@ class VehicleController extends Controller
     public function update(Request $request, $id)
     {
         ini_set('max_execution_time', 0);
-        
+
         if (empty($id)) {
             return response()->json(['status' => false, 'message' => 'Vehicle ID is required'], 400);
         }
@@ -222,7 +222,7 @@ class VehicleController extends Controller
         }
 
         try {
-            
+
             $validatedData = $request->validate([
                 'vehicle_name' => 'required|string|max:255',
                 'type' => 'required|string|max:255',
@@ -272,12 +272,12 @@ class VehicleController extends Controller
             } else {
                 return response()->json(['status' => false, 'message' => 'Failed to update vehicle'], 500);
             }
-            
+
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json(['status' => 'error', 'errors' => $e->validator->errors()], 422);
         } catch (\Exception $e) {
             return response()->json([
-                'status' => false, 
+                'status' => false,
                 'message' => 'An error occurred while updating the vehicle. Please try again.',
                 'error' => $e->getMessage(),
                 'line' => $e->getLine(),
@@ -295,14 +295,14 @@ class VehicleController extends Controller
     public function import(Request $request)
     {
         ini_set('max_execution_time', 0);
-        
+
         try {
             $request->validate([
                 'file' => 'required|mimes:xlsx,xls,csv|max:10240',
             ]);
 
             $file = $request->file('file');
-            
+
             $import = new VehicleImport;
             Excel::import($import, $file);
 
@@ -347,7 +347,7 @@ class VehicleController extends Controller
 
     public function getStatistics()
     {
-        
+
         $totalVehicles = Vehical::count();
         $activeCount = Vehical::where('initial_status', '=', 'active')->count();
         $inMaintenanceCount = Vehical::where('initial_status', '=', 'maintenance')->count();
@@ -359,7 +359,7 @@ class VehicleController extends Controller
             'in_maintenance' => $inMaintenanceCount,
             'available' => $availableCount,
         ]]);
-       
+
     }
 
     public function export(Request $request)
@@ -370,9 +370,9 @@ class VehicleController extends Controller
             $fuelType = $request->input('fuelType', '');
 
             $export = new VehicleExport($search, $status, $fuelType);
-            
+
             $fileName = 'vehicles_export_' . date('Y-m-d_His') . '.xlsx';
-            
+
             return Excel::download($export, $fileName);
         } catch (\Exception $e) {
             return response()->json([

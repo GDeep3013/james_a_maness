@@ -9,23 +9,25 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Auth;
+use App\Exports\ServiceExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ServiceController extends Controller
 {
     private function prepareRequestData(Request $request)
     {
         $data = $request->all();
-        
+
         if ($request->has('service_items') && is_string($request->service_items)) {
             $decoded = json_decode($request->service_items, true);
             $data['service_items'] = $decoded !== null ? $decoded : [];
         }
-        
+
         if ($request->has('parts') && is_string($request->parts)) {
             $decoded = json_decode($request->parts, true);
             $data['parts'] = $decoded !== null ? $decoded : [];
         }
-        
+
         $request->merge($data);
     }
 
@@ -90,7 +92,7 @@ class ServiceController extends Controller
             'vendor:id,name',
             'user:id,name'
         ])->orderBy('id', 'desc');
-        
+
         $searchTerm = $request->search;
 
 
@@ -132,15 +134,15 @@ class ServiceController extends Controller
                     ->where('id', '!=', $service->id)
                     ->whereNotNull('completion_date')
                     ->orderBy('completion_date', 'desc')
-                    ->first(['completion_date','primary_meter']);
-                
+                    ->first(['completion_date', 'primary_meter']);
+
                 $service->last_completed_date = $lastCompletedService ? $lastCompletedService->completion_date : null;
                 $service->last_completed_meter = $lastCompletedService ? $lastCompletedService->primary_meter : null;
             } else {
                 $service->last_completed_date = null;
                 $service->last_completed_meter = null;
             }
-            
+
             return $service;
         });
 
@@ -151,7 +153,7 @@ class ServiceController extends Controller
     {
         try {
             $this->prepareRequestData($request);
-            
+
             $validatedData = $request->validate([
                 'vehicle_id' => 'nullable|exists:vehicals,id',
                 'vendor_id' => 'nullable|exists:vendors,id',
@@ -180,7 +182,7 @@ class ServiceController extends Controller
             $service->discount_value = $request->discount_value ?? null;
             $service->tax_type = $request->tax_type ?? null;
             $service->tax_value = $request->tax_value ?? null;
-            
+
             $serviceItems = $request->service_items;
             if (is_string($serviceItems)) {
                 $decodedServiceItems = json_decode($serviceItems, true);
@@ -188,7 +190,7 @@ class ServiceController extends Controller
             } else {
                 $service->service_items = $serviceItems ?? [];
             }
-            
+
             $parts = $request->parts;
             if (is_string($parts)) {
                 $decodedParts = json_decode($parts, true);
@@ -216,14 +218,14 @@ class ServiceController extends Controller
             if ($service->save()) {
                 DB::commit();
                 return response()->json([
-                    'status' => true, 
+                    'status' => true,
                     'message' => 'Service created successfully',
                     'data' => $service->load(['vehicle', 'vendor', 'user'])
                 ]);
             } else {
                 DB::rollBack();
                 return response()->json([
-                    'status' => false, 
+                    'status' => false,
                     'message' => 'Failed to create service'
                 ], 500);
             }
@@ -232,7 +234,7 @@ class ServiceController extends Controller
                 DB::rollBack();
             }
             return response()->json([
-                'status' => 'error', 
+                'status' => 'error',
                 'errors' => $e->validator->errors()
             ], 422);
         } catch (\Exception $e) {
@@ -241,7 +243,7 @@ class ServiceController extends Controller
             }
             Log::error("Service creation error: " . $e->getMessage());
             return response()->json([
-                'status' => false, 
+                'status' => false,
                 'message' => 'An error occurred while creating the service. Please try again.',
                 'error' => $e->getMessage()
             ], 500);
@@ -252,7 +254,7 @@ class ServiceController extends Controller
     {
         if (empty($id)) {
             return response()->json([
-                'status' => false, 
+                'status' => false,
                 'message' => 'Service ID is required'
             ], 400);
         }
@@ -261,13 +263,13 @@ class ServiceController extends Controller
 
         if ($service) {
             return response()->json([
-                'status' => true, 
+                'status' => true,
                 'message' => 'Service retrieved successfully',
                 'service' => $service
             ]);
         } else {
             return response()->json([
-                'status' => false, 
+                'status' => false,
                 'message' => 'Service not found'
             ], 404);
         }
@@ -277,7 +279,7 @@ class ServiceController extends Controller
     {
         if (empty($id)) {
             return response()->json([
-                'status' => false, 
+                'status' => false,
                 'message' => 'Service ID is required'
             ], 400);
         }
@@ -290,13 +292,13 @@ class ServiceController extends Controller
 
         if ($service) {
             return response()->json([
-                'status' => true, 
+                'status' => true,
                 'message' => 'Service data',
                 'data' => $service
             ]);
         } else {
             return response()->json([
-                'status' => false, 
+                'status' => false,
                 'message' => 'Service not found'
             ], 404);
         }
@@ -306,7 +308,7 @@ class ServiceController extends Controller
     {
         if (empty($id)) {
             return response()->json([
-                'status' => false, 
+                'status' => false,
                 'message' => 'Service ID is required'
             ], 400);
         }
@@ -314,14 +316,14 @@ class ServiceController extends Controller
         $service = Service::find($id);
         if (!$service) {
             return response()->json([
-                'status' => false, 
+                'status' => false,
                 'message' => 'Service not found'
             ], 404);
         }
 
         try {
             $this->prepareRequestData($request);
-            
+
             $validatedData = $request->validate([
                 'vehicle_id' => 'nullable|exists:vehicals,id',
                 'vendor_id' => 'nullable|exists:vendors,id',
@@ -415,14 +417,14 @@ class ServiceController extends Controller
             if ($service->save()) {
                 DB::commit();
                 return response()->json([
-                    'status' => true, 
+                    'status' => true,
                     'message' => 'Service updated successfully',
                     'data' => $service->load(['vehicle', 'vendor', 'user'])
                 ]);
             } else {
                 DB::rollBack();
                 return response()->json([
-                    'status' => false, 
+                    'status' => false,
                     'message' => 'Failed to update service'
                 ], 500);
             }
@@ -431,7 +433,7 @@ class ServiceController extends Controller
                 DB::rollBack();
             }
             return response()->json([
-                'status' => 'error', 
+                'status' => 'error',
                 'errors' => $e->validator->errors()
             ], 422);
         } catch (\Exception $e) {
@@ -440,7 +442,7 @@ class ServiceController extends Controller
             }
             Log::error("Service update error: " . $e->getMessage());
             return response()->json([
-                'status' => false, 
+                'status' => false,
                 'message' => 'An error occurred while updating the service. Please try again.',
                 'error' => $e->getMessage()
             ], 500);
@@ -451,7 +453,7 @@ class ServiceController extends Controller
     {
         if (empty($id)) {
             return response()->json([
-                'status' => false, 
+                'status' => false,
                 'message' => 'Service ID is required'
             ], 400);
         }
@@ -459,22 +461,40 @@ class ServiceController extends Controller
         $service = Service::find($id);
         if (!$service) {
             return response()->json([
-                'status' => false, 
+                'status' => false,
                 'message' => 'Service not found'
             ], 404);
         }
 
         if ($service->delete()) {
             return response()->json([
-                'status' => true, 
+                'status' => true,
                 'message' => 'Service deleted successfully'
             ]);
         } else {
             return response()->json([
-                'status' => false, 
+                'status' => false,
                 'message' => 'Failed to delete service'
             ], 500);
         }
     }
-}
 
+    public function export(Request $request)
+    {
+        try {
+            $search = $request->input('search', '');
+
+            $export = new ServiceExport($search);
+
+            $fileName = 'services_export_' . date('Y-m-d_His') . '.xlsx';
+
+            return Excel::download($export, $fileName);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'An error occurred while exporting services.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+}

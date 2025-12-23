@@ -68,7 +68,8 @@ const CreateAssignment: React.FC = () => {
     const [currentYear, setCurrentYear] = useState<number>(new Date().getFullYear());
     const calendarRef = useRef<FullCalendar>(null);
     const { isOpen, openModal, closeModal } = useModal();
-
+    const [allEventsSorted, setAllEventsSorted] = useState<AssignmentEvent[]>([]);
+    const [calendarLoader, setCalendarLoader] = useState(false);
     const calendarsEvents = {
         Danger: "danger",
         Success: "success",
@@ -104,7 +105,8 @@ const CreateAssignment: React.FC = () => {
         }
     };
 
-    const fetchEvents = async (month?: number, year?: number) => {
+    const fetchEvents = async (month?: number, year?: number, calendarLoader?: boolean) => {
+
         try {
             const fetchMonth = month || currentMonth;
             const fetchYear = year || currentYear;
@@ -188,7 +190,11 @@ const CreateAssignment: React.FC = () => {
                         },
                     };
                 });
-                setEvents(calendarEvents);
+                // setEvents(calendarEvents);
+                if (calendarLoader) {
+                    setEvents(calendarEvents);
+                    setCalendarLoader(true);
+                }
             }
         } catch {
             // Error handling is silent
@@ -198,7 +204,7 @@ const CreateAssignment: React.FC = () => {
     useEffect(() => {
         fetchVehicles();
         fetchContacts();
-        fetchEvents(currentMonth, currentYear);
+        fetchEvents(currentMonth, currentYear, true);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -236,7 +242,7 @@ const CreateAssignment: React.FC = () => {
         if (viewMonth !== currentMonth || viewYear !== currentYear) {
             setCurrentMonth(viewMonth);
             setCurrentYear(viewYear);
-            fetchEvents(viewMonth, viewYear);
+            fetchEvents(viewMonth, viewYear, false);
         }
     };
 
@@ -369,10 +375,10 @@ const CreateAssignment: React.FC = () => {
 
                 // If event is in current view month, refresh current month, otherwise fetch event's month
                 if (eventMonth === currentMonth && eventYear === currentYear) {
-                    await fetchEvents(currentMonth, currentYear);
+                    await fetchEvents(currentMonth, currentYear, true);
                 } else {
                     // Fetch the month where the event is located
-                    await fetchEvents(eventMonth, eventYear);
+                    await fetchEvents(eventMonth, eventYear, true);
                     setCurrentMonth(eventMonth);
                     setCurrentYear(eventYear);
                 }
@@ -558,19 +564,36 @@ const CreateAssignment: React.FC = () => {
 
 
     // Get all events sorted by date
-    const getAllEventsSorted = (): AssignmentEvent[] => {
-        return [...events].sort((a, b) => {
-            const dateA = a.start && (typeof a.start === 'string' || a.start instanceof Date)
-                ? new Date(a.start).getTime()
-                : 0;
-            const dateB = b.start && (typeof b.start === 'string' || b.start instanceof Date)
-                ? new Date(b.start).getTime()
-                : 0;
-            return dateA - dateB;
-        });
-    };
+    // const getAllEventsSorted = (): AssignmentEvent[] => {
+    //     return [...events].sort((a, b) => {
+    //         const dateA = a.start && (typeof a.start === 'string' || a.start instanceof Date)
+    //             ? new Date(a.start).getTime()
+    //             : 0;
+    //         const dateB = b.start && (typeof b.start === 'string' || b.start instanceof Date)
+    //             ? new Date(b.start).getTime()
+    //             : 0;
+    //         return dateA - dateB;
+    //     });
+    // };
 
-    const allEventsSorted = getAllEventsSorted();
+    useEffect(() => {
+        if (calendarLoader) {
+
+            const sorted = [...events].sort((a, b) => {
+                const dateA = a.start && (typeof a.start === 'string' || a.start instanceof Date)
+                    ? new Date(a.start).getTime()
+                    : 0;
+                const dateB = b.start && (typeof b.start === 'string' || b.start instanceof Date)
+                    ? new Date(b.start).getTime()
+                    : 0;
+                return dateA - dateB;
+            });
+
+            setAllEventsSorted(sorted);
+            setCalendarLoader(false);
+        }
+    }, [calendarLoader]);
+
 
     return (
         <>
@@ -708,9 +731,9 @@ const CreateAssignment: React.FC = () => {
                                                             </div>
                                                         </div>
                                                         <span className={`inline-block w-2 h-2 rounded-full ml-2 ${event.extendedProps.calendar === 'Danger' ? 'bg-red-500' :
-                                                                event.extendedProps.calendar === 'Success' ? 'bg-green-500' :
-                                                                    event.extendedProps.calendar === 'Warning' ? 'bg-yellow-500' :
-                                                                        'bg-blue-500'
+                                                            event.extendedProps.calendar === 'Success' ? 'bg-green-500' :
+                                                                event.extendedProps.calendar === 'Warning' ? 'bg-yellow-500' :
+                                                                    'bg-blue-500'
                                                             }`}></span>
                                                     </div>
                                                 </div>

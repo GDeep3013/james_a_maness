@@ -61,7 +61,7 @@ const TableCell: React.FC<TableCellProps> = ({
 }) => {
   const CellTag = isHeader ? "th" : "td";
 
-  const ThClasse = isHeader ? "px-5 py-4 text-sm font-medium text-gray-500 text-start" : "";
+  const ThClasse = isHeader ? "px-5 py-4 text-sm font-bold text-[#344054] text-start" : "";
 
   return (
     <CellTag className={`${ThClasse} ${className}`} colSpan={colSpan}>

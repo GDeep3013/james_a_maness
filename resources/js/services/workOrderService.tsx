@@ -1,32 +1,34 @@
 import api from './api';
 
 interface WorkOrderData {
-  user_id?: number;
-  vehicle_id?: number;
-  status?: string;
-  repair_priority_class?: string;
-  issue_date?: string;
-  scheduled_start_date?: string;
-  send_scheduled_start_date_reminder?: boolean;
-  actual_start_date?: string;
-  expected_completion_date?: string;
-  actual_completion_date?: string;
-  use_start_odometer_for_completion_meter?: boolean;
-  assigned_to?: number;
-  labels?: string[] | string;
-  vendor_id?: number;
-  invoice_number?: string;
-  po_number?: string;
-  service_items?: unknown[];
-  parts?: unknown[];
+    user_id?: number;
+    vehicle_id?: number;
+    status?: string;
+    repair_priority_class?: string;
+    issue_date?: string;
+    scheduled_start_date?: string;
+    send_scheduled_start_date_reminder?: boolean;
+    actual_start_date?: string;
+    expected_completion_date?: string;
+    actual_completion_date?: string;
+    use_start_odometer_for_completion_meter?: boolean;
+    assigned_to?: number;
+    labels?: string[] | string;
+    vendor_id?: number;
+    invoice_number?: string;
+    po_number?: string;
+    service_items?: unknown[];
+    parts?: unknown[];
+    priorityStatus?: string
 }
 
 export const workOrderService = {
-    getAll: (params?: { search?: string; page?: number; status?: string; vehicle_id?: number; vendor_id?: number; issue_date?: string; start_date?: string; end_date?: string }) => {
+    getAll: (params?: { search?: string; page?: number; status?: string; priorityStatus?: string; vehicle_id?: number; vendor_id?: number; issue_date?: string; start_date?: string; end_date?: string }) => {
         const queryParams = new URLSearchParams();
         if (params?.search) queryParams.append('search', params.search);
         if (params?.page) queryParams.append('page', params.page.toString());
         if (params?.status) queryParams.append('status', params.status);
+        if (params?.priorityStatus) queryParams.append('priorityStatus', params.priorityStatus);
         if (params?.vehicle_id) queryParams.append('vehicle_id', params.vehicle_id.toString());
         if (params?.vendor_id) queryParams.append('vendor_id', params.vendor_id.toString());
         if (params?.issue_date) queryParams.append('issue_date', params.issue_date || '');
@@ -123,6 +125,20 @@ export const workOrderService = {
     getForEdit: (id: number) =>
         api.get(`/work-orders/${id}/edit`),
     getAllDashboard: () => { return api.get(`/get-dashboard-workorder`) },
-    getAllReminder: () => { return api.get(`/get-reminder-service`)}
+    getAllReminder: () => { return api.get(`/get-reminder-service`) },
+
+    export: (params?: { search?: string; status?: string }) => {
+        const queryParams = new URLSearchParams();
+        if (params?.search) queryParams.append('search', params.search);
+        if (params?.status) queryParams.append('status', params.status);
+        const queryString = queryParams.toString();
+
+        return api.get(`/work-orders/export${queryString ? `?${queryString}` : ''}`, {
+            responseType: 'blob',
+            headers: {
+                'Accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            },
+        });
+    },
 };
 

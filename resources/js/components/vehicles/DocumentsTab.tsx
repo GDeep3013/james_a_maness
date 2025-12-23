@@ -32,7 +32,7 @@ export default function DocumentsTab({ activeTab }: DocumentsTabProps) {
     const { id } = useParams<{ id: string }>();
     const { isOpen: isUploadModalOpen, openModal: openUploadModal, closeModal: closeUploadModal } = useModal(false);
     const { isOpen: isEditModalOpen, openModal: openEditModal, closeModal: closeEditModal } = useModal(false);
-    
+
     const [loadingDocuments, setLoadingDocuments] = useState(false);
     const [documents, setDocuments] = useState<Document[]>([]);
     const [documentsPagination, setDocumentsPagination] = useState<PaginationData>({
@@ -45,7 +45,7 @@ export default function DocumentsTab({ activeTab }: DocumentsTabProps) {
     const [isDragging, setIsDragging] = useState(false);
     const [uploading, setUploading] = useState(false);
     const [editingDocument, setEditingDocument] = useState<Document | null>(null);
-    
+
     const [formData, setFormData] = useState<DocumentFormData>({
         vehicle_id: id ? parseInt(id) : 0,
         title: '',
@@ -205,7 +205,7 @@ export default function DocumentsTab({ activeTab }: DocumentsTabProps) {
     };
 
     const handleSubmit = async () => {
-        const errors: Record<string, string> = {};
+        const errors: Record<string, string> = {};   
 
         if (!formData.title.trim()) {
             errors.title = 'Title is required';
@@ -230,8 +230,8 @@ export default function DocumentsTab({ activeTab }: DocumentsTabProps) {
             handleCloseModals();
             fetchDocuments();
         } catch (err: unknown) {
-            const errorMessage = (err && typeof err === 'object' && 'response' in err && err.response && typeof err.response === 'object' && 'data' in err.response && err.response.data && typeof err.response.data === 'object' && 'message' in err.response.data && typeof err.response.data.message === 'string') 
-                ? err.response.data.message 
+            const errorMessage = (err && typeof err === 'object' && 'response' in err && err.response && typeof err.response === 'object' && 'data' in err.response && err.response.data && typeof err.response.data === 'object' && 'message' in err.response.data && typeof err.response.data.message === 'string')
+                ? err.response.data.message
                 : 'An error occurred';
             setFormErrors({ submit: errorMessage });
         } finally {
@@ -444,7 +444,7 @@ export default function DocumentsTab({ activeTab }: DocumentsTabProps) {
                                                             </svg>
                                                         </button>
                                                     </div>
-                                                </div>    
+                                                </div>
                                                 {document.expires_date && (
                                                     <div className="text-right mt-1">
                                                         <p className="text-xs text-gray-500">Expires</p>
@@ -454,7 +454,7 @@ export default function DocumentsTab({ activeTab }: DocumentsTabProps) {
                                                     </div>
                                                 )}
                                                 </div>
-                                                
+
                                             </div>
                                         </div>
                                     </div>
@@ -571,7 +571,7 @@ export default function DocumentsTab({ activeTab }: DocumentsTabProps) {
 
                         <div className="flex justify-end gap-3 pt-4">
                             <Button
-                                size='sm' 
+                                size='sm'
                                 variant='outline'
                                 onClick={handleCloseModals}
                                 disabled={uploading}

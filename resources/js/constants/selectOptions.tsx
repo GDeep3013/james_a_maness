@@ -28,17 +28,24 @@ export const WORK_ORDER_STATUS_OPTIONS: SelectOption[] = [
 ];
 
 export const WORK_ORDER_STATUS_FILTER_OPTIONS: SelectOption[] = [
-    { value: "", label: "All Status" },
+    // { value: "", label: "All Status" },
     { value: "Open", label: "Open" },
     { value: "In Progress", label: "In Progress" },
     { value: "Completed", label: "Completed" },
     { value: "Cancelled", label: "Cancelled" },
 ];
-
+export const REPAIR_PRIORITY_STATUS_FILTER_OPTIONS: SelectOption[] = [
+    // { value: "", label: "All Priority" },
+    { value: "low", label: "Low" },
+    { value: "medium", label: "Medium" },
+    { value: "high", label: "High" },
+    { value: "critical", label: "Critical" },
+];
 export const REPAIR_PRIORITY_CLASS_OPTIONS: SelectOption[] = [
-    { value: "Scheduled", label: "Scheduled" },
-    { value: "Non-Scheduled", label: "Non-Scheduled" },
-    { value: "Emergency", label: "Emergency" },
+    { value: "Low", label: "Low" },
+    { value: "Medium", label: "Medium" },
+    { value: "High", label: "High" },
+    { value: "Critical", label: "Critical" },
 ];
 
 export const ISSUE_STATUS_OPTIONS: SelectOption[] = [

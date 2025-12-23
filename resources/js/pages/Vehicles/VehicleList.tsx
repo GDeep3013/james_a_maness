@@ -208,13 +208,15 @@ export default function VehicleList({ importSuccess }: { importSuccess?: boolean
                             placeholder="All Status"
                             onChange={(value) => setStatus(value)}
                             className="w-full md:max-w-[200px] all-status-select"
+                            isPlaceholder={true}
                         />
                         <Select
                             options={fuelTypeOptions}
                             placeholder="All Fuel Types"
                             onChange={(value) => setFuelType(value)}
                             className="w-full md:max-w-[200px] all-status-select"
-                        />
+                            isPlaceholder={true}
+                         />
                         <Button
                             variant="outline"
                             onClick={handleExport}

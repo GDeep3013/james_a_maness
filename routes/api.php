@@ -59,6 +59,12 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::get('/vehicles/export', [VehicleController::class, 'export']);
 Route::get('/con/export', [ContactController::class, 'export']);
 Route::get('/vendors/export', [VendorController::class, 'export']);
+Route::get('/meter-history/export',[MeterReadingController::class, 'export']);
+Route::get('/expense-history/export',[ExpenseHistoryController::class, 'export']);
+Route::get('/work-orders/export',[WorkOrderController::class, 'export']);
+Route::get('/services/export',[ServiceController::class, 'export']);
+
+
 
 Route::middleware('auth:sanctum')->group(function () {
 
