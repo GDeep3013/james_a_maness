@@ -137,6 +137,8 @@ Route::middleware(['auth', 'page.access'])->group(function () {
 
     Route::get('profile', [HomeController::class, 'index']);
 
+    Route::get('settings', [HomeController::class, 'index']);
+
     // Fuel Reports
     Route::get('/reports/fuel', [HomeController::class, 'index']);
     Route::get('/reports/fuel/create', [HomeController::class, 'index']);

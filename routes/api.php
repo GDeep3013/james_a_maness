@@ -29,6 +29,7 @@ use App\Http\Controllers\ReminderController;
 use App\Http\Controllers\VehicleDocumentController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\MMRReportController;
+use App\Http\Controllers\SettingsController;
 
 // use App\Http\Controllers\Apps\LoginController;
 // use App\Http\Controllers\Apps\ContactApiController;
@@ -154,6 +155,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('/fuel-reports', FuelReportController::class);
     Route::get('/fuel-reports/{id}/edit', [FuelReportController::class, 'edit'])->where('id', '[0-9]+');
     Route::get('/fuel-reports/{id}/download', [FuelReportController::class, 'download'])->where('id', '[0-9]+');
+
+    Route::get('/settings', [SettingsController::class, 'index']);
+    Route::post('/settings', [SettingsController::class, 'store']);
 
 });
 
