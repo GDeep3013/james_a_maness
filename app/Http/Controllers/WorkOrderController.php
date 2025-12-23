@@ -46,6 +46,9 @@ class WorkOrderController extends Controller
         if ($request->has('status') && !empty($request->status)) {
             $query->where('status', $request->status);
         }
+          if ($request->has('priorityStatus') && !empty($request->priorityStatus)) {
+            $query->where('repair_priority_class', $request->priorityStatus);
+        }
 
         if ($request->has('vehicle_id') && !empty($request->vehicle_id)) {
             $query->where('vehicle_id', $request->vehicle_id);

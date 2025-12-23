@@ -481,7 +481,11 @@ export default function EditVehicle() {
                                             name="year"
                                             placeholder="e.g., 2023"
                                             value={formData.year}
-                                            onChange={(e) => handleInputChange('year', e.target.value)}
+                                            maxLength={4}
+                                            onChange={(e) => {
+                                                const value = e.target.value.replace(/\D/g, '').slice(0, 4);
+                                                handleInputChange('year', value);
+                                            }}
                                         />
                                         {errors.year && (
                                             <p className="mt-1 text-xs text-error-500">{errors.year}</p>
@@ -498,6 +502,7 @@ export default function EditVehicle() {
                                             name="vin"
                                             placeholder="17-character VIN"
                                             value={formData.vin}
+                                            maxLength={17}
                                             onChange={(e) => handleInputChange('vin', e.target.value)}
                                         />
                                         {errors.vin && (
@@ -652,7 +657,7 @@ export default function EditVehicle() {
                                         <Label htmlFor="vendor">Vendor</Label>
                                         <Select
                                             options={[
-                                                { value: "", label: "Select vendor (optional)" },
+                                                // { value: "", label: "Select vendor (optional)" },
                                                 ...vendors.map(vendor => ({
                                                     value: vendor.id.toString(),
                                                     label: vendor.name

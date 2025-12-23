@@ -35,8 +35,10 @@ body {
 }
 .view-button span svg{
     fill: currentColor;
-    width: 16px;
-    height: 16px;
+}
+.view-button span svg, .edit-button span svg, .delete-button span svg{
+    width: 20px;
+    height: 20px;
 }
 .delete-button{
     color: #E7000B;
@@ -106,6 +108,7 @@ select {
 select.all-status-select {
     background: url('/images/down-arrow.png') no-repeat #F3F3F5;
     background-position: 95% 50%;
+    color: #1d2939;
 }
 .footer-shadow{
     box-shadow: -3px -3px 13.7px 0px #0000001A;

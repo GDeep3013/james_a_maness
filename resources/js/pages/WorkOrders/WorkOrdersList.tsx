@@ -12,7 +12,7 @@ import Input from "../../components/form/input/InputField";
 import Button from "../../components/ui/button/Button";
 import PageMeta from "../../components/common/PageMeta";
 import { workOrderService } from "../../services/workOrderService";
-import { WORK_ORDER_STATUS_FILTER_OPTIONS } from "../../constants/selectOptions";
+import { WORK_ORDER_STATUS_FILTER_OPTIONS, REPAIR_PRIORITY_STATUS_FILTER_OPTIONS } from "../../constants/selectOptions";
 import { PencilIcon, TrashBinIcon, ExportIcon, EyeIcon } from "../../icons";
 import Select from "../../components/form/Select";
 import TableFooter, { PaginationData } from "../../components/common/TableFooter";
@@ -64,6 +64,7 @@ export default function WorkOrdersList() {
     const [error, setError] = useState<string>("");
     const [searchTerm, setSearchTerm] = useState("");
     const [statusFilter, setStatusFilter] = useState("");
+    const [priorityFilter, setPriorityFilter] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
     const [pagination, setPagination] = useState<PaginationData>({
         current_page: 1,
@@ -73,11 +74,11 @@ export default function WorkOrdersList() {
     });
     const [deletingId, setDeletingId] = useState<number | null>(null);
 
-    const fetchWorkOrders = useCallback(async (page: number = 1, search: string = "", status: string = "") => {
+    const fetchWorkOrders = useCallback(async (page: number = 1, search: string = "", status: string = "", priorityStatus: string = "") => {
         setLoading(true);
         setError("");
         try {
-            const response = await workOrderService.getAll({ page, search, status });
+            const response = await workOrderService.getAll({ page, search, status, priorityStatus });
             const data = response.data as WorkOrdersResponse;
 
             if (data.status && data.work_orders) {
@@ -101,13 +102,13 @@ export default function WorkOrdersList() {
     }, []);
 
     useEffect(() => {
-        fetchWorkOrders(currentPage, searchTerm, statusFilter);
-    }, [currentPage, searchTerm, statusFilter, fetchWorkOrders]);
+        fetchWorkOrders(currentPage, searchTerm, statusFilter, priorityFilter);
+    }, [currentPage, searchTerm, statusFilter, priorityFilter, fetchWorkOrders]);
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
         setCurrentPage(1);
-        fetchWorkOrders(1, searchTerm, statusFilter);
+        fetchWorkOrders(1, searchTerm, statusFilter, priorityFilter);
     };
 
     const handleDelete = async (id: number) => {
@@ -118,7 +119,7 @@ export default function WorkOrdersList() {
         setDeletingId(id);
         try {
             await workOrderService.delete(id);
-            fetchWorkOrders(currentPage, searchTerm, statusFilter);
+            fetchWorkOrders(currentPage, searchTerm, statusFilter, priorityFilter);
         } catch {
             alert("Failed to delete work order. Please try again.");
         } finally {
@@ -186,6 +187,21 @@ export default function WorkOrdersList() {
                 return "warning";
         }
     };
+    const getPriorityColor = (priority?: string) => {
+        switch (priority) {
+            case "Low":
+                return "light";
+            case "Medium":
+                return "info";
+            case "High":
+                return "high";
+            case "Critical":
+                return "error";
+            default:
+                return "info";
+        }
+    };
+
 
     return (
         <>
@@ -198,6 +214,7 @@ export default function WorkOrdersList() {
                 <div className="flex items-center justify-between">
                     <div>
                         <h2 className="text-2xl font-semibold text-gray-800">Work Orders</h2>
+                        <p className="text-sm text-[#595959] text-left">Manage vehicle maintenance and repairs</p>
                     </div>
                     <Button
                         variant="primary"
@@ -210,7 +227,7 @@ export default function WorkOrdersList() {
 
                 <form onSubmit={handleSearch} className="bg-white border border-gray-200 rounded-xl p-4">
                     <div className="flex flex-wrap items-center gap-4">
-                        <div className="flex-1 md:max-w-[50%]">
+                        <div className="flex-1 md:max-w-[60%]">
                             <Input
                                 type="text"
                                 placeholder="Search by vehicle, invoice number, PO number..."
@@ -224,18 +241,28 @@ export default function WorkOrdersList() {
                                 options={WORK_ORDER_STATUS_FILTER_OPTIONS}
                                 placeholder="All Status"
                                 onChange={(value) => setStatusFilter(value)}
-                                defaultValue=""
-                                className="!bg-[#F3F3F5] border-gray-200"
+                                className="!bg-[#F3F3F5] border-gray-200 all-status-select"
+                                isPlaceholder={true}
                             />
                         </div>
-                        <Button
+                        <div className="w-full sm:max-w-[50%] md:max-w-[20%]">
+                            <Select
+                                options={REPAIR_PRIORITY_STATUS_FILTER_OPTIONS}
+                                placeholder="All Priority"
+                                onChange={(value) => setPriorityFilter(value)}
+                                className="!bg-[#F3F3F5] border-gray-200 all-status-select"
+                                isPlaceholder={true}
+                            />
+                        </div>
+                        {/* <Button
                             variant="outline"
                             onClick={handleExport}
                             className="bg-gray-50 border-gray-200 hover:bg-gray-100 w-full sm:max-w-[50%] md:max-w-[10%] min-h-[44px] !leading-[44px]"
                         >
                             <ExportIcon />
                             Export
-                        </Button>
+                        </Button> */}
+
                     </div>
                 </form>
 
@@ -283,6 +310,11 @@ export default function WorkOrdersList() {
                                                 isHeader
                                             >
                                                 Status
+                                            </TableCell>
+                                            <TableCell
+                                                isHeader
+                                            >
+                                                Priority
                                             </TableCell>
                                             <TableCell
                                                 isHeader
@@ -335,6 +367,14 @@ export default function WorkOrdersList() {
                                                         color={getStatusColor(workOrder.status)}
                                                     >
                                                         {workOrder.status || "Open"}
+                                                    </Badge>
+                                                </TableCell>
+                                                <TableCell className="px-4 py-3 text-start">
+                                                    <Badge
+                                                        size="sm"
+                                                        color={getPriorityColor(workOrder.repair_priority_class)}
+                                                    >
+                                                        {workOrder.repair_priority_class || "Medium"}
                                                     </Badge>
                                                 </TableCell>
                                                 <TableCell className="px-4 py-3 text-start">

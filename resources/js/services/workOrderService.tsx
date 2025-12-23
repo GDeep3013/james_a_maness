@@ -19,14 +19,16 @@ interface WorkOrderData {
     po_number?: string;
     service_items?: unknown[];
     parts?: unknown[];
+    priorityStatus?: string
 }
 
 export const workOrderService = {
-    getAll: (params?: { search?: string; page?: number; status?: string; vehicle_id?: number; vendor_id?: number; issue_date?: string; start_date?: string; end_date?: string }) => {
+    getAll: (params?: { search?: string; page?: number; status?: string; priorityStatus?: string; vehicle_id?: number; vendor_id?: number; issue_date?: string; start_date?: string; end_date?: string }) => {
         const queryParams = new URLSearchParams();
         if (params?.search) queryParams.append('search', params.search);
         if (params?.page) queryParams.append('page', params.page.toString());
         if (params?.status) queryParams.append('status', params.status);
+        if (params?.priorityStatus) queryParams.append('priorityStatus', params.priorityStatus);
         if (params?.vehicle_id) queryParams.append('vehicle_id', params.vehicle_id.toString());
         if (params?.vendor_id) queryParams.append('vendor_id', params.vendor_id.toString());
         if (params?.issue_date) queryParams.append('issue_date', params.issue_date || '');

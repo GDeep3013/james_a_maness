@@ -312,7 +312,7 @@ export default function CreateMeterReading() {
             <div className="space-y-6">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                    
+
                         <h1 className="text-base md:text-2xl font-semibold text-gray-800 dark:text-white/90">
                             {isEditMode ? "Edit Meter Entry" : "New Meter Entry"}
                         </h1>
@@ -354,14 +354,14 @@ export default function CreateMeterReading() {
                                         >
                                             Cancel
                                         </Button>
-                                        <Button
+                                        {/* <Button
                                             variant="outline"
                                             size="sm"
                                             onClick={handleSaveAndAddAnother}
                                             disabled={isSubmitting}
                                         >
                                             Save & Add Another
-                                        </Button>
+                                        </Button> */}
                                         <Button
                                             variant="primary"
                                             type="submit"

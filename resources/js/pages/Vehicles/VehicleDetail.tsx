@@ -283,43 +283,7 @@ export default function VehicleDetail() {
 
                     </div>
 
-                    <div className='current-assignment mt-6'>
-                        <div className="bg-white rounded-lg px-6 py-4 border border-gray-200 shadow-sm">
-                            <h3 className="text-[18px] font-medium text-[#1D2939] mb-4">Current Assignment</h3>
-                            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-6">
-                                <div className="flex-1">
-                                    <span className="block text-sm text-[#595959] mb-1">Vendor</span>
-                                    <span className="block text-base text-[#1D2939]">
-                                        {vehicle.vendor?.id ? (
-                                            <Link to={`/vendors/${vehicle.vendor.id}`} className="text-blue-500 hover:text-blue-700">
-                                                {capitalizeFirst(vehicle.vendor?.name)}
-                                            </Link>
-                                        ) : 'N/A'}
-                                    </span>
-                                </div>
-                                <div className="flex-1">
-                                    <span className="block text-sm text-[#595959] mb-1">Assigned Driver</span>
-                                    <span className="block text-base text-[#1D2939]">
-                                        {vehicle.contact?.id ? (
-                                            <Link to={`/contacts/${vehicle.contact.id}`} className="text-blue-500 hover:text-blue-700">
-                                                {capitalizeFirst(vehicle.contact?.first_name) + ' ' + capitalizeFirst(vehicle.contact?.last_name)}
-                                            </Link>
-                                        ) : 'N/A'}
-                                    </span>
-                                </div>
-                                <div className="flex-1">
-                                    <span className="block text-sm text-[#595959] mb-1">Primary Location</span>
-                                    <span className="block text-base text-[#1D2939]">{capitalizeFirst(vehicle.primary_location) || 'N/A'}</span>
-                                </div>
-                                <div className="flex-1">
-                                    <span className="block text-sm text-[#595959] mb-1">Department</span>
-                                    <span className="block text-base text-[#1D2939]">
-                                        {capitalizeFirst(vehicle.department) || 'N/A'}
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+
 
                     <div className="bg-white rounded-lg border border-gray-200 w-full mt-6">
                         <div className="lg:p-6 p-3">
@@ -378,6 +342,43 @@ export default function VehicleDetail() {
 
                     </div>
 
+                    <div className='current-assignment mt-6'>
+                        <div className="bg-white rounded-lg px-6 py-4 border border-gray-200 shadow-sm">
+                            <h3 className="text-[18px] font-medium text-[#1D2939] mb-4">Current Assignment</h3>
+                            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-6">
+                                <div className="flex-1">
+                                    <span className="block text-sm text-[#595959] mb-1">Vendor</span>
+                                    <span className="block text-base text-[#1D2939]">
+                                        {vehicle.vendor?.id ? (
+                                            <Link to={`/vendors/${vehicle.vendor.id}`} className="text-blue-500 hover:text-blue-700">
+                                                {capitalizeFirst(vehicle.vendor?.name)}
+                                            </Link>
+                                        ) : 'N/A'}
+                                    </span>
+                                </div>
+                                <div className="flex-1">
+                                    <span className="block text-sm text-[#595959] mb-1">Assigned Driver</span>
+                                    <span className="block text-base text-[#1D2939]">
+                                        {vehicle.contact?.id ? (
+                                            <Link to={`/contacts/${vehicle.contact.id}`} className="text-blue-500 hover:text-blue-700">
+                                                {capitalizeFirst(vehicle.contact?.first_name) + ' ' + capitalizeFirst(vehicle.contact?.last_name)}
+                                            </Link>
+                                        ) : 'N/A'}
+                                    </span>
+                                </div>
+                                <div className="flex-1">
+                                    <span className="block text-sm text-[#595959] mb-1">Primary Location</span>
+                                    <span className="block text-base text-[#1D2939]">{capitalizeFirst(vehicle.primary_location) || 'N/A'}</span>
+                                </div>
+                                <div className="flex-1">
+                                    <span className="block text-sm text-[#595959] mb-1">Department</span>
+                                    <span className="block text-base text-[#1D2939]">
+                                        {capitalizeFirst(vehicle.department) || 'N/A'}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
                 </div>
             </div>
