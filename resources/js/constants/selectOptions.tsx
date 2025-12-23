@@ -4,11 +4,12 @@ export interface SelectOption {
 }
 
 export const PRIORITY_OPTIONS: SelectOption[] = [
-    { value: "", label: "No Priority" },
+    // { value: "", label: "No Priority" },
     { value: "low", label: "Low" },
     { value: "medium", label: "Medium" },
     { value: "high", label: "High" },
     { value: "urgent", label: "Urgent" },
+    { value: "critical", label: "Critical" },
 ];
 
 export const LABEL_OPTIONS: SelectOption[] = [

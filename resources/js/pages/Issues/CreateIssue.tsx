@@ -95,7 +95,7 @@ export default function CreateIssue() {
         const reportedDate = issue.reported_date ? new Date(issue.reported_date) : new Date();
         const dateStr = reportedDate.toISOString().split("T")[0];
         const timeStr = reportedDate.toTimeString().slice(0, 5);
-        
+
         const assignedToValue = issue.assigned_to || issue.assignedTo;
         const assignedToId = typeof assignedToValue === 'object' && assignedToValue?.id
           ? String(assignedToValue.id)
@@ -131,14 +131,14 @@ export default function CreateIssue() {
   useEffect(() => {
     fetchContacts();
     fetchVehicles();
-    
+
     if (isEditMode && id) {
       fetchIssueData(parseInt(id));
     } else {
       const today = new Date();
       const dateStr = today.toISOString().split("T")[0];
       const timeStr = today.toTimeString().slice(0, 5);
-      
+
       setFormData({
         vehicle_id: 0,
         asset: "",
@@ -350,7 +350,7 @@ export default function CreateIssue() {
                 </h3>
 
                   <div className="grid grid-cols-1 gap-6 lg:grid-cols-3 mb-6">
-                  
+
                     <div>
                     <Label htmlFor="asset">
                         Asset <span className="text-red-500">*</span>
@@ -387,7 +387,7 @@ export default function CreateIssue() {
                     />
                     </div>
                   </div>
-                  
+
                   <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
 
                     <div className="lg:col-span-2">

@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id();
             $table->bigInteger('work_order_id')->nullable();
             $table->bigInteger('vehicle_id')->nullable();
-            $table->enum('priority', ['', 'low', 'medium', 'high', 'urgent'])->nullable();
+            $table->enum('priority', ['', 'low', 'medium', 'high', 'urgent', 'critical'])->nullable();
             $table->dateTime('reported_date')->nullable();
             $table->string('summary');
             $table->text('description')->nullable();

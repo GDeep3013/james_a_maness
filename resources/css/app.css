@@ -37,8 +37,8 @@ body {
     fill: currentColor;
 }
 .view-button span svg, .edit-button span svg, .delete-button span svg{
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
 }
 .delete-button{
     color: #E7000B;

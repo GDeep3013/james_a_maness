@@ -20,10 +20,10 @@ class IssueController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
-        
+
         if (!$user) {
             return response()->json([
-                'status' => false, 
+                'status' => false,
                 'message' => 'Unauthenticated'
             ], 401);
         }
@@ -34,18 +34,18 @@ class IssueController extends Controller
             'assignedTo:id,first_name,last_name',
             'workOrder:id,status'
         ])->orderBy('id', 'desc');
-        
+
         if (!$this->isAdminOrManager($user)) {
             $userContact = \App\Models\Contact::where('user_id', $user->id)->first();
             $query->where(function ($q) use ($user, $userContact) {
                 $q->where('reported_by', $user->id);
-                
+
                 if ($userContact) {
                     $q->orWhere('assigned_to', $userContact->id);
                 }
             });
         }
-        
+
         $searchTerm = $request->search;
 
         if ($request->has('status') && !empty($request->status)) {
@@ -85,7 +85,7 @@ class IssueController extends Controller
             $validatedData = $request->validate([
                 'work_order_id' => 'nullable|exists:work_orders,id',
                 'vehicle_id' => 'required|exists:vehicals,id',
-                'priority' => 'nullable|in:,low,medium,high,urgent',
+                'priority' => 'nullable|in:,low,medium,high,urgent,critical',
                 'reported_date' => 'required|date',
                 'reported_time' => 'nullable',
                 'summary' => 'required|string|max:255',
@@ -126,14 +126,14 @@ class IssueController extends Controller
             if ($issue->save()) {
                 DB::commit();
                 return response()->json([
-                    'status' => true,  
+                    'status' => true,
                     'message' => 'Issue created successfully',
                     'data' => $issue->load(['vehicle', 'assignedTo', 'workOrder'])
                 ]);
             } else {
                 DB::rollBack();
                 return response()->json([
-                    'status' => false, 
+                    'status' => false,
                     'message' => 'Failed to create issue'
                 ], 500);
             }
@@ -142,7 +142,7 @@ class IssueController extends Controller
                 DB::rollBack();
             }
             return response()->json([
-                'status' => 'error', 
+                'status' => 'error',
                 'errors' => $e->validator->errors()
             ], 422);
         } catch (\Exception $e) {
@@ -151,7 +151,7 @@ class IssueController extends Controller
             }
             Log::error("Issue creation error: " . $e->getMessage());
             return response()->json([
-                'status' => false, 
+                'status' => false,
                 'message' => 'An error occurred while creating the issue. Please try again.',
                 'error' => $e->getMessage()
             ], 500);
@@ -161,17 +161,17 @@ class IssueController extends Controller
     public function show($id)
     {
         $user = Auth::user();
-        
+
         if (!$user) {
             return response()->json([
-                'status' => false, 
+                'status' => false,
                 'message' => 'Unauthenticated'
             ], 401);
         }
 
         if (empty($id)) {
             return response()->json([
-                'status' => false, 
+                'status' => false,
                 'message' => 'Issue ID is required'
             ], 400);
         }
@@ -184,7 +184,7 @@ class IssueController extends Controller
 
         if (!$issue) {
             return response()->json([
-                'status' => false, 
+                'status' => false,
                 'message' => 'Issue not found'
             ], 404);
         }
@@ -192,25 +192,25 @@ class IssueController extends Controller
         if (!$this->isAdminOrManager($user)) {
             $userContact = \App\Models\Contact::where('user_id', $user->id)->first();
             $canView = false;
-            
+
             if ($issue->reported_by == $user->id) {
                 $canView = true;
             }
-            
+
             if ($userContact && $issue->assigned_to == $userContact->id) {
                 $canView = true;
             }
 
             if (!$canView) {
                 return response()->json([
-                    'status' => false, 
+                    'status' => false,
                     'message' => 'You do not have permission to view this issue'
                 ], 403);
             }
         }
 
         return response()->json([
-            'status' => true, 
+            'status' => true,
             'message' => 'Issue retrieved successfully',
             'issue' => $issue
         ]);
@@ -219,17 +219,17 @@ class IssueController extends Controller
     public function edit($id)
     {
         $user = Auth::user();
-        
+
         if (!$user) {
             return response()->json([
-                'status' => false, 
+                'status' => false,
                 'message' => 'Unauthenticated'
             ], 401);
         }
 
         if (empty($id)) {
             return response()->json([
-                'status' => false, 
+                'status' => false,
                 'message' => 'Issue ID is required'
             ], 400);
         }
@@ -242,7 +242,7 @@ class IssueController extends Controller
 
         if (!$issue) {
             return response()->json([
-                'status' => false, 
+                'status' => false,
                 'message' => 'Issue not found'
             ], 404);
         }
@@ -250,25 +250,25 @@ class IssueController extends Controller
         if (!$this->isAdminOrManager($user)) {
             $userContact = \App\Models\Contact::where('user_id', $user->id)->first();
             $canEdit = false;
-            
+
             if ($issue->reported_by == $user->id) {
                 $canEdit = true;
             }
-            
+
             if ($userContact && $issue->assigned_to == $userContact->id) {
                 $canEdit = true;
             }
 
             if (!$canEdit) {
                 return response()->json([
-                    'status' => false, 
+                    'status' => false,
                     'message' => 'You do not have permission to edit this issue'
                 ], 403);
             }
         }
 
         return response()->json([
-            'status' => true, 
+            'status' => true,
             'message' => 'Issue data',
             'data' => $issue
         ]);
@@ -277,17 +277,17 @@ class IssueController extends Controller
     public function update(Request $request, $id)
     {
         $user = Auth::user();
-        
+
         if (!$user) {
             return response()->json([
-                'status' => false, 
+                'status' => false,
                 'message' => 'Unauthenticated'
             ], 401);
         }
 
         if (empty($id)) {
             return response()->json([
-                'status' => false, 
+                'status' => false,
                 'message' => 'Issue ID is required'
             ], 400);
         }
@@ -295,7 +295,7 @@ class IssueController extends Controller
         $issue = Issue::find($id);
         if (!$issue) {
             return response()->json([
-                'status' => false, 
+                'status' => false,
                 'message' => 'Issue not found'
             ], 404);
         }
@@ -303,18 +303,18 @@ class IssueController extends Controller
         if (!$this->isAdminOrManager($user)) {
             $userContact = \App\Models\Contact::where('user_id', $user->id)->first();
             $canUpdate = false;
-            
+
             if ($issue->reported_by == $user->id) {
                 $canUpdate = true;
             }
-            
+
             if ($userContact && $issue->assigned_to == $userContact->id) {
                 $canUpdate = true;
             }
 
             if (!$canUpdate) {
                 return response()->json([
-                    'status' => false, 
+                    'status' => false,
                     'message' => 'You do not have permission to update this issue'
                 ], 403);
             }
@@ -324,7 +324,7 @@ class IssueController extends Controller
             $validatedData = $request->validate([
                 'work_order_id' => 'nullable|exists:work_orders,id',
                 'vehicle_id' => 'nullable|exists:vehicals,id',
-                'priority' => 'nullable|in:,low,medium,high,urgent',
+                'priority' => 'nullable|in:,low,medium,high,urgent,critical',
                 'reported_date' => 'nullable|date',
                 'reported_time' => 'nullable',
                 'summary' => 'nullable|string|max:255',
@@ -391,14 +391,14 @@ class IssueController extends Controller
             if ($issue->save()) {
                 DB::commit();
                 return response()->json([
-                    'status' => true, 
+                    'status' => true,
                     'message' => 'Issue updated successfully',
                     'data' => $issue->load(['vehicle', 'assignedTo', 'workOrder'])
                 ]);
             } else {
                 DB::rollBack();
                 return response()->json([
-                    'status' => false, 
+                    'status' => false,
                     'message' => 'Failed to update issue'
                 ], 500);
             }
@@ -407,7 +407,7 @@ class IssueController extends Controller
                 DB::rollBack();
             }
             return response()->json([
-                'status' => 'error', 
+                'status' => 'error',
                 'errors' => $e->validator->errors()
             ], 422);
         } catch (\Exception $e) {
@@ -416,7 +416,7 @@ class IssueController extends Controller
             }
             Log::error("Issue update error: " . $e->getMessage());
             return response()->json([
-                'status' => false, 
+                'status' => false,
                 'message' => 'An error occurred while updating the issue. Please try again.',
                 'error' => $e->getMessage()
             ], 500);
@@ -426,17 +426,17 @@ class IssueController extends Controller
     public function destroy($id)
     {
         $user = Auth::user();
-        
+
         if (!$user) {
             return response()->json([
-                'status' => false, 
+                'status' => false,
                 'message' => 'Unauthenticated'
             ], 401);
         }
 
         if (empty($id)) {
             return response()->json([
-                'status' => false, 
+                'status' => false,
                 'message' => 'Issue ID is required'
             ], 400);
         }
@@ -444,7 +444,7 @@ class IssueController extends Controller
         $issue = Issue::find($id);
         if (!$issue) {
             return response()->json([
-                'status' => false, 
+                'status' => false,
                 'message' => 'Issue not found'
             ], 404);
         }
@@ -452,7 +452,7 @@ class IssueController extends Controller
         if (!$this->isAdminOrManager($user)) {
             $userContact = \App\Models\Contact::where('user_id', $user->id)->first();
             $canDelete = false;
-            
+
             if ($issue->reported_by == $user->id) {
                 $canDelete = true;
             }
@@ -463,7 +463,7 @@ class IssueController extends Controller
 
             if (!$canDelete) {
                 return response()->json([
-                    'status' => false, 
+                    'status' => false,
                     'message' => 'You do not have permission to delete this issue'
                 ], 403);
             }
@@ -471,12 +471,12 @@ class IssueController extends Controller
 
         if ($issue->delete()) {
             return response()->json([
-                'status' => true, 
+                'status' => true,
                 'message' => 'Issue deleted successfully'
             ]);
         } else {
             return response()->json([
-                'status' => false, 
+                'status' => false,
                 'message' => 'Failed to delete issue'
             ], 500);
         }
