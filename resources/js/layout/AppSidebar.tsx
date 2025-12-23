@@ -36,13 +36,34 @@ const AppSidebar: React.FC = () => {
     );
     const subMenuRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
-    // const isActive = (path: string) => location.pathname === path;
     const isActive = useCallback((path: string) => {
-        // console.log(path, " ******* ", location.pathname)
-        return location.pathname === path;
+        if (location.pathname === path) {
+            return true;
+        }
+        if (path === "/") {
+            return location.pathname === "/" || location.pathname === "/home";
+        }
+        return location.pathname.startsWith(path + "/");
     },
         [location.pathname]
     );
+
+    const isSubItemActive = useCallback((subItemPath: string) => {
+        if (location.pathname === subItemPath) {
+            return true;
+        }
+        return location.pathname.startsWith(subItemPath + "/");
+    }, [location.pathname]);
+
+    const isMenuActive = useCallback((nav: NavItem) => {
+        if (nav.path && isActive(nav.path)) {
+            return true;
+        }
+        if (nav.subItems) {
+            return nav.subItems.some((subItem) => isSubItemActive(subItem.path));
+        }
+        return false;
+    }, [isActive, isSubItemActive]);
 
     const navItems = hasRole(["Admin", "Manager"]) ? AdminMenus : ContactMenus;
     const othersItems: NavItem[] = OtherMenuItems;
@@ -53,7 +74,7 @@ const AppSidebar: React.FC = () => {
             items.forEach((nav, index) => {
                 if (nav.subItems) {
                     nav.subItems.forEach((subItem) => {
-                        if (isActive(subItem.path)) {
+                        if (isSubItemActive(subItem.path)) {
                             setOpenSubmenu({
                                 type: menuType as "main" | "others",
                                 index,
@@ -63,7 +84,7 @@ const AppSidebar: React.FC = () => {
                 }
             });
         });
-    }, [location.pathname]);
+    }, [location.pathname, isSubItemActive, navItems, othersItems]);
 
     useEffect(() => {
         if (openSubmenu !== null) {
@@ -83,7 +104,7 @@ const AppSidebar: React.FC = () => {
             const nav = items[index];
 
             if (nav.subItems) {
-                const hasActiveSubItem = nav.subItems.some((subItem) => isActive(subItem.path));
+                const hasActiveSubItem = nav.subItems.some((subItem) => isSubItemActive(subItem.path));
 
                 if (hasActiveSubItem) {
                     return { type: menuType, index };
@@ -141,7 +162,7 @@ const AppSidebar: React.FC = () => {
                                         e.stopPropagation();
                                         handleSubmenuToggle(index, menuType);
                                     }}
-                                    className={`menu-item group text-base font-medium text-white hover:bg-[#2C0A77] ${openSubmenu?.type === menuType && (openSubmenu?.index) === index
+                                    className={`menu-item group text-base font-medium text-white hover:bg-[#2C0A77] ${(openSubmenu?.type === menuType && (openSubmenu?.index) === index) || isMenuActive(nav)
                                             ? "menu-item-active bg-[#2C0A77]"
                                             : "menu-item-inactive"
                                         } cursor-pointer ${!isExpanded && !isHovered
@@ -150,7 +171,7 @@ const AppSidebar: React.FC = () => {
                                         } ${isOthersItem ? "menu-item-others" : ""}`}
                                 >
                                     <span
-                                        className={`menu-item-icon-size  ${openSubmenu?.type === menuType && openSubmenu?.index === index
+                                        className={`menu-item-icon-size  ${(openSubmenu?.type === menuType && openSubmenu?.index === index) || isMenuActive(nav)
                                                 ? "menu-item-icon-active"
                                                 : "menu-item-icon-inactive"
                                             } ${isOthersItem ? "menu-item-others-icon" : ""}`}
@@ -212,7 +233,7 @@ const AppSidebar: React.FC = () => {
                                                     onClick={(e) => {
                                                         e.stopPropagation();
                                                     }}
-                                                    className={`menu-dropdown-item text-sm text-white hover:bg-[#2C0A77] ${isActive(subItem.path)
+                                                    className={`menu-dropdown-item text-sm text-white hover:bg-[#2C0A77] ${isSubItemActive(subItem.path)
                                                             ? "menu-dropdown-item-active bg-[#2C0A77]"
                                                             : "menu-dropdown-item-inactive"
                                                         }`}
@@ -221,7 +242,7 @@ const AppSidebar: React.FC = () => {
                                                     <span className="flex items-center gap-1 ml-auto">
                                                         {subItem.new && (
                                                             <span
-                                                                className={`ml-auto ${isActive(subItem.path)
+                                                                className={`ml-auto ${isSubItemActive(subItem.path)
                                                                         ? "menu-dropdown-badge-active"
                                                                         : "menu-dropdown-badge-inactive"
                                                                     } menu-dropdown-badge`}
@@ -231,7 +252,7 @@ const AppSidebar: React.FC = () => {
                                                         )}
                                                         {subItem.pro && (
                                                             <span
-                                                                className={`ml-auto ${isActive(subItem.path)
+                                                                className={`ml-auto ${isSubItemActive(subItem.path)
                                                                         ? "menu-dropdown-badge-active"
                                                                         : "menu-dropdown-badge-inactive"
                                                                     } menu-dropdown-badge`}

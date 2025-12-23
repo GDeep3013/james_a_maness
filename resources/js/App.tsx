@@ -64,7 +64,7 @@ import MaintenanceReport from "./pages/Reports/Maintenance_Reports/MaintenanceRe
 import MaintenanceReportList from "./pages/Reports/Maintenance_Reports/MaintenanceReportList";
 import FuelReport from "./pages/Reports/Fuel_Reports/FuelReport";
 import FuelReportList from "./pages/Reports/Fuel_Reports/FuelReportList";
-
+import Settings from "./pages/Settings/index";
 
 export default function App() {
     return (
@@ -652,11 +652,21 @@ export default function App() {
                                 </ProtectedRoute>
                             }
                         />
+                        
                         <Route
                             path="/profile"
                             element={
                                 <ProtectedRoute>
                                     <UserProfiles />
+                                </ProtectedRoute>
+                            }
+                        />
+
+                        <Route
+                            path="/settings"
+                            element={
+                                <ProtectedRoute>
+                                    <Settings />
                                 </ProtectedRoute>
                             }
                         />
