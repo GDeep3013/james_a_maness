@@ -465,7 +465,7 @@ export default function MaintenanceReport() {
                 { name: isEditMode ? "Edit" : "Create", to: isEditMode ? `/reports/maintenance/${id}` : "/reports/maintenance/create" },
             ]} />
 
-            <div className="space-y-6" id= 'message-container'>
+            <div className="space-y-6" id='message-container'>
                 <div className="page-actions flex flex-wrap items-center justify-between gap-3 mb-6">
                     <h2 className="text-base md:text-xl font-semibold text-gray-800 dark:text-white/90">
                         {isEditMode ? "Edit Maintenance Report" : "Create Maintenance Report"}
@@ -739,7 +739,7 @@ export default function MaintenanceReport() {
                                                         <tr>
                                                             <th style={{ borderTop: "2px solid #000", borderBottom: "1px solid #000", fontSize: "12px", fontWeight: "bold", padding: "2px", textAlign: "center" }}>Qty</th>
                                                             <th style={{ borderTop: "2px solid #000", borderBottom: "1px solid #000", fontSize: "12px", fontWeight: "bold", padding: "2px", textAlign: "center" }}>Line</th>
-                                                            <th style={{ borderTop: "2px solid #000", borderBottom: "1px solid #000", fontSize: "12px", fontWeight: "bold", padding: "2px", textAlign: "center" }}>Item Number</th>
+                                                            <th style={{ borderTop: "2px solid #000", borderBottom: "1px solid #000", fontSize: "12px", fontWeight: "bold", padding: "2px", textAlign: "center" }} >Item Number <span style={{ color: "red" }}>*</span></th>
                                                             <th style={{ borderTop: "2px solid #000", borderBottom: "1px solid #000", fontSize: "12px", fontWeight: "bold", padding: "2px", textAlign: "left" }}>Description</th>
                                                             <th style={{ borderTop: "2px solid #000", borderBottom: "1px solid #000", fontSize: "12px", fontWeight: "bold", padding: "2px", textAlign: "center" }}>Warr</th>
                                                             <th style={{ borderTop: "2px solid #000", borderBottom: "1px solid #000", fontSize: "12px", fontWeight: "bold", padding: "2px", textAlign: "center" }}>Unit</th>
@@ -770,12 +770,16 @@ export default function MaintenanceReport() {
                                                                     />
                                                                 </td>
                                                                 <td style={{ border: "none", fontSize: "12px", padding: "4px 2px", textAlign: "center" }}>
+
                                                                     <input
                                                                         type="text"
                                                                         value={item.item_number}
                                                                         onChange={(e) => handleLineItemChange(index, "item_number", e.target.value)}
                                                                         style={{ width: "80px", border: "1px solid #ccc", padding: "2px", fontSize: "12px", textAlign: "center", backgroundColor: "#f1f4ff" }}
                                                                     />
+                                                                    {fieldErrors.item_number && (
+                                                                        <div style={{ fontSize: "10px", color: "red", marginTop: "2px" }}>{fieldErrors.item_number}</div>
+                                                                    )}
                                                                 </td>
                                                                 <td style={{ border: "none", fontSize: "12px", padding: "4px 2px", textAlign: "left" }}>
                                                                     <input
@@ -995,20 +999,20 @@ export default function MaintenanceReport() {
                                     </Button>
 
 
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => navigate("/reports/maintenance")}
-                                    disabled={isSubmitting}
-                                    className="ml-2"
-                                >
-                                    Cancel
-                                </Button>
-                        </div>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => navigate("/reports/maintenance")}
+                                        disabled={isSubmitting}
+                                        className="ml-2"
+                                    >
+                                        Cancel
+                                    </Button>
+                                </div>
                             </form>
-            </div>
+                        </div>
                     )}
-        </div >
+                </div >
             </div >
         </>
     );

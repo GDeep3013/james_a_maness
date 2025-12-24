@@ -16,6 +16,7 @@ interface ServiceReminderData {
     watchers?: number[];
 
     next_due_date?: string;
+    next_due_meter?: string;
 }
 
 export const serviceReminderService = {
@@ -74,6 +75,9 @@ export const serviceReminderService = {
         }
         if (data.next_due_date !== undefined) {
             formData.append('next_due_date', data.next_due_date || '');
+        }
+        if (data.next_due_meter !== undefined) {
+            formData.append('next_due_meter', data.next_due_meter || '');
         }
         if (data.watchers && data.watchers.length > 0) {
             data.watchers.forEach((watcherId) => {
@@ -138,6 +142,10 @@ export const serviceReminderService = {
         if (data.next_due_date !== undefined) {
             formData.append('next_due_date', data.next_due_date || '');
         }
+        if (data.next_due_meter !== undefined) {
+            formData.append('next_due_meter', data.next_due_meter || '');
+        }
+
         if (data.watchers !== undefined) {
             if (data.watchers.length > 0) {
                 data.watchers.forEach((watcherId) => {
