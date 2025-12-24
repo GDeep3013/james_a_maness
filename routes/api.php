@@ -102,6 +102,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::apiResource('work-orders', WorkOrderController::class);
     Route::get('/work-orders/{id}/edit', [WorkOrderController::class, 'edit'])->where('id', '[0-9]+');
+    Route::get('/work-orders-statistics', [WorkOrderController::class, 'getStatistics']);
 
     Route::apiResource('issues', IssueController::class);
     Route::get('/issues/{id}/edit', [IssueController::class, 'edit'])->where('id', '[0-9]+');

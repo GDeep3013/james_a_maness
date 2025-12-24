@@ -489,4 +489,31 @@ class WorkOrderController extends Controller
             ], 500);
         }
     }
+
+    public function getStatistics()
+    {
+        try {
+            $totalWorkOrders = WorkOrder::count();
+            $openCount = WorkOrder::where('status', 'Open')->count();
+            $inProgressCount = WorkOrder::where('status', 'In Progress')->count();
+            $completedCount = WorkOrder::where('status', 'Completed')->count();
+
+            return response()->json([
+                'status' => true,
+                'data' => [
+                    'total' => $totalWorkOrders,
+                    'open' => $openCount,
+                    'in_progress' => $inProgressCount,
+                    'completed' => $completedCount,
+                ]
+            ]);
+        } catch (\Exception $e) {
+            Log::error("Work order statistics error: " . $e->getMessage());
+            return response()->json([
+                'status' => false,
+                'message' => 'Failed to fetch work order statistics',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 }
