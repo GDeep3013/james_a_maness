@@ -53,7 +53,7 @@ export default function CreateServiceReminder() {
     const { id } = useParams<{ id?: string }>();
     const isEditMode = !!id;
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [generalError, setGeneralError] = useState<string>("");
     const [vehicles, setVehicles] = useState<Array<Vehicle & { current_mileage?: string }>>([]);
@@ -336,13 +336,13 @@ export default function CreateServiceReminder() {
     const handleDateTimeChange = (name: string) => (selectedDates: Date[]) => {
         if (selectedDates && selectedDates.length > 0) {
             const date = selectedDates[0];
-            const formattedDate = date.toISOString().split('T')[0];
+            const formattedDate = date.toLocaleDateString('en-CA');
+            console.log(date, formattedDate)
             handleInputChange(name, formattedDate);
         } else {
             handleInputChange(name, "");
         }
     };
-
 
 
 
@@ -411,8 +411,6 @@ export default function CreateServiceReminder() {
                 next_due_date: formData.next_due_date || undefined,
                 next_due_meter: nextDueMeter,
             };
-            console.log(reminderData)
-
             const response = isEditMode && id
                 ? await serviceReminderService.update(parseInt(id), reminderData)
                 : await serviceReminderService.create(reminderData);
@@ -524,7 +522,7 @@ export default function CreateServiceReminder() {
                     <span className="cursor-help">
                         <InfoIcon className="w-4 h-4 text-gray-400" />
                     </span>
-                )}
+                )} <span className="text-error-500">*</span>
             </Label>
             <div className="flex gap-2">
                 <div className="flex-1">
@@ -579,7 +577,7 @@ export default function CreateServiceReminder() {
             <div className="flex flex-col lg:flex-row gap-6 justify-center max-w-5xl mx-auto">
                 <form onSubmit={handleSubmit}>
                     <div className="flex-1">
-                        {isLoading ? (
+                        {isEditMode && isLoading ? (
                             <div className="flex items-center justify-center py-12">
                                 <div className="text-center">
                                     <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-brand-500"></div>
@@ -700,7 +698,8 @@ export default function CreateServiceReminder() {
                                                     Primary Meter Due Soon Threshold
                                                     {/* <span className="cursor-help">
                             <InfoIcon className="w-4 h-4 text-gray-400" />
-                          </span> */}
+                          </span> */}<span className="text-error-500">*</span>
+
                                                 </Label>
                                                 {/* <Input
                                                     type="number"

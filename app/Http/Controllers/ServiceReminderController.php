@@ -137,13 +137,12 @@ class ServiceReminderController extends Controller
             if ($manuallySet) {
 
                 if ($request->has('next_due_date')) {
-                $serviceReminder->next_due_date = $request->next_due_date;
+                    $serviceReminder->next_due_date = $request->next_due_date;
                 }
 
                 if ($request->has('next_due_meter')) {
                     $serviceReminder->next_due_meter = $request->next_due_meter;
                 }
-
             } else {
                 $serviceReminder->next_due_date = $this->calculateNextDueDate(
                     $request->time_interval_value,
@@ -272,7 +271,7 @@ class ServiceReminderController extends Controller
         }
 
         $serviceReminder = ServiceReminder::find($id);
-        // return $request->all();
+
         // die($serviceReminder);
         if (!$serviceReminder) {
             return response()->json([
@@ -376,11 +375,12 @@ class ServiceReminderController extends Controller
 
             $manuallySet = $serviceReminder->manually_set_next_reminder;
             $intervalChanged = $request->has('time_interval_value') || $request->has('time_interval_unit') ||
-                              $request->has('primary_meter_interval_value') || $request->has('primary_meter_interval_unit');
+                $request->has('primary_meter_interval_value') || $request->has('primary_meter_interval_unit');
             $completedChanged = $request->has('last_completed_date') || $request->has('last_completed_meter');
             $manuallySetChanged = $request->has('manually_set_next_reminder');
-
-            if ($manuallySet && !$manuallySetChanged && !$intervalChanged && !$completedChanged) {
+            // return $request->all();
+            if ($manuallySet) {
+                // return $request->has('next_due_date');
                 if ($request->has('next_due_date')) {
 
                     $serviceReminder->next_due_date = $request->next_due_date;
@@ -553,4 +553,3 @@ class ServiceReminderController extends Controller
         return (string) $nextDueMeter;
     }
 }
-
