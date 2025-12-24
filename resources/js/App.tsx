@@ -29,6 +29,7 @@ import AddVehicle from "./pages/Vehicles/AddVehicle";
 import EditVehicle from "./pages/Vehicles/EditVehicle";
 import CreateWorkOrder from "./pages/WorkOrders/CreateWorkOrder";
 import WorkOrdersList from "./pages/WorkOrders/WorkOrdersList";
+import WorkOrderDetails from "./pages/WorkOrders/WorkOrderDetails";
 import ServiceTasksList from "./pages/ServiceTasks/ServiceTasksList";
 import CreateServiceTask from "./pages/ServiceTasks/CreateServiceTask";
 import ViewServiceTask from "./pages/ServiceTasks/ViewServiceTask";
@@ -287,10 +288,18 @@ export default function App() {
                             }
                         />
                         <Route
-                            path="/work-orders/:id"
+                            path="/work-orders/:id/edit"
                             element={
                                 <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
                                     <CreateWorkOrder />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/work-orders/:id"
+                            element={
+                                <ProtectedRoute requiredRoles={["Admin", "Manager"]}>
+                                    <WorkOrderDetails />
                                 </ProtectedRoute>
                             }
                         />

@@ -129,7 +129,7 @@ export default function WorkOrdersList() {
     };
 
     const handleEdit = (id: number) => {
-        navigate(`/work-orders/${id}`);
+        navigate(`/work-orders/${id}/edit`);
     };
 
     const handleView = (id: number) => {
