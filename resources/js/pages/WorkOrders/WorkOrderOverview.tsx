@@ -77,36 +77,31 @@ export default function WorkOrderOverview() {
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       <div className="bg-white border border-gray-200 rounded-xl p-6 flex flex-col">
         <span className="text-base font-medium text-black mb-2">Total Work Orders</span>
-        <span className="text-[40px] font-medium text-[#1D2939]">
+        <span className="text-[30px] font-medium text-[#1D2939]">
           {statistics.total}
         </span>
-        <span className="mt-2 text-sm text-[#595959]">
-          Overall work orders
-        </span>
+     
       </div>
 
       <div className="bg-white border border-gray-200 rounded-xl p-6 flex flex-col">
         <span className="text-base font-medium text-black mb-2">Open</span>
-        <span className="text-[40px] font-medium text-[#155DFC]">
+        <span className="text-[30px] font-medium text-[#155DFC]">
           {statistics.open}
         </span>
-        <span className="mt-2 text-sm text-[#595959]">Pending work</span>
       </div>
 
       <div className="bg-white border border-gray-200 rounded-xl p-6 flex flex-col">
         <span className="text-base font-medium text-black mb-2">In Progress</span>
-        <span className="text-[40px] font-medium text-[#D08700]">
+        <span className="text-[30px] font-medium text-[#D08700]">
           {statistics.inProgress}
         </span>
-        <span className="mt-2 text-sm text-[#595959]">Currently active</span>
       </div>
 
       <div className="bg-white border border-gray-200 rounded-xl p-6 flex flex-col">
         <span className="text-base font-medium text-black mb-2">Completed</span>
-        <span className="text-[40px] font-medium text-[#00A63E]">
+        <span className="text-[30px] font-medium text-[#00A63E]">
           {statistics.completed}
         </span>
-        <span className="mt-2 text-sm text-[#595959]">Finished work</span>
       </div>
     </div>
   );
