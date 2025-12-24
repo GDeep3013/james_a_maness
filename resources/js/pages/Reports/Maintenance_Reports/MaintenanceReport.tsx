@@ -175,8 +175,6 @@ export default function MaintenanceReport() {
             fetchMaintenanceRecord(parseInt(id));
         }
     }, [isEditMode, id, fetchMaintenanceRecord]);
-
-
     useEffect(() => {
         calculateTotals(lineItems);
     }, [lineItems]);
@@ -348,9 +346,19 @@ export default function MaintenanceReport() {
         e.target.style.backgroundColor = "#f1f4ff";
     };
 
+    const scrollToTop = () => {
+        window.scrollTo(0, 0);
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+        const messageEl = document.getElementById('message-container');
+        if (messageEl) {
+            messageEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        setTimeout(() => scrollToTop(), 100);
         setGeneralError("");
         setSuccessMessage("");
 
@@ -452,12 +460,12 @@ export default function MaintenanceReport() {
                 description="Manage maintenance reports"
             />
 
-            <PageBreadcrumb pageTitle={[ 
+            <PageBreadcrumb pageTitle={[
                 { name: "Maintenance Reports", to: "/reports/maintenance" },
                 { name: isEditMode ? "Edit" : "Create", to: isEditMode ? `/reports/maintenance/${id}` : "/reports/maintenance/create" },
             ]} />
 
-            <div className="space-y-6">
+            <div className="space-y-6" id= 'message-container'>
                 <div className="page-actions flex flex-wrap items-center justify-between gap-3 mb-6">
                     <h2 className="text-base md:text-xl font-semibold text-gray-800 dark:text-white/90">
                         {isEditMode ? "Edit Maintenance Report" : "Create Maintenance Report"}
@@ -922,7 +930,7 @@ export default function MaintenanceReport() {
                                                                     <tbody>
                                                                         <tr>
                                                                             <td style={{ fontSize: "12px", textAlign: "right", padding: "2px 5px" }}>Sub-Total</td>
-                                                                            <td style={{ fontSize: "12px", textAlign: "right", padding: "2px 0" }}>{formData.sub_total || "0.00"}</td>
+                                                                            <td style={{ fontSize: "12px", textAlign: "right", padding: "2px 0" }}>$ {formData.sub_total || "0.00"}</td>
                                                                         </tr>
                                                                         <tr>
                                                                             <td style={{ fontSize: "12px", textAlign: "right", padding: "2px 5px", borderBottom: "1px solid #000" }}>
@@ -945,12 +953,12 @@ export default function MaintenanceReport() {
                                                                         </tr>
                                                                         <tr>
                                                                             <td style={{ fontSize: "12px", textAlign: "right", padding: "2px 5px", fontWeight: "bold" }}>Total</td>
-                                                                            <td style={{ fontSize: "12px", textAlign: "right", padding: "2px 0", fontWeight: "bold" }}>{formData.total_value || "0.00"}</td>
+                                                                            <td style={{ fontSize: "12px", textAlign: "right", padding: "2px 0", fontWeight: "bold" }}>$ {formData.total_value || "0.00"}</td>
                                                                         </tr>
                                                                         <tr>
-                                                                            <td colSpan={2} style={{ fontSize: "12px", textAlign: "right", padding: "2px 0" }}>
-                                                                                {formData.payment_method} {formData.total_value || "0.00"}
-                                                                            </td>
+                                                                            <td style={{ fontSize: "12px", textAlign: "right", padding: "2px 5px" }}>{formData.payment_method}</td>
+                                                                            <td style={{ fontSize: "12px", textAlign: "right", padding: "2px 0" }}>{formData.payment_method && ('$ ' + formData.total_value || "0.00")}</td>
+
                                                                         </tr>
                                                                     </tbody>
                                                                 </table>
@@ -987,22 +995,21 @@ export default function MaintenanceReport() {
                                     </Button>
 
 
-
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => navigate("/reports/maintenance")}
-                                        disabled={isSubmitting}
-                                        className="ml-2"
-                                    >
-                                        Cancel
-                                    </Button>
-                                </div>
-                            </form>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => navigate("/reports/maintenance")}
+                                    disabled={isSubmitting}
+                                    className="ml-2"
+                                >
+                                    Cancel
+                                </Button>
                         </div>
-                    )}
-                </div>
+                            </form>
             </div>
+                    )}
+        </div >
+            </div >
         </>
     );
 }

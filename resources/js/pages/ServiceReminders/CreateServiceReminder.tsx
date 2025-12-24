@@ -343,6 +343,9 @@ export default function CreateServiceReminder() {
         }
     };
 
+
+
+
     const validateForm = (): boolean => {
         const newErrors: Record<string, string> = {};
 
@@ -408,6 +411,7 @@ export default function CreateServiceReminder() {
                 next_due_date: formData.next_due_date || undefined,
                 next_due_meter: nextDueMeter,
             };
+            console.log(reminderData)
 
             const response = isEditMode && id
                 ? await serviceReminderService.update(parseInt(id), reminderData)
@@ -756,11 +760,20 @@ export default function CreateServiceReminder() {
                                                 <div>
                                                     <Label htmlFor="next_due_date">Next Due Date</Label>
                                                     <DateTimePicker
+                                                        // id="next_due_date"
+                                                        // label=""
+                                                        // placeholder="Select date"
+                                                        // onChange={handleDateTimeChange("next_due_date")}
+
+                                                        // defaultDate={formData.next_due_date ? new Date(formData.next_due_date) : undefined}
+                                                        // enableTime={false}
+                                                        // dateFormat="m/d/Y"
+
                                                         id="next_due_date"
                                                         label=""
                                                         placeholder="Select date"
                                                         onChange={handleDateTimeChange("next_due_date")}
-                                                        defaultDate={formData.next_due_date || undefined}
+                                                        defaultDate={formData.next_due_date ? new Date(formData.next_due_date) : undefined}
                                                         enableTime={false}
                                                         dateFormat="m/d/Y"
                                                     />

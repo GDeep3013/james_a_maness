@@ -57,7 +57,7 @@ export default function MonthlyMaintenanceReport() {
       try {
         const response = await vehicleService.getAll();
         const data = response.data as VehiclesResponse;
-        
+
         if (data.status && data.vehical) {
           if (Array.isArray(data.vehical)) {
             setVehicles(data.vehical);
@@ -88,7 +88,7 @@ export default function MonthlyMaintenanceReport() {
         const report = data.mmrReport;
         const dateValue = report.date ? new Date(report.date).toISOString().split('T')[0].substring(0, 7) : "";
         const completedDateValue = report.completed_date ? new Date(report.completed_date).toISOString().split('T')[0] : "";
-        
+
         setFormData({
           date: dateValue,
           domicile_station: report.domicile_station || "",
@@ -128,17 +128,17 @@ export default function MonthlyMaintenanceReport() {
 
   const handleVehicleChange = async (vehicleId: string) => {
     setFormData({ ...formData, vehicle_id: vehicleId });
-    
+
     if (vehicleId) {
       const selectedVehicleData = vehicles.find((v) => v.id === Number(vehicleId));
-      
+
       if (selectedVehicleData?.current_mileage) {
         setFormData({ ...formData, vehicle_id: vehicleId, current_mileage: String(selectedVehicleData.current_mileage) });
       } else {
         try {
           const response = await vehicleService.getById(Number(vehicleId));
           const vehicleData = response.data as { status: boolean; vehicle?: Vehicle };
-          
+
           if (vehicleData.status && vehicleData.vehicle?.current_mileage) {
             setFormData({ ...formData, vehicle_id: vehicleId, current_mileage: String(vehicleData.vehicle.current_mileage) });
           } else {
@@ -223,7 +223,7 @@ export default function MonthlyMaintenanceReport() {
 
       if (response.data?.status === true || response.status === 200 || response.status === 201) {
         setSuccessMessage(isEditMode ? "MMR report updated successfully!" : "MMR report saved successfully!");
-        
+
         if (!isEditMode) {
           setFormData({
             date: "",
@@ -412,27 +412,27 @@ export default function MonthlyMaintenanceReport() {
                         <tr>
                           <td style={{ fontSize: "12px", padding: "8px 20px 8px 8px", verticalAlign: "top", width: "35%" }}>
                             <span style={{ fontWeight: "bold", paddingLeft: "10px", paddingBottom: "5px", fontSize: "14px" }}>Maintenance Record for the Month and Year of:</span>
-                            <input 
-                              type="month" 
+                            <input
+                              type="month"
                               value={formData.date}
                               onChange={(e) => handleInputChange("date", e.target.value)}
-                              style={{ width: "100%", backgroundColor: errors.date ? "#fee" : "#f1f4ff", border: errors.date ? "1px solid #f00" : "1px solid #000", padding: "5px", fontSize: "12px", minHeight: "25px", boxSizing: "border-box", outline: "none" }} 
-                              onFocus={handleInputFocus} 
-                              onBlur={handleInputBlur} 
-                              autoComplete="off" 
+                              style={{ width: "100%", backgroundColor: errors.date ? "#fee" : "#f1f4ff", border: errors.date ? "1px solid #f00" : "1px solid #000", padding: "5px", fontSize: "12px", minHeight: "25px", boxSizing: "border-box", outline: "none" }}
+                              onFocus={handleInputFocus}
+                              onBlur={handleInputBlur}
+                              autoComplete="off"
                             />
                             {errors.date && <div style={{ color: "#f00", fontSize: "11px", paddingTop: "2px" }}>{errors.date}</div>}
                           </td>
                           <td style={{ fontSize: "12px", padding: "8px 5px 8px 20px", verticalAlign: "top", width: "35%" }}>
                             <span style={{ fontWeight: "bold", paddingLeft: "10px", paddingBottom: "5px", fontSize: "14px" }}>Domicile Station/Hub: <span style={{ color: "#f00" }}>*</span></span>
-                            <input 
-                              type="text" 
+                            <input
+                              type="text"
                               value={formData.domicile_station}
                               onChange={(e) => handleInputChange("domicile_station", e.target.value)}
-                              style={{ width: "100%", backgroundColor: errors.domicile_station ? "#fee" : "#f1f4ff", border: errors.domicile_station ? "1px solid #f00" : "1px solid #000", padding: "5px", fontSize: "12px", minHeight: "25px", boxSizing: "border-box", outline: "none" }} 
-                              onFocus={handleInputFocus} 
-                              onBlur={handleInputBlur} 
-                              autoComplete="off" 
+                              style={{ width: "100%", backgroundColor: errors.domicile_station ? "#fee" : "#f1f4ff", border: errors.domicile_station ? "1px solid #f00" : "1px solid #000", padding: "5px", fontSize: "12px", minHeight: "25px", boxSizing: "border-box", outline: "none" }}
+                              onFocus={handleInputFocus}
+                              onBlur={handleInputBlur}
+                              autoComplete="off"
                             />
                             {errors.domicile_station && <div style={{ color: "#f00", fontSize: "11px", paddingTop: "2px" }}>{errors.domicile_station}</div>}
                           </td>
@@ -440,27 +440,27 @@ export default function MonthlyMaintenanceReport() {
                         <tr>
                           <td style={{ fontSize: "12px", padding: "8px 20px 8px 8px", verticalAlign: "top", width: "35%" }}>
                             <span style={{ fontWeight: "bold", paddingLeft: "10px", paddingBottom: "5px", fontSize: "14px" }}>Service Provider Company Name: <span style={{ color: "#f00" }}>*</span></span>
-                            <input 
-                              type="text" 
+                            <input
+                              type="text"
                               value={formData.provider_company_name}
                               onChange={(e) => handleInputChange("provider_company_name", e.target.value)}
-                              style={{ width: "100%", backgroundColor: errors.provider_company_name ? "#fee" : "#f1f4ff", border: errors.provider_company_name ? "1px solid #f00" : "1px solid #000", padding: "5px", fontSize: "12px", minHeight: "25px", boxSizing: "border-box", outline: "none" }} 
-                              onFocus={handleInputFocus} 
-                              onBlur={handleInputBlur} 
-                              autoComplete="off" 
+                              style={{ width: "100%", backgroundColor: errors.provider_company_name ? "#fee" : "#f1f4ff", border: errors.provider_company_name ? "1px solid #f00" : "1px solid #000", padding: "5px", fontSize: "12px", minHeight: "25px", boxSizing: "border-box", outline: "none" }}
+                              onFocus={handleInputFocus}
+                              onBlur={handleInputBlur}
+                              autoComplete="off"
                             />
                             {errors.provider_company_name && <div style={{ color: "#f00", fontSize: "11px", paddingTop: "2px" }}>{errors.provider_company_name}</div>}
                           </td>
                           <td style={{ fontSize: "12px", padding: "8px 5px 8px 20px", verticalAlign: "top", width: "35%" }}>
                             <span style={{ fontWeight: "bold", paddingLeft: "10px", paddingBottom: "5px", fontSize: "14px" }}>Current Mileage* (Odometer Reading)</span>
-                            <input 
-                              type="text" 
+                            <input
+                              type="text"
                               value={formData.current_mileage}
                               onChange={(e) => handleInputChange("current_mileage", e.target.value)}
-                              style={{ width: "100%", backgroundColor: errors.current_mileage ? "#fee" : "#f1f4ff", border: errors.current_mileage ? "1px solid #f00" : "1px solid #000", padding: "5px", fontSize: "12px", minHeight: "25px", boxSizing: "border-box", outline: "none" }} 
-                              onFocus={handleInputFocus} 
-                              onBlur={handleInputBlur} 
-                              autoComplete="off" 
+                              style={{ width: "100%", backgroundColor: errors.current_mileage ? "#fee" : "#f1f4ff", border: errors.current_mileage ? "1px solid #f00" : "1px solid #000", padding: "5px", fontSize: "12px", minHeight: "25px", boxSizing: "border-box", outline: "none" }}
+                              onFocus={handleInputFocus}
+                              onBlur={handleInputBlur}
+                              autoComplete="off"
                             />
                             {errors.current_mileage && <div style={{ color: "#f00", fontSize: "11px", paddingTop: "2px" }}>{errors.current_mileage}</div>}
                           </td>
@@ -468,11 +468,11 @@ export default function MonthlyMaintenanceReport() {
                         <tr>
                           <td style={{ fontSize: "12px", padding: "8px 20px 8px 8px", verticalAlign: "top", width: "35%" }}>
                             <span style={{ fontWeight: "bold", paddingLeft: "10px", paddingBottom: "5px", fontSize: "14px" }}>Vehicle Unit #:</span>
-                            <select 
+                            <select
                               value={formData.vehicle_id}
                               onChange={(e) => handleVehicleChange(e.target.value)}
-                              style={{ width: "100%", backgroundColor: errors.vehicle_id ? "#fee" : "#f1f4ff", border: errors.vehicle_id ? "1px solid #f00" : "1px solid #000", padding: "5px", fontSize: "12px", minHeight: "25px", boxSizing: "border-box", outline: "none" }} 
-                              onFocus={handleInputFocus} 
+                              style={{ width: "100%", backgroundColor: errors.vehicle_id ? "#fee" : "#f1f4ff", border: errors.vehicle_id ? "1px solid #f00" : "1px solid #000", padding: "5px", fontSize: "12px", minHeight: "25px", boxSizing: "border-box", outline: "none" }}
+                              onFocus={handleInputFocus}
                               onBlur={handleInputBlur}
                             >
                               <option value="">Select Vehicle</option>
@@ -508,22 +508,22 @@ export default function MonthlyMaintenanceReport() {
                               <tbody>
                                 <tr>
                                   <td style={{ padding: "0 10px 0 0", fontSize: "12px" }}>
-                                    <input 
-                                      type="radio" 
+                                    <input
+                                      type="radio"
                                       name="preventative_maintenance"
                                       checked={formData.preventative_maintenance === true}
                                       onChange={() => handleInputChange("preventative_maintenance", true)}
-                                      style={{ marginRight: "5px", backgroundColor: "#f1f4ff", width: "23px", height: "23px", border: "1px solid #000", verticalAlign: "middle", accentColor: "#f1f4ff" }} 
+                                      style={{ marginRight: "5px", backgroundColor: "#f1f4ff", width: "23px", height: "23px", border: "1px solid #000", verticalAlign: "middle", accentColor: "#f1f4ff" }}
                                     />
                                     Yes
                                   </td>
                                   <td style={{ padding: "0", fontSize: "12px" }}>
-                                    <input 
-                                      type="radio" 
+                                    <input
+                                      type="radio"
                                       name="preventative_maintenance"
                                       checked={formData.preventative_maintenance === false}
                                       onChange={() => handleInputChange("preventative_maintenance", false)}
-                                      style={{ marginRight: "5px", backgroundColor: "#f1f4ff", width: "23px", height: "23px", border: "1px solid #000", verticalAlign: "middle", accentColor: "#f1f4ff" }} 
+                                      style={{ marginRight: "5px", backgroundColor: "#f1f4ff", width: "23px", height: "23px", border: "1px solid #000", verticalAlign: "middle", accentColor: "#f1f4ff" }}
                                     />
                                     No
                                   </td>
@@ -541,22 +541,22 @@ export default function MonthlyMaintenanceReport() {
                               <tbody>
                                 <tr>
                                   <td style={{ padding: "0 10px 0 0", fontSize: "12px" }}>
-                                    <input 
-                                      type="radio" 
+                                    <input
+                                      type="radio"
                                       name="out_of_service"
                                       checked={formData.out_of_service === true}
                                       onChange={() => handleInputChange("out_of_service", true)}
-                                      style={{ marginRight: "5px", backgroundColor: "#f1f4ff", width: "23px", height: "23px", border: "1px solid #000", verticalAlign: "middle", accentColor: "#f1f4ff" }} 
+                                      style={{ marginRight: "5px", backgroundColor: "#f1f4ff", width: "23px", height: "23px", border: "1px solid #000", verticalAlign: "middle", accentColor: "#f1f4ff" }}
                                     />
                                     Yes
                                   </td>
                                   <td style={{ padding: "0", fontSize: "12px" }}>
-                                    <input 
-                                      type="radio" 
+                                    <input
+                                      type="radio"
                                       name="out_of_service"
                                       checked={formData.out_of_service === false}
                                       onChange={() => handleInputChange("out_of_service", false)}
-                                      style={{ marginRight: "5px", backgroundColor: "#f1f4ff", width: "23px", height: "23px", border: "1px solid #000", verticalAlign: "middle", accentColor: "#f1f4ff" }} 
+                                      style={{ marginRight: "5px", backgroundColor: "#f1f4ff", width: "23px", height: "23px", border: "1px solid #000", verticalAlign: "middle", accentColor: "#f1f4ff" }}
                                     />
                                     No
                                   </td>
@@ -611,7 +611,7 @@ export default function MonthlyMaintenanceReport() {
                     />
                   </td>
                 </tr>
-                
+
 
                 <tr>
                   <td style={{ padding: "20px" }}>
@@ -640,27 +640,27 @@ export default function MonthlyMaintenanceReport() {
                                 <tr>
                                   <td style={{ fontSize: "12px", padding: "8px 20px 8px 8px", verticalAlign: "top", width: "50%" }}>
                                     <span style={{ fontWeight: "bold", paddingLeft: "10px", paddingBottom: "5px", fontSize: "14px" }}>Signature of Authorized Officer or Business Contact:</span>
-                                    <input 
-                                      type="text" 
+                                    <input
+                                      type="text"
                                       value={formData.signature}
                                       onChange={(e) => handleInputChange("signature", e.target.value)}
-                                      style={{ width: "100%", border: errors.signature ? "1px solid #f00" : "1px solid #000", padding: "5px", fontSize: "12px", minHeight: "25px", boxSizing: "border-box", outline: 'none', backgroundColor: errors.signature ? '#fee' : '#f1f4ff' }} 
-                                      onFocus={handleInputFocus} 
-                                      onBlur={handleInputBlur} 
-                                      autoComplete="off" 
+                                      style={{ width: "100%", border: errors.signature ? "1px solid #f00" : "1px solid #000", padding: "5px", fontSize: "12px", minHeight: "25px", boxSizing: "border-box", outline: 'none', backgroundColor: errors.signature ? '#fee' : '#f1f4ff' }}
+                                      onFocus={handleInputFocus}
+                                      onBlur={handleInputBlur}
+                                      autoComplete="off"
                                     />
                                     {errors.signature && <div style={{ color: "#f00", fontSize: "11px", paddingTop: "2px" }}>{errors.signature}</div>}
                                   </td>
                                   <td style={{ fontSize: "12px", padding: "8px 8px 8px 20px", verticalAlign: "top", width: "50%" }}>
                                     <span style={{ fontWeight: "bold", paddingLeft: "10px", paddingBottom: "5px", fontSize: "14px" }}>Date Completed: <span style={{ color: "#f00" }}>*</span></span>
-                                    <input 
-                                      type="date" 
+                                    <input
+                                      type="date"
                                       value={formData.completed_date}
                                       onChange={(e) => handleInputChange("completed_date", e.target.value)}
-                                      style={{ width: "100%", border: errors.completed_date ? "1px solid #f00" : "1px solid #000", padding: "5px", fontSize: "12px", minHeight: "25px", boxSizing: "border-box", outline: 'none', backgroundColor: errors.completed_date ? '#fee' : '#f1f4ff' }} 
-                                      onFocus={handleInputFocus} 
-                                      onBlur={handleInputBlur} 
-                                      autoComplete="off" 
+                                      style={{ width: "100%", border: errors.completed_date ? "1px solid #f00" : "1px solid #000", padding: "5px", fontSize: "12px", minHeight: "25px", boxSizing: "border-box", outline: 'none', backgroundColor: errors.completed_date ? '#fee' : '#f1f4ff' }}
+                                      onFocus={handleInputFocus}
+                                      onBlur={handleInputBlur}
+                                      autoComplete="off"
                                     />
                                     {errors.completed_date && <div style={{ color: "#f00", fontSize: "11px", paddingTop: "2px" }}>{errors.completed_date}</div>}
                                   </td>
@@ -703,9 +703,6 @@ export default function MonthlyMaintenanceReport() {
               >
                 {isSubmitting ? (isEditMode ? "Updating..." : "Saving...") : (isEditMode ? "Update MMR Report" : "Save MMR Report")}
               </Button>
-
-
-            
               <Button
                 variant="outline"
                 size="sm"

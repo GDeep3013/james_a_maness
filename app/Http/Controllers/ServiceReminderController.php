@@ -21,7 +21,7 @@ class ServiceReminderController extends Controller
             'vehicle:id,vehicle_name,make,model,year,license_plate,current_mileage',
             'user:id,name'
         ])->orderBy('id', 'desc');
-        
+
         $searchTerm = $request->search;
 
         if ($request->has('status') && !empty($request->status)) {
@@ -112,7 +112,7 @@ class ServiceReminderController extends Controller
             $serviceReminder = new ServiceReminder;
             $serviceReminder->user_id = Auth::id();
             $serviceReminder->vehicle_id = $request->vehicle_id;
-            
+
             if ($request->has('service_task_ids') && is_array($request->service_task_ids)) {
                 $serviceReminder->service_task_ids = array_map('intval', $request->service_task_ids);
             }
@@ -125,18 +125,18 @@ class ServiceReminderController extends Controller
             $serviceReminder->primary_meter_due_soon_threshold_value = $request->primary_meter_due_soon_threshold_value ?? null;
             $serviceReminder->manually_set_next_reminder = $this->convertToBoolean($request->manually_set_next_reminder, false);
             $serviceReminder->notifications_enabled = $this->convertToBoolean($request->notifications_enabled, true);
-            
+
             if ($request->has('watchers') && is_array($request->watchers)) {
                 $serviceReminder->watchers = $request->watchers;
             } else {
                 $serviceReminder->watchers = null;
             }
-            
+
             $manuallySet = $this->convertToBoolean($request->manually_set_next_reminder, false);
-            
+
             if ($manuallySet) {
 
-                if ($request->has('next_due_date')) {   
+                if ($request->has('next_due_date')) {
                 $serviceReminder->next_due_date = $request->next_due_date;
                 }
 
@@ -157,7 +157,7 @@ class ServiceReminderController extends Controller
                     null
                 );
             }
-            
+
             $serviceReminder->status = $request->status ?? 'active';
 
             if ($serviceReminder->save()) {
@@ -213,7 +213,7 @@ class ServiceReminderController extends Controller
             } else {
                 $serviceReminder->service_tasks = collect([]);
             }
-            
+
             return response()->json([
                 'status' => true,
                 'message' => 'Service reminder retrieved successfully',
@@ -248,7 +248,7 @@ class ServiceReminderController extends Controller
             } else {
                 $serviceReminder->service_tasks = collect([]);
             }
-            
+
             return response()->json([
                 'status' => true,
                 'message' => 'Service reminder data',
@@ -272,6 +272,8 @@ class ServiceReminderController extends Controller
         }
 
         $serviceReminder = ServiceReminder::find($id);
+        // return $request->all();
+        // die($serviceReminder);
         if (!$serviceReminder) {
             return response()->json([
                 'status' => false,
@@ -364,22 +366,23 @@ class ServiceReminderController extends Controller
                     $serviceReminder->watchers = null;
                 }
             }
-            
+
             if ($request->has('last_completed_date')) {
                 $serviceReminder->last_completed_date = $request->last_completed_date;
             }
             if ($request->has('last_completed_meter')) {
                 $serviceReminder->last_completed_meter = $request->last_completed_meter;
             }
-            
+
             $manuallySet = $serviceReminder->manually_set_next_reminder;
-            $intervalChanged = $request->has('time_interval_value') || $request->has('time_interval_unit') || 
+            $intervalChanged = $request->has('time_interval_value') || $request->has('time_interval_unit') ||
                               $request->has('primary_meter_interval_value') || $request->has('primary_meter_interval_unit');
             $completedChanged = $request->has('last_completed_date') || $request->has('last_completed_meter');
             $manuallySetChanged = $request->has('manually_set_next_reminder');
-            
+
             if ($manuallySet && !$manuallySetChanged && !$intervalChanged && !$completedChanged) {
                 if ($request->has('next_due_date')) {
+
                     $serviceReminder->next_due_date = $request->next_due_date;
                 }
                 if ($request->has('next_due_meter')) {
@@ -388,7 +391,7 @@ class ServiceReminderController extends Controller
             } else {
                 $timeIntervalValue = $request->has('time_interval_value') ? $request->time_interval_value : $serviceReminder->time_interval_value;
                 $timeIntervalUnit = $request->has('time_interval_unit') ? $request->time_interval_unit : $serviceReminder->time_interval_unit;
-                
+
                 if ($timeIntervalValue && $timeIntervalUnit) {
                     $serviceReminder->next_due_date = $this->calculateNextDueDate(
                         $timeIntervalValue,
@@ -396,11 +399,11 @@ class ServiceReminderController extends Controller
                         $serviceReminder->last_completed_date
                     );
                 }
-                
+
                 $vehicleId = $request->has('vehicle_id') ? $request->vehicle_id : $serviceReminder->vehicle_id;
                 $meterIntervalValue = $request->has('primary_meter_interval_value') ? $request->primary_meter_interval_value : $serviceReminder->primary_meter_interval_value;
                 $meterIntervalUnit = $request->has('primary_meter_interval_unit') ? $request->primary_meter_interval_unit : $serviceReminder->primary_meter_interval_unit;
-                
+
                 if ($vehicleId && $meterIntervalValue && $meterIntervalUnit) {
                     $serviceReminder->next_due_meter = $this->calculateNextDueMeter(
                         $vehicleId,
@@ -536,8 +539,8 @@ class ServiceReminderController extends Controller
             return null;
         }
 
-        $baseMeter = $lastCompletedMeter 
-            ? (float) $lastCompletedMeter 
+        $baseMeter = $lastCompletedMeter
+            ? (float) $lastCompletedMeter
             : ($vehicle->current_mileage ? (float) $vehicle->current_mileage : 0);
 
         if ($baseMeter <= 0) {

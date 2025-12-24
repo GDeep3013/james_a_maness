@@ -329,8 +329,19 @@ export default function FuelReportCreate() {
         e.target.style.backgroundColor = "#f1f4ff";
     };
 
+      const scrollToTop = () => {
+        window.scrollTo(0, 0);
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+        const messageEl = document.getElementById('fuel-container');
+        if (messageEl) {
+            messageEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        setTimeout(() => scrollToTop(), 100);
         setGeneralError("");
         setSuccessMessage("");
 
@@ -432,7 +443,7 @@ export default function FuelReportCreate() {
                 description="Manage fuel reports"
             />
 
-            <div className="space-y-6">
+            <div className="space-y-6" id= 'fuel-container'>
                 <div className="page-actions flex flex-wrap items-center justify-between gap-3 mb-6">
                     <h2 className="text-base md:text-xl font-semibold text-gray-800 dark:text-white/90">
                         {isEditMode ? "Edit Fuel Report" : "Create Fuel Report"}
@@ -760,7 +771,7 @@ export default function FuelReportCreate() {
                                                                 </td> */}
                                                                 <td style={{ border: "none", fontSize: "12px", padding: "4px 2px", textAlign: "center" }}>
                                                                     <input
-                                                                        type="text"
+                                                                        type="number"
                                                                         value={item.meter_reading}
                                                                         onChange={(e) => handleLineItemChange(index, "meter_reading", e.target.value)}
                                                                         style={{ width: "75%", border: "1px solid #ccc", padding: "2px", fontSize: "12px", textAlign: "center", backgroundColor: "#f1f4ff" }}
@@ -905,7 +916,7 @@ export default function FuelReportCreate() {
                                                                     <tbody>
                                                                         <tr>
                                                                             <td style={{ fontSize: "12px", textAlign: "right", padding: "2px 5px" }}>Sub-Total</td>
-                                                                            <td style={{ fontSize: "12px", textAlign: "right", padding: "2px 0" }}>${formData.sub_total || "0.00"}</td>
+                                                                            <td style={{ fontSize: "12px", textAlign: "right", padding: "2px 0" }}>$ {formData.sub_total || "0.00"}</td>
                                                                         </tr>
                                                                         <tr>
                                                                             <td style={{ fontSize: "12px", textAlign: "right", padding: "2px 5px", borderBottom: "1px solid #000" }}>
@@ -928,12 +939,14 @@ export default function FuelReportCreate() {
                                                                         </tr>
                                                                         <tr>
                                                                             <td style={{ fontSize: "12px", textAlign: "right", padding: "2px 5px", fontWeight: "bold" }}>Total</td>
-                                                                            <td style={{ fontSize: "12px", textAlign: "right", padding: "2px 0", fontWeight: "bold" }}>${formData.total_value || "0.00"}</td>
+                                                                            <td style={{ fontSize: "12px", textAlign: "right", padding: "2px 0", fontWeight: "bold" }}>$ {formData.total_value || "0.00"}</td>
                                                                         </tr>
-                                                                        <tr>
-                                                                            <td colSpan={2} style={{ fontSize: "12px", textAlign: "right", padding: "2px 0" }}>
-                                                                                {formData.payment_method} {formData.total_value || "0.00"}
-                                                                            </td>
+                                                                            <tr>
+                                                                                 <td style={{ fontSize: "12px", textAlign: "right", padding: "2px 5px" }}>{formData.payment_method}</td>
+                                                                                <td style={{ fontSize: "12px", textAlign: "right", padding: "2px 0"}}> {formData.payment_method && ('$ '+formData.total_value || "0.00")}</td>
+
+
+
                                                                         </tr>
                                                                     </tbody>
                                                                 </table>
