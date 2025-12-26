@@ -4,6 +4,7 @@ import PageMeta from "../../../components/common/PageMeta";
 import Button from "../../../components/ui/button/Button";
 import { vehicleService } from "../../../services/vehicleService";
 import { vendorService } from "../../../services/vendorService";
+import { settingsService } from "../../../services/settingsService";
 import { maintenanceRecordService } from "../../../services/maintenanceRecordService";
 import DatePicker from "../../../components/form/date-picker";
 import { workOrderService } from "../../../services/workOrderService";
@@ -37,6 +38,22 @@ interface LineItem {
     list: number;
     net: number;
     extended: number;
+}
+interface Settings {
+    id?: number;
+    title?: string;
+    store_name?: string;
+    address?: string;
+    state?: string;
+    city?: string;
+    country?: string;
+    post_code?: string;
+    primary_email?: string;
+    phone?: string;
+    logo_image?: string;
+    favicon?: string;
+    splash_logo?: string;
+    footer_text?: string;
 }
 
 interface WorkOrderPart {
@@ -75,6 +92,7 @@ export default function MaintenanceReport() {
 
     const [vehicles, setVehicles] = useState<Vehicle[]>([]);
     const [vendors, setVendors] = useState<Vendor[]>([]);
+    const [settings, setSettings] = useState<Settings | null>(null);
     const [selectedVendor, setSelectedVendor] = useState<Vendor | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -111,6 +129,7 @@ export default function MaintenanceReport() {
             const [vehiclesRes, vendorsRes] = await Promise.all([
                 vehicleService.getAll({ page: 1 }),
                 vendorService.getAll({ page: 1 }),
+
             ]);
 
             if (vehiclesRes.data?.status && vehiclesRes.data?.vehical?.data) {
@@ -120,8 +139,26 @@ export default function MaintenanceReport() {
             if (vendorsRes.data?.status && vendorsRes.data?.vendor?.data) {
                 setVendors(vendorsRes.data.vendor.data);
             }
+
         } catch {
             setGeneralError("Failed to load data");
+        }
+    }, []);
+
+    const getSettingFunction = useCallback(async () => {
+        try {
+            const [settingsRes] = await Promise.all([
+                settingsService.get(),
+
+            ]);
+            console.log(settingsRes);
+            if (settingsRes.data?.status && settingsRes.data?.data) {
+                setSettings(settingsRes.data.data);
+            }
+
+
+        } catch {
+            setGeneralError("Failed to load logo img");
         }
     }, []);
 
@@ -169,6 +206,9 @@ export default function MaintenanceReport() {
     useEffect(() => {
         fetchDropdownData();
     }, [fetchDropdownData]);
+    useEffect(() => {
+        getSettingFunction();
+    }, []);
 
     useEffect(() => {
         if (isEditMode && id) {
@@ -178,7 +218,7 @@ export default function MaintenanceReport() {
     useEffect(() => {
         calculateTotals(lineItems);
     }, [lineItems]);
-
+    console.log()
     const fetchFilteredWorkOrders = useCallback(async () => {
         try {
             const [workOrdersRes, servicesRes] = await Promise.all([
@@ -453,6 +493,8 @@ export default function MaintenanceReport() {
         setFieldErrors(errors);
         return Object.keys(errors).length === 0;
     };
+    console.log(settings, "settigns")
+
     return (
         <>
             <PageMeta
@@ -498,11 +540,14 @@ export default function MaintenanceReport() {
                                                                     <tbody>
                                                                         <tr>
                                                                             <td>
-                                                                                <img src="/images/pdf-logo.png" alt="Logo" style={{ maxWidth: "200px", height: "auto", marginBottom: "5px" }} />
-                                                                                <div style={{ fontSize: "14px", fontWeight: "bold", marginTop: "10px", letterSpacing: "2px" }}>DEDICATED TO THE PROFESSIONAL</div>
+                                                                                <img src={settings?.logo_image} alt="Logo" style={{ width: "100%",maxWidth: "100px", height: "auto", marginBottom: "5px" }} />
+                                                                                <div style={{ fontSize: "14px", fontWeight: "bold", marginTop: "10px", letterSpacing: "2px" }}>{settings?.title || "DEDICATED TO THE PROFESSIONAL"}</div>
                                                                                 <div style={{ fontSize: "11px", marginTop: "3px", lineHeight: "1.4" }}>
-                                                                                    <div>Store 464, 11448 AIRLINE HIGHWAY,</div>
-                                                                                    <div>BATON ROUGE, LA 70816 <span style={{ marginLeft: "10px" }}>(225) 292-8930</span></div>
+                                                                                        <div>{settings?.store_name},{settings?.address},{settings?.city}</div>
+                                                                                        <div>{settings?.primary_email}
+                                                                                        <span style={{ marginLeft: "10px" }}>
+                                                                                            {settings?.phone || "(225) 292-8930"}
+                                                                                        </span></div>
                                                                                 </div>
                                                                             </td>
                                                                         </tr>
