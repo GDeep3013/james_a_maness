@@ -1,5 +1,6 @@
 /node_modules
 /public/build
+/public/settings-images/
 /public/vehicle-documents
 /storage/*.key
 /storage/logs/*.log
