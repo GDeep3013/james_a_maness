@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHeader,
-  TableRow,
+    Table,
+    TableBody,
+    TableCell,
+    TableHeader,
+    TableRow,
 } from "../../components/ui/table";
 import Badge from "../../components/ui/badge/Badge";
 import Input from "../../components/form/input/InputField";
@@ -21,479 +21,481 @@ import { formatTypeModel, getPriorityColor } from "../../utilites";
 import PageBreadcrumb from "../../components/common/PageBreadCrumb";
 
 interface Issue {
-  id: number;
-  vehicle_id?: number;
-  vehicle?: {
-    vehicle_name?: string;
-  };
-  status?: string;
-  priority?: string;
-  summary?: string;
-  source?: string;
-  issue_date?: string;
-  reported_date?: string;
-  assigned_to?: {
-    id?: number;
-    first_name?: string;
-    last_name?: string;
-  };
-  labels?: string | string[];
-  created_at?: string;
+    id: number;
+    vehicle_id?: number;
+    vehicle?: {
+        vehicle_name?: string;
+    };
+    status?: string;
+    priority?: string;
+    summary?: string;
+    source?: string;
+    issue_date?: string;
+    reported_date?: string;
+    assigned_to?: {
+        id?: number;
+        first_name?: string;
+        last_name?: string;
+    };
+    labels?: string | string[];
+    created_at?: string;
 }
 
 interface IssuesResponse {
-  status: boolean;
-  issues?: {
-    data: Issue[];
-    current_page: number;
-    last_page: number;
-    per_page: number;
-    total: number;
-  };
+    status: boolean;
+    issues?: {
+        data: Issue[];
+        current_page: number;
+        last_page: number;
+        per_page: number;
+        total: number;
+    };
 }
 
 interface Contact {
-  id: number;
-  first_name: string;
-  last_name?: string;
+    id: number;
+    first_name: string;
+    last_name?: string;
 }
 
 export default function IssuesList() {
-  const navigate = useNavigate();
-  const [issues, setIssues] = useState<Issue[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string>("");
-  const [searchTerm, setSearchTerm] = useState("");
-  const [activeTab, setActiveTab] = useState<"All" | "Open" | "Overdue" | "Resolved" | "Closed">("All");
-  const [assignedToFilter, setAssignedToFilter] = useState("");
-  const [labelFilter, setLabelFilter] = useState("");
-  const [contacts, setContacts] = useState<Contact[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pagination, setPagination] = useState<PaginationData>({
-    current_page: 1,
-    last_page: 1,
-    per_page: 20,
-    total: 0,
-  });
-  const [deletingId, setDeletingId] = useState<number | null>(null);
+    const navigate = useNavigate();
+    const [issues, setIssues] = useState<Issue[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string>("");
+    const [searchTerm, setSearchTerm] = useState("");
+    const [activeTab, setActiveTab] = useState<"All" | "Open" | "Overdue" | "Resolved" | "Closed">("All");
+    const [assignedToFilter, setAssignedToFilter] = useState("");
+    const [labelFilter, setLabelFilter] = useState("");
+    const [contacts, setContacts] = useState<Contact[]>([]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [pagination, setPagination] = useState<PaginationData>({
+        current_page: 1,
+        last_page: 1,
+        per_page: 20,
+        total: 0,
+    });
+    const [deletingId, setDeletingId] = useState<number | null>(null);
 
-  const activeFiltersCount = [
-    assignedToFilter,
-    labelFilter,
-  ].filter(Boolean).length;
+    const activeFiltersCount = [
+        assignedToFilter,
+        labelFilter,
+    ].filter(Boolean).length;
 
-  useEffect(() => {
-    const fetchContacts = async () => {
-      try {
-        const response = await contactService.getAll({});
-        if (response.data?.status && response.data?.contact?.data) {
-          setContacts(response.data.contact.data);
+    useEffect(() => {
+        const fetchContacts = async () => {
+            try {
+                const response = await contactService.getAll({});
+                if (response.data?.status && response.data?.contact?.data) {
+                    setContacts(response.data.contact.data);
+                }
+            } catch {
+                // Error fetching contacts, continue without them
+            }
+        };
+        fetchContacts();
+    }, []);
+
+    const fetchIssues = useCallback(async (page: number = 1, search: string = "", status: string = "",labelFilter: string ="",assignedToFilter: string ="",) => {
+        setLoading(true);
+        setError("");
+        try {
+            const response = await issueService.getAll({ page, search, status,labelFilter,assignedToFilter });
+            const data = response.data as IssuesResponse;
+
+            if (data.status && data.issues) {
+                setIssues(data.issues.data || []);
+                setPagination({
+                    current_page: data.issues.current_page,
+                    last_page: data.issues.last_page,
+                    per_page: data.issues.per_page,
+                    total: data.issues.total,
+                });
+            } else {
+                setError("Failed to load issues");
+                setIssues([]);
+            }
+        } catch {
+            setError("An error occurred while loading issues");
+            setIssues([]);
+        } finally {
+            setLoading(false);
         }
-      } catch {
-        // Error fetching contacts, continue without them
-      }
+    }, []);
+
+
+    useEffect(() => {
+        const status = activeTab === "All" ? "" : activeTab;
+        fetchIssues(currentPage, searchTerm, status,labelFilter,assignedToFilter);
+    }, [currentPage, searchTerm, activeTab, fetchIssues,labelFilter,assignedToFilter]);
+
+    const handleSearch = (e: React.FormEvent) => {
+        e.preventDefault();
+        setCurrentPage(1);
+        const status = activeTab === "All" ? "" : activeTab;
+        fetchIssues(1, searchTerm, status,labelFilter,assignedToFilter);
     };
-    fetchContacts();
-  }, []);
 
-  const fetchIssues = useCallback(async (page: number = 1, search: string = "", status: string = "") => {
-    setLoading(true);
-    setError("");
-    try {
-      const response = await issueService.getAll({ page, search, status });
-      const data = response.data as IssuesResponse;
+    const handleView = (id: number) => {
+        navigate(`/issues/${id}`);
+    };
 
-      if (data.status && data.issues) {
-        setIssues(data.issues.data || []);
-        setPagination({
-          current_page: data.issues.current_page,
-          last_page: data.issues.last_page,
-          per_page: data.issues.per_page,
-          total: data.issues.total,
-        });
-      } else {
-        setError("Failed to load issues");
-        setIssues([]);
-      }
-    } catch {
-      setError("An error occurred while loading issues");
-      setIssues([]);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+    const handleEdit = (id: number) => {
+        navigate(`/issues/${id}/edit`);
+    };
 
-  useEffect(() => {
-    const status = activeTab === "All" ? "" : activeTab;
-    fetchIssues(currentPage, searchTerm, status);
-  }, [currentPage, searchTerm, activeTab, fetchIssues]);
+    const handleDelete = async (id: number) => {
+        if (!window.confirm("Are you sure you want to delete this issue?")) {
+            return;
+        }
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    setCurrentPage(1);
-    const status = activeTab === "All" ? "" : activeTab;
-    fetchIssues(1, searchTerm, status);
-  };
+        setDeletingId(id);
+        try {
+            await issueService.delete(id);
+            const status = activeTab === "All" ? "" : activeTab;
+            fetchIssues(currentPage, searchTerm, status);
+        } catch {
+            alert("Failed to delete issue. Please try again.");
+        } finally {
+            setDeletingId(null);
+        }
+    };
 
-  const handleView = (id: number) => {
-    navigate(`/issues/${id}`);
-  };
+    const handleCreate = () => {
+        navigate("/issues/create");
+    };
 
-  const handleEdit = (id: number) => {
-    navigate(`/issues/${id}/edit`);
-  };
+    const handlePageChange = (page: number) => {
+        setCurrentPage(page);
+    };
 
-  const handleDelete = async (id: number) => {
-    if (!window.confirm("Are you sure you want to delete this issue?")) {
-      return;
-    }
-
-    setDeletingId(id);
-    try {
-      await issueService.delete(id);
-      const status = activeTab === "All" ? "" : activeTab;
-      fetchIssues(currentPage, searchTerm, status);
-    } catch {
-      alert("Failed to delete issue. Please try again.");
-    } finally {
-      setDeletingId(null);
-    }
-  };
-
-  const handleCreate = () => {
-    navigate("/issues/create");
-  };
-
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-  };
-
-  const formatDate = (dateString?: string) => {
-    if (!dateString) return "—";
-    try {
-      const date = new Date(dateString);
-      return date.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' });
-    } catch {
-      return dateString;
-    }
-  };
+    const formatDate = (dateString?: string) => {
+        if (!dateString) return "—";
+        try {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' });
+        } catch {
+            return dateString;
+        }
+    };
 
 
-  const getStatusColor = (status?: string) => {
-    switch (status) {
-      case "Open":
-        return "error";
-      case "Overdue":
-        return "error";
-      case "In Progress":
-        return "warning";
-      case "Resolved":
-        return "info";
-      case "Closed":
-        return "warning";
-      default:
-        return "warning";
-    }
-  };
+    const getStatusColor = (status?: string) => {
+        switch (status) {
+            case "Open":
+                return "error";
+            case "Overdue":
+                return "error";
+            case "In Progress":
+                return "warning";
+            case "Resolved":
+                return "info";
+            case "Closed":
+                return "warning";
+            default:
+                return "warning";
+        }
+    };
 
-  const contactOptions = contacts.map(contact => ({
-    value: contact.id.toString(),
-    label: `${contact.first_name} ${contact.last_name || ""}`.trim()
-  }));
+    const contactOptions = contacts.map(contact => ({
+        value: contact.id.toString(),
+        label: `${contact.first_name} ${contact.last_name || ""}`.trim()
+    }));
 
-  const labelOptions = LABEL_OPTIONS.filter(opt => opt.value !== "");
+    const labelOptions = LABEL_OPTIONS.filter(opt => opt.value !== "");
 
-  return (
-    <>
-      <PageMeta
-        title="Issues List"
-        description="Manage and view all issues"
-      />
-      <PageBreadcrumb pageTitle="Issues"/>
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h2 className="text-base md:text-2xl font-semibold text-gray-800">Issues</h2>
-          <Button
-            variant="primary"
-            size="sm"
-            onClick={handleCreate}
-          >
-            + Create Issue
-          </Button>
-        </div>
-
-        <div className="border-b border-gray-200 dark:border-white/10">
-          <nav className="flex space-x-4 md:space-x-8" aria-label="Tabs">
-            {(["All", "Open", "Overdue", "Resolved", "Closed"] as const).map((tab) => (
-              <button
-                key={tab}
-                onClick={(e) => {
-                  e.preventDefault();
-                  setActiveTab(tab);
-                  setCurrentPage(1);
-                }}
-                className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
-                  activeTab === tab
-                    ? "border-brand-500 text-brand-600 dark:text-brand-400"
-                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300"
-                }`}
-              >
-                {tab}
-              </button>
-            ))}
-          </nav>
-        </div>
-
-        <form onSubmit={handleSearch} className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl p-4">
-          <div className="flex flex-wrap items-center gap-4">
-            <div className="flex-1 min-w-[200px]">
-              <div className="relative">
-                <Input
-                  type="text"
-                  placeholder="Search"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="!bg-[#F3F3F5] dark:!bg-white/5 border-none !rounded-[8px] pl-10"
-                />
-                <svg
-                  className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                  />
-                </svg>
-              </div>
-            </div>
-            <div className="w-full sm:w-auto min-w-[180px]">
-              <Select
-                options={[{ value: "", label: "Issue Assigned To" }, ...contactOptions]}
-                placeholder="Issue Assigned To"
-                onChange={(value) => setAssignedToFilter(value)}
-                defaultValue=""
-                className="!bg-[#F3F3F5] dark:!bg-white/5 border-gray-200 dark:border-white/10"
-              />
-            </div>
-            <div className="w-full sm:w-auto min-w-[150px]">
-              <Select
-                options={[{ value: "", label: "Labels" }, ...labelOptions]}
-                placeholder="Labels"
-                onChange={(value) => setLabelFilter(value)}
-                defaultValue=""
-                className="!bg-[#F3F3F5] dark:!bg-white/5 border-gray-200 dark:border-white/10"
-              />
-            </div>
-
-            {activeFiltersCount > 0 && (
-              <Button
-                variant="primary"
-                size="sm"
-                className="min-h-[44px] !leading-[44px]"
-              >
-                <svg
-                  className="w-4 h-4 mr-2"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
-                  />
-                </svg>
-                {activeFiltersCount} Filter{activeFiltersCount !== 1 ? 's' : ''}
-              </Button>
-            )}
-          </div>
-        </form>
-
-        {error && (
-          <div className="p-4 bg-error-50 dark:bg-error-900/20 border border-error-200 dark:border-error-800 rounded-lg">
-            <p className="text-sm text-error-600 dark:text-error-400">{error}</p>
-          </div>
-        )}
-
-        <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
-          <div className="max-w-full overflow-hidden overflow-x-auto">
-            {loading ? (
-              <div className="flex items-center justify-center py-12">
-                <div className="text-center">
-                  <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-brand-500"></div>
-                  <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                    Loading issues...
-                  </p>
+    return (
+        <>
+            <PageMeta
+                title="Issues List"
+                description="Manage and view all issues"
+            />
+            <PageBreadcrumb pageTitle="Issues" />
+            <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                    <h2 className="text-base md:text-2xl font-semibold text-gray-800">Issues</h2>
+                    <Button
+                        variant="primary"
+                        size="sm"
+                        onClick={handleCreate}
+                    >
+                        + Create Issue
+                    </Button>
                 </div>
-              </div>
-            ) : issues.length === 0 ? (
-              <div className="flex items-center justify-center py-12">
-                <div className="text-center">
-                  <p className="text-gray-600 dark:text-gray-400">
-                    No issues found
-                  </p>
+
+                <div className="border-b border-gray-200 dark:border-white/10">
+                    <nav className="flex space-x-4 md:space-x-8" aria-label="Tabs">
+                        {(["All", "Open", "Overdue", "Resolved", "Closed"] as const).map((tab) => (
+                            <button
+                                key={tab}
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    setActiveTab(tab);
+                                    setCurrentPage(1);
+                                }}
+                                className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${activeTab === tab
+                                        ? "border-brand-500 text-brand-600 dark:text-brand-400"
+                                        : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300"
+                                    }`}
+                            >
+                                {tab}
+                            </button>
+                        ))}
+                    </nav>
                 </div>
-              </div>
-            ) : (
-              <>
-                <Table>
-                  <TableHeader className="border-b border-gray-100 dark:border-white/5">
-                    <TableRow className="bg-[#E5E7EB]">
-                      <TableCell isHeader >
-                        Issue ID.
-                      </TableCell>
-                      <TableCell isHeader >
-                        Vehicle Name
-                      </TableCell>
-                      <TableCell isHeader >
-                        Priority
-                      </TableCell>
-                      <TableCell isHeader >
-                        Issue
-                      </TableCell>
-                      <TableCell
-                        isHeader
-                      >
-                        Summary
-                      </TableCell>
-                      <TableCell isHeader >
-                        Issue Status
-                      </TableCell>
-                      <TableCell isHeader >
-                        Source
-                      </TableCell>
-                        <TableCell isHeader >
-                        Reported Date
-                      </TableCell>
-                      <TableCell isHeader >
-                        Assigned
-                      </TableCell>
-                      <TableCell isHeader >
-                        Actions
-                      </TableCell>
-                    </TableRow>
-                  </TableHeader>
 
-                  <TableBody className="divide-y divide-gray-100 dark:divide-white/5">
-                    {issues.map((issue) => (
-                      <TableRow key={issue.id}>
-
-                        <TableCell className="px-4 py-3 text-start">
-                          <div className="text-theme-sm font-medium">
-                            ISS-{issue.id}
-                          </div>
-                        </TableCell>
-
-                        <TableCell className="px-4 py-3 text-start">
-                          <div className="text-brand-600 dark:text-brand-400 text-theme-sm font-medium">
-                            {  formatTypeModel(issue.vehicle)}
-                          </div>
-                        </TableCell>
-
-                        <TableCell className="px-4 py-3 text-start">
-                          {issue.priority && issue.priority !== "" ? (
-                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${getPriorityColor(issue.priority)}`}>
-                              {issue.priority}
-                            </span>
-                          ) : (
-                            <span className="text-gray-400 text-sm">—</span>
-                          )}
-                        </TableCell>
-                        <TableCell className="px-4 py-3 text-start">
-                          <div className="text-gray-800 text-theme-sm dark:text-white/90">
-                            Vehicle
-                          </div>
-                        </TableCell>
-
-                        <TableCell className="px-4 py-3 text-start">
-                          <div className="text-gray-800 text-theme-sm dark:text-white/90">
-                            {issue.summary || "—"}
-                          </div>
-                        </TableCell>
-                        <TableCell className="px-4 py-3 text-start">
-                          <Badge
-                            size="sm"
-                            color={getStatusColor(issue.status)}
-                          >
-                            {issue.status || "Open"}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="px-4 py-3 text-start">
-                          <div className="text-gray-800 text-theme-sm dark:text-white/90">
-                            {issue.source || "—"}
-                          </div>
-                        </TableCell>
-                        <TableCell className="px-4 py-3 text-start">
-                          <div className="text-gray-800 text-theme-sm dark:text-white/90">
-                            {formatDate(issue.reported_date || issue.issue_date)}
-                          </div>
-                        </TableCell>
-                        <TableCell className="px-4 py-3 text-start">
-                          {issue.assigned_to ? (
-                            <div className="text-gray-800 text-theme-sm dark:text-white/90">
-                              {`${issue.assigned_to.first_name || ""} ${issue.assigned_to.last_name || ""}`.trim() || "—"}
+                <form onSubmit={handleSearch} className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl p-4">
+                    <div className="flex flex-wrap items-center gap-4">
+                        <div className="flex-1 min-w-[200px]">
+                            <div className="relative">
+                                <Input
+                                    type="text"
+                                    placeholder="Search"
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    className="!bg-[#F3F3F5] dark:!bg-white/5 border-none !rounded-[8px] pl-10"
+                                />
+                                <svg
+                                    className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                                    />
+                                </svg>
                             </div>
-                          ) : (
-                            <div className="text-gray-400 text-theme-sm">
-                              —
+                        </div>
+                        <div className="w-full sm:w-auto min-w-[180px]">
+                            <Select
+                                options={[...contactOptions]}
+                                placeholder="Issue Assigned To"
+                                onChange={(value) => setAssignedToFilter(value)}
+                                defaultValue=""
+                                className="!bg-[#F3F3F5] dark:!bg-white/5 border-gray-200 dark:border-white/10"
+                                isPlaceholder={true}
+                            />
+                        </div>
+                        <div className="w-full sm:w-auto min-w-[150px]">
+                            <Select
+                                options={[...labelOptions]}
+                                placeholder="Labels"
+                                onChange={(value) => setLabelFilter(value)}
+                                defaultValue=""
+                                className="!bg-[#F3F3F5] dark:!bg-white/5 border-gray-200 dark:border-white/10"
+                                isPlaceholder={true}
+                            />
+                        </div>
+
+                        {activeFiltersCount > 0 && (
+                            <Button
+                                variant="primary"
+                                size="sm"
+                                className="min-h-[44px] !leading-[44px]"
+                            >
+                                <svg
+                                    className="w-4 h-4 mr-2"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
+                                    />
+                                </svg>
+                                {activeFiltersCount} Filter{activeFiltersCount !== 1 ? 's' : ''}
+                            </Button>
+                        )}
+                    </div>
+                </form>
+
+                {error && (
+                    <div className="p-4 bg-error-50 dark:bg-error-900/20 border border-error-200 dark:border-error-800 rounded-lg">
+                        <p className="text-sm text-error-600 dark:text-error-400">{error}</p>
+                    </div>
+                )}
+
+                <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
+                    <div className="max-w-full overflow-hidden overflow-x-auto">
+                        {loading ? (
+                            <div className="flex items-center justify-center py-12">
+                                <div className="text-center">
+                                    <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-brand-500"></div>
+                                    <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                                        Loading issues...
+                                    </p>
+                                </div>
                             </div>
-                          )}
-                        </TableCell>
+                        ) : issues.length === 0 ? (
+                            <div className="flex items-center justify-center py-12">
+                                <div className="text-center">
+                                    <p className="text-gray-600 dark:text-gray-400">
+                                        No issues found
+                                    </p>
+                                </div>
+                            </div>
+                        ) : (
+                            <>
+                                <Table>
+                                    <TableHeader className="border-b border-gray-100 dark:border-white/5">
+                                        <TableRow className="bg-[#E5E7EB]">
+                                            <TableCell isHeader >
+                                                Issue ID.
+                                            </TableCell>
+                                            <TableCell isHeader >
+                                                Vehicle Name
+                                            </TableCell>
+                                            <TableCell isHeader >
+                                                Priority
+                                            </TableCell>
+                                            <TableCell isHeader >
+                                                Issue
+                                            </TableCell>
+                                            <TableCell
+                                                isHeader
+                                            >
+                                                Summary
+                                            </TableCell>
+                                            <TableCell isHeader >
+                                                Issue Status
+                                            </TableCell>
+                                            <TableCell isHeader >
+                                                Source
+                                            </TableCell>
+                                            <TableCell isHeader >
+                                                Reported Date
+                                            </TableCell>
+                                            <TableCell isHeader >
+                                                Assigned
+                                            </TableCell>
+                                            <TableCell isHeader >
+                                                Actions
+                                            </TableCell>
+                                        </TableRow>
+                                    </TableHeader>
 
-                         <TableCell className="px-4 py-3 text-start">
-                          <div className="items-center">
-                            <Button
-                              variant="none"
-                              size="sm"
-                              onClick={() => handleView(issue.id)}
-                              className="view-button hover:scale-105 transition-all duration-300"
-                              startIcon={<EyeIcon />}
-                            >
-                             {""}
-                            </Button>
-                            <Button
-                              variant="none"
-                              size="sm"
-                              onClick={() => handleEdit(issue.id)}
-                              className="edit-button hover:scale-105 transition-all duration-300"
-                              startIcon={<PencilIcon />}
-                            >
-                             {""}
-                            </Button>
-                            <Button
-                              variant="none"
-                              size="sm"
-                              onClick={() => handleDelete(issue.id)}
-                              disabled={deletingId === issue.id}
-                              className="delete-button hover:scale-105 transition-all duration-300"
-                              startIcon={<TrashBinIcon />}
-                            >
-                             {""}
-                            </Button>
-                          </div>
-                        </TableCell>
+                                    <TableBody className="divide-y divide-gray-100 dark:divide-white/5">
+                                        {issues.map((issue) => (
+                                            <TableRow key={issue.id}>
 
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-                <TableFooter
-                  pagination={pagination}
-                  currentPage={currentPage}
-                  onPageChange={handlePageChange}
-                  loading={loading}
-                  itemLabel="issues"
-                />
-              </>
-            )}
-          </div>
-        </div>
-      </div>
-    </>
-  );
+                                                <TableCell className="px-4 py-3 text-start">
+                                                    <div className="text-theme-sm font-medium">
+                                                        ISS-{issue.id}
+                                                    </div>
+                                                </TableCell>
+
+                                                <TableCell className="px-4 py-3 text-start">
+                                                    <div className="text-brand-600 dark:text-brand-400 text-theme-sm font-medium">
+                                                        {formatTypeModel(issue.vehicle)}
+                                                    </div>
+                                                </TableCell>
+
+                                                <TableCell className="px-4 py-3 text-start">
+                                                    {issue.priority && issue.priority !== "" ? (
+                                                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${getPriorityColor(issue.priority)}`}>
+                                                            {issue.priority}
+                                                        </span>
+                                                    ) : (
+                                                        <span className="text-gray-400 text-sm">—</span>
+                                                    )}
+                                                </TableCell>
+                                                <TableCell className="px-4 py-3 text-start">
+                                                    <div className="text-gray-800 text-theme-sm dark:text-white/90">
+                                                        Vehicle
+                                                    </div>
+                                                </TableCell>
+
+                                                <TableCell className="px-4 py-3 text-start">
+                                                    <div className="text-gray-800 text-theme-sm dark:text-white/90">
+                                                        {issue.summary || "—"}
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell className="px-4 py-3 text-start">
+                                                    <Badge
+                                                        size="sm"
+                                                        color={getStatusColor(issue.status)}
+                                                    >
+                                                        {issue.status || "Open"}
+                                                    </Badge>
+                                                </TableCell>
+                                                <TableCell className="px-4 py-3 text-start">
+                                                    <div className="text-gray-800 text-theme-sm dark:text-white/90">
+                                                        {issue.source || "—"}
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell className="px-4 py-3 text-start">
+                                                    <div className="text-gray-800 text-theme-sm dark:text-white/90">
+                                                        {formatDate(issue.reported_date || issue.issue_date)}
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell className="px-4 py-3 text-start">
+                                                    {issue.assigned_to ? (
+                                                        <div className="text-gray-800 text-theme-sm dark:text-white/90">
+                                                            {`${issue.assigned_to.first_name || ""} ${issue.assigned_to.last_name || ""}`.trim() || "—"}
+                                                        </div>
+                                                    ) : (
+                                                        <div className="text-gray-400 text-theme-sm">
+                                                            —
+                                                        </div>
+                                                    )}
+                                                </TableCell>
+
+                                                <TableCell className="px-4 py-3 text-start">
+                                                    <div className="items-center">
+                                                        <Button
+                                                            variant="none"
+                                                            size="sm"
+                                                            onClick={() => handleView(issue.id)}
+                                                            className="view-button hover:scale-105 transition-all duration-300"
+                                                            startIcon={<EyeIcon />}
+                                                        >
+                                                            {""}
+                                                        </Button>
+                                                        <Button
+                                                            variant="none"
+                                                            size="sm"
+                                                            onClick={() => handleEdit(issue.id)}
+                                                            className="edit-button hover:scale-105 transition-all duration-300"
+                                                            startIcon={<PencilIcon />}
+                                                        >
+                                                            {""}
+                                                        </Button>
+                                                        <Button
+                                                            variant="none"
+                                                            size="sm"
+                                                            onClick={() => handleDelete(issue.id)}
+                                                            disabled={deletingId === issue.id}
+                                                            className="delete-button hover:scale-105 transition-all duration-300"
+                                                            startIcon={<TrashBinIcon />}
+                                                        >
+                                                            {""}
+                                                        </Button>
+                                                    </div>
+                                                </TableCell>
+
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                                <TableFooter
+                                    pagination={pagination}
+                                    currentPage={currentPage}
+                                    onPageChange={handlePageChange}
+                                    loading={loading}
+                                    itemLabel="issues"
+                                />
+                            </>
+                        )}
+                    </div>
+                </div>
+            </div>
+        </>
+    );
 }

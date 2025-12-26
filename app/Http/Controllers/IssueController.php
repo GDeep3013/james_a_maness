@@ -28,6 +28,7 @@ class IssueController extends Controller
             ], 401);
         }
 
+
         $tableColumns = Schema::getColumnListing('issues');
         $query = Issue::with([
             'vehicle:id,vehicle_name,make,model,year,license_plate',
@@ -62,6 +63,14 @@ class IssueController extends Controller
 
         if ($request->has('work_order_id') && !empty($request->work_order_id)) {
             $query->where('work_order_id', $request->work_order_id);
+        }
+
+        if ($request->has('labelFilter') && !empty($request->labelFilter)) {
+            $query->where('labels', $request->labelFilter);
+        }
+
+        if ($request->has('assignedToFilter') && !empty($request->assignedToFilter)) {
+            $query->where('assigned_to', (int) $request->assignedToFilter);
         }
 
         if (!empty($searchTerm)) {

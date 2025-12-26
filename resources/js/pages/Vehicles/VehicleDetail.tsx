@@ -222,7 +222,7 @@ export default function VehicleDetail() {
                     <div className="flex md:flex-nowrap flex-wrap gap-6">
                         <div className="bg-white rounded-lg lg:p-6 p-3 border border-gray-200  w-full">
                             <h2 className="text-lg font-semibold text-gray-900 mb-4">Vehicle Information</h2>
-                            <div className="space-y-4 flex item-center justify-between">
+                            <div className="space-y-7 grid grid-cols-4 item-center justify-between">
                                 <div className="flex flex-col">
                                     <span className="text-sm text-gray-600">Status </span>
                                     <span className="inline-block">
