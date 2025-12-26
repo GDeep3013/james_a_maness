@@ -13,10 +13,11 @@ import Button from "../../components/ui/button/Button";
 import PageMeta from "../../components/common/PageMeta";
 import { workOrderService } from "../../services/workOrderService";
 import { WORK_ORDER_STATUS_FILTER_OPTIONS, REPAIR_PRIORITY_STATUS_FILTER_OPTIONS } from "../../constants/selectOptions";
-import { PencilIcon, TrashBinIcon, ExportIcon, EyeIcon } from "../../icons";
+import { PencilIcon, TrashBinIcon, EyeIcon } from "../../icons";
 import Select from "../../components/form/Select";
 import TableFooter, { PaginationData } from "../../components/common/TableFooter";
 import PageBreadcrumb from "../../components/common/PageBreadCrumb";
+import WorkOrderOverview from "./WorkOrderOverview";
 
 interface WorkOrder {
     id: number;
@@ -128,7 +129,7 @@ export default function WorkOrdersList() {
     };
 
     const handleEdit = (id: number) => {
-        navigate(`/work-orders/${id}`);
+        navigate(`/work-orders/${id}/edit`);
     };
 
     const handleView = (id: number) => {
@@ -143,26 +144,26 @@ export default function WorkOrdersList() {
         setCurrentPage(page);
     };
 
-    const handleExport = async () => {
-        try {
-            const response = await workOrderService.export({
-                search: searchTerm,
-                status: statusFilter,
-            });
+    // const handleExport = async () => {
+    //     try {
+    //         const response = await workOrderService.export({
+    //             search: searchTerm,
+    //             status: statusFilter,
+    //         });
 
-            const url = window.URL.createObjectURL(new Blob([response.data]));
-            const link = document.createElement('a');
-            link.href = url;
-            link.setAttribute('download', `work_orders_export_${new Date().toISOString().split('T')[0]}.xlsx`);
-            document.body.appendChild(link);
-            link.click();
-            link.remove();
-            window.URL.revokeObjectURL(url);
-        } catch (error) {
-            console.error('Export failed:', error);
-            alert('Failed to export work orders. Please try again.');
-        }
-    };
+    //         const url = window.URL.createObjectURL(new Blob([response.data]));
+    //         const link = document.createElement('a');
+    //         link.href = url;
+    //         link.setAttribute('download', `work_orders_export_${new Date().toISOString().split('T')[0]}.xlsx`);
+    //         document.body.appendChild(link);
+    //         link.click();
+    //         link.remove();
+    //         window.URL.revokeObjectURL(url);
+    //     } catch (error) {
+    //         console.error('Export failed:', error);
+    //         alert('Failed to export work orders. Please try again.');
+    //     }
+    // };
 
     const formatDate = (dateString?: string) => {
         if (!dateString) return "N/A";
@@ -211,6 +212,7 @@ export default function WorkOrdersList() {
             />
             <PageBreadcrumb pageTitle="Work Orders" />
             <div className="space-y-6">
+               
                 <div className="flex items-center justify-between">
                     <div>
                         <h2 className="text-2xl font-semibold text-gray-800">Work Orders</h2>
@@ -224,6 +226,8 @@ export default function WorkOrdersList() {
                         + Create Work Order
                     </Button>
                 </div>
+
+                <WorkOrderOverview />
 
                 <form onSubmit={handleSearch} className="bg-white border border-gray-200 rounded-xl p-4">
                     <div className="flex flex-wrap items-center gap-4">

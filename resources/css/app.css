@@ -162,7 +162,9 @@ nav span.menu-item-icon-size svg {
     width: 18px;
     height: 18px;
 }
-
+.bg-info-500{
+    background-color: var(--color-blue-500);
+}
 
 @media (max-width: 1023px) {
     .toggle-sidebar-icon svg,

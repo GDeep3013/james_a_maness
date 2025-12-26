@@ -2,6 +2,8 @@ import api from './api';
 
 interface SettingsData {
   logo_image?: File | string | null;
+  company_name?: string;
+  phone_number?: string;
   address?: string;
   state?: string;
   city?: string;
@@ -19,6 +21,14 @@ export const settingsService = {
     
     if (data.logo_image instanceof File) {
       formData.append('logo_image', data.logo_image);
+    }
+    
+    if (data.company_name) {
+      formData.append('company_name', data.company_name);
+    }
+    
+    if (data.phone_number) {
+      formData.append('phone_number', data.phone_number);
     }
     
     if (data.address) {

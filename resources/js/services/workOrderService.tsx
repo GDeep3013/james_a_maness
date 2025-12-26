@@ -127,6 +127,9 @@ export const workOrderService = {
     getAllDashboard: () => { return api.get(`/get-dashboard-workorder`) },
     getAllReminder: () => { return api.get(`/get-reminder-service`) },
 
+    getStatistics: () =>
+        api.get('/work-orders-statistics'),
+
     export: (params?: { search?: string; status?: string }) => {
         const queryParams = new URLSearchParams();
         if (params?.search) queryParams.append('search', params.search);

@@ -9,6 +9,8 @@ import { settingsService } from '../../services/settingsService';
 
 interface SettingsData {
   logo_image: File | string | null;
+  company_name: string;
+  phone_number: string;
   address: string;
   state: string;
   city: string;
@@ -21,6 +23,8 @@ interface SettingsData {
 export default function Settings() {
   const [formData, setFormData] = useState<SettingsData>({
     logo_image: null,
+    company_name: '',
+    phone_number: '',
     address: '',
     state: '',
     city: '',
@@ -47,6 +51,8 @@ export default function Settings() {
         const settings = response.data.data;
         setFormData({
           logo_image: null,
+          company_name: settings.company_name || '',
+          phone_number: settings.phone_number || '',
           address: settings.address || '',
           state: settings.state || '',
           city: settings.city || '',
@@ -144,6 +150,8 @@ export default function Settings() {
         : [];
 
       const settingsData = {
+        company_name: formData.company_name,
+        phone_number: formData.phone_number,
         address: formData.address,
         state: formData.state,
         city: formData.city,
@@ -288,6 +296,53 @@ export default function Settings() {
                       )}
                       </div>
                   </div>
+                </div>
+
+                <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
+                <h4 className="mb-4 text-sm md:text-base font-semibold text-gray-800 dark:text-white/90">
+                    Company Information
+                </h4>
+                <div className="space-y-6">
+                    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[200px_1fr]">
+                    <div className="flex items-start">
+                        <Label htmlFor="company_name" className="pt-2">
+                        Company Name
+                        </Label>
+                    </div>
+                    <div>
+                        <Input
+                        type="text"
+                        id="company_name"
+                        name="company_name"
+                        value={formData.company_name}
+                        onChange={handleInputChange}
+                        placeholder="Enter company name"
+                        error={!!errors.company_name}
+                        hint={errors.company_name}
+                        />
+                    </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[200px_1fr]">
+                    <div className="flex items-start">
+                        <Label htmlFor="phone_number" className="pt-2">
+                        Phone Number
+                        </Label>
+                    </div>
+                    <div>
+                        <Input
+                        type="text"
+                        id="phone_number"
+                        name="phone_number"
+                        value={formData.phone_number}
+                        onChange={handleInputChange}
+                        placeholder="Enter phone number"
+                        error={!!errors.phone_number}
+                        hint={errors.phone_number}
+                        />
+                    </div>
+                    </div>
+                </div>
                 </div>
 
                 <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
