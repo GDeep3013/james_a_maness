@@ -3,7 +3,9 @@ import Button from "../../components/ui/button/Button";
 import { useModal } from "../../hooks/useModal";
 import { issueService } from "../../services/issueService";
 const AddIssue = lazy(() => import("./AddIssue"));
+const SelectIssuesList = lazy(() => import("./SelectIssuesList"));
 import { PencilIcon, TrashBinIcon } from "../../icons";
+import { getPriorityColor } from "../../utilites";
 
 interface Issue {
   id: number;
@@ -34,6 +36,7 @@ export default function Issues({
   vehicleName,
 }: IssuesProps) {
   const { isOpen, openModal, closeModal } = useModal(false);
+  const { isOpen: isSelectIssuesOpen, openModal: openSelectIssuesModal, closeModal: closeSelectIssuesModal } = useModal(false);
   const [selectedIssueId, setSelectedIssueId] = useState<number | undefined>(undefined);
   const [activeTab, setActiveTab] = useState<"Open" | "Resolved" | "Closed">("Open");
   const [issues, setIssues] = useState<Issue[]>([]);
@@ -51,6 +54,7 @@ export default function Issues({
     try {
       const response = await issueService.getAll({
         vehicle_id: vehicleId,
+        work_order_id : workOrderId,
         status: activeTab,
       });
       if (response.data?.status && response.data?.issues?.data) {
@@ -98,16 +102,16 @@ export default function Issues({
   };
 
   const handleDeleteIssue = async (id: number) => {
-    if (!window.confirm("Are you sure you want to delete this issue?")) {
+    if (!window.confirm("Are you sure you want to remove this issue from the work order?")) {
       return;
     }
     try {
-      const response = await issueService.delete(id);
+      const response = await issueService.update(id, { work_order_id: null });
       if (response.data?.status === true || response.status === 200) {
         fetchIssues();
       }
     } catch (error) {
-      console.error("Error deleting issue:", error);
+      console.error("Error removing issue from work order:", error);
     }
   };
 
@@ -127,14 +131,26 @@ export default function Issues({
     <div className="">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-2xl font-semibold text-gray-800">Issues</h2>
-        <Button
-          variant="none"
-          size="md"
-          onClick={handleAddIssue}
-          type="button"
-        >
-          + Add Issue
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleAddIssue}
+            type="button"
+          >
+            + Add New Issue
+          </Button>
+          {workOrderId && (
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={openSelectIssuesModal}
+              type="button"
+            >
+              Select Issues
+            </Button>
+          )}
+        </div>
       </div>
 
 
@@ -200,9 +216,9 @@ export default function Issues({
                         { issue.summary}
                       </h3>
                       {issue.priority && issue.priority !== "" && (
-                        <span className="px-2 py-0.5 text-xs font-medium rounded bg-gray-100 text-gray-700">
-                          {issue.priority}
-                        </span>
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${getPriorityColor(issue.priority)}`}>
+                        {issue.priority}
+                      </span>
                       )}
                     </div>
                     {issue.description && (
@@ -254,6 +270,18 @@ export default function Issues({
         vehicleName={vehicleName}
         onSuccess={fetchIssues}
         issueId={selectedIssueId}
+        />
+      </Suspense>
+
+
+      <Suspense fallback={<div>Loading...</div>}>
+        <SelectIssuesList
+        isOpen={isSelectIssuesOpen}
+        onClose={closeSelectIssuesModal}
+        workOrderId={workOrderId}
+        vehicleId={vehicleId}
+        vehicleName={vehicleName}
+        onSuccess={fetchIssues}
         />
       </Suspense>
 

@@ -292,3 +292,34 @@ export const formatNextDue = (nextDueDate: string | null | undefined): string =>
     return timeText ;
 };
 
+export const getPriorityColor = (priority?: string): string => {
+    switch (priority?.toLowerCase()) {
+        case "urgent":
+        case "critical":
+            return "bg-red-500 text-white";
+        case "high":
+            return "bg-orange-500 text-white";
+        case "medium":
+            return "bg-[#DBEAFE] text-[#1447E6]";
+        case "low":
+            return "bg-gray-300 text-gray-800";
+        default:
+            return "bg-gray-200 text-gray-600";
+    }
+};
+
+export const getPriorityBadgeColor = (priority?: string): 'light' | 'info' | 'high' | 'error' => {
+    switch (priority) {
+        case "Low":
+            return "light";
+        case "Medium":
+            return "info";
+        case "High":
+            return "high";
+        case "Critical":
+            return "error";
+        default:
+            return "info";
+    }
+};
+

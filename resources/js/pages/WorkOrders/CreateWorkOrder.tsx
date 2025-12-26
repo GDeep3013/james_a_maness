@@ -282,8 +282,43 @@ export default function CreateWorkOrder() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const prepareWorkOrderData = () => {
+    return {
+      vehicle_id: formData.vehicle_id ? parseInt(formData.vehicle_id) : undefined,
+      status: formData.status || undefined,
+      repair_priority_class: formData.repair_priority_class || undefined,
+      issue_date: formData.issue_date || undefined,
+      scheduled_start_date: formData.scheduled_start_date || undefined,
+      send_scheduled_start_date_reminder: Boolean(formData.send_scheduled_start_date_reminder),
+      actual_start_date: formData.actual_start_date || undefined,
+      expected_completion_date: formData.expected_completion_date || undefined,
+      actual_completion_date: formData.actual_completion_date || undefined,
+      use_start_odometer_for_completion_meter: Boolean(formData.use_start_odometer_for_completion_meter),
+      assigned_to: formData.assigned_to ? parseInt(formData.assigned_to) : undefined,
+      vendor_id: formData.vendor_id ? parseInt(formData.vendor_id) : undefined,
+      invoice_number: formData.invoice_number || undefined,
+      po_number: formData.po_number || undefined,
+      service_items: formData.service_items,
+      parts: formData.parts,
+      notes: formData.notes || undefined,
+      discount_type: formData.discount_type || undefined,
+      discount_value: formData.discount_value !== undefined ? formData.discount_value : undefined,
+      base_value: formData.base_value !== undefined ? formData.base_value : undefined,
+      total_value: formData.total_value !== undefined ? formData.total_value : undefined,
+      tax_type: formData.tax_type || undefined,
+      tax_value: formData.tax_value !== undefined ? formData.tax_value : undefined,
+    };
+  };
+
+  const handleSubmit = async (e?: React.FormEvent, continueEditing: boolean = false) => {
+    if (e) {
+      e.preventDefault();
+    }
+
+    if (continueEditing && isEditMode) {
+      return;
+    }
+
     setGeneralError("");
     setErrors({});
 
@@ -294,38 +329,26 @@ export default function CreateWorkOrder() {
     setIsSubmitting(true);
 
     try {
-      const workOrderData = {
-        vehicle_id: formData.vehicle_id ? parseInt(formData.vehicle_id) : undefined,
-        status: formData.status || undefined,
-        repair_priority_class: formData.repair_priority_class || undefined,
-        issue_date: formData.issue_date || undefined,
-        scheduled_start_date: formData.scheduled_start_date || undefined,
-        send_scheduled_start_date_reminder: Boolean(formData.send_scheduled_start_date_reminder),
-        actual_start_date: formData.actual_start_date || undefined,
-        expected_completion_date: formData.expected_completion_date || undefined,
-        actual_completion_date: formData.actual_completion_date || undefined,
-        use_start_odometer_for_completion_meter: Boolean(formData.use_start_odometer_for_completion_meter),
-        assigned_to: formData.assigned_to ? parseInt(formData.assigned_to) : undefined,
-        vendor_id: formData.vendor_id ? parseInt(formData.vendor_id) : undefined,
-        invoice_number: formData.invoice_number || undefined,
-        po_number: formData.po_number || undefined,
-        service_items: formData.service_items,
-        parts: formData.parts,
-        notes: formData.notes || undefined,
-        discount_type: formData.discount_type || undefined,
-        discount_value: formData.discount_value !== undefined ? formData.discount_value : undefined,
-        base_value: formData.base_value !== undefined ? formData.base_value : undefined,
-        total_value: formData.total_value !== undefined ? formData.total_value : undefined,
-        tax_type: formData.tax_type || undefined,
-        tax_value: formData.tax_value !== undefined ? formData.tax_value : undefined,
-      };
+      const workOrderData = prepareWorkOrderData();
 
       const response = isEditMode && id
         ? await workOrderService.update(parseInt(id), workOrderData)
         : await workOrderService.create(workOrderData);
 
       if (response.data?.status === true || response.status === 200 || response.status === 201) {
-        navigate("/work-orders", { replace: true });
+        if (continueEditing && !isEditMode) {
+          const workOrderId = (response.data?.data as { id?: number })?.id;
+          if (workOrderId) {
+            navigate(`/work-orders/${workOrderId}`, { replace: true });
+          } else {
+            setGeneralError("Work order created but ID not found. Redirecting to list...");
+            setTimeout(() => {
+              navigate("/work-orders", { replace: true });
+            }, 2000);
+          }
+        } else {
+          navigate("/work-orders", { replace: true });
+        }
       } else {
         setGeneralError(response.data?.message || `Failed to ${isEditMode ? 'update' : 'create'} work order. Please try again.`);
       }
@@ -364,6 +387,10 @@ export default function CreateWorkOrder() {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleSaveAndContinue = () => {
+    handleSubmit(undefined, true);
   };
 
   const vehicleOptions = vehicles.map((vehicle) => ({
@@ -693,6 +720,45 @@ export default function CreateWorkOrder() {
                   >
                     Cancel
                   </Button>
+                  
+                  {!isEditMode && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      type="button"
+                      onClick={handleSaveAndContinue}
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <svg
+                            className="animate-spin -ml-1 mr-2 h-4 w-4"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                          >
+                            <circle
+                              className="opacity-25"
+                              cx="12"
+                              cy="12"
+                              r="10"
+                              stroke="currentColor"
+                              strokeWidth="4"
+                            ></circle>
+                            <path
+                              className="opacity-75"
+                              fill="currentColor"
+                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                            ></path>
+                          </svg>
+                          Saving...
+                        </>
+                      ) : (
+                        "Save and Continue"
+                      )}
+                    </Button>
+                  )}
+                  
                   <Button
                     variant="primary"
                     type="submit"

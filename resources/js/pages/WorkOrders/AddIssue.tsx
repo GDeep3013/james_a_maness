@@ -4,7 +4,6 @@ import Label from "../../components/form/Label";
 import Input from "../../components/form/input/InputField";
 import Select from "../../components/form/Select";
 import DatePicker from "../../components/form/date-picker";
-import Checkbox from "../../components/form/input/Checkbox";
 import Button from "../../components/ui/button/Button";
 import { TimeIcon } from "../../icons";
 import { contactService } from "../../services/contactService";
@@ -30,6 +29,7 @@ interface Contact {
 
 export interface IssueFormData {
   vehicle_id: number;
+  work_order_id: number | null;
   asset: string;
   priority: string;
   reported_date: string;
@@ -58,6 +58,7 @@ export default function AddIssue({
   const isEditMode = !!issueId;
   const [formData, setFormData] = useState<IssueFormData>({
     vehicle_id: vehicleId || 0,
+    work_order_id: workOrderId || null,
     asset: vehicleName || "",
     priority: "",
     reported_date: "",
@@ -113,6 +114,7 @@ export default function AddIssue({
 
         setFormData({
           vehicle_id: issue.vehicle_id || vehicleId || 0,
+          work_order_id: workOrderId || null,
           asset: issue.vehicle?.vehicle_name || vehicleName || "",
           priority: issue.priority || "",
           reported_date: dateStr,
@@ -148,6 +150,7 @@ export default function AddIssue({
         
         setFormData({
           vehicle_id: vehicleId || 0,
+          work_order_id: workOrderId || null,
           asset: vehicleName || "",
           priority: "",
           reported_date: dateStr,
@@ -272,6 +275,7 @@ export default function AddIssue({
         onClose();
         setFormData({
           vehicle_id: vehicleId || 0,
+          work_order_id: workOrderId || null,
           asset: vehicleName || "",
           priority: "",
           reported_date: "",
@@ -465,21 +469,10 @@ export default function AddIssue({
                           placeholder="Enter value"
                         />
                         <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-500">
-                          hr
+                          mi
                         </span>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <Checkbox
-                          id="primary_meter_void"
-                          checked={formData.primary_meter_void}
-                          onChange={(checked) =>
-                            handleInputChange("primary_meter_void", checked)
-                          }
-                        />
-                        <Label htmlFor="primary_meter_void" className="mb-0 cursor-pointer">
-                          Void
-                        </Label>
-                      </div>
+                    
                     </div>
                     <p className="mt-1 text-sm text-gray-500">
                       Last updated: 80 hr (11 days ago)
@@ -544,7 +537,7 @@ export default function AddIssue({
                         placeholder="Enter value"
                       />
                       <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-500">
-                        hr
+                        mi
                       </span>
                     </div>
                     <p className="mt-1 text-sm text-gray-500">
