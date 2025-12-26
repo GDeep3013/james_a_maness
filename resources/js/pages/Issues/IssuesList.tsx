@@ -17,7 +17,7 @@ import { EyeIcon, PencilIcon, TrashBinIcon } from "../../icons";
 import Select from "../../components/form/Select";
 import { contactService } from "../../services/contactService";
 import TableFooter, { PaginationData } from "../../components/common/TableFooter";
-import { formatTypeModel } from "../../utilites";
+import { formatTypeModel, getPriorityColor } from "../../utilites";
 import PageBreadcrumb from "../../components/common/PageBreadCrumb";
 
 interface Issue {
@@ -178,20 +178,6 @@ export default function IssuesList() {
     }
   };
 
-  const getPriorityColor = (priority?: string) => {
-    switch (priority?.toLowerCase()) {
-      case "critical":
-        return "bg-red-500 text-white";
-      case "high":
-        return "bg-orange-500 text-white";
-      case "medium":
-        return "bg-blue-500 text-white";
-      case "low":
-        return "bg-gray-300 text-gray-800";
-      default:
-        return "bg-gray-200 text-gray-600";
-    }
-  };
 
   const getStatusColor = (status?: string) => {
     switch (status) {

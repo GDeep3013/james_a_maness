@@ -6,6 +6,7 @@ import Button from "../../components/ui/button/Button";
 import Badge from "../../components/ui/badge/Badge";
 import { ChevronLeftIcon, PencilIcon, ReopenIcon } from "../../icons";
 import { useAuth } from "../../context/AuthContext";
+import { getPriorityColor } from "../../utilites";
 
 interface Issue {
     id: number;
@@ -167,21 +168,6 @@ export default function IssueDetails() {
         }
     };
 
-    const getPriorityColor = (priority?: string) => {
-        switch (priority?.toLowerCase()) {
-            case "urgent":
-            case "critical":
-                return "bg-red-500 text-white";
-            case "high":
-                return "bg-orange-500 text-white";
-            case "medium":
-                return "bg-[#DBEAFE] text-[#1447E6]";
-            case "low":
-                return "bg-gray-300 text-gray-800";
-            default:
-                return "bg-gray-200 text-gray-600";
-        }
-    };
 
     const getStatusColor = (status?: string) => {
         switch (status) {

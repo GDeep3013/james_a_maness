@@ -56,6 +56,14 @@ class IssueController extends Controller
             $query->where('vehicle_id', $request->vehicle_id);
         }
 
+        if ($request->has('work_order_id_null') && $request->work_order_id_null === 'true') {
+            $query->whereNull('work_order_id');
+        }
+
+        if ($request->has('work_order_id') && !empty($request->work_order_id)) {
+            $query->where('work_order_id', $request->work_order_id);
+        }
+
         if (!empty($searchTerm)) {
             $query->where(function ($query) use ($tableColumns, $searchTerm) {
                 foreach ($tableColumns as $column) {
@@ -342,7 +350,12 @@ class IssueController extends Controller
             DB::beginTransaction();
 
             if ($request->has('work_order_id')) {
-                $issue->work_order_id = $request->work_order_id;
+                $workOrderId = $request->work_order_id;
+                if ($workOrderId === '' || $workOrderId === null) {
+                    $issue->work_order_id = null;
+                } else {
+                    $issue->work_order_id = $workOrderId;
+                }
             }
             if ($request->has('vehicle_id')) {
                 $issue->vehicle_id = $request->vehicle_id;

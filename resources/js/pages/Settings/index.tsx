@@ -268,254 +268,259 @@ export default function Settings() {
             )}
 
             <form onSubmit={handleSubmit} className="space-y-8">
-            <div className="space-y-6">
-                <div>
-                  <div className="grid grid-cols-1 gap-6 lg:grid-cols-[200px_1fr]">
-                      <div className="flex items-start">
-                      <Label htmlFor="logo_image" className="pt-2">
-                          Logo Image
-                      </Label>
-                      </div>
-                      <div>
-                      {logoPreview && (
-                          <div className="mb-4">
-                          <img
-                              src={logoPreview}
-                              alt="Logo preview"
-                              className="h-20 w-auto object-contain rounded border border-gray-200 dark:border-gray-700"
-                          />
-                          </div>
-                      )}
-                      <FileInput
-                          accept="image/*"
-                          onChange={handleFileChange}
-                          className={errors.logo_image ? 'border-error-500' : ''}
-                      />
-                      {errors.logo_image && (
-                          <p className="mt-1 text-xs text-error-500">{errors.logo_image}</p>
-                      )}
-                      </div>
+              <div className="space-y-6">
+                  <div>
+                    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[200px_1fr]">
+                        <div className="flex items-start">
+                        <Label htmlFor="logo_image" className="pt-2">
+                            Logo Image
+                        </Label>
+                        </div>
+                        <div>
+                        {logoPreview && (
+                            <div className="mb-4">
+                            <img
+                                src={logoPreview}
+                                alt="Logo preview"
+                                className="h-20 w-auto object-contain rounded border border-gray-200 dark:border-gray-700"
+                            />
+                            </div>
+                        )}
+                        <FileInput
+                            accept="image/*"
+                            onChange={handleFileChange}
+                            className={errors.logo_image ? 'border-error-500' : ''}
+                        />
+                        {errors.logo_image && (
+                            <p className="mt-1 text-xs text-error-500">{errors.logo_image}</p>
+                        )}
+                        </div>
+                    </div>
                   </div>
-                </div>
 
-                <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
-                <h4 className="mb-4 text-sm md:text-base font-semibold text-gray-800 dark:text-white/90">
-                    Company Information
-                </h4>
-                <div className="space-y-6">
-                    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[200px_1fr]">
-                    <div className="flex items-start">
-                        <Label htmlFor="company_name" className="pt-2">
-                        Company Name
-                        </Label>
-                    </div>
-                    <div>
-                        <Input
-                        type="text"
-                        id="company_name"
-                        name="company_name"
-                        value={formData.company_name}
-                        onChange={handleInputChange}
-                        placeholder="Enter company name"
-                        error={!!errors.company_name}
-                        hint={errors.company_name}
-                        />
-                    </div>
-                    </div>
+                  <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
+                    <h4 className="mb-4 text-sm md:text-base font-semibold text-gray-800">
+                        Company Information
+                    </h4>
+                    <div className="space-y-6">
 
-                    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[200px_1fr]">
-                    <div className="flex items-start">
-                        <Label htmlFor="phone_number" className="pt-2">
-                        Phone Number
-                        </Label>
-                    </div>
-                    <div>
-                        <Input
-                        type="text"
-                        id="phone_number"
-                        name="phone_number"
-                        value={formData.phone_number}
-                        onChange={handleInputChange}
-                        placeholder="Enter phone number"
-                        error={!!errors.phone_number}
-                        hint={errors.phone_number}
-                        />
-                    </div>
-                    </div>
-                </div>
-                </div>
+                        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[200px_1fr]">
+                          <div className="flex items-start">
+                              <Label htmlFor="company_name" className="pt-2">
+                              Company Name
+                              </Label>
+                          </div>
+                          <div>
+                              <Input
+                              type="text"
+                              id="company_name"
+                              name="company_name"
+                              value={formData.company_name}
+                              onChange={handleInputChange}
+                              placeholder="Enter company name"
+                              error={!!errors.company_name}
+                              hint={errors.company_name}
+                              />
+                          </div>
+                        </div>
 
-                <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
-                <h4 className="mb-4 text-sm md:text-base font-semibold text-gray-800 dark:text-white/90">
-                    Address Information
-                </h4>
-                <div className="space-y-6">
-                    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[200px_1fr]">
-                    <div className="flex items-start">
-                        <Label htmlFor="address" className="pt-2">
-                        Address
-                        </Label>
-                    </div>
-                    <div>
-                        <Input
-                        type="text"
-                        id="address"
-                        name="address"
-                        value={formData.address}
-                        onChange={handleInputChange}
-                        placeholder="Enter address"
-                        error={!!errors.address}
-                        hint={errors.address}
-                        />
-                    </div>
-                    </div>
+                        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[200px_1fr]">
+                          <div className="flex items-start">
+                              <Label htmlFor="phone_number" className="pt-2">
+                              Phone Number
+                              </Label>
+                          </div>
 
-                    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[200px_1fr]">
-                    <div className="flex items-start">
-                        <Label htmlFor="state" className="pt-2">
-                        State
-                        </Label>
-                    </div>
-                    <div>
-                        <Input
-                        type="text"
-                        id="state"
-                        name="state"
-                        value={formData.state}
-                        onChange={handleInputChange}
-                        placeholder="Enter state"
-                        error={!!errors.state}
-                        hint={errors.state}
-                        />
-                    </div>
-                    </div>
+                          <div>
+                              <Input
+                              type="text"
+                              id="phone_number"
+                              name="phone_number"
+                              value={formData.phone_number}
+                              onChange={handleInputChange}
+                              placeholder="Enter phone number"
+                              error={!!errors.phone_number}
+                              hint={errors.phone_number}
+                              />
+                          </div>
+                        </div>
 
-                    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[200px_1fr]">
-                    <div className="flex items-start">
-                        <Label htmlFor="city" className="pt-2">
-                        City
-                        </Label>
                     </div>
-                    <div>
-                        <Input
-                        type="text"
-                        id="city"
-                        name="city"
-                        value={formData.city}
-                        onChange={handleInputChange}
-                        placeholder="Enter city"
-                        error={!!errors.city}
-                        hint={errors.city}
-                        />
-                    </div>
-                    </div>
+                    
+                  </div>
 
-                    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[200px_1fr]">
-                    <div className="flex items-start">
-                        <Label htmlFor="country" className="pt-2">
-                        Country
-                        </Label>
-                    </div>
-                    <div>
-                        <Input
-                        type="text"
-                        id="country"
-                        name="country"
-                        value={formData.country}
-                        onChange={handleInputChange}
-                        placeholder="Enter country"
-                        error={!!errors.country}
-                        hint={errors.country}
-                        />
-                    </div>
-                    </div>
+                  <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
+                    <h4 className="mb-4 text-sm md:text-base font-semibold text-gray-800">
+                        Address Information
+                    </h4>
+                    <div className="space-y-6">
+                        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[200px_1fr]">
+                        <div className="flex items-start">
+                            <Label htmlFor="address" className="pt-2">
+                            Address
+                            </Label>
+                        </div>
+                        <div>
+                            <Input
+                            type="text"
+                            id="address"
+                            name="address"
+                            value={formData.address}
+                            onChange={handleInputChange}
+                            placeholder="Enter address"
+                            error={!!errors.address}
+                            hint={errors.address}
+                            />
+                        </div>
+                        </div>
 
-                    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[200px_1fr]">
-                    <div className="flex items-start">
-                        <Label htmlFor="post_code" className="pt-2">
-                        Post Code
-                        </Label>
-                    </div>
-                    <div>
-                        <Input
-                        type="text"
-                        id="post_code"
-                        name="post_code"
-                        value={formData.post_code}
-                        onChange={handleInputChange}
-                        placeholder="Enter post code"
-                        error={!!errors.post_code}
-                        hint={errors.post_code}
-                        />
-                    </div>
-                    </div>
-                </div>
-                </div>
+                        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[200px_1fr]">
+                        <div className="flex items-start">
+                            <Label htmlFor="state" className="pt-2">
+                            State
+                            </Label>
+                        </div>
+                        <div>
+                            <Input
+                            type="text"
+                            id="state"
+                            name="state"
+                            value={formData.state}
+                            onChange={handleInputChange}
+                            placeholder="Enter state"
+                            error={!!errors.state}
+                            hint={errors.state}
+                            />
+                        </div>
+                        </div>
 
-                <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
-                <h4 className="mb-4 text-sm md:text-base font-semibold text-gray-800 dark:text-white/90">
-                    Email Notifications
-                </h4>
-                <div className="space-y-6">
-                    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[200px_1fr]">
-                    <div className="flex items-start">
-                        <Label htmlFor="primary_email" className="pt-2">
-                        Primary Email
-                        </Label>
-                    </div>
-                    <div>
-                        <Input
-                        type="email"
-                        id="primary_email"
-                        name="primary_email"
-                        value={formData.primary_email}
-                        onChange={handleInputChange}
-                        placeholder="Enter primary email for notifications"
-                        error={!!errors.primary_email}
-                        hint={errors.primary_email}
-                        />
-                    </div>
-                    </div>
+                        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[200px_1fr]">
+                        <div className="flex items-start">
+                            <Label htmlFor="city" className="pt-2">
+                            City
+                            </Label>
+                        </div>
+                        <div>
+                            <Input
+                            type="text"
+                            id="city"
+                            name="city"
+                            value={formData.city}
+                            onChange={handleInputChange}
+                            placeholder="Enter city"
+                            error={!!errors.city}
+                            hint={errors.city}
+                            />
+                        </div>
+                        </div>
 
-                    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[200px_1fr]">
-                    <div className="flex items-start">
-                        <Label htmlFor="cc_emails" className="pt-2">
-                        CC Emails
-                        </Label>
-                    </div>
-                    <div>
-                        <TextArea
-                        placeholder="Enter CC emails separated by commas (e.g., email1@example.com, email2@example.com)"
-                        value={formData.cc_emails}
-                        onChange={(value) => {
-                            setFormData({ ...formData, cc_emails: value });
-                            if (errors.cc_emails) {
-                            setErrors((prev) => {
-                                const newErrors = { ...prev };
-                                delete newErrors.cc_emails;
-                                return newErrors;
-                            });
-                            }
-                        }}
-                        rows={4}
-                        error={!!errors.cc_emails}
-                        hint={errors.cc_emails}
-                        />
-                    </div>
-                    </div>
-                </div>
-                </div>
-            </div>
+                        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[200px_1fr]">
+                          <div className="flex items-start">
+                              <Label htmlFor="country" className="pt-2">
+                              Country
+                              </Label>
+                          </div>
+                          <div>
+                              <Input
+                              type="text"
+                              id="country"
+                              name="country"
+                              value={formData.country}
+                              onChange={handleInputChange}
+                              placeholder="Enter country"
+                              error={!!errors.country}
+                              hint={errors.country}
+                              />
+                          </div>
+                        </div>
 
-            <div className="flex items-center justify-end gap-3 pt-6 border-t border-gray-200 dark:border-gray-700">
-                <Button
-                size='sm'
-                type="submit"
-                disabled={isSubmitting}
-                >
-                {isSubmitting ? 'Saving...' : 'Save Settings'}
-                </Button>
-            </div>
+                        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[200px_1fr]">
+                          <div className="flex items-start">
+                              <Label htmlFor="post_code" className="pt-2">
+                              Post Code
+                              </Label>
+                        </div>
+                        
+                        <div>
+                            <Input
+                            type="text"
+                            id="post_code"
+                            name="post_code"
+                            value={formData.post_code}
+                            onChange={handleInputChange}
+                            placeholder="Enter post code"
+                            error={!!errors.post_code}
+                            hint={errors.post_code}
+                            />
+                        </div>
+                        </div>
+                    </div>
+                  </div>
+
+                  <div className="border-t border-gray-200 pt-6">
+                    <h4 className="mb-4 text-sm md:text-base font-semibold text-gray-800">
+                        Email Notifications
+                    </h4>
+                    <div className="space-y-6">
+                        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[200px_1fr]">
+                        <div className="flex items-start">
+                            <Label htmlFor="primary_email" className="pt-2">
+                            Primary Email
+                            </Label>
+                        </div>
+                        <div>
+                            <Input
+                            type="email"
+                            id="primary_email"
+                            name="primary_email"
+                            value={formData.primary_email}
+                            onChange={handleInputChange}
+                            placeholder="Enter primary email for notifications"
+                            error={!!errors.primary_email}
+                            hint={errors.primary_email}
+                            />
+                        </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[200px_1fr]">
+                        <div className="flex items-start">
+                            <Label htmlFor="cc_emails" className="pt-2">
+                            CC Emails
+                            </Label>
+                        </div>
+                        <div>
+                            <TextArea
+                            placeholder="Enter CC emails separated by commas (e.g., email1@example.com, email2@example.com)"
+                            value={formData.cc_emails}
+                            onChange={(value) => {
+                                setFormData({ ...formData, cc_emails: value });
+                                if (errors.cc_emails) {
+                                setErrors((prev) => {
+                                    const newErrors = { ...prev };
+                                    delete newErrors.cc_emails;
+                                    return newErrors;
+                                });
+                                }
+                            }}
+                            rows={4}
+                            error={!!errors.cc_emails}
+                            hint={errors.cc_emails}
+                            />
+                        </div>
+                        </div>
+                    </div>
+                  </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-6 border-t border-gray-200 dark:border-gray-700">
+                  <Button
+                  size='sm'
+                  type="submit"
+                  disabled={isSubmitting}
+                  >
+                  {isSubmitting ? 'Saving...' : 'Save Settings'}
+                  </Button>
+              </div>
             </form>
         </div>
       </div>

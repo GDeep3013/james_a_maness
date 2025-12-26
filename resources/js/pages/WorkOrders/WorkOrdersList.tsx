@@ -18,6 +18,7 @@ import Select from "../../components/form/Select";
 import TableFooter, { PaginationData } from "../../components/common/TableFooter";
 import PageBreadcrumb from "../../components/common/PageBreadCrumb";
 import WorkOrderOverview from "./WorkOrderOverview";
+import { getPriorityBadgeColor } from "../../utilites";
 
 interface WorkOrder {
     id: number;
@@ -186,20 +187,6 @@ export default function WorkOrdersList() {
                 return "error";
             default:
                 return "warning";
-        }
-    };
-    const getPriorityColor = (priority?: string) => {
-        switch (priority) {
-            case "Low":
-                return "light";
-            case "Medium":
-                return "info";
-            case "High":
-                return "high";
-            case "Critical":
-                return "error";
-            default:
-                return "info";
         }
     };
 
@@ -376,7 +363,7 @@ export default function WorkOrdersList() {
                                                 <TableCell className="px-4 py-3 text-start">
                                                     <Badge
                                                         size="sm"
-                                                        color={getPriorityColor(workOrder.repair_priority_class)}
+                                                        color={getPriorityBadgeColor(workOrder.repair_priority_class)}
                                                     >
                                                         {workOrder.repair_priority_class || "Medium"}
                                                     </Badge>
