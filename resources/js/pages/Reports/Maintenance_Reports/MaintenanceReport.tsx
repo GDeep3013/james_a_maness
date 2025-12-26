@@ -42,18 +42,15 @@ interface LineItem {
 interface Settings {
     id?: number;
     title?: string;
-    store_name?: string;
+    company_name?: string;
+    phone_number?: string;
     address?: string;
     state?: string;
     city?: string;
     country?: string;
     post_code?: string;
     primary_email?: string;
-    phone?: string;
     logo_image?: string;
-    favicon?: string;
-    splash_logo?: string;
-    footer_text?: string;
 }
 
 interface WorkOrderPart {
@@ -98,8 +95,8 @@ export default function MaintenanceReport() {
     const [isLoading, setIsLoading] = useState(false);
     const [generalError, setGeneralError] = useState<string>("");
     const [successMessage, setSuccessMessage] = useState<string>("");
-    const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
-
+    // const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+    const [fieldErrors, setFieldErrors] = useState<Record<string, string | string[]>>({});
     const [formData, setFormData] = useState({
         vehicle_id: "",
         vendor_id: "",
@@ -192,8 +189,7 @@ export default function MaintenanceReport() {
                     setLineItems(record.line_items);
                 }
                 if (record.vendor_id) {
-                    const vendor = vendors.find(v => v.id === record.vendor_id);
-                    if (vendor) setSelectedVendor(vendor);
+                    return record.vendor_id;
                 }
             }
         } catch {
@@ -201,11 +197,20 @@ export default function MaintenanceReport() {
         } finally {
             setIsLoading(false);
         }
-    }, [vendors]);
+        return null;
+    }, []);
+
+    useEffect(() => {
+    if (formData.vendor_id && vendors.length > 0) {
+        const vendor = vendors.find(v => v.id === Number(formData.vendor_id));
+        if (vendor) setSelectedVendor(vendor);
+    }
+    }, [formData.vendor_id]);
 
     useEffect(() => {
         fetchDropdownData();
     }, [fetchDropdownData]);
+
     useEffect(() => {
         getSettingFunction();
     }, []);
@@ -218,7 +223,7 @@ export default function MaintenanceReport() {
     useEffect(() => {
         calculateTotals(lineItems);
     }, [lineItems]);
-    console.log()
+
     const fetchFilteredWorkOrders = useCallback(async () => {
         try {
             const [workOrdersRes, servicesRes] = await Promise.all([
@@ -347,13 +352,27 @@ export default function MaintenanceReport() {
         const newLineItems = [...lineItems];
         newLineItems[index] = { ...newLineItems[index], [field]: value };
 
-        // Auto-calculate extended if qty, net are provided
         if (field === 'qty' || field === 'net') {
             const qty = field === 'qty' ? Number(value) : newLineItems[index].qty;
             const net = field === 'net' ? Number(value) : newLineItems[index].net;
             newLineItems[index].extended = qty * net;
         }
         setLineItems(newLineItems);
+
+        if (field === 'item_number' && fieldErrors.lineItems && Array.isArray(fieldErrors.lineItems)) {
+            const newLineItemErrors = [...(fieldErrors.lineItems as string[])];
+            delete newLineItemErrors[index];
+
+            setFieldErrors(prev => {
+                const newErrors = { ...prev };
+                if (newLineItemErrors.filter(Boolean).length === 0) {
+                    delete newErrors.lineItems;
+                } else {
+                    newErrors.lineItems = newLineItemErrors;
+                }
+                return newErrors;
+            });
+        }
     };
 
     const calculateTotals = (items: LineItem[]) => {
@@ -464,7 +483,7 @@ export default function MaintenanceReport() {
     };
 
     const validateForm = (): boolean => {
-        const errors: Record<string, string> = {};
+        const errors: Record<string, string | string[]> = {};
 
         if (!formData.invoice_number?.trim()) {
             errors.invoice_number = "Invoice number is required";
@@ -488,6 +507,17 @@ export default function MaintenanceReport() {
 
         if (!formData.vendor_id?.trim()) {
             errors.vendor_id = "Vendor is required";
+        }
+
+        const lineItemErrors: string[] = [];
+        lineItems.forEach((item, index) => {
+            if (!item.item_number?.trim()) {
+                lineItemErrors[index] = "Item number is required";
+            }
+        });
+
+        if (lineItemErrors.length > 0) {
+            errors.lineItems = lineItemErrors;
         }
 
         setFieldErrors(errors);
@@ -540,13 +570,13 @@ export default function MaintenanceReport() {
                                                                     <tbody>
                                                                         <tr>
                                                                             <td>
-                                                                                <img src={settings?.logo_image} alt="Logo" style={{ width: "100%",maxWidth: "100px", height: "auto", marginBottom: "5px" }} />
+                                                                                <img src={settings?.logo_image} alt="Logo" style={{ width: "100%", maxWidth: "100px", height: "auto", marginBottom: "5px" }} />
                                                                                 <div style={{ fontSize: "14px", fontWeight: "bold", marginTop: "10px", letterSpacing: "2px" }}>{settings?.title || "DEDICATED TO THE PROFESSIONAL"}</div>
                                                                                 <div style={{ fontSize: "11px", marginTop: "3px", lineHeight: "1.4" }}>
-                                                                                        <div>{settings?.store_name},{settings?.address},{settings?.city}</div>
-                                                                                        <div>{settings?.primary_email}
+                                                                                    <div>{settings?.company_name},{settings?.address}</div>
+                                                                                    <div>{settings?.city},{settings?.post_code}
                                                                                         <span style={{ marginLeft: "10px" }}>
-                                                                                            {settings?.phone || "(225) 292-8930"}
+                                                                                            {settings?.phone_number || "(225) 292-8930"}
                                                                                         </span></div>
                                                                                 </div>
                                                                             </td>
@@ -822,8 +852,13 @@ export default function MaintenanceReport() {
                                                                         onChange={(e) => handleLineItemChange(index, "item_number", e.target.value)}
                                                                         style={{ width: "80px", border: "1px solid #ccc", padding: "2px", fontSize: "12px", textAlign: "center", backgroundColor: "#f1f4ff" }}
                                                                     />
-                                                                    {fieldErrors.item_number && (
+                                                                    {/* {fieldErrors.item_number && (
                                                                         <div style={{ fontSize: "10px", color: "red", marginTop: "2px" }}>{fieldErrors.item_number}</div>
+                                                                    )} */}
+                                                                    {fieldErrors.lineItems && Array.isArray(fieldErrors.lineItems) && fieldErrors.lineItems[index] && (
+                                                                        <div style={{ fontSize: "10px", color: "red", marginTop: "2px" }}>
+                                                                            {fieldErrors.lineItems[index]}
+                                                                        </div>
                                                                     )}
                                                                 </td>
                                                                 <td style={{ border: "none", fontSize: "12px", padding: "4px 2px", textAlign: "left" }}>
@@ -1019,12 +1054,12 @@ export default function MaintenanceReport() {
                                                     <tbody>
                                                         <tr>
                                                             <td style={{ width: "60%", padding: "15px 0 5px 0" }}>
-                                                                <div style={{ fontSize: "15px", marginBottom: "3px", textTransform: "uppercase", letterSpacing: "2px" }}>WWW.OREILLYPRO.COM</div>
-                                                                <div style={{ fontSize: "10px", marginBottom: "8px" }}>Warranty/Garantia: www.oreillypro.com/warranty</div>
+                                                                <div style={{ fontSize: "15px", marginBottom: "3px", textTransform: "uppercase", letterSpacing: "2px" }}>WWW.KAVEXPEDITING.COM</div>
+                                                                {/* <div style={{ fontSize: "10px", marginBottom: "8px" }}>Warranty/Garantia: www.oreillypro.com/warranty</div> */}
                                                             </td>
                                                             <td style={{ width: "30%", padding: "15px 0 5px 0" }}>
                                                                 <div style={{ fontSize: "15px", marginBottom: "3px", textTransform: "uppercase", letterSpacing: "2px" }}>WE APPRECIATE YOUR BUSINESS!</div>
-                                                                <div style={{ fontSize: "10px" }}>464WS167 Remit To: PO BOX 9464, SPRINGFIELD, MO 65801-9464</div>
+                                                                {/* <div style={{ fontSize: "10px" }}>464WS167 Remit To: PO BOX 9464, SPRINGFIELD, MO 65801-9464</div> */}
                                                             </td>
                                                         </tr>
                                                     </tbody>

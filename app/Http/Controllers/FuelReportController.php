@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\FuelReport;
 use App\Models\Fuel;
+use App\Models\Setting;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
@@ -35,7 +36,7 @@ class FuelReportController extends Controller
             'vendor:id,name,address,city,state,zip,email',
             'user:id,name'
         ])->orderBy('id', 'desc');
-
+        $setting = Setting::first();
         $fuels = Fuel::with(['vehicle', 'vendor'])
             ->when($request->vehicle_id, function ($q) use ($request) {
                 $q->where('vehicle_id', $request->vehicle_id);
@@ -90,6 +91,7 @@ class FuelReportController extends Controller
             'status' => true,
             'fuel_reports' => $fuelReports,
             'fuels' => $fuels,
+            'settings' => $setting
         ]);
     }
 
@@ -432,7 +434,7 @@ class FuelReportController extends Controller
                 : (is_string($fuelReport->line_items)
                     ? json_decode($fuelReport->line_items, true) ?? []
                     : []);
-
+            $setting = Setting::first();
             $fuels = Fuel::with(['vehicle', 'vendor'])
                 ->when($fuelReport->vehicle_id, function ($q) use ($fuelReport) {
                     $q->where('vehicle_id', $fuelReport->vehicle_id);
@@ -449,6 +451,7 @@ class FuelReportController extends Controller
                 'fuelReport' => $fuelReport,
                 'fuels' => $fuels,
                 'lineItems' => $lineItems,
+                'settings' => $setting
             ];
 
             $pdf = Pdf::loadView('fuelReport.fuelReportPdf', $data);

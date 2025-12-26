@@ -75,6 +75,7 @@ export default function WorkOrdersList() {
     });
     const [deletingId, setDeletingId] = useState<number | null>(null);
 
+        const [isRefersh, setIsRefersh] =useState(false);
     const fetchWorkOrders = useCallback(async (page: number = 1, search: string = "", status: string = "", priorityStatus: string = "") => {
         setLoading(true);
         setError("");
@@ -121,6 +122,7 @@ export default function WorkOrdersList() {
         try {
             await workOrderService.delete(id);
             fetchWorkOrders(currentPage, searchTerm, statusFilter, priorityFilter);
+            setIsRefersh(true)
         } catch {
             alert("Failed to delete work order. Please try again.");
         } finally {
@@ -212,7 +214,7 @@ export default function WorkOrdersList() {
             />
             <PageBreadcrumb pageTitle="Work Orders" />
             <div className="space-y-6">
-               
+
                 <div className="flex items-center justify-between">
                     <div>
                         <h2 className="text-2xl font-semibold text-gray-800">Work Orders</h2>
@@ -227,7 +229,7 @@ export default function WorkOrdersList() {
                     </Button>
                 </div>
 
-                <WorkOrderOverview />
+                <WorkOrderOverview isRefersh={isRefersh} setIsRefersh={setIsRefersh} />
 
                 <form onSubmit={handleSearch} className="bg-white border border-gray-200 rounded-xl p-4">
                     <div className="flex flex-wrap items-center gap-4">

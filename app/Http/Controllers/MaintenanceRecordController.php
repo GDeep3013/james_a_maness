@@ -434,7 +434,7 @@ class MaintenanceRecordController extends Controller
                     ? json_decode($maintenanceRecord->line_items, true) ?? []
                     : []);
 
-
+            $setting = Setting::first();
             $workOrders = WorkOrder::with(['vehicle','vendor'])
             ->when($maintenanceRecord->vehicle_id, function ($q) use ($maintenanceRecord) {
                 $q->where('vehicle_id', $maintenanceRecord->vehicle_id);
@@ -451,7 +451,9 @@ class MaintenanceRecordController extends Controller
                 'maintenanceRecord' => $maintenanceRecord,
                 'workOrders' => $workOrders,
                 'lineItems' => $lineItems,
+                'settings' => $setting
             ];
+            //    dd($data);
             $pdf = Pdf::loadView('invoice.maintenanceReportPdf', $data);
             $fileName = 'Maintenance_Report_' . $maintenanceRecord->id . '_' . date('Y-m-d') . '.pdf';
 

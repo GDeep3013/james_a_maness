@@ -7,8 +7,14 @@ interface WorkOrderStatistics {
   inProgress: number;
   completed: number;
 }
+interface WorkOrderProps {
+  isRefersh:boolean;
+  setIsRefersh: React.Dispatch<React.SetStateAction<boolean>>;
+}
 
-export default function WorkOrderOverview() {
+export default function WorkOrderOverview({ isRefersh,
+    setIsRefersh,
+}: WorkOrderProps) {
   const [statistics, setStatistics] = useState<WorkOrderStatistics>({
     total: 0,
     open: 0,
@@ -16,10 +22,8 @@ export default function WorkOrderOverview() {
     completed: 0,
   });
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string>('');
-
-  useEffect(() => {
-    const fetchStatistics = async () => {
+    const [error, setError] = useState<string>('');
+     const fetchStatistics = async () => {
       setLoading(true);
       setError('');
       try {
@@ -43,8 +47,20 @@ export default function WorkOrderOverview() {
       }
     };
 
-    fetchStatistics();
+  useEffect(() => {
+
+
+   fetchStatistics()
   }, []);
+
+    useEffect(() => {
+        if (isRefersh) {
+
+            fetchStatistics()
+            setIsRefersh(false)
+        }
+
+  }, [isRefersh]);
 
   if (loading) {
     return (
@@ -80,7 +96,7 @@ export default function WorkOrderOverview() {
         <span className="text-[30px] font-medium text-[#1D2939]">
           {statistics.total}
         </span>
-     
+
       </div>
 
       <div className="bg-white border border-gray-200 rounded-xl p-6 flex flex-col">
