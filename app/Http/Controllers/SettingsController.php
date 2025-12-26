@@ -39,6 +39,8 @@ class SettingsController extends Controller
 
             $validatedData = $request->validate([
                 'logo_image' => 'nullable|mimes:jpeg,jpg,png,gif,webp|max:5120',
+                'company_name' => 'nullable|string|max:255',
+                'phone_number' => 'nullable|string|max:50',
                 'address' => 'nullable|string|max:500',
                 'state' => 'nullable|string|max:255',
                 'city' => 'nullable|string|max:255',
@@ -75,6 +77,14 @@ class SettingsController extends Controller
                     chmod(public_path('settings-images/logo/' . $logoFileName), 0644);
                     $setting->logo_image = $logoFileName;
                 }
+            }
+
+            if ($request->has('company_name')) {
+                $setting->company_name = $request->company_name ?: null;
+            }
+
+            if ($request->has('phone_number')) {
+                $setting->phone_number = $request->phone_number ?: null;
             }
 
             if ($request->has('address')) {

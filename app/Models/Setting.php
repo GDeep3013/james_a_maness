@@ -11,6 +11,8 @@ class Setting extends Model
 
     protected $fillable = [
         'logo_image',
+        'company_name',
+        'phone_number',
         'address',
         'state',
         'city',
