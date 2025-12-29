@@ -15,9 +15,11 @@ import TableFooter, { PaginationData } from "../../components/common/TableFooter
 import { formatTypeModel } from "../../utilites/vehicleUtils";
 import { FuelRecord as Fuel , FuelsResponse } from "../../types/FuelRecordTypes";
 
+interface FuelListProps {
+  setIsRefersh: React.Dispatch<React.SetStateAction<boolean>>;
+}
 
-
-export default function FuelsList() {
+export default function FuelsList({ setIsRefersh, }: FuelListProps ) {
     const navigate = useNavigate();
     const [fuels, setFuels] = useState<Fuel[]>([]);
     const [loading, setLoading] = useState(true);
@@ -77,6 +79,7 @@ export default function FuelsList() {
         try {
             await fuelService.delete(id);
             fetchFuels(currentPage);
+            setIsRefersh(true)
         } catch {
             alert("Failed to delete fuel entry. Please try again.");
         } finally {

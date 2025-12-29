@@ -4,6 +4,7 @@ import PageMeta from "../../../components/common/PageMeta";
 import Button from "../../../components/ui/button/Button";
 import { vehicleService } from "../../../services/vehicleService";
 import { vendorService } from "../../../services/vendorService";
+import { settingsService } from "../../../services/settingsService";
 import { maintenanceRecordService } from "../../../services/maintenanceRecordService";
 import DatePicker from "../../../components/form/date-picker";
 import { workOrderService } from "../../../services/workOrderService";
@@ -37,6 +38,19 @@ interface LineItem {
     list: number;
     net: number;
     extended: number;
+}
+interface Settings {
+    id?: number;
+    title?: string;
+    company_name?: string;
+    phone_number?: string;
+    address?: string;
+    state?: string;
+    city?: string;
+    country?: string;
+    post_code?: string;
+    primary_email?: string;
+    logo_image?: string;
 }
 
 interface WorkOrderPart {
@@ -75,13 +89,14 @@ export default function MaintenanceReport() {
 
     const [vehicles, setVehicles] = useState<Vehicle[]>([]);
     const [vendors, setVendors] = useState<Vendor[]>([]);
+    const [settings, setSettings] = useState<Settings | null>(null);
     const [selectedVendor, setSelectedVendor] = useState<Vendor | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [generalError, setGeneralError] = useState<string>("");
     const [successMessage, setSuccessMessage] = useState<string>("");
-    const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
-
+    // const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+    const [fieldErrors, setFieldErrors] = useState<Record<string, string | string[]>>({});
     const [formData, setFormData] = useState({
         vehicle_id: "",
         vendor_id: "",
@@ -111,6 +126,7 @@ export default function MaintenanceReport() {
             const [vehiclesRes, vendorsRes] = await Promise.all([
                 vehicleService.getAll({ page: 1 }),
                 vendorService.getAll({ page: 1 }),
+
             ]);
 
             if (vehiclesRes.data?.status && vehiclesRes.data?.vehical?.data) {
@@ -120,8 +136,26 @@ export default function MaintenanceReport() {
             if (vendorsRes.data?.status && vendorsRes.data?.vendor?.data) {
                 setVendors(vendorsRes.data.vendor.data);
             }
+
         } catch {
             setGeneralError("Failed to load data");
+        }
+    }, []);
+
+    const getSettingFunction = useCallback(async () => {
+        try {
+            const [settingsRes] = await Promise.all([
+                settingsService.get(),
+
+            ]);
+            console.log(settingsRes);
+            if (settingsRes.data?.status && settingsRes.data?.data) {
+                setSettings(settingsRes.data.data);
+            }
+
+
+        } catch {
+            setGeneralError("Failed to load logo img");
         }
     }, []);
 
@@ -155,8 +189,7 @@ export default function MaintenanceReport() {
                     setLineItems(record.line_items);
                 }
                 if (record.vendor_id) {
-                    const vendor = vendors.find(v => v.id === record.vendor_id);
-                    if (vendor) setSelectedVendor(vendor);
+                    return record.vendor_id;
                 }
             }
         } catch {
@@ -164,11 +197,23 @@ export default function MaintenanceReport() {
         } finally {
             setIsLoading(false);
         }
-    }, [vendors]);
+        return null;
+    }, []);
+
+    useEffect(() => {
+    if (formData.vendor_id && vendors.length > 0) {
+        const vendor = vendors.find(v => v.id === Number(formData.vendor_id));
+        if (vendor) setSelectedVendor(vendor);
+    }
+    }, [formData.vendor_id]);
 
     useEffect(() => {
         fetchDropdownData();
     }, [fetchDropdownData]);
+
+    useEffect(() => {
+        getSettingFunction();
+    }, []);
 
     useEffect(() => {
         if (isEditMode && id) {
@@ -307,13 +352,27 @@ export default function MaintenanceReport() {
         const newLineItems = [...lineItems];
         newLineItems[index] = { ...newLineItems[index], [field]: value };
 
-        // Auto-calculate extended if qty, net are provided
         if (field === 'qty' || field === 'net') {
             const qty = field === 'qty' ? Number(value) : newLineItems[index].qty;
             const net = field === 'net' ? Number(value) : newLineItems[index].net;
             newLineItems[index].extended = qty * net;
         }
         setLineItems(newLineItems);
+
+        if (field === 'item_number' && fieldErrors.lineItems && Array.isArray(fieldErrors.lineItems)) {
+            const newLineItemErrors = [...(fieldErrors.lineItems as string[])];
+            delete newLineItemErrors[index];
+
+            setFieldErrors(prev => {
+                const newErrors = { ...prev };
+                if (newLineItemErrors.filter(Boolean).length === 0) {
+                    delete newErrors.lineItems;
+                } else {
+                    newErrors.lineItems = newLineItemErrors;
+                }
+                return newErrors;
+            });
+        }
     };
 
     const calculateTotals = (items: LineItem[]) => {
@@ -424,7 +483,7 @@ export default function MaintenanceReport() {
     };
 
     const validateForm = (): boolean => {
-        const errors: Record<string, string> = {};
+        const errors: Record<string, string | string[]> = {};
 
         if (!formData.invoice_number?.trim()) {
             errors.invoice_number = "Invoice number is required";
@@ -450,9 +509,22 @@ export default function MaintenanceReport() {
             errors.vendor_id = "Vendor is required";
         }
 
+        const lineItemErrors: string[] = [];
+        lineItems.forEach((item, index) => {
+            if (!item.item_number?.trim()) {
+                lineItemErrors[index] = "Item number is required";
+            }
+        });
+
+        if (lineItemErrors.length > 0) {
+            errors.lineItems = lineItemErrors;
+        }
+
         setFieldErrors(errors);
         return Object.keys(errors).length === 0;
     };
+    console.log(settings, "settigns")
+
     return (
         <>
             <PageMeta
@@ -498,11 +570,14 @@ export default function MaintenanceReport() {
                                                                     <tbody>
                                                                         <tr>
                                                                             <td>
-                                                                                <img src="/images/pdf-logo.png" alt="Logo" style={{ maxWidth: "200px", height: "auto", marginBottom: "5px" }} />
-                                                                                <div style={{ fontSize: "14px", fontWeight: "bold", marginTop: "10px", letterSpacing: "2px" }}>DEDICATED TO THE PROFESSIONAL</div>
+                                                                                <img src={settings?.logo_image} alt="Logo" style={{ width: "100%", maxWidth: "100px", height: "auto", marginBottom: "5px" }} />
+                                                                                <div style={{ fontSize: "14px", fontWeight: "bold", marginTop: "10px", letterSpacing: "2px" }}>{settings?.title || "DEDICATED TO THE PROFESSIONAL"}</div>
                                                                                 <div style={{ fontSize: "11px", marginTop: "3px", lineHeight: "1.4" }}>
-                                                                                    <div>Store 464, 11448 AIRLINE HIGHWAY,</div>
-                                                                                    <div>BATON ROUGE, LA 70816 <span style={{ marginLeft: "10px" }}>(225) 292-8930</span></div>
+                                                                                    <div>{settings?.company_name},{settings?.address}</div>
+                                                                                    <div>{settings?.city},{settings?.post_code}
+                                                                                        <span style={{ marginLeft: "10px" }}>
+                                                                                            {settings?.phone_number || "(225) 292-8930"}
+                                                                                        </span></div>
                                                                                 </div>
                                                                             </td>
                                                                         </tr>
@@ -777,8 +852,13 @@ export default function MaintenanceReport() {
                                                                         onChange={(e) => handleLineItemChange(index, "item_number", e.target.value)}
                                                                         style={{ width: "80px", border: "1px solid #ccc", padding: "2px", fontSize: "12px", textAlign: "center", backgroundColor: "#f1f4ff" }}
                                                                     />
-                                                                    {fieldErrors.item_number && (
+                                                                    {/* {fieldErrors.item_number && (
                                                                         <div style={{ fontSize: "10px", color: "red", marginTop: "2px" }}>{fieldErrors.item_number}</div>
+                                                                    )} */}
+                                                                    {fieldErrors.lineItems && Array.isArray(fieldErrors.lineItems) && fieldErrors.lineItems[index] && (
+                                                                        <div style={{ fontSize: "10px", color: "red", marginTop: "2px" }}>
+                                                                            {fieldErrors.lineItems[index]}
+                                                                        </div>
                                                                     )}
                                                                 </td>
                                                                 <td style={{ border: "none", fontSize: "12px", padding: "4px 2px", textAlign: "left" }}>
@@ -974,12 +1054,12 @@ export default function MaintenanceReport() {
                                                     <tbody>
                                                         <tr>
                                                             <td style={{ width: "60%", padding: "15px 0 5px 0" }}>
-                                                                <div style={{ fontSize: "15px", marginBottom: "3px", textTransform: "uppercase", letterSpacing: "2px" }}>WWW.OREILLYPRO.COM</div>
-                                                                <div style={{ fontSize: "10px", marginBottom: "8px" }}>Warranty/Garantia: www.oreillypro.com/warranty</div>
+                                                                <div style={{ fontSize: "15px", marginBottom: "3px", textTransform: "uppercase", letterSpacing: "2px" }}>WWW.KAVEXPEDITING.COM</div>
+                                                                {/* <div style={{ fontSize: "10px", marginBottom: "8px" }}>Warranty/Garantia: www.oreillypro.com/warranty</div> */}
                                                             </td>
                                                             <td style={{ width: "30%", padding: "15px 0 5px 0" }}>
                                                                 <div style={{ fontSize: "15px", marginBottom: "3px", textTransform: "uppercase", letterSpacing: "2px" }}>WE APPRECIATE YOUR BUSINESS!</div>
-                                                                <div style={{ fontSize: "10px" }}>464WS167 Remit To: PO BOX 9464, SPRINGFIELD, MO 65801-9464</div>
+                                                                {/* <div style={{ fontSize: "10px" }}>464WS167 Remit To: PO BOX 9464, SPRINGFIELD, MO 65801-9464</div> */}
                                                             </td>
                                                         </tr>
                                                     </tbody>

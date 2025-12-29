@@ -9,6 +9,7 @@ import DatePicker from "../../../components/form/date-picker";
 import { fuelService } from "../../../services/fuelService";
 import { TAX_OPTIONS } from "../../../constants/selectOptions";
 import { fuelTypeOptions, UnitTypeOptions } from "../../../constants/vehicleConstants";
+import { settingsService } from "../../../services/settingsService";
 
 interface Vehicle {
     id: number;
@@ -55,6 +56,19 @@ interface Fuel {
         vehicle_name?: string;
     };
 }
+interface Settings {
+    id?: number;
+    title?: string;
+    company_name?: string;
+    phone_number?: string;
+    address?: string;
+    state?: string;
+    city?: string;
+    country?: string;
+    post_code?: string;
+    primary_email?: string;
+    logo_image?: string;
+}
 
 export default function FuelReportCreate() {
     const navigate = useNavigate();
@@ -63,12 +77,14 @@ export default function FuelReportCreate() {
 
     const [vehicles, setVehicles] = useState<Vehicle[]>([]);
     const [vendors, setVendors] = useState<Vendor[]>([]);
+    const [settings, setSettings] = useState<Settings | null>(null);
     const [selectedVendor, setSelectedVendor] = useState<Vendor | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [generalError, setGeneralError] = useState<string>("");
     const [successMessage, setSuccessMessage] = useState<string>("");
-    const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+    // const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+    const [fieldErrors, setFieldErrors] = useState<Record<string, string | string[]>>({});
 
     const [formData, setFormData] = useState({
         vehicle_id: "",
@@ -116,6 +132,23 @@ export default function FuelReportCreate() {
         }
     }, []);
 
+    const getSettingFunction = useCallback(async () => {
+        try {
+            const [settingsRes] = await Promise.all([
+                settingsService.get(),
+
+            ]);
+            console.log(settingsRes);
+            if (settingsRes.data?.status && settingsRes.data?.data) {
+                setSettings(settingsRes.data.data);
+            }
+
+
+        } catch {
+            setGeneralError("Failed to load logo img");
+        }
+    }, []);
+
     const fetchFuelReport = useCallback(async (reportId: number) => {
         setIsLoading(true);
         try {
@@ -146,8 +179,7 @@ export default function FuelReportCreate() {
                     setLineItems(record.line_items);
                 }
                 if (record.vendor_id) {
-                    const vendor = vendors.find(v => v.id === record.vendor_id);
-                    if (vendor) setSelectedVendor(vendor);
+                    return record.vendor_id;
                 }
             }
         } catch {
@@ -155,11 +187,22 @@ export default function FuelReportCreate() {
         } finally {
             setIsLoading(false);
         }
-    }, [vendors]);
+    }, []);
+
+    useEffect(() => {
+        if (formData.vendor_id && vendors.length > 0) {
+            const vendor = vendors.find(v => v.id === Number(formData.vendor_id));
+            if (vendor) setSelectedVendor(vendor);
+        }
+    }, [formData.vendor_id]);
 
     useEffect(() => {
         fetchDropdownData();
     }, [fetchDropdownData]);
+
+    useEffect(() => {
+        getSettingFunction();
+    }, []);
 
     useEffect(() => {
         if (isEditMode && id) {
@@ -297,6 +340,21 @@ export default function FuelReportCreate() {
         }
 
         setLineItems(newLineItems);
+
+        if (field === 'meter_reading' && fieldErrors.lineItems && Array.isArray(fieldErrors.lineItems)) {
+            const newLineItemErrors = [...(fieldErrors.lineItems as string[])];
+            delete newLineItemErrors[index];
+
+            setFieldErrors(prev => {
+                const newErrors = { ...prev };
+                if (newLineItemErrors.filter(Boolean).length === 0) {
+                    delete newErrors.lineItems;
+                } else {
+                    newErrors.lineItems = newLineItemErrors;
+                }
+                return newErrors;
+            });
+        }
     };
 
 
@@ -329,7 +387,7 @@ export default function FuelReportCreate() {
         e.target.style.backgroundColor = "#f1f4ff";
     };
 
-      const scrollToTop = () => {
+    const scrollToTop = () => {
         window.scrollTo(0, 0);
         document.documentElement.scrollTop = 0;
         document.body.scrollTop = 0;
@@ -406,7 +464,7 @@ export default function FuelReportCreate() {
     };
 
     const validateForm = (): boolean => {
-        const errors: Record<string, string> = {};
+        const errors: Record<string, string | string[]> = {};
 
         if (!formData.invoice_number?.trim()) {
             errors.invoice_number = "Invoice number is required";
@@ -432,6 +490,17 @@ export default function FuelReportCreate() {
             errors.vendor_id = "Vendor is required";
         }
 
+        const lineItemErrors: string[] = [];
+        lineItems.forEach((item, index) => {
+            if (!item.meter_reading?.toString().trim()) {
+                lineItemErrors[index] = "Meter reading is required";
+            }
+        });
+
+        if (lineItemErrors.length > 0) {
+            errors.lineItems = lineItemErrors;
+        }
+
         setFieldErrors(errors);
         return Object.keys(errors).length === 0;
     };
@@ -443,7 +512,7 @@ export default function FuelReportCreate() {
                 description="Manage fuel reports"
             />
 
-            <div className="space-y-6" id= 'fuel-container'>
+            <div className="space-y-6" id='fuel-container'>
                 <div className="page-actions flex flex-wrap items-center justify-between gap-3 mb-6">
                     <h2 className="text-base md:text-xl font-semibold text-gray-800 dark:text-white/90">
                         {isEditMode ? "Edit Fuel Report" : "Create Fuel Report"}
@@ -476,11 +545,14 @@ export default function FuelReportCreate() {
                                                                     <tbody>
                                                                         <tr>
                                                                             <td>
-                                                                                <img src="/images/pdf-logo.png" alt="Logo" style={{ maxWidth: "200px", height: "auto", marginBottom: "5px" }} />
-                                                                                <div style={{ fontSize: "14px", fontWeight: "bold", marginTop: "10px", letterSpacing: "2px" }}>DEDICATED TO THE PROFESSIONAL</div>
+                                                                                <img src={settings?.logo_image} alt="Logo" style={{ width: "100%", maxWidth: "100px", height: "auto", marginBottom: "5px" }} />
+                                                                                <div style={{ fontSize: "14px", fontWeight: "bold", marginTop: "10px", letterSpacing: "2px" }}>{settings?.title || "DEDICATED TO THE PROFESSIONAL"}</div>
                                                                                 <div style={{ fontSize: "11px", marginTop: "3px", lineHeight: "1.4" }}>
-                                                                                    <div>Store 464, 11448 AIRLINE HIGHWAY,</div>
-                                                                                    <div>BATON ROUGE, LA 70816 <span style={{ marginLeft: "10px" }}>(225) 292-8930</span></div>
+                                                                                    <div>{settings?.company_name},{settings?.address}</div>
+                                                                                    <div>{settings?.city},{settings?.post_code}
+                                                                                        <span style={{ marginLeft: "10px" }}>
+                                                                                            {settings?.phone_number || "(225) 292-8930"}
+                                                                                        </span></div>
                                                                                 </div>
                                                                             </td>
                                                                         </tr>
@@ -715,7 +787,7 @@ export default function FuelReportCreate() {
                                                             <th style={{ borderTop: "2px solid #000", borderBottom: "1px solid #000", fontSize: "12px", fontWeight: "bold", padding: "2px", textAlign: "center" }}>Vehicle</th>
                                                             {/* <th style={{ borderTop: "2px solid #000", borderBottom: "1px solid #000", fontSize: "12px", fontWeight: "bold", padding: "2px", textAlign: "center" }}>Line</th> */}
                                                             {/* <th style={{ borderTop: "2px solid #000", borderBottom: "1px solid #000", fontSize: "12px", fontWeight: "bold", padding: "2px", textAlign: "center" }}>Fuel Type</th> */}
-                                                            <th style={{ borderTop: "2px solid #000", borderBottom: "1px solid #000", fontSize: "12px", fontWeight: "bold", padding: "2px", textAlign: "center" }}>Meter Reading</th>
+                                                            <th style={{ borderTop: "2px solid #000", borderBottom: "1px solid #000", fontSize: "12px", fontWeight: "bold", padding: "2px", textAlign: "center" }}>Meter Reading <span style={{ color: "red" }}>*</span></th>
                                                             <th style={{ borderTop: "2px solid #000", borderBottom: "1px solid #000", fontSize: "12px", fontWeight: "bold", padding: "2px", textAlign: "center" }}>Unit Type</th>
                                                             <th style={{ borderTop: "2px solid #000", borderBottom: "1px solid #000", fontSize: "12px", fontWeight: "bold", padding: "2px", textAlign: "center" }}>Unit</th>
                                                             <th style={{ borderTop: "2px solid #000", borderBottom: "1px solid #000", fontSize: "12px", fontWeight: "bold", padding: "2px", textAlign: "center" }}>Tax</th>
@@ -776,6 +848,11 @@ export default function FuelReportCreate() {
                                                                         onChange={(e) => handleLineItemChange(index, "meter_reading", e.target.value)}
                                                                         style={{ width: "75%", border: "1px solid #ccc", padding: "2px", fontSize: "12px", textAlign: "center", backgroundColor: "#f1f4ff" }}
                                                                     />
+                                                                    {fieldErrors.lineItems && Array.isArray(fieldErrors.lineItems) && fieldErrors.lineItems[index] && (
+                                                                        <div style={{ fontSize: "10px", color: "red", marginTop: "2px" }}>
+                                                                            {fieldErrors.lineItems[index]}
+                                                                        </div>
+                                                                    )}
                                                                 </td>
                                                                 <td style={{ border: "none", fontSize: "12px", padding: "4px 2px", textAlign: "center" }}>
                                                                     <select
@@ -941,9 +1018,9 @@ export default function FuelReportCreate() {
                                                                             <td style={{ fontSize: "12px", textAlign: "right", padding: "2px 5px", fontWeight: "bold" }}>Total</td>
                                                                             <td style={{ fontSize: "12px", textAlign: "right", padding: "2px 0", fontWeight: "bold" }}>$ {formData.total_value || "0.00"}</td>
                                                                         </tr>
-                                                                            <tr>
-                                                                                 <td style={{ fontSize: "12px", textAlign: "right", padding: "2px 5px" }}>{formData.payment_method}</td>
-                                                                                <td style={{ fontSize: "12px", textAlign: "right", padding: "2px 0"}}> {formData.payment_method && ('$ '+formData.total_value || "0.00")}</td>
+                                                                        <tr>
+                                                                            <td style={{ fontSize: "12px", textAlign: "right", padding: "2px 5px" }}>{formData.payment_method}</td>
+                                                                            <td style={{ fontSize: "12px", textAlign: "right", padding: "2px 0" }}> {formData.payment_method && ('$ ' + formData.total_value || "0.00")}</td>
 
 
 
@@ -958,12 +1035,12 @@ export default function FuelReportCreate() {
                                                     <tbody>
                                                         <tr>
                                                             <td style={{ width: "60%", padding: "15px 0 5px 0" }}>
-                                                                <div style={{ fontSize: "15px", marginBottom: "3px", textTransform: "uppercase", letterSpacing: "2px" }}>WWW.OREILLYPRO.COM</div>
-                                                                <div style={{ fontSize: "10px", marginBottom: "8px" }}>Warranty/Garantia: www.oreillypro.com/warranty</div>
+                                                                <div style={{ fontSize: "15px", marginBottom: "3px", textTransform: "uppercase", letterSpacing: "2px" }}>WWW.KAVEXPEDITING.COM</div>
+                                                                {/* <div style={{ fontSize: "10px", marginBottom: "8px" }}>Warranty/Garantia: www.oreillypro.com/warranty</div> */}
                                                             </td>
                                                             <td style={{ width: "30%", padding: "15px 0 5px 0" }}>
                                                                 <div style={{ fontSize: "15px", marginBottom: "3px", textTransform: "uppercase", letterSpacing: "2px" }}>WE APPRECIATE YOUR BUSINESS!</div>
-                                                                <div style={{ fontSize: "10px" }}>464WS167 Remit To: PO BOX 9464, SPRINGFIELD, MO 65801-9464</div>
+                                                                {/* <div style={{ fontSize: "10px" }}>464WS167 Remit To: PO BOX 9464, SPRINGFIELD, MO 65801-9464</div> */}
                                                             </td>
                                                         </tr>
                                                     </tbody>

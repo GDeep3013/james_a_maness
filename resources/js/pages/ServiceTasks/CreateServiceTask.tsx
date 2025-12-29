@@ -39,7 +39,7 @@ export default function CreateServiceTask() {
     try {
       const response = await serviceTaskService.getForEdit(serviceTaskId);
       const data = response.data as { status: boolean; data?: Record<string, unknown> };
-      
+
       if (data.status && data.data) {
         const serviceTask = data.data as {
           name?: string;
@@ -153,7 +153,7 @@ export default function CreateServiceTask() {
         description={isEditMode ? "Edit service task" : "Create a new service task"}
       />
       <PageBreadcrumb pageTitle={isEditMode ? "Edit Service Task" : "Create Service Task"} />
-      
+
       <div className="flex flex-col lg:flex-row gap-6 justify-center">
         <form onSubmit={handleSubmit} className="w-full max-w-4xl">
           <div className="bg-white rounded-lg border border-gray-200 p-6">
@@ -209,7 +209,7 @@ export default function CreateServiceTask() {
                       onChange={(e) => handleInputChange("description", e.target.value)}
                       placeholder="Enter description"
                       rows={4}
-                      className="h-24 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/20"
+                      className="h-24 w-full rounded-lg resize-none border border-gray-300 bg-transparent px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/20"
                     />
                     <p className="mt-1 text-sm text-gray-500">
                       Additional details about the service/maintenance task.

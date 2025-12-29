@@ -1,109 +1,113 @@
 import api from './api';
 
 interface IssueData {
-  work_order_id?: number | null;
-  user_id?: number;
-  vehicle_id?: number;
-  status?: string;
-  repair_priority_class?: string;
-  issue_date?: string;
-  issued_by?: string;
-  scheduled_start_date?: string;
-  send_scheduled_start_date_reminder?: boolean;
-  actual_start_date?: string;
-  expected_completion_date?: string;
-  actual_completion_date?: string;
-  use_start_odometer_for_completion_meter?: boolean;
-  assigned_to?: number;
-  labels?: string[] | string;
-  vendor_id?: number;
-  invoice_number?: string;
-  po_number?: string;
+    work_order_id?: number | null;
+    user_id?: number;
+    vehicle_id?: number;
+    status?: string;
+    repair_priority_class?: string;
+    issue_date?: string;
+    issued_by?: string;
+    scheduled_start_date?: string;
+    send_scheduled_start_date_reminder?: boolean;
+    actual_start_date?: string;
+    expected_completion_date?: string;
+    actual_completion_date?: string;
+    use_start_odometer_for_completion_meter?: boolean;
+    assigned_to?: number;
+    labels?: string[] | string;
+    vendor_id?: number;
+    invoice_number?: string;
+    po_number?: string;
+    labelFilter?: string;
+    assignedToFilter?: string;
 }
 
 export const issueService = {
-  getAll: (params?: { search?: string; page?: number; status?: string , vehicle_id?: number, work_order_id_null?: boolean, work_order_id?: number}) => {
-    const queryParams = new URLSearchParams();
-    if (params?.search) queryParams.append('search', params.search);
-    if (params?.page) queryParams.append('page', params.page.toString());
-    if (params?.status) queryParams.append('status', params.status);
-    if (params?.vehicle_id) queryParams.append('vehicle_id', params.vehicle_id.toString());
-    if (params?.work_order_id_null) queryParams.append('work_order_id_null', 'true');
-    if (params?.work_order_id) queryParams.append('work_order_id', params.work_order_id.toString());
-    const queryString = queryParams.toString();
-    return api.get(`/issues${queryString ? `?${queryString}` : ''}`);
-  },
+    getAll: (params?: { search?: string; page?: number; status?: string, vehicle_id?: number, work_order_id_null?: boolean, work_order_id?: number ,labelFilter?: string,assignedToFilter?: string,}) => {
+        const queryParams = new URLSearchParams();
+        if (params?.search) queryParams.append('search', params.search);
+        if (params?.page) queryParams.append('page', params.page.toString());
+        if (params?.status) queryParams.append('status', params.status);
+        if (params?.vehicle_id) queryParams.append('vehicle_id', params.vehicle_id.toString());
+        if (params?.work_order_id_null) queryParams.append('work_order_id_null', 'true');
+        if (params?.work_order_id) queryParams.append('work_order_id', params.work_order_id.toString());
+        if (params?.labelFilter) queryParams.append('labelFilter', params.labelFilter.toString());
+        if (params?.assignedToFilter) queryParams.append('assignedToFilter', params.assignedToFilter.toString());
+        const queryString = queryParams.toString();
+        return api.get(`/issues${queryString ? `?${queryString}` : ''}`);
+    },
 
-  getById: (id: number) =>
-    api.get(`/issues/${id}`),
+    getById: (id: number) =>
+        api.get(`/issues/${id}`),
 
-  create: (data: IssueData) => {
-    const formData = new FormData();
-    
-    Object.keys(data).forEach((key) => {
-      const value = data[key as keyof IssueData];
-      if (value !== null && value !== undefined && value !== '') {
-        if (Array.isArray(value)) {
-          formData.append(key, JSON.stringify(value));
-        } else if (typeof value === 'object' && value !== null) {
-          formData.append(key, JSON.stringify(value));
-        } else {
-          formData.append(key, String(value));
+    create: (data: IssueData) => {
+        const formData = new FormData();
+
+        Object.keys(data).forEach((key) => {
+            const value = data[key as keyof IssueData];
+            if (value !== null && value !== undefined && value !== '') {
+                if (Array.isArray(value)) {
+                    formData.append(key, JSON.stringify(value));
+                } else if (typeof value === 'object' && value !== null) {
+                    formData.append(key, JSON.stringify(value));
+                } else {
+                    formData.append(key, String(value));
+                }
+            }
+        });
+
+        const token = localStorage.getItem('auth_token');
+        const headers: Record<string, string> = {};
+        if (token) {
+            headers.Authorization = `Bearer ${token}`;
         }
-      }
-    });
 
-    const token = localStorage.getItem('auth_token');
-    const headers: Record<string, string> = {};
-    if (token) {
-      headers.Authorization = `Bearer ${token}`;
-    }
+        return api.post('/issues', formData, {
+            headers,
+        });
+    },
 
-    return api.post('/issues', formData, {
-      headers,
-    });
-  },
+    update: (id: number, data: Partial<IssueData>) => {
+        const formData = new FormData();
 
-  update: (id: number, data: Partial<IssueData>) => {
-    const formData = new FormData();
-    
-    Object.keys(data).forEach((key) => {
-      const value = data[key as keyof IssueData];
-      if (key === 'work_order_id' && value === null) {
-        formData.append(key, '');
-      } else if (value !== null && value !== undefined && value !== '') {
-        if (Array.isArray(value)) {
-          formData.append(key, JSON.stringify(value));
-        } else if (typeof value === 'object' && value !== null) {
-          formData.append(key, JSON.stringify(value));
-        } else {
-          formData.append(key, String(value));
+        Object.keys(data).forEach((key) => {
+            const value = data[key as keyof IssueData];
+            if (key === 'work_order_id' && value === null) {
+                formData.append(key, '');
+            } else if (value !== null && value !== undefined && value !== '') {
+                if (Array.isArray(value)) {
+                    formData.append(key, JSON.stringify(value));
+                } else if (typeof value === 'object' && value !== null) {
+                    formData.append(key, JSON.stringify(value));
+                } else {
+                    formData.append(key, String(value));
+                }
+            }
+        });
+
+        formData.append('_method', 'PUT');
+
+        const token = localStorage.getItem('auth_token');
+        const headers: Record<string, string> = {};
+        if (token) {
+            headers.Authorization = `Bearer ${token}`;
         }
-      }
-    });
 
-    formData.append('_method', 'PUT');
+        return api.post(`/issues/${id}`, formData, {
+            headers,
+        });
+    },
 
-    const token = localStorage.getItem('auth_token');
-    const headers: Record<string, string> = {};
-    if (token) {
-      headers.Authorization = `Bearer ${token}`;
-    }
+    delete: (id: number) =>
+        api.delete(`/issues/${id}`),
 
-    return api.post(`/issues/${id}`, formData, {
-      headers,
-    });
-  },
+    getForEdit: (id: number) =>
+        api.get(`/issues/${id}/edit`),
 
-  delete: (id: number) =>
-    api.delete(`/issues/${id}`),
-
-  getForEdit: (id: number) =>
-    api.get(`/issues/${id}/edit`),
-
-  assignToWorkOrder: (issueIds: number[], workOrderId: number) => {
-    return Promise.all(
-      issueIds.map(id => issueService.update(id, { work_order_id: workOrderId }))
-    );
-  },
+    assignToWorkOrder: (issueIds: number[], workOrderId: number) => {
+        return Promise.all(
+            issueIds.map(id => issueService.update(id, { work_order_id: workOrderId }))
+        );
+    },
 };

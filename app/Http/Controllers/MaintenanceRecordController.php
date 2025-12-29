@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\MaintenanceRecord;
 use App\Models\Part;
+use App\Models\Setting;
 use App\Models\WorkOrder;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Schema;
@@ -13,7 +14,6 @@ use Illuminate\Support\Facades\Log;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Auth;
-
 class MaintenanceRecordController extends Controller
 {
     private function prepareRequestData(Request $request)
@@ -36,6 +36,7 @@ class MaintenanceRecordController extends Controller
             'vendor:id,name,address,city,state,zip,email',
             'user:id,name'
         ])->orderBy('id', 'desc');
+         $setting = Setting::first();
         $workOrders = WorkOrder::with(['vehicle','vendor'])
             ->when($request->vehicle_id, function ($q) use ($request) {
                 $q->where('vehicle_id', $request->vehicle_id);
@@ -86,7 +87,7 @@ class MaintenanceRecordController extends Controller
 
         $maintenanceRecords = $query->paginate(20);
 
-        return response()->json(['status' => true, 'maintenance_records' => $maintenanceRecords, 'work_orders' => $workOrders,]);
+        return response()->json(['status' => true, 'maintenance_records' => $maintenanceRecords, 'work_orders' => $workOrders, 'settings' => $setting]);
     }
 
     public function store(Request $request)
@@ -433,7 +434,7 @@ class MaintenanceRecordController extends Controller
                     ? json_decode($maintenanceRecord->line_items, true) ?? []
                     : []);
 
-
+            $setting = Setting::first();
             $workOrders = WorkOrder::with(['vehicle','vendor'])
             ->when($maintenanceRecord->vehicle_id, function ($q) use ($maintenanceRecord) {
                 $q->where('vehicle_id', $maintenanceRecord->vehicle_id);
@@ -450,7 +451,9 @@ class MaintenanceRecordController extends Controller
                 'maintenanceRecord' => $maintenanceRecord,
                 'workOrders' => $workOrders,
                 'lineItems' => $lineItems,
+                'settings' => $setting
             ];
+            //    dd($data);
             $pdf = Pdf::loadView('invoice.maintenanceReportPdf', $data);
             $fileName = 'Maintenance_Report_' . $maintenanceRecord->id . '_' . date('Y-m-d') . '.pdf';
 

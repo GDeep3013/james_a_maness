@@ -37,11 +37,16 @@
                                                 <tbody>
                                                     <tr>
                                                         <td>
-                                                            <img src="{{ public_path('images/pdf-logo.png') }}" alt="Logo" style="max-width: 350px; height: auto; margin-bottom: 5px;" />
-                                                            <div style="font-size: 14px; font-weight: bold; margin-top: 10px; letter-spacing: 2px;">DEDICATED TO THE PROFESSIONAL</div>
+                                                            @if(isset($settings) && $settings['logo_image'])
+                                                            <img src="{{ public_path('settings-images/logo/' . $settings['logo_image']) }}" style="width: 150px;"/>
+                                                            @else
+                                                            <img src="{{ public_path('images/pdf-logo.png') }}" style="width: 150px;" />
+                                                            @endif
+
+                                                            <div style="font-size: 14px; font-weight: bold; margin-top: 10px; letter-spacing: 2px;">{{ $settings->title ?? 'DEDICATED TO THE PROFESSIONAL' }}</div>
                                                             <div style="font-size: 14px; margin-top: 3px; line-height: 1.4;">
-                                                                <div>Store 464, 11448 AIRLINE HIGHWAY,</div>
-                                                                <div>BATON ROUGE, LA 70816 <span style="margin-left: 10px;">(225) 292-8930</span></div>
+                                                                <div>{{ $settings['company_name']}}, {{$settings['address']  }}</div>
+                                                                <div>{{$settings['city']}},{{$settings['post_code'] }}<span style="margin-left: 10px;">{{ $settings['phone_number']  ?? '(225) 292-8930' }}</span></div>
                                                             </div>
                                                         </td>
                                                     </tr>
@@ -259,12 +264,12 @@
                                 <tbody>
                                     <tr>
                                         <td style="width:65%; padding: 15px 0 5px 0">
-                                            <div style="font-size: 19px; margin-bottom: 3px; text-transform: uppercase; letter-spacing: 2px;">WWW.OREILLYPRO.COM</div>
-                                            <div style="font-size:12px; margin-bottom:8px;">Warranty/Garantia: www.oreillypro.com/warranty</div>
+                                            <div style="font-size: 19px; margin-bottom: 3px; text-transform: uppercase; letter-spacing: 2px;">WWW.KAVEXPEDITING.COM</div>
+                                            <!-- <div style="font-size:12px; margin-bottom:8px;">Warranty/Garantia: www.oreillypro.com/warranty</div> -->
                                         </td>
                                         <td sstyle="width:25%; padding: 15px 0 5px 0">
                                             <div style="font-size: 19px; margin-bottom: 3px; text-transform: uppercase; letter-spacing: 2px;">WE APPRECIATE YOUR BUSINESS!</div>
-                                            <div style="font-size:12px; margin-bottom:8px;">464WS167 Remit To: PO BOX 9464, SPRINGFIELD, MO 65801-9464</div>
+                                            <!-- <div style="font-size:12px; margin-bottom:8px;">464WS167 Remit To: PO BOX 9464, SPRINGFIELD, MO 65801-9464</div> -->
                                         </td>
                                     </tr>
                                 </tbody>

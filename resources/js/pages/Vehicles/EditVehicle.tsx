@@ -431,6 +431,7 @@ export default function EditVehicle() {
                                             placeholder="Select vehicle type"
                                             onChange={handleSelectChange('type')}
                                             defaultValue={formData.type}
+                                            isPlaceholder={true}
                                         />
                                         {errors.type && (
                                             <p className="mt-1 text-xs text-error-500">{errors.type}</p>
@@ -666,6 +667,7 @@ export default function EditVehicle() {
                                             placeholder={isLoadingVendors ? "Loading vendors..." : "Select vendor (optional)"}
                                             onChange={handleSelectChange('vendor_id')}
                                             defaultValue={formData.vendor_id}
+                                            isPlaceholder={true}
                                         />
                                         {errors.vendor && (
                                             <p className="mt-1 text-xs text-error-500">{errors.vendor}</p>
@@ -676,7 +678,7 @@ export default function EditVehicle() {
                                         <Label htmlFor="assigned_driver">Assigned Driver</Label>
                                         <Select
                                             options={[
-                                                { value: "", label: "Select driver (optional)" },
+                                                // { value: "", label: "Select driver (optional)" },
                                                 ...contacts.map(contact => ({
                                                     value: contact.id.toString(),
                                                     label: `${contact.first_name} ${contact.last_name || ""}`.trim()
@@ -685,6 +687,7 @@ export default function EditVehicle() {
                                             placeholder={isLoadingContacts ? "Loading contacts..." : "Select driver (optional)"}
                                             onChange={(value) => handleInputChange('assigned_driver', value)}
                                             defaultValue={formData.assigned_driver}
+                                            isPlaceholder={true}
                                         />
                                         {errors.assigned_driver && (
                                             <p className="mt-1 text-xs text-error-500">{errors.assigned_driver}</p>
