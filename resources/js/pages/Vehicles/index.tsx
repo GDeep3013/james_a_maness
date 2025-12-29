@@ -10,6 +10,7 @@ import PageBreadcrumb from "../../components/common/PageBreadCrumb";
 
 export default function Vehicles() {
 
+    const [isRefersh, setIsRefersh] = React.useState(false);
     const [importSuccess, setImportSuccess] = useState(false);
 
     const handleImportSuccess = () => {
@@ -39,8 +40,9 @@ export default function Vehicles() {
                 </div>
             </div>
             <div className="space-y-6">
-                <VehicleOverview importSuccess={importSuccess} />
-                <VehicleList importSuccess={importSuccess} />
+                <VehicleOverview importSuccess={importSuccess} isRefersh={isRefersh}
+                    setIsRefersh={setIsRefersh} />
+                <VehicleList importSuccess={importSuccess} setIsRefersh={setIsRefersh} />
             </div>
         </>
     );

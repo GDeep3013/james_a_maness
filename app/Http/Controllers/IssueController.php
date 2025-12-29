@@ -116,14 +116,11 @@ class IssueController extends Controller
                 'primary_meter_due' => 'nullable|numeric',
                 'status' => 'nullable|in:Open,Overdue,Resolved,Closed',
             ]);
-
             DB::beginTransaction();
-
             $reportedDateTime = $validatedData['reported_date'];
             if (!empty($request->reported_time)) {
                 $reportedDateTime = $validatedData['reported_date'] . ' ' . $request->reported_time . ':00';
             }
-
             $issue = new Issue;
             $issue->work_order_id = $request->work_order_id ?? null;
             $issue->vehicle_id = $validatedData['vehicle_id'];
@@ -139,7 +136,6 @@ class IssueController extends Controller
             $issue->due_date = $request->due_date ?? null;
             $issue->primary_meter_due = $request->primary_meter_due ?? null;
             $issue->status = $request->status ?? 'Open';
-
             if ($issue->save()) {
                 DB::commit();
                 return response()->json([

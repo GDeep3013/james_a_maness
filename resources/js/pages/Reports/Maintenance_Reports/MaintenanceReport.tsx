@@ -97,6 +97,8 @@ export default function MaintenanceReport() {
     const [successMessage, setSuccessMessage] = useState<string>("");
     // const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
     const [fieldErrors, setFieldErrors] = useState<Record<string, string | string[]>>({});
+    const [isRefersh, setIsRefersh] = useState(false);
+
     const [formData, setFormData] = useState({
         vehicle_id: "",
         vendor_id: "",
@@ -118,7 +120,7 @@ export default function MaintenanceReport() {
         payment_reference: "",
     });
     const [lineItems, setLineItems] = useState<LineItem[]>([
-        { qty: 0, line: "", item_number: "", description: "", warr: "", unit: "", tax: "Y", list: 0, net: 0, extended: 0 },
+        { qty: 1, line: "", item_number: "", description: "", warr: "", unit: "", tax: "Y", list: 0, net: 0, extended: 0 },
     ]);
 
     const fetchDropdownData = useCallback(async () => {
@@ -148,7 +150,6 @@ export default function MaintenanceReport() {
                 settingsService.get(),
 
             ]);
-            console.log(settingsRes);
             if (settingsRes.data?.status && settingsRes.data?.data) {
                 setSettings(settingsRes.data.data);
             }
@@ -188,6 +189,10 @@ export default function MaintenanceReport() {
                 if (record.line_items && Array.isArray(record.line_items)) {
                     setLineItems(record.line_items);
                 }
+                // if (record.vendor_id) {
+                //     const vendor = vendors.find(v => v.id === record.vendor_id);
+                //     if (vendor) setSelectedVendor(vendor);
+                // }
                 if (record.vendor_id) {
                     return record.vendor_id;
                 }
@@ -197,20 +202,18 @@ export default function MaintenanceReport() {
         } finally {
             setIsLoading(false);
         }
-        return null;
     }, []);
 
     useEffect(() => {
-    if (formData.vendor_id && vendors.length > 0) {
-        const vendor = vendors.find(v => v.id === Number(formData.vendor_id));
-        if (vendor) setSelectedVendor(vendor);
-    }
+        if (formData.vendor_id && vendors.length > 0) {
+            const vendor = vendors.find(v => v.id === Number(formData.vendor_id));
+            if (vendor) setSelectedVendor(vendor);
+        }
     }, [formData.vendor_id]);
 
     useEffect(() => {
         fetchDropdownData();
     }, [fetchDropdownData]);
-
     useEffect(() => {
         getSettingFunction();
     }, []);
@@ -223,7 +226,6 @@ export default function MaintenanceReport() {
     useEffect(() => {
         calculateTotals(lineItems);
     }, [lineItems]);
-
     const fetchFilteredWorkOrders = useCallback(async () => {
         try {
             const [workOrdersRes, servicesRes] = await Promise.all([
@@ -262,11 +264,13 @@ export default function MaintenanceReport() {
                 return true;
             });
 
+            // console.log(workOrders,services)
             const workOrderLineItems: LineItem[] = workOrders.flatMap((wo: WorkOrder) => {
                 if (!wo.parts || wo.parts?.length === 0) return [];
 
                 return wo.parts.map((part: WorkOrderPart) => {
                     const quantity = part.quantity || Number(part.value) || 1;
+                    // console.log(part)
                     return {
                         qty: quantity,
                         line: "",
@@ -309,14 +313,16 @@ export default function MaintenanceReport() {
         } catch {
             setGeneralError("Failed to load work orders and services data");
         }
-    }, [formData.vehicle_id, formData.actual_start_date, formData.actual_completion_date, formData.vendor_id]);
+    }, [formData.vehicle_id, formData.actual_start_date, formData.actual_completion_date]);
 
     useEffect(() => {
         if (formData.vehicle_id && formData.actual_start_date && formData.actual_completion_date) {
-            fetchFilteredWorkOrders();
+            if (isRefersh) {
+                fetchFilteredWorkOrders();
+                setIsRefersh(false)
+            }
         }
-    }, [formData.vehicle_id, formData.actual_start_date, formData.actual_completion_date, fetchFilteredWorkOrders]);
-
+    }, [formData.vehicle_id, formData.actual_start_date, formData.actual_completion_date, isRefersh]);
     const handleInputChange = (field: string, value: string) => {
         setFormData(prev => ({ ...prev, [field]: value }));
         if (fieldErrors[field]) {
@@ -471,16 +477,17 @@ export default function MaintenanceReport() {
     };
 
 
-    const handleDateTimeChange = (name: string) => (_dates: unknown, dateString: string) => {
-        setFormData((prev) => ({ ...prev, [name]: dateString }));
-        if (fieldErrors[name]) {
-            setFieldErrors(prev => {
-                const newErrors = { ...prev };
-                delete newErrors[name];
-                return newErrors;
-            });
-        }
-    };
+    // const handleDateTimeChange = (name: string) => (_dates: unknown, dateString: string) => {
+    //     setFormData((prev) => ({ ...prev, [name]: dateString }));
+    //     if (fieldErrors[name]) {
+    //         setFieldErrors(prev => {
+    //             const newErrors = { ...prev };
+    //             delete newErrors[name];
+    //             return newErrors;
+    //         });
+    //     }
+    // };
+
 
     const validateForm = (): boolean => {
         const errors: Record<string, string | string[]> = {};
@@ -512,7 +519,7 @@ export default function MaintenanceReport() {
         const lineItemErrors: string[] = [];
         lineItems.forEach((item, index) => {
             if (!item.item_number?.trim()) {
-                lineItemErrors[index] = "Item number is required";
+                lineItemErrors[index] = "Item no. is required";
             }
         });
 
@@ -523,7 +530,18 @@ export default function MaintenanceReport() {
         setFieldErrors(errors);
         return Object.keys(errors).length === 0;
     };
-    console.log(settings, "settigns")
+    const handleDateTimeChange = (name: string) => (_dates: unknown, dateString: string) => {
+        setFormData((prev) => ({ ...prev, [name]: dateString }));
+        setIsRefresh(true);
+        if (fieldErrors[name]) {
+            setFieldErrors(prev => {
+                const newErrors = { ...prev };
+                delete newErrors[name];
+                return newErrors;
+            });
+        }
+
+    };
 
     return (
         <>
@@ -718,7 +736,8 @@ export default function MaintenanceReport() {
                                                                     <h3 style={{ fontSize: "14px", fontWeight: "bold", marginBottom: "10px", color: "#374151" }} > Invoice Details </h3>
 
                                                                     <div className="date-time-picker" style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "8px" }} >
-                                                                        <select value={formData.vehicle_id} onChange={(e) => handleInputChange("vehicle_id", e.target.value)}
+                                                                        <select value={formData.vehicle_id}
+                                                                            onChange={(e) => { handleInputChange("vehicle_id", e.target.value), setIsRefersh(true) }}
                                                                             style={{ width: "100%", backgroundColor: "#fff", border: "1px solid #d1d5db", padding: "8px", fontSize: "12px", borderRadius: "6px", outline: "none" }} >
                                                                             <option value="">Select Vehicle</option>
                                                                             {vehicles.map((vehicle) => (
@@ -734,12 +753,14 @@ export default function MaintenanceReport() {
                                                                             placeholder="Select start date"
                                                                             onChange={handleDateTimeChange("actual_start_date")}
                                                                             defaultDate={formData.actual_start_date || undefined}
+
+
                                                                         />
 
                                                                         <DatePicker
                                                                             id="actual_completion_date"
                                                                             placeholder="Select completion date"
-                                                                            onChange={handleDateTimeChange("actual_completion_date")}
+                                                                            onChange={ handleDateTimeChange("actual_completion_date")}
                                                                             defaultDate={formData.actual_completion_date || undefined}
                                                                         />
 
@@ -844,19 +865,16 @@ export default function MaintenanceReport() {
                                                                         style={{ width: "60px", border: "1px solid #ccc", padding: "2px", fontSize: "12px", textAlign: "center", backgroundColor: "#f1f4ff" }}
                                                                     />
                                                                 </td>
-                                                                <td style={{ border: "none", fontSize: "12px", padding: "4px 2px", textAlign: "center" }}>
+                                                                <td style={{ border: "none", fontSize: "12px", padding: "4px 2px", textAlign: "center", position: "relative" }}>
 
                                                                     <input
                                                                         type="text"
                                                                         value={item.item_number}
                                                                         onChange={(e) => handleLineItemChange(index, "item_number", e.target.value)}
-                                                                        style={{ width: "80px", border: "1px solid #ccc", padding: "2px", fontSize: "12px", textAlign: "center", backgroundColor: "#f1f4ff" }}
+                                                                        style={{ width: "82px", border: "1px solid #ccc", padding: "2px", fontSize: "12px", textAlign: "center", backgroundColor: "#f1f4ff" }}
                                                                     />
-                                                                    {/* {fieldErrors.item_number && (
-                                                                        <div style={{ fontSize: "10px", color: "red", marginTop: "2px" }}>{fieldErrors.item_number}</div>
-                                                                    )} */}
                                                                     {fieldErrors.lineItems && Array.isArray(fieldErrors.lineItems) && fieldErrors.lineItems[index] && (
-                                                                        <div style={{ fontSize: "10px", color: "red", marginTop: "2px" }}>
+                                                                        <div style={{ fontSize: "10px", color: "red", position: "absolute", left: "12px", marginTop: "2px" }}>
                                                                             {fieldErrors.lineItems[index]}
                                                                         </div>
                                                                     )}

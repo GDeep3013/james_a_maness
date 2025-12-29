@@ -59,7 +59,11 @@ interface VehiclesResponse {
     };
 }
 
-export default function VehicleList({ importSuccess }: { importSuccess?: boolean }) {
+interface VehicleListProps {
+  importSuccess: boolean;
+  setIsRefersh: React.Dispatch<React.SetStateAction<boolean>>;
+}
+export default function VehicleList({ importSuccess, setIsRefersh}:VehicleListProps) {
     const navigate = useNavigate();
     const [vehicles, setVehicles] = useState<Vehicle[]>([]);
     const [loading, setLoading] = useState(true);
@@ -127,6 +131,7 @@ export default function VehicleList({ importSuccess }: { importSuccess?: boolean
         try {
             await vehicleService.delete(id);
             fetchVehicles(currentPage, searchTerm, status, fuelType);
+            setIsRefersh(true)
         } catch {
             alert("Failed to delete vehicle. Please try again.");
         } finally {

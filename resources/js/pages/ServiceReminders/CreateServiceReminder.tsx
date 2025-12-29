@@ -718,8 +718,6 @@ export default function CreateServiceReminder() {
                                                     placeholder={formData.primary_meter_interval_unit}
                                                     onChange={(e) => {
                                                         const value = e.target.value;
-
-                                                        // Allow empty OR non-negative numbers only
                                                         if (value === "" || Number(value) >= 0) {
                                                             handleInputChange(
                                                                 "primary_meter_due_soon_threshold_value",

@@ -225,7 +225,7 @@ export default function CreateVendor() {
             <div className="space-y-6">
                 {/* <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                       
+
                         <h1 className="text-base md:text-2xl font-semibold text-gray-800 dark:text-white/90">
                             {isEditMode ? "Edit Vendor" : "New Vendor"}
                         </h1>
@@ -517,14 +517,14 @@ export default function CreateVendor() {
                                         >
                                             Cancel
                                         </Button>
-                                        <Button
+                                        {/* <Button
                                             variant="outline"
                                             size="sm"
                                             onClick={handleSaveAndAddAnother}
                                             disabled={isSubmitting}
                                         >
                                             Save & Add Another
-                                        </Button>
+                                        </Button> */}
                                         <Button
                                             variant="primary"
                                             type="submit"

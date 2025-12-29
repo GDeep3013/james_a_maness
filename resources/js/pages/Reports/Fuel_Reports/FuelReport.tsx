@@ -85,7 +85,7 @@ export default function FuelReportCreate() {
     const [successMessage, setSuccessMessage] = useState<string>("");
     // const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
     const [fieldErrors, setFieldErrors] = useState<Record<string, string | string[]>>({});
-
+    const [isRefersh, setIsRefersh] = useState(false);
     const [formData, setFormData] = useState({
         vehicle_id: "",
         vendor_id: "",
@@ -138,7 +138,6 @@ export default function FuelReportCreate() {
                 settingsService.get(),
 
             ]);
-            console.log(settingsRes);
             if (settingsRes.data?.status && settingsRes.data?.data) {
                 setSettings(settingsRes.data.data);
             }
@@ -181,6 +180,10 @@ export default function FuelReportCreate() {
                 if (record.vendor_id) {
                     return record.vendor_id;
                 }
+                // if (record.vendor_id) {
+                //     const vendor = vendors.find(v => v.id === record.vendor_id);
+                //     if (vendor) setSelectedVendor(vendor);
+                // }
             }
         } catch {
             setGeneralError("Failed to load fuel report");
@@ -245,10 +248,7 @@ export default function FuelReportCreate() {
                 const pricePerUnit = Number(
                     String(fuel.price_per_volume_unit).replace(/[^0-9.]/g, '')
                 ) || 0;
-
-                // calculation
                 const extended = totalUnit * pricePerUnit;
-                console.log(typeof (totalUnit), typeof (quantity), typeof (pricePerUnit))
                 return {
                     qty: quantity,
                     // line: "",
@@ -269,13 +269,22 @@ export default function FuelReportCreate() {
         } catch {
             setGeneralError("Failed to load fuel data");
         }
-    }, [formData.vehicle_id, formData.start_date, formData.end_date, formData.vendor_id]);
+    }, [formData.vehicle_id, formData.start_date, formData.end_date]);
 
+    // useEffect(() => {
+    //     if (formData.vehicle_id && formData.start_date && formData.end_date) {
+    //         fetchFilteredFuels();
+    //     }
+    // }, [formData.vehicle_id, formData.start_date, formData.end_date, fetcFilteredFuels]);
     useEffect(() => {
+        // Only fetch filtered fuels in create mode, not in edit mode
         if (formData.vehicle_id && formData.start_date && formData.end_date) {
-            fetchFilteredFuels();
+            if (isRefersh) {
+                fetchFilteredFuels();
+                setIsRefersh(false)
+            }
         }
-    }, [formData.vehicle_id, formData.start_date, formData.end_date, fetchFilteredFuels]);
+    }, [formData.vehicle_id, formData.start_date, formData.end_date, isRefersh]);
 
     const handleInputChange = (field: string, value: string) => {
         setFormData(prev => ({ ...prev, [field]: value }));
@@ -689,7 +698,7 @@ export default function FuelReportCreate() {
                                                                     <div className="date-time-picker" style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "8px" }}>
                                                                         <select
                                                                             value={formData.vehicle_id}
-                                                                            onChange={(e) => handleInputChange("vehicle_id", e.target.value)}
+                                                                            onChange={(e) => { handleInputChange("vehicle_id", e.target.value), setIsRefersh(true) }}
                                                                             style={{ width: "100%", backgroundColor: "#fff", border: "1px solid #d1d5db", padding: "8px", fontSize: "12px", borderRadius: "6px", outline: "none" }}
                                                                         >
                                                                             <option value="">Select Vehicle</option>
@@ -704,14 +713,14 @@ export default function FuelReportCreate() {
                                                                         <DatePicker
                                                                             id="start_date"
                                                                             placeholder="Select start date"
-                                                                            onChange={handleDateTimeChange("start_date")}
+                                                                            onChange={() => { handleDateTimeChange("start_date"), setIsRefersh(true) }}
                                                                             defaultDate={formData.start_date || undefined}
                                                                         />
 
                                                                         <DatePicker
                                                                             id="end_date"
                                                                             placeholder="Select end date"
-                                                                            onChange={handleDateTimeChange("end_date")}
+                                                                            onChange={() => { handleDateTimeChange("end_date"), setIsRefersh(true) }}
                                                                             defaultDate={formData.end_date || undefined}
                                                                         />
 
@@ -841,7 +850,7 @@ export default function FuelReportCreate() {
                                                                         ))}
                                                                     </select>
                                                                 </td> */}
-                                                                <td style={{ border: "none", fontSize: "12px", padding: "4px 2px", textAlign: "center" }}>
+                                                                <td style={{ border: "none", fontSize: "12px", padding: "4px 2px", textAlign: "center", position: "relative" }}>
                                                                     <input
                                                                         type="number"
                                                                         value={item.meter_reading}
