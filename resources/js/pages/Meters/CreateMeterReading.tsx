@@ -263,6 +263,7 @@ export default function CreateMeterReading() {
                         id="date"
                         placeholder="Select date"
                         onChange={handleDateChange("date")}
+                        defaultDate={formData.date || undefined}
                     />
                     {errors.date && (
                         <p className="mt-1 text-sm text-error-500">{errors.date}</p>

@@ -72,7 +72,7 @@ export default function CreateFuel() {
         vehicle_meter: "",
         previous_meter: "",
         notes: "",
-        date: new Date().toISOString().split('T')[0],
+        date: "",
     });
 
     // Dropdown options
@@ -135,7 +135,6 @@ export default function CreateFuel() {
 
             if (data.status && data.data) {
                 const fuel = data.data;
-
                 setFormData({
                     vehicle_id: String(fuel.vehicle_id || ""),
                     vendor_id: String(fuel.vendor_id || ""),
@@ -146,7 +145,8 @@ export default function CreateFuel() {
                     vehicle_meter: String(fuel.vehicle_meter || ""),
                     previous_meter: String(fuel.previous_meter || ""),
                     notes: String(fuel.notes || ""),
-                    date: fuel.date ? String(fuel.date).split('T')[0] : new Date().toISOString().split('T')[0],
+                    date: fuel.date ? String(fuel.date).split('T')[0] : ""
+
                 });
             }
         } catch (error) {
@@ -167,7 +167,6 @@ export default function CreateFuel() {
             });
         }
     };
-
     const handleDateChange = (name: keyof FuelFormData) => (_dates: unknown, currentDateString: string) => {
         setFormData((prev) => ({ ...prev, [name]: currentDateString }));
         if (errors[name]) {
@@ -331,7 +330,7 @@ export default function CreateFuel() {
                         vehicle_meter: "",
                         previous_meter: "",
                         notes: "",
-                        date: new Date().toISOString().split('T')[0],
+                        date: "",
                     });
                     setErrors({});
                     setGeneralError("");
@@ -449,6 +448,8 @@ export default function CreateFuel() {
                         id="date"
                         placeholder="Select date"
                         onChange={handleDateChange("date")}
+                        defaultDate={formData.date || undefined}
+
                     />
                     {errors.date && (
                         <p className="mt-1 text-sm text-error-500">{errors.date}</p>

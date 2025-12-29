@@ -381,6 +381,7 @@ export default function CreateExpenseHistory() {
                         id="date"
                         placeholder="Select date"
                         onChange={handleDateChange("date")}
+                        defaultDate={formData.date || undefined}
                     />
                     {errors.date && (
                         <p className="mt-1 text-sm text-error-500">{errors.date}</p>
@@ -519,12 +520,12 @@ export default function CreateExpenseHistory() {
             <div className="space-y-6">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                    
+
                         <h1 className="text-base md:text-2xl font-semibold text-gray-800 dark:text-white/90">
                             {isEditMode ? "Edit Expense Entry" : "New Expense Entry"}
                         </h1>
                     </div>
-                </div> 
+                </div>
 
                 <div className="flex flex-col lg:flex-row gap-6 justify-center">
                     <form onSubmit={handleSubmit} className="w-full max-w-5xl">

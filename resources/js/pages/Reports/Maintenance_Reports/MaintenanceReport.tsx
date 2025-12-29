@@ -264,13 +264,11 @@ export default function MaintenanceReport() {
                 return true;
             });
 
-            // console.log(workOrders,services)
             const workOrderLineItems: LineItem[] = workOrders.flatMap((wo: WorkOrder) => {
                 if (!wo.parts || wo.parts?.length === 0) return [];
 
                 return wo.parts.map((part: WorkOrderPart) => {
                     const quantity = part.quantity || Number(part.value) || 1;
-                    // console.log(part)
                     return {
                         qty: quantity,
                         line: "",
@@ -281,7 +279,7 @@ export default function MaintenanceReport() {
                         tax: "Y",
                         list: Number(part.unit_price) || 0,
                         net: Number(part.unit_price) || 0,
-                        extended: quantity * (Number(part.unit_price) || 0),
+                        extended: quantity * (Number(part.purchase_price) || 0),
                     };
                 });
             });
@@ -301,7 +299,7 @@ export default function MaintenanceReport() {
                         tax: "Y",
                         list: Number(part.unit_price) || 0,
                         net: Number(part.unit_price) || 0,
-                        extended: quantity * (Number(part.unit_price) || 0),
+                        extended: quantity * (Number(part.purchase_price) || 0),
                     };
                 });
             });

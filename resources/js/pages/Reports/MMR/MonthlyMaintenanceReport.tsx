@@ -708,7 +708,7 @@ export default function MonthlyMaintenanceReport() {
                                     <Button
                                         type="submit"
                                         size="sm"
-                                        disabled={isSubmitting}
+                                        disabled={isSubmitting ||!formData.declaration}
                                         variant="primary"
                                     >
                                         {isSubmitting ? (isEditMode ? "Updating..." : "Saving...") : (isEditMode ? "Update MMR Report" : "Save MMR Report")}
