@@ -7,6 +7,8 @@ import Badge from "../../components/ui/badge/Badge";
 import { workOrderService } from "../../services/workOrderService";
 import { WorkOrder, ServiceItem, Part } from "../../types/workOrderTypes";
 import { WORK_ORDER_STATUS_OPTIONS } from "../../constants/selectOptions";
+import ResolvedIssues from "./ResolvedIssues";
+import { formatTypeModel } from "../../utilites";
 // import { Dropdown } from "../../components/ui/dropdown/Dropdown";
 // import { DropdownItem } from "../../components/ui/dropdown/DropdownItem";
 import {
@@ -35,6 +37,7 @@ export default function WorkOrderDetails() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string>("");
     const [statusDropdownOpen, setStatusDropdownOpen] = useState(false);
+    const [activeTab, setActiveTab] = useState<"Service Line Items" | "Parts">("Service Line Items");
     // const [moreOptionsOpen, setMoreOptionsOpen] = useState(false);
     const statusDropdownRef = useRef<HTMLDivElement>(null);
 
@@ -110,7 +113,6 @@ export default function WorkOrderDetails() {
 
         serviceItems.forEach((item) => {
             laborTotal += getLaborPrice(item);
-            partsTotal += getPartsPrice(item);
         });
 
         parts.forEach((item) => {
@@ -399,9 +401,9 @@ export default function WorkOrderDetails() {
                         </div>
                         <div className="">
                             <p className="text-xs text-gray-500 mb-1">Vehicle</p>
-                            <p className="text-sm font-semibold text-purple-600">
-                                {workOrder.vehicle?.vehicle_name || "N/A"}
-                            </p>
+                            <div className="text-sm font-semibold text-purple-600">
+                                { formatTypeModel(workOrder.vehicle) || "N/A"}
+                            </div>
                         </div>
                     </div>
 
@@ -455,78 +457,168 @@ export default function WorkOrderDetails() {
                 </div>
 
                 <div className="bg-white border-2 border-purple-100 rounded-xl p-6">
-
-                    <div className="flex items-center">
-                        <div className="flex items-center gap-2 mb-4 w-full">
+                    <div className="flex items-center mb-4">
+                        <div className="flex items-center gap-2 w-full">
                             <MaintenanceIcon className="w-5 h-5 text-purple-700 inline-block" />
-                            <h3 className="text-lg font-semibold text-gray-900">Service Line Items</h3>
+                            <h3 className="text-lg font-semibold text-gray-900">Service Line Items & Parts</h3>
                         </div>
-
-
                     </div>
 
+                    <div className="border-b border-gray-200 mb-6">
+                        <nav className="flex space-x-8" aria-label="Tabs">
+                            <button
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    setActiveTab("Service Line Items");
+                                }}
+                                className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                                    activeTab === "Service Line Items"
+                                        ? "border-green-500 text-green-600"
+                                        : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                                }`}
+                            >
+                                Service Line Items
+                            </button>
+                            <button
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    setActiveTab("Parts");
+                                }}
+                                className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                                    activeTab === "Parts"
+                                        ? "border-green-500 text-green-600"
+                                        : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                                }`}
+                            >
+                                Parts
+                            </button>
+                        </nav>
+                    </div>
 
-                    <div className="space-y-4 mb-6">
-                        {serviceItems.map((item, index) => {
-                            const laborPrice = getLaborPrice(item);
-                            const partsPrice = getPartsPrice(item);
-                            const subtotal = laborPrice + partsPrice;
-
-                            return (
-                                <div key={index} className="bg-[#F8F8F8] border border-[#E5E7EB] rounded-lg p-4">
-                                    <div className="flex justify-between md:flex-row flex-col">
-                                        <div className="w-full">
-                                            <div className="flex items-center gap-2 mb-1">
-                                                <h4 className="text-base font-medium text-[#1D2939]">
-                                                    {item.name || "Service Item"}
-                                                </h4>
-                                                {/* <InfoIcon className="w-4 h-4 text-gray-400" /> */}
-                                            </div>
-                                            <div className="flex gap-2">
-                                                <p className="text-sm text-[#595959]">Reason</p>
-                                                <p className="text-sm text-[#595959]">
-                                                    {item.description || "N/A"}
-                                                </p>
-                                            </div>
-                                            <div className="flex items-center gap-2 mb-3">
-                                                <div className="flex gap-2">
-                                                    <p className="text-xs text-[#595959]">Category</p>
-                                                    <p className="text-sm text-[#595959]">
-                                                        {item.label || item.value || "N/A"}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="">
-                                            <div className="flex items-center gap-4 pt-3 border-t border-gray-100">
-                                                <div>
-                                                    <p className="text-xs text-gray-500">Labor</p>
-                                                    <p className="text-sm font-medium text-gray-900">
-                                                        {formatCurrencyWithDecimals(laborPrice)}
-                                                    </p>
-                                                </div>
-                                                <div>
-                                                    <p className="text-xs text-gray-500">Parts</p>
-                                                    <p className="text-sm font-medium text-gray-900">
-                                                        {formatCurrencyWithDecimals(partsPrice)}
-                                                    </p>
-                                                </div>
-                                                <div className="ml-auto">
-                                                    <p className="text-xs text-gray-500">Subtotal</p>
-                                                    <p className="text-sm font-semibold text-gray-900">
-                                                        {formatCurrencyWithDecimals(subtotal)}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
+                    {activeTab === "Service Line Items" && (
+                        <div className="space-y-4 mb-6">
+                            {serviceItems.length === 0 ? (
+                                <div className="flex flex-col items-center justify-center py-12">
+                                    <p className="text-sm text-gray-500">No service line items found</p>
                                 </div>
-                            );
-                        })}
+                            ) : (
+                                serviceItems.map((item, index) => {
+                                    const laborPrice = getLaborPrice(item);
+                                    const subtotal = laborPrice;
 
+                                    return (
+                                        <div key={index} className="bg-[#F8F8F8] border border-[#E5E7EB] rounded-lg p-4">
+                                            <div className="flex justify-between md:flex-row flex-col">
+                                                <div className="w-full">
+                                                    <div className="flex items-center gap-2 mb-1">
+                                                        <h4 className="text-base font-medium text-[#1D2939]">
+                                                            {item.name || "Service Item"}
+                                                        </h4>
+                                                    </div>
+                                                    <div className="flex gap-2">
+                                                        <p className="text-sm text-[#595959]">Reason</p>
+                                                        <p className="text-sm text-[#595959]">
+                                                            {item.description || "N/A"}
+                                                        </p>
+                                                    </div>
+                                                    <div className="flex items-center gap-2 mb-3">
+                                                        <div className="flex gap-2">
+                                                            <p className="text-xs text-[#595959]">Category</p>
+                                                            <p className="text-sm text-[#595959]">
+                                                                {item.label || item.value || "N/A"}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div className="">
+                                                    <div className="flex items-center gap-4 pt-3 border-t border-gray-100">
+                                                        <div>
+                                                            <p className="text-xs text-gray-500">Labor</p>
+                                                            <p className="text-sm font-medium text-gray-900">
+                                                                {formatCurrencyWithDecimals(laborPrice)}
+                                                            </p>
+                                                        </div>
+                                                        <div className="ml-auto">
+                                                            <p className="text-xs text-gray-500">Subtotal</p>
+                                                            <p className="text-sm font-semibold text-gray-900">
+                                                                {formatCurrencyWithDecimals(subtotal)}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                })
+                            )}
+                        </div>
+                    )}
 
-                    </div>
+                    {activeTab === "Parts" && (
+                        <div className="space-y-4 mb-6">
+                            {parts.length === 0 ? (
+                                <div className="flex flex-col items-center justify-center py-12">
+                                    <p className="text-sm text-gray-500">No parts found</p>
+                                </div>
+                            ) : (
+                                parts.map((item, index) => {
+                                    const partsPrice = getPartsPrice(item);
+                                    const subtotal = partsPrice;
+
+                                    return (
+                                        <div key={index} className="bg-[#F8F8F8] border border-[#E5E7EB] rounded-lg p-4">
+                                            <div className="flex justify-between md:flex-row flex-col">
+                                                <div className="w-full">
+                                                    <div className="flex items-center gap-2 mb-1">
+                                                        <h4 className="text-base font-medium text-[#1D2939]">
+                                                            {item.part_name || "Part"}
+                                                            {item.part_code && (
+                                                                <span className="text-sm text-gray-500 ml-2">
+                                                                    ({item.part_code})
+                                                                </span>
+                                                            )}
+                                                        </h4>
+                                                    </div>
+                                                    {item.description && (
+                                                        <div className="flex gap-2 mb-3">
+                                                            <p className="text-sm text-[#595959]">Description</p>
+                                                            <p className="text-sm text-[#595959]">
+                                                                {item.description}
+                                                            </p>
+                                                        </div>
+                                                    )}
+                                                    <div className="flex items-center gap-2 mb-3">
+                                                        <div className="flex gap-2">
+                                                            <p className="text-xs text-[#595959]">Quantity</p>
+                                                            <p className="text-sm text-[#595959]">
+                                                                {item.quantity || 1}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div className="">
+                                                    <div className="flex items-center gap-4 pt-3 border-t border-gray-100">
+                                                        <div>
+                                                            <p className="text-xs text-gray-500">Unit Price</p>
+                                                            <p className="text-sm font-medium text-gray-900">
+                                                                {formatCurrencyWithDecimals(item.unit_price || 0)}
+                                                            </p>
+                                                        </div>
+                                                        <div className="ml-auto">
+                                                            <p className="text-xs text-gray-500">Subtotal</p>
+                                                            <p className="text-sm font-semibold text-gray-900">
+                                                                {formatCurrencyWithDecimals(subtotal)}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                })
+                            )}
+                        </div>
+                    )}
 
                     <div className="pt-4 space-y-3 bg-[#F9FAFB] p-4 rounded-[16px]">
                         <div className="flex justify-between items-center">
@@ -632,7 +724,7 @@ export default function WorkOrderDetails() {
                             <div>
                                 <p className="text-sm text-gray-500 mb-1">Vendor</p>
                                 <p className="text-sm text-gray-900">
-                                    {workOrder.vendor?.company_contact || workOrder.vendor?.first_name || "Not specified"}
+                                    {workOrder.vendor?.company_contact || workOrder.vendor?.name || "Not specified"}
                                 </p>
                             </div>
                             <div>
@@ -645,16 +737,18 @@ export default function WorkOrderDetails() {
                             </div>
                             <div>
                                 <p className="text-sm text-gray-500 mb-1">Description</p>
-                                <p className="text-sm text-gray-900">No description provided</p>
+                                <p className="text-sm text-gray-900">{workOrder.notes || "No description provided"}</p>
                             </div>
                             <div>
                                 <p className="text-sm text-gray-500 mb-1">Users to Notify</p>
-                                <p className="text-sm text-gray-900">None</p>
+                                <p className="text-sm text-gray-900">{workOrder.user?.name || "None"}</p>
                             </div>
-                            <div>
+
+                            {workOrder.send_scheduled_start_date_reminder && <div>
                                 <p className="text-sm text-gray-500 mb-1">Alert Time</p>
-                                <p className="text-sm text-gray-900">Not set</p>
-                            </div>
+                                <p className="text-sm text-gray-900">{ formatDateTime(workOrder.scheduled_start_date)}</p>
+                            </div>}
+
                         </div>
                     </div>
                 </div>
@@ -662,12 +756,13 @@ export default function WorkOrderDetails() {
                 <div className="bg-white border border-[#E5E7EB] rounded-xl p-6">
                     <div className="flex items-center gap-2 mb-4">
                         <AlertIcon className="w-5 h-5 text-purple-600" />
-                        <h3 className="text-lg font-semibold text-gray-900">Resolved Issues</h3>
+                        <h3 className="text-lg font-semibold text-gray-900">Issues</h3>
                     </div>
-                    <div className="flex flex-col items-center justify-center py-4">
-                        <DocsIcon className="w-16 h-16 text-gray-300 mb-4" />
-                        <p className="text-sm text-gray-500">No issues resolved with this work order</p>
-                    </div>
+
+                    <ResolvedIssues 
+                        workOrderId={workOrder.id} 
+                    />
+
                 </div>
 
                 {workOrder.created_at && (

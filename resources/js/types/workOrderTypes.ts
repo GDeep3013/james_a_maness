@@ -115,6 +115,10 @@ export interface WorkOrder {
     year?: string | number;
     license_plate?: string;
   };
+  user?: {
+    id?: number;
+    name?: string;
+  };
   status?: string;
   repair_priority_class?: string;
   issue_date?: string;
@@ -122,6 +126,7 @@ export interface WorkOrder {
   actual_start_date?: string;
   expected_completion_date?: string;
   actual_completion_date?: string;
+  send_scheduled_start_date_reminder?: boolean;
   assigned_to?: {
     id?: number;
     first_name?: string;
@@ -129,12 +134,14 @@ export interface WorkOrder {
   };
   vendor_id?: number;
   vendor?: {
-    first_name?: string;
+    name?: string;
     company_contact?: string;
   };
   invoice_number?: string;
   po_number?: string;
   service_items?: ServiceItem[] | string;
+  parts?: Part[] | string;
+  notes?: string;
   created_at?: string;
 }
 

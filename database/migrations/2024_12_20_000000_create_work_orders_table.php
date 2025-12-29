@@ -28,6 +28,7 @@ return new class extends Migration
             $table->string('po_number')->nullable();
             $table->json('service_items')->nullable();
             $table->json('parts')->nullable();
+            $table->longText('notes')->nullable();
             $table->timestamps();
         });
     }
