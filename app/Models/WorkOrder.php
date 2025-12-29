@@ -35,6 +35,7 @@ class WorkOrder extends Model
         'tax_value',
         'service_items',
         'parts',
+        'notes',
     ];
 
     protected $casts = [

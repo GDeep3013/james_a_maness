@@ -127,6 +127,7 @@ class WorkOrderController extends Controller
                 'tax_value' => 'nullable|numeric',
                 'service_items' => 'nullable|array',
                 'parts' => 'nullable|array',
+                'notes' => 'nullable|string|max:1500',
             ]);
 
             DB::beginTransaction();
@@ -179,6 +180,8 @@ class WorkOrderController extends Controller
                 $workOrder->parts = $parts ?? [];
             }
 
+            $workOrder->notes = $request->notes ?? null;
+
             if ($workOrder->save()) {
                 DB::commit();
                 return response()->json([
@@ -223,7 +226,12 @@ class WorkOrderController extends Controller
             ], 400);
         }
 
-        $workOrder = WorkOrder::where('id', $id)->first();
+        $workOrder = WorkOrder::with([
+            'vehicle:id,vehicle_name,type,make,model,year,license_plate',
+            'assignedTo:id,first_name,last_name',
+            'vendor:id,name',
+            'user:id,name'
+            ])->where('id', $id)->first();
 
         if ($workOrder) {
             return response()->json([
@@ -313,6 +321,7 @@ class WorkOrderController extends Controller
                 'tax_value' => 'nullable|numeric',
                 'service_items' => 'nullable|array',
                 'parts' => 'nullable|array',
+                'notes' => 'nullable|string|max:1500',
             ]);
 
             DB::beginTransaction();
@@ -403,6 +412,9 @@ class WorkOrderController extends Controller
                 } else {
                     $workOrder->parts = $parts ?? [];
                 }
+            }
+            if ($request->has('notes')) {
+                $workOrder->notes = $request->notes;
             }
 
             if ($workOrder->save()) {

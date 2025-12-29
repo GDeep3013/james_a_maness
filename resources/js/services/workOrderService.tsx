@@ -19,6 +19,7 @@ interface WorkOrderData {
     po_number?: string;
     service_items?: unknown[];
     parts?: unknown[];
+    notes?: string;
     priorityStatus?: string
 }
 
