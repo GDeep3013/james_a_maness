@@ -530,7 +530,7 @@ export default function MaintenanceReport() {
     };
     const handleDateTimeChange = (name: string) => (_dates: unknown, dateString: string) => {
         setFormData((prev) => ({ ...prev, [name]: dateString }));
-        setIsRefresh(true);
+        setIsRefersh(true);
         if (fieldErrors[name]) {
             setFieldErrors(prev => {
                 const newErrors = { ...prev };
