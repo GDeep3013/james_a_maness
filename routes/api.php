@@ -85,6 +85,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::apiResource('vehicles', VehicleController::class);
     Route::post('/vehicles/import', [VehicleController::class, 'import']);
+    Route::put('/vehicles/{id}/assigned-driver', [VehicleController::class, 'updateAssignedDriver'])->where('id', '[0-9]+');
 
     Route::get('/vehicles/{id}/edit', [VehicleController::class, 'edit'])->where('id', '[0-9]+');
     Route::get('/vehicles-statistics', [VehicleController::class, 'getStatistics']);

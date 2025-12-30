@@ -88,4 +88,9 @@ class Contact extends Model
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
+
+    function vehicles(){
+        return $this->hasMany(Vehical::class, 'assigned_driver', 'id');
+    }
+
 }

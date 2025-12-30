@@ -58,6 +58,10 @@ class WorkOrderController extends Controller
             $query->where('vendor_id', $request->vendor_id);
         }
 
+        if ($request->has('assigned_to') && !empty($request->assigned_to)) {
+            $query->where('assigned_to', $request->assigned_to);
+        }
+
         if ($request->has('issue_date') && !empty($request->issue_date)) {
             $query->whereMonth('issue_date', date('m', strtotime($request->issue_date)));
             $query->whereYear('issue_date', date('Y', strtotime($request->issue_date)));

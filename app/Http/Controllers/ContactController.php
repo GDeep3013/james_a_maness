@@ -249,7 +249,10 @@ class ContactController extends Controller
     {
         // dd($id);
         if (!empty($id)) {
-            $data = Contact::with(['user:id,profile_picture'])->where('id', $id)->first();
+            $data = Contact::with([
+                    'user:id,profile_picture',
+                    'vehicles'
+                ])->where('id', $id)->first();
             return response()->json(['status' => true, 'message' => 'Contact list', 'contact' => $data]);
         } else {
             return response()->json(['status' => false, 'message' => 'Contact not found']);

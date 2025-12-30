@@ -6,55 +6,12 @@ import { contactService } from "../../services/contactService";
 import PageMeta from "../../components/common/PageMeta";
 import Button from "../../components/ui/button/Button";
 import Badge from "../../components/ui/badge/Badge";
-
-interface Contact {
-    id: number;
-    user_id?: number;
-    job_title?: string;
-    first_name: string;
-    last_name?: string;
-    gender?: string;
-    dob?: string;
-    date_of_birth?: string;
-    sin_no?: string;
-    phone: string;
-    email: string;
-    address?: string;
-    country?: string;
-    state?: string;
-    city?: string;
-    zip?: string;
-    zip_code?: string;
-    license_no?: string;
-    license_number?: string;
-    license_class?: string;
-    license_issue_country?: string;
-    license_issue_state?: string;
-    license_issue_date?: string;
-    license_expire_date?: string;
-    status_in_country?: string;
-    doc_expiry_date?: string;
-    job_join_date?: string;
-    job_leave_date?: string;
-    emergency_contact_name?: string;
-    emergency_contact_no?: string;
-    emergency_contact_address?: string;
-    designation?: string;
-    status?: string;
-    immigration_status?: string;
-    comment?: string;
-    hourly_labor_rate?: number;
-    employee_number?: string;
-    start_date?: string;
-    end_date?: string;
-    user?: {
-        id: number;
-        profile_picture?: string;
-    };
-    classification: string;
-    created_at?: string;
-    updated_at?: string;
-}
+import WorkOrderAssignments from "./WorkOrderAssignments";
+import IssueAssignments from "./IssueAssignments";
+import ServiceReminderAssignments from "./ServiceReminderAssignments";
+import AddVehicleAssignmentModal from "./AddVehicleAssignmentModal";
+import VehicleAssignments from "./VehicleAssignments";
+import { Contact } from "../../types/ContactTypes";
 
 export default function ContactDetail() {
     const navigate = useNavigate();
@@ -62,6 +19,7 @@ export default function ContactDetail() {
     const [contact, setContact] = useState<Contact | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string>("");
+    const [isAddVehicleModalOpen, setIsAddVehicleModalOpen] = useState(false);
 
     useEffect(() => {
         if (id) {
@@ -112,6 +70,12 @@ export default function ContactDetail() {
     const getFullName = () => {
         if (!contact) return "";
         return `${contact.first_name} ${contact.last_name || ""}`.trim();
+    };
+
+    const handleVehicleAssignmentSuccess = () => {
+        if (id) {
+            fetchContact(parseInt(id));
+        }
     };
 
     if (loading) {
@@ -179,7 +143,7 @@ export default function ContactDetail() {
                             variant="primary"
                             size="sm"
                             onClick={handleEdit}
-                            className="min-height-[40px] !leading-[40px]"
+                            className="min-height-[40px] leading-[40px]!"
                             startIcon={<PencilIcon />}
                         >
                             Edit
@@ -363,22 +327,21 @@ export default function ContactDetail() {
                         <div className="bg-white rounded-lg lg:p-6 p-3 border border-gray-200">
                             <div className="flex flex-wrap sm:flex-nowrap justify-between items-center mb-2">
                                 <h2 className="text-base md:text-lg font-semibold text-gray-800 dark:text-white/90 mb-3">
-                                    No currently active vehicle assignments.
+                                    Vehicle assignments.
                                 </h2>
                                 <div className="flex gap-3">
-                                    <button className="text-sm text-primary-600 font-medium hover:underline">
+                                    <button
+                                        onClick={() => setIsAddVehicleModalOpen(true)}
+                                        className="text-sm text-primary-600 font-medium hover:underline"
+                                    >
                                         + Add Vehicle Assignment
-                                    </button>
-                                    <button className="text-sm text-primary-600 font-medium hover:underline">
-                                        View All
                                     </button>
                                 </div>
                             </div>
-                            <div className="flex flex-col items-center py-6">
-                                <span className="text-gray-400 text-sm">
-                                    No currently active vehicle assignments.
-                                </span>
-                            </div>
+                            <VehicleAssignments 
+                                vehicles={contact.vehicles} 
+                                onUnassign={handleVehicleAssignmentSuccess}
+                            />
                         </div>
                         <div className="bg-white rounded-lg lg:p-6 p-3 border border-gray-200 mt-4">
                             <div className="flex flex-wrap sm:flex-nowrap justify-between items-center mb-2">
@@ -386,45 +349,28 @@ export default function ContactDetail() {
                                     Incomplete Work Order Assignments
                                 </h2>
                             </div>
-                            <div className="flex flex-col items-center py-6">
-                                <span className="text-gray-400 text-sm">
-                                    Contact must have technican crassification to the assigned to work anders
-                                </span>
-                            </div>
+                            
+                            <WorkOrderAssignments contactId={contact.id} />
+                                
+                           
                         </div>
                         <div className="bg-white rounded-lg lg:p-6 p-3 border border-gray-200 mt-4">
                             <div className="flex flex-wrap sm:flex-nowrap justify-between items-center mb-2">
                                 <h2 className="text-base md:text-lg font-semibold text-gray-800 dark:text-white/90 mb-3">
                                     Open Issue Assignments
                                 </h2>
-                                <div className="flex gap-3">
-                                    <button className="text-sm text-primary-600 font-medium hover:underline">
-                                        View All
-                                    </button>
-                                </div>
+                                
                             </div>
-                            <div className="flex flex-col items-center py-6">
-                                <span className="text-gray-400 text-sm">
-                                    No open uns currently assigned
-                                </span>
-                            </div>
+                            <IssueAssignments contactId={contact.id} />
                         </div>
                         <div className="bg-white rounded-lg lg:p-6 p-3 border border-gray-200 mt-4">
                             <div className="flex flex-wrap sm:flex-nowrap justify-between items-center mb-2">
                                 <h2 className="text-base md:text-lg font-semibold text-gray-800 dark:text-white/90 mb-3">
                                     Service Reminder Assignments
                                 </h2>
-                                <div className="flex gap-3">
-                                    <button className="text-sm text-primary-600 font-medium hover:underline">
-                                        View All
-                                    </button>
-                                </div>
+                                
                             </div>
-                            <div className="flex flex-col items-center py-6">
-                                <span className="text-gray-400 text-sm">
-                                    No service reminders currently assigned
-                                </span>
-                            </div>
+                            <ServiceReminderAssignments contactId={contact.id} />
                         </div>
                     </div>
                 </div>
@@ -432,6 +378,13 @@ export default function ContactDetail() {
 
 
             </div>
+
+            <AddVehicleAssignmentModal
+                isOpen={isAddVehicleModalOpen}
+                onClose={() => setIsAddVehicleModalOpen(false)}
+                contactId={contact.id}
+                onSuccess={handleVehicleAssignmentSuccess}
+            />
         </>
     );
 }

@@ -46,6 +46,14 @@ class VehicleController extends Controller
             $query->where('fuel_type', '=', $request->fuelType);
         }
 
+        if ($request->has('unassigned') && $request->unassigned === 'true') {
+            $query->whereNull('assigned_driver');
+        }
+
+        if ($request->has('assigned_driver') && !empty($request->assigned_driver)) {
+            $query->where('assigned_driver', $request->assigned_driver);
+        }
+
         if (!empty($request->page) && $request->page !== "page") {
             $vehicle = $query->paginate(20);
             if (!empty($vehicle)) {
@@ -222,6 +230,10 @@ class VehicleController extends Controller
         }
 
         try {
+            // Convert empty string to null for assigned_driver to allow unassigning
+            if ($request->has('assigned_driver') && $request->assigned_driver === '') {
+                $request->merge(['assigned_driver' => null]);
+            }
 
             $validatedData = $request->validate([
                 'vehicle_name' => 'required|string|max:255',
@@ -264,7 +276,7 @@ class VehicleController extends Controller
             $vehicle->vendor_id = $request->vendor_id ?? $vehicle->vendor_id;
             $vehicle->primary_location = $request->primary_location ?? null;
             $vehicle->notes = $request->notes ?? null;
-            $vehicle->assigned_driver = $request->assigned_driver ?? null;
+            $vehicle->assigned_driver = $request->assigned_driver ?? $vehicle->assigned_driver;
             $vehicle->department = $request->department ?? null;
 
             if ($vehicle->save()) {
@@ -285,6 +297,51 @@ class VehicleController extends Controller
         }
     }
 
+    /**
+     * Update the assigned driver for a vehicle.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function updateAssignedDriver(Request $request, $id)
+    {
+        if (empty($id)) {
+            return response()->json(['status' => false, 'message' => 'Vehicle ID is required'], 400);
+        }
+
+        $vehicle = Vehical::find($id);
+        if (!$vehicle) {
+            return response()->json(['status' => false, 'message' => 'Vehicle not found'], 404);
+        }
+
+        try {
+            $validatedData = $request->validate([
+                'assigned_driver' => 'nullable|integer|exists:contacts,id',
+            ]);
+
+            $vehicle->assigned_driver = $validatedData['assigned_driver'] ?? null;
+
+            if ($vehicle->save()) {
+                return response()->json([
+                    'status' => true,
+                    'message' => $validatedData['assigned_driver'] 
+                        ? 'Vehicle assigned successfully' 
+                        : 'Vehicle unassigned successfully'
+                ]);
+            } else {
+                return response()->json(['status' => false, 'message' => 'Failed to update assigned driver'], 500);
+            }
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json(['status' => 'error', 'errors' => $e->validator->errors()], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'An error occurred while updating the assigned driver. Please try again.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
 
     /**
      * Import vehicles from Excel file.

@@ -20,11 +20,12 @@ interface ServiceReminderData {
 }
 
 export const serviceReminderService = {
-    getAll: (params?: { search?: string; page?: number; status?: string }) => {
+    getAll: (params?: { search?: string; page?: number; status?: string; watcher_id?: number }) => {
         const queryParams = new URLSearchParams();
         if (params?.search) queryParams.append('search', params.search);
         if (params?.page) queryParams.append('page', params.page.toString());
         if (params?.status) queryParams.append('status', params.status);
+        if (params?.watcher_id) queryParams.append('watcher_id', params.watcher_id.toString());
         const queryString = queryParams.toString();
         return api.get(`/service-reminders${queryString ? `?${queryString}` : ''}`);
     },

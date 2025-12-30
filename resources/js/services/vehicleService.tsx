@@ -13,15 +13,18 @@ interface VehicleData {
   registration_state_province?: string;
   labels?: string;
   photo?: File | string | null;
+  assigned_driver?: number | null;
 }
 
 export const vehicleService = {
-  getAll: (params?: { search?: string; page?: number; status?: string; fuelType?: string }) => {
+  getAll: (params?: { search?: string; page?: number; status?: string; fuelType?: string; unassigned?: boolean; assigned_driver?: number }) => {
     const queryParams = new URLSearchParams();
     if (params?.search) queryParams.append('search', params.search);
     if (params?.page) queryParams.append('page', params.page.toString());
     if (params?.status) queryParams.append('status', params.status);
     if (params?.fuelType) queryParams.append('fuelType', params.fuelType);
+    if (params?.unassigned) queryParams.append('unassigned', 'true');
+    if (params?.assigned_driver) queryParams.append('assigned_driver', params.assigned_driver.toString());
     const queryString = queryParams.toString();
     return api.get(`/vehicles${queryString ? `?${queryString}` : ''}`);
   },
@@ -57,7 +60,10 @@ export const vehicleService = {
     
     Object.keys(data).forEach((key) => {
       const value = data[key as keyof VehicleData];
-      if (value !== null && value !== undefined && value !== '') {
+      // Handle explicit null for assigned_driver to allow unassigning
+      if (key === 'assigned_driver' && value === null) {
+        formData.append(key, '');
+      } else if (value !== null && value !== undefined && value !== '') {
         if (value instanceof File) {
           formData.append(key, value);
         } else if (typeof value === 'object' && value !== null) {
@@ -79,6 +85,12 @@ export const vehicleService = {
 
   delete: (id: number) =>
     api.delete(`/vehicles/${id}`),
+
+  updateAssignedDriver: (id: number, assignedDriverId: number | null) => {
+    return api.put(`/vehicles/${id}/assigned-driver`, {
+      assigned_driver: assignedDriverId,
+    });
+  },
 
   getForEdit: (id: number) =>
     api.get(`/vehicles/${id}/edit`),

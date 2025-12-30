@@ -32,6 +32,10 @@ class ServiceReminderController extends Controller
             $query->where('vehicle_id', $request->vehicle_id);
         }
 
+        if ($request->has('watcher_id') && !empty($request->watcher_id)) {
+            $query->whereJsonContains('watchers', $request->watcher_id);
+        }
+
         if (!empty($searchTerm)) {
             $query->where(function ($query) use ($tableColumns, $searchTerm) {
                 foreach ($tableColumns as $column) {
