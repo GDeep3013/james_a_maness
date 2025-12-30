@@ -49,11 +49,11 @@ export default function CreateVendor() {
         setIsLoading(true);
         setErrors({});
         try {
-            const response = await vendorService.getForEdit(vendorId);
+            const response = await vendorService.getById(vendorId);
             const data = response.data as VendorResponse;
-
-            if (data.status && data.vendor) {
-                const vendor = data.vendor;
+            console.log(data.data)
+            if (data.status && data.data) {
+                const vendor = data.data;
 
                 // Parse address back into street_address and address_line_2
                 // const addressStr = String(vendor.address || "");

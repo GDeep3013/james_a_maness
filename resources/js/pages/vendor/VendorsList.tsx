@@ -96,8 +96,8 @@ export default function VendorsList() {
         search: searchTerm,
       });
 
-      const blob = response.data instanceof Blob 
-        ? response.data 
+      const blob = response.data instanceof Blob
+        ? response.data
         : new Blob([response.data], {
             type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
           });
@@ -110,17 +110,17 @@ export default function VendorsList() {
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      
+
       const contentDisposition = response.headers['content-disposition'] || response.headers['Content-Disposition'];
       let fileName = `vendors_export_${new Date().toISOString().split('T')[0]}.xlsx`;
-      
+
       if (contentDisposition) {
         const fileNameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
         if (fileNameMatch && fileNameMatch[1]) {
           fileName = fileNameMatch[1].replace(/['"]/g, '').trim();
         }
       }
-      
+
       link.setAttribute('download', fileName);
       document.body.appendChild(link);
       link.click();

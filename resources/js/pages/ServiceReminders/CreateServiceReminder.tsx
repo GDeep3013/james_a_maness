@@ -337,7 +337,6 @@ export default function CreateServiceReminder() {
         if (selectedDates && selectedDates.length > 0) {
             const date = selectedDates[0];
             const formattedDate = date.toLocaleDateString('en-CA');
-            console.log(date, formattedDate)
             handleInputChange(name, formattedDate);
         } else {
             handleInputChange(name, "");

@@ -69,7 +69,7 @@ Route::middleware(['auth', 'page.access'])->group(function () {
     // Vendors
     Route::get('/vendors', [HomeController::class, 'index']);
     Route::get('/vendors/create', [HomeController::class, 'index']);
-    Route::get('/vendors/{id}', [HomeController::class, 'index'])->where('id', '[0-9]+');
+    Route::get('/vendors/{id}/', [HomeController::class, 'index'])->where('id', '[0-9]+');
     Route::get('/vendors/{id}/edit', [HomeController::class, 'index'])->where('id', '[0-9]+');
 
     // Fuels

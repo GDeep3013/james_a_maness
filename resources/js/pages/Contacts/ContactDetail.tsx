@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { ChevronLeftIcon, PencilIcon } from "../../icons";
 import { useNavigate, useParams } from "react-router";
@@ -239,16 +240,16 @@ export default function ContactDetail() {
                                     <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Phone</label>
                                     <p className="mt-1 text-sm text-gray-900 dark:text-white">{contact.phone || "—"}</p>
                                 </div>
-                                <div>
-                                    <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Email</label>
-                                    <p className="mt-1 text-sm text-gray-900 dark:text-white">{contact.email || "—"}</p>
-                                </div>
                                 {contact.sin_no && (
                                     <div>
                                         <label className="text-sm font-medium text-gray-500 dark:text-gray-400">SIN Number</label>
                                         <p className="mt-1 text-sm text-gray-900 dark:text-white">{contact.sin_no}</p>
                                     </div>
                                 )}
+                                <div>
+                                    <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Email</label>
+                                    <p className="mt-1 text-sm text-gray-900 dark:text-white break-all">{contact.email || "—"}</p>
+                                </div>
                                 <div>
                                     <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Address</label>
                                     <p className="mt-1 text-sm text-gray-900 dark:text-white"> Times Square </p>

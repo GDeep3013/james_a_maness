@@ -63,7 +63,7 @@ export default function CreateSchedule() {
     try {
       const response = await serviceTaskService.getAll({ search });
       const data = response.data as { status: boolean; service_tasks?: { data: Array<{ id: number; name: string }> } };
-      
+
       if (data.status && data.service_tasks?.data) {
         const fetchedTasks = data.service_tasks.data.map((task) => ({
           value: task.id.toString(),
@@ -77,7 +77,7 @@ export default function CreateSchedule() {
 
         setServiceTaskOptions((prevOptions) => {
           const currentSelected = selectedTasksRef.current;
-          
+
           const mergedOptions = [...currentSelected];
           fetchedTasks.forEach(task => {
             if (!mergedOptions.find(opt => opt.value === task.value)) {
@@ -146,20 +146,20 @@ export default function CreateSchedule() {
       try {
         const response = await scheduleService.getForEdit(scheduleId);
         const data = response.data as { status: boolean; data?: Record<string, unknown> };
-        
+
         if (data.status && data.data) {
           const schedule = data.data;
           const nextDueMeterStr = String(schedule.next_due_meter || "");
           let nextDueMeterValue = "";
-          
+
           if (nextDueMeterStr) {
             const parts = nextDueMeterStr.trim().split(/\s+/);
             if (parts.length >= 1) {
               nextDueMeterValue = parts[0];
             }
           }
-          
-          const scheduleServiceTaskIds = Array.isArray(schedule.service_task_ids) 
+
+          const scheduleServiceTaskIds = Array.isArray(schedule.service_task_ids)
             ? schedule.service_task_ids.map((id: unknown) => String(id))
             : [];
 
@@ -167,7 +167,7 @@ export default function CreateSchedule() {
             vehicle_id: String(schedule.vehicle_id || ""),
             service_task_ids: scheduleServiceTaskIds,
             notifications_enabled: Boolean(schedule.notifications_enabled !== false),
-            watchers: Array.isArray(schedule.watchers) 
+            watchers: Array.isArray(schedule.watchers)
               ? schedule.watchers.map((w: unknown) => String(w))
               : [],
             next_due_date: schedule.next_due_date ? String(schedule.next_due_date) : "",
@@ -176,7 +176,7 @@ export default function CreateSchedule() {
 
           if (scheduleServiceTaskIds.length > 0) {
             setTimeout(() => {
-              const selectedOptions = allServiceTasks.filter((task: ServiceTaskOption) => 
+              const selectedOptions = allServiceTasks.filter((task: ServiceTaskOption) =>
                 scheduleServiceTaskIds.includes(task.value)
               );
               if (selectedOptions.length > 0) {
@@ -286,16 +286,17 @@ export default function CreateSchedule() {
     setFormData((prev) => ({ ...prev, watchers: selected }));
   };
 
-  const handleDateTimeChange = (name: string) => (selectedDates: Date[]) => {
-    if (selectedDates && selectedDates.length > 0) {
-      const date = selectedDates[0];
-      const formattedDate = date.toISOString().split('T')[0];
-      handleInputChange(name, formattedDate);
-    } else {
-      handleInputChange(name, "");
-    }
-  };
 
+
+    const handleDateTimeChange = (name: string) => (selectedDates: Date[]) => {
+        if (selectedDates && selectedDates.length > 0) {
+            const date = selectedDates[0];
+            const formattedDate = date.toLocaleDateString('en-CA');
+            handleInputChange(name, formattedDate);
+        } else {
+            handleInputChange(name, "");
+        }
+    };
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
 
@@ -405,7 +406,7 @@ export default function CreateSchedule() {
         description={isEditMode ? "Edit schedule" : "Create a new schedule"}
       />
       <PageBreadcrumb pageTitle={isEditMode ? "Edit Schedule" : "Create Schedule"} />
-      
+
       <div className="flex flex-col lg:flex-row gap-6 justify-center max-w-5xl mx-auto">
         <form onSubmit={handleSubmit}>
           <div className="flex-1">
@@ -504,13 +505,21 @@ export default function CreateSchedule() {
                             Next Due Date <span className="text-error-500">*</span>
                           </Label>
                           <DateTimePicker
-                            id="next_due_date"
-                            label=""
-                            placeholder="Select date"
-                            onChange={handleDateTimeChange("next_due_date")}
-                            defaultDate={formData.next_due_date || undefined}
-                            enableTime={false}
-                            dateFormat="m/d/Y"
+                            // id="next_due_date"
+                            // label=""
+                            // placeholder="Select date"
+                            // onChange={handleDateTimeChange("next_due_date")}
+                            //  defaultDate={formData.next_due_date ? new Date(formData.next_due_date) : undefined}
+                            // enableTime={false}
+                                                    //   dateFormat="m/d/Y"
+
+                                                       id="next_due_date"
+                                                        label=""
+                                                        placeholder="Select date"
+                                                        onChange={handleDateTimeChange("next_due_date")}
+                                                        defaultDate={formData.next_due_date ? new Date(formData.next_due_date) : undefined}
+                                                        enableTime={false}
+                                                        dateFormat="m/d/Y"
                           />
                           {errors.next_due_date && (
                             <p className="mt-1 text-sm text-error-500">{errors.next_due_date}</p>
@@ -534,7 +543,7 @@ export default function CreateSchedule() {
                           )}
                         </div>
                       </div>
-                  
+
 
                     <div className="flex items-start gap-3">
                       <Checkbox
@@ -650,7 +659,7 @@ export default function CreateSchedule() {
                       isEditMode ? "Update Schedule" : "Save Schedule"
                     )}
                   </Button>
-                </div>  
+                </div>
               </div>
             )}
           </div>
