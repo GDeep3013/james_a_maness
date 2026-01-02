@@ -475,17 +475,6 @@ export default function MaintenanceReport() {
     };
 
 
-    // const handleDateTimeChange = (name: string) => (_dates: unknown, dateString: string) => {
-    //     setFormData((prev) => ({ ...prev, [name]: dateString }));
-    //     if (fieldErrors[name]) {
-    //         setFieldErrors(prev => {
-    //             const newErrors = { ...prev };
-    //             delete newErrors[name];
-    //             return newErrors;
-    //         });
-    //     }
-    // };
-
 
     const validateForm = (): boolean => {
         const errors: Record<string, string | string[]> = {};
