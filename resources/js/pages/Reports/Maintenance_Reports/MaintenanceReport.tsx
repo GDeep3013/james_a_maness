@@ -758,8 +758,9 @@ export default function MaintenanceReport() {
                                                                         <DatePicker
                                                                             id="actual_completion_date"
                                                                             placeholder="Select completion date"
-                                                                            onChange={ handleDateTimeChange("actual_completion_date")}
+                                                                            onChange={handleDateTimeChange("actual_completion_date")}
                                                                             defaultDate={formData.actual_completion_date || undefined}
+                                                                            defaultMinDate={formData.actual_start_date || undefined}
                                                                         />
 
                                                                     </div>
