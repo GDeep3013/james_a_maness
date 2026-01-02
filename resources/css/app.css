@@ -166,7 +166,9 @@ nav span.menu-item-icon-size svg {
 .bg-info-500{
     background-color: var(--color-blue-500);
 }
-
+span.flatpickr-day.flatpickr-disabled {
+    color: var(--color-gray-400) !important;
+}
 @media (max-width: 1023px) {
     .toggle-sidebar-icon svg,
     .toggle-sidebar-icon .menu-icon {

@@ -104,6 +104,7 @@ export default function VehicleReplacement() {
         }
     };
 
+
     const fetchVehicleReplacement = async (vehicleId: string) => {
         if (!vehicleId) {
             setReplacementId(null);
@@ -675,7 +676,13 @@ export default function VehicleReplacement() {
                             variant="outline"
                             size='sm'
                             onClick={() => {
-                                 setTimeout(() => scrollToTop(), 100);
+
+                                setFormData(prev => ({
+                                    ...prev,
+                                    vehicleId: '',
+                                }));
+                                setTimeout(() => scrollToTop(), 100);
+
                             }}
                             disabled={isSubmitting}
                         >

@@ -104,7 +104,7 @@ class VendorController extends Controller
         try {
             $validatedData = $request->validate([
                 'name' => 'required',
-                'phone'=> 'required',
+                'phone'=> 'required|unique:vendors,phone',
                 'longitude' => 'nullable',
                 'latitude' => 'nullable',
                 'address' => 'nullable',
@@ -205,7 +205,7 @@ class VendorController extends Controller
         try {
             $validatedData = $request->validate([
                 'name' => 'required',
-                'phone'=> 'required',
+                'phone'=> 'required|unique:vendors,phone,' . $id,
                 'address' => 'nullable',
                 'longitude' => 'nullable',
                 'latitude' => 'nullable',
@@ -284,9 +284,9 @@ class VendorController extends Controller
             $search = $request->input('search', '');
 
             $export = new VendorExport($search);
-            
+
             $fileName = 'vendors_export_' . date('Y-m-d_His') . '.xlsx';
-            
+
             return Excel::download($export, $fileName);
         } catch (\Exception $e) {
             return response()->json([

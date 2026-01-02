@@ -851,10 +851,21 @@ export default function FuelReportCreate() {
                                                                     </select>
                                                                 </td> */}
                                                                 <td style={{ border: "none", fontSize: "12px", padding: "4px 2px", textAlign: "center", position: "relative" }}>
-                                                                    <input
+                                                                    {/* <input
                                                                         type="number"
                                                                         value={item.meter_reading}
                                                                         onChange={(e) => handleLineItemChange(index, "meter_reading", e.target.value)}
+                                                                        style={{ width: "75%", border: "1px solid #ccc", padding: "2px", fontSize: "12px", textAlign: "center", backgroundColor: "#f1f4ff" }}
+                                                                    /> */}
+                                                                    <input
+                                                                        type="text"
+                                                                        inputMode="numeric"
+                                                                        pattern="[0-9]*"
+                                                                        value={item.meter_reading}
+                                                                        onChange={(e) => {
+                                                                            const value = e.target.value.replace(/\D/g, ""); 
+                                                                            handleLineItemChange(index, "meter_reading", value);
+                                                                        }}
                                                                         style={{ width: "75%", border: "1px solid #ccc", padding: "2px", fontSize: "12px", textAlign: "center", backgroundColor: "#f1f4ff" }}
                                                                     />
                                                                     {fieldErrors.lineItems && Array.isArray(fieldErrors.lineItems) && fieldErrors.lineItems[index] && (
