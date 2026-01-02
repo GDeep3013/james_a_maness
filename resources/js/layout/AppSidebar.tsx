@@ -23,7 +23,7 @@ type NavItem = {
 
 const AppSidebar: React.FC = () => {
 
-    const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
+    const { isExpanded, isMobileOpen, isHovered, setIsHovered, closeMobileSidebar } = useSidebar();
     const location = useLocation();
     const { hasRole } = useAuth();
 
@@ -85,6 +85,22 @@ const AppSidebar: React.FC = () => {
             });
         });
     }, [location.pathname, isSubItemActive, navItems, othersItems]);
+
+    const prevPathnameRef = useRef(location.pathname);
+    const isMobileOpenRef = useRef(isMobileOpen);
+    
+    useEffect(() => {
+        isMobileOpenRef.current = isMobileOpen;
+    }, [isMobileOpen]);
+    
+    useEffect(() => {
+        if (prevPathnameRef.current !== location.pathname) {
+            prevPathnameRef.current = location.pathname;
+            if (window.innerWidth < 768 && isMobileOpenRef.current) {
+                closeMobileSidebar();
+            }
+        }
+    }, [location.pathname, closeMobileSidebar]);
 
     useEffect(() => {
         if (openSubmenu !== null) {
@@ -195,6 +211,11 @@ const AppSidebar: React.FC = () => {
                                 nav.path && (
                                     <Link
                                         to={nav.path}
+                                        onClick={() => {
+                                            if (window.innerWidth < 768) {
+                                                closeMobileSidebar();
+                                            }
+                                        }}
                                         className={`menu-item group text-base font-medium text-white hover:bg-[#2C0A77] ${isActive(nav.path) ? "menu-item-active bg-[#2C0A77]" : "menu-item-inactive"
                                             } ${isOthersItem ? "menu-item-others hover:bg-transparent" : ""}`}
                                     >
@@ -232,6 +253,9 @@ const AppSidebar: React.FC = () => {
                                                     to={subItem.path}
                                                     onClick={(e) => {
                                                         e.stopPropagation();
+                                                        if (window.innerWidth < 768) {
+                                                            closeMobileSidebar();
+                                                        }
                                                     }}
                                                     className={`menu-dropdown-item text-sm text-white hover:bg-[#2C0A77] ${isSubItemActive(subItem.path)
                                                             ? "menu-dropdown-item-active bg-[#2C0A77]"
