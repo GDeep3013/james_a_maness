@@ -1,55 +1,51 @@
-import { useEffect, ReactNode ,useRef } from "react";
+import { useEffect, ReactNode } from "react";
 import flatpickr from "flatpickr";
 import "flatpickr/dist/flatpickr.css";
 import Label from "./Label";
 import { CalenderIcon } from "../../icons";
 import Hook = flatpickr.Options.Hook;
-import Instance = flatpickr.Options.Hook;
 import DateOption = flatpickr.Options.DateOption;
+
 type PropsType = {
     id: string;
     mode?: "single" | "multiple" | "range" | "time";
     onChange?: Hook | Hook[];
     defaultDate?: DateOption;
     minDate?: DateOption;
-    defaultMinDate?: DateOption;
-    label?: React.ReactNode;
+    label?: ReactNode;
     placeholder?: string;
     error?: boolean;
+    defaultMinDate?: DateOption;
 };
 
 export default function DatePicker({
     id,
-    mode = "single",
+    mode,
     onChange,
     label,
     defaultDate,
     minDate,
     placeholder,
     error,
-    defaultMinDate,
+    defaultMinDate
 }: PropsType) {
-    const inputRef = useRef<HTMLInputElement | null>(null);
-    const fpInstance = useRef<Instance | null>(null);
-
     useEffect(() => {
-        if (!inputRef.current) return;
-
-        fpInstance.current = flatpickr(inputRef.current, {
-            mode,
+        const flatPickr = flatpickr(`#${id}`, {
+            mode: mode || "single",
             static: true,
             monthSelectorType: "static",
             dateFormat: "Y-m-d",
             defaultDate,
-            minDate: minDate ?? defaultMinDate,
+            minDate: defaultMinDate,
             onChange,
         });
 
         return () => {
-            fpInstance.current?.destroy();
-            fpInstance.current = null;
+            if (!Array.isArray(flatPickr)) {
+                flatPickr.destroy();
+            }
         };
-    }, [mode, defaultDate, minDate, defaultMinDate, onChange]);
+    }, [mode, onChange, id, defaultDate, minDate, defaultMinDate]);
 
     return (
         <div>

@@ -722,6 +722,7 @@ export default function FuelReportCreate() {
                                                                             placeholder="Select end date"
                                                                             onChange={() => { handleDateTimeChange("end_date"), setIsRefersh(true) }}
                                                                             defaultDate={formData.end_date || undefined}
+                                                                            defaultMinDate={formData.start_date || undefined}
                                                                         />
 
                                                                     </div>
@@ -863,7 +864,7 @@ export default function FuelReportCreate() {
                                                                         pattern="[0-9]*"
                                                                         value={item.meter_reading}
                                                                         onChange={(e) => {
-                                                                            const value = e.target.value.replace(/\D/g, ""); 
+                                                                            const value = e.target.value.replace(/\D/g, "");
                                                                             handleLineItemChange(index, "meter_reading", value);
                                                                         }}
                                                                         style={{ width: "75%", border: "1px solid #ccc", padding: "2px", fontSize: "12px", textAlign: "center", backgroundColor: "#f1f4ff" }}
