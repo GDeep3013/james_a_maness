@@ -145,6 +145,19 @@ export default function MaintenanceCostChart() {
         dataLabels: {
             enabled: true,
         },
+        states: {
+            hover: {
+                filter: {
+                    type: 'none',
+                }
+            },
+            active: {
+                allowMultipleDataPointsSelection: false,
+                filter: {
+                    type: 'none',
+                }
+            }
+        },
         plotOptions: {
             pie: {
                 donut: {
