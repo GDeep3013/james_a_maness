@@ -203,7 +203,7 @@ export default function WorkOrdersList() {
             <div className="space-y-6">
 
                 <div className="flex items-center justify-between">
-                    <div>
+                    <div className="max-[767px]:max-w-[56%]">
                         <h2 className="text-2xl font-semibold text-gray-800">Work Orders</h2>
                         <p className="text-sm text-[#595959] text-left">Manage vehicle maintenance and repairs</p>
                     </div>

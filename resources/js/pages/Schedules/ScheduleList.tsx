@@ -200,7 +200,7 @@ export default function ScheduleList() {
                 className="!bg-[#F3F3F5] max-w-full border-none !rounded-[8px]"
               />
             </div>
-            <div className="w-full max-w-[20%]">
+            <div className="w-full max-[767px]:max-w-[50%] max-w-[20%]">
               <Select
                 options={STATUS_FILTER_OPTIONS}
                 placeholder="All Status"
@@ -315,7 +315,7 @@ export default function ScheduleList() {
                           </Badge>
                         </TableCell>
                         <TableCell className="px-4 py-3 text-start">
-                          <div className="items-center">
+                          <div className="actions-buttons">
                             <Button
                               variant="none"
                               size="sm"

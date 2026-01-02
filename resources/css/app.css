@@ -4,7 +4,7 @@
     --theme-color: #5321B1;
     --delete-color: #cb3a3a;
     --secondary-color: #26ade1;
-        --spacing: 0.25rem;
+    --spacing: 0.25rem;
 }
 
 html {
@@ -21,64 +21,85 @@ body {
 .kav-side-bar-bg {
     background: linear-gradient(180deg, #2F0886 0%, #6B2AC2 51.44%, #9466EF 100%);
 }
+
 .kav-side-bar-bg span.menu-item-icon-size svg path {
     fill: #fff;
 }
+
 .kav-side-bar-bg span.menu-item-icon-size svg.svg-no-fill path {
     fill: none;
     stroke: #fff;
 }
-.login-image-bg{
+
+.login-image-bg {
     background: url(/assets/img/main-bg-login.webp) no-repeat;
     background-size: 100% 100%;
     min-height: calc(100vh - 63px);
 }
-.view-button span svg{
+
+.view-button span svg {
     fill: currentColor;
 }
-.view-button span svg, .edit-button span svg, .delete-button span svg{
+
+.view-button span svg,
+.edit-button span svg,
+.delete-button span svg {
     width: 18px;
     height: 18px;
 }
-.delete-button{
+
+.delete-button {
     color: #E7000B;
 }
-.delete-button span svg path{
+
+.delete-button span svg path {
     fill: #E7000B;
- }
- .next-button svg {
+}
+
+.next-button svg {
     width: 16px;
     height: 16px;
- }
- .next-button svg path{
+}
+
+.next-button svg path {
     stroke: #fff;
- }
+}
+
 .menu-item-others-wrapper {
     margin-top: auto;
     border-top: 1px solid rgba(255, 255, 255, 0.2);
     padding-top: 1rem;
 }
+
 .menu-item-others {
     border-top: none;
     padding-top: 0;
     margin-top: 0;
 }
+
 .menu-item-others-icon {
     opacity: 0.9;
 }
+
 .fc-daygrid-event-harness .fc-daygrid-event.fc-event-start {
     margin-left: 0px !important;
 }
+
 .fc-daygrid-event-harness .fc-daygrid-event.fc-event-start {
     margin: 2px 3px !IMPORTANT;
 }
+
 .fc-daygrid-event-harness .fc-daygrid-event.fc-event-start .event-fc-color {
     padding: 1px 5px;
     overflow: hidden;
 }
-.fc-daygrid-event-harness .fc-daygrid-event.fc-event .event-fc-color .fc-event-title, .fc-event-main .fc-event-title, .fc-daygrid-event-harness .fc-daygrid-event.fc-event .event-fc-color .fc-event-time {
+
+.fc-daygrid-event-harness .fc-daygrid-event.fc-event .event-fc-color .fc-event-title,
+.fc-event-main .fc-event-title,
+.fc-daygrid-event-harness .fc-daygrid-event.fc-event .event-fc-color .fc-event-time {
     font-size: 12px !important;
 }
+
 .fc-event .fc-event-main .fc-event-title {
     font-size: 12px;
     max-width: 100%;
@@ -87,52 +108,70 @@ body {
     overflow: hidden;
     margin-left: 2px;
 }
-.fc-timegrid-col-events .fc-timegrid-event-harness a.fc-event{
+
+.fc-timegrid-col-events .fc-timegrid-event-harness a.fc-event {
     min-height: max-content;
 }
+
 .fc-event-main .fc-daygrid-event-dot {
     margin-right: 4px;
 }
-.custom-calendar button.fc-addEventButton-button, .custom-calendar .fc-button.fc-button-active {
+
+.custom-calendar button.fc-addEventButton-button,
+.custom-calendar .fc-button.fc-button-active {
     background-color: #5321B1 !important;
     color: #fff !important;
 }
+
 .custom-calendar button.fc-addEventButton-button:hover {
     background-color: #E06B04 !important;
 }
+
 select {
     appearance: none;
     background: url('/images/down-arrow.png') no-repeat;
     background-position: 98% 50%;
     color: #1d2939
 }
+
 select.all-status-select {
     background: url('/images/down-arrow.png') no-repeat #F3F3F5;
     background-position: 95% 50%;
     /* color: #1d2939; */
 }
-.footer-shadow{
+
+.footer-shadow {
     box-shadow: -3px -3px 13.7px 0px #0000001A;
 }
+
 nav span.menu-item-icon-size svg {
     width: calc(var(--spacing) * 5) !important;
     height: calc(var(--spacing) * 5) !important;
 }
+
 .screen-height {
     min-height: calc(100vh - 77px);
     padding-bottom: 70px;
     max-height: calc(100dvh - 77px);
     stroke-width: thin;
 }
-.react-select__menu{
+
+.react-select__menu {
     z-index: 99999;
     background-color: #fff;
 }
-#fuel-form-container .date-picker input {height: 22px;box-shadow: none;border: none;}
+
+#fuel-form-container .date-picker input {
+    height: 22px;
+    box-shadow: none;
+    border: none;
+}
+
 #fuel-form-container .date-time-picker .flatpickr-wrapper span svg {
     width: 18px;
     height: 18px;
 }
+
 #fuel-form-container .date-time-picker div .date-picker {
     background-color: rgb(255, 255, 255);
     border: 1px solid rgb(209, 213, 219);
@@ -146,12 +185,17 @@ nav span.menu-item-icon-size svg {
     height: 18px;
 }
 
-#maintenance-form-container .date-picker input {height: 22px;box-shadow: none;border: none;}
+#maintenance-form-container .date-picker input {
+    height: 22px;
+    box-shadow: none;
+    border: none;
+}
 
 #maintenance-form-container .date-time-picker .flatpickr-wrapper span svg {
     width: 18px;
     height: 18px;
 }
+
 #maintenance-form-container .date-time-picker div .date-picker {
     background-color: rgb(255, 255, 255);
     border: 1px solid rgb(209, 213, 219);
@@ -159,15 +203,22 @@ nav span.menu-item-icon-size svg {
     font-size: 12px;
     border-radius: 6px;
 }
+
 #maintenance-form-container .date-time-picker div .date-picker span svg {
     width: 18px;
     height: 18px;
 }
-.bg-info-500{
+
+.bg-info-500 {
     background-color: var(--color-blue-500);
+}
+.actions-buttons{
+  display: grid;  
+  grid-template-columns: repeat(3, 1fr);
 }
 
 @media (max-width: 1023px) {
+
     .toggle-sidebar-icon svg,
     .toggle-sidebar-icon .menu-icon {
         width: 32px !important;
@@ -177,11 +228,16 @@ nav span.menu-item-icon-size svg {
 }
 
 @media screen and (max-width:767px) {
-    .custom-calendar .fc-dayGridMonth-view{
+    .custom-calendar .fc-dayGridMonth-view {
         min-width: 100% !important;
     }
+
     .screen-height {
-    min-height: calc(100vh - 34px);
-    padding-bottom: 34px;
-}
+        min-height: calc(100vh - 34px);
+        padding-bottom: 64px;
+    }
+
+    nav ol li a {
+        font-size: 12px;
+    }
 }
