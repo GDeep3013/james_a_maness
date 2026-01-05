@@ -819,7 +819,7 @@ export default function CreateServiceReminder() {
                                     </div>
                                 </div>
 
-                                <div className="mt-6 flex justify-end gap-4">
+                                <div className="md:mt-6 flex flex-wrap md:flex-nowrap justify-center md:justify-end gap-2 md:gap-4">
                                     <Button
                                         variant="outline"
                                         size="sm"
