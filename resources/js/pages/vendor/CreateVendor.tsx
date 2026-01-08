@@ -302,7 +302,7 @@ export default function CreateVendor() {
                                                     Phone <span className="text-red-500">*</span>
                                                 </Label>
                                                 <Input
-                                                    type="tel"
+                                                    type="text"
                                                     id="phone"
                                                     name="phone"
                                                     value={formData.phone}
@@ -316,14 +316,14 @@ export default function CreateVendor() {
                                                     placeholder="Enter phone number"
                                                     className={errors.phone ? "border-error-500" : ""}
                                                 />
-                                                <Input
+                                                {/* <Input
                                                     type="text"
                                                     id="phone"
                                                     value={formData.phone}
                                                     onChange={(e) => handleInputChange("phone", e.target.value)}
                                                     placeholder="Enter phone number"
                                                     className={errors.phone ? "border-red-500" : ""}
-                                                />
+                                                /> */}
                                                 {errors.phone && (
                                                     <p className="mt-1 text-sm text-red-500">{errors.phone}</p>
                                                 )}
