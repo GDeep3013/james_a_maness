@@ -8,7 +8,7 @@ import DateOption = flatpickr.Options.DateOption;
 
 type PropsType = {
     id: string;
-    mode?: "single" | "multiple" | "range" | "time";
+    mode?: "single" | "multiple" | "range" | "time" | "month";
     onChange?: Hook | Hook[];
     defaultDate?: DateOption;
     minDate?: DateOption;
@@ -31,7 +31,7 @@ export default function DatePicker({
 }: PropsType) {
     useEffect(() => {
         const flatPickr = flatpickr(`#${id}`, {
-            mode: mode || "single",
+            mode: mode === "month" ? "single" : (mode || "single"),
             static: true,
             monthSelectorType: "static",
             dateFormat: "Y-m-d",

@@ -115,6 +115,12 @@ export default function FuelDetail() {
                             ${calculateTotalCost(fuel?.units || 0, fuel?.price_per_volume_unit || 0)}
                             </span>
                         </div>
+                        <div className="flex flex-col">
+                            <span className="text-sm text-gray-600 dark:text-gray-400">Notes</span>
+                            <span className="text-sm font-medium text-gray-900 dark:text-white">
+                            {fuel?.notes || '--'}
+                            </span>
+                        </div>
 
                     </div>
                 </div>
@@ -122,17 +128,17 @@ export default function FuelDetail() {
                     <div className="grid grid-cols-2 lg:grid-cols-3 gap-6">
 
                         <div>
-                            <span className="text-xs text-gray-500">Volume</span>
+                            <span className="text-sm text-gray-500">Volume</span>
                             <div className="flex items-end gap-2">
-                                <span className="md:text-2xl text-xl font-semibold text-gray-900 dark:text-white">143.127</span>
+                                <span className="text-xl font-semibold text-gray-900 dark:text-white">143.127</span>
                                 <span className="text-xs text-gray-400">gallons (US)</span>
                             </div>
                         </div>
 
                         <div>
-                            <span className="text-xs text-gray-500">Fuel Price</span>
+                            <span className="text-sm text-gray-500">Fuel Price</span>
                             <div className="flex items-end gap-2">
-                                <span className="md:text-2xl text-xl font-semibold text-gray-900 dark:text-white">
+                                <span className="text-xl font-semibold text-gray-900 dark:text-white">
                                     ${fuel?.price_per_volume_unit || 0}
                                     </span>
                                 <span className="text-xs text-gray-400">/gallon</span>
@@ -140,18 +146,18 @@ export default function FuelDetail() {
                         </div>
 
                         <div>
-                            <span className="text-xs text-gray-500">Total</span>
+                            <span className="text-sm text-gray-500">Total</span>
                             <div className="flex items-end gap-2">
-                                <span className="md:text-2xl text-xl font-semibold text-gray-900 dark:text-white">
+                                <span className="text-xl font-semibold text-gray-900 dark:text-white">
                                 ${calculateTotalCost(fuel?.units || 0, fuel?.price_per_volume_unit || 0)}
                                     </span>
                             </div>
                         </div>
 
                         <div>
-                            <span className="text-xs text-gray-500">Usage</span>
+                            <span className="text-sm text-gray-500">Usage</span>
                             <div className="flex items-end gap-2">
-                                <span className="md:text-2xl text-xl font-semibold text-gray-900 dark:text-white">
+                                <span className="text-xl font-semibold text-gray-900 dark:text-white">
                                     {fuel?.vehicle_meter || 0}
                                     </span>
                                 <span className="text-xs text-gray-400">miles</span>
@@ -159,22 +165,31 @@ export default function FuelDetail() {
                         </div>
 
                         <div>
-                            <span className="text-xs text-gray-500">Fuel Economy</span>
+                            <span className="text-sm text-gray-500">Fuel Economy</span>
                             <div className="flex items-end gap-2">
-                                <span className="md:text-2xl text-xl font-semibold text-gray-900 dark:text-white">0.78</span>
+                                <span className="text-xl font-semibold text-gray-900 dark:text-white">0.78</span>
                                 <span className="text-xs text-gray-400">mpg (US)</span>
                             </div>
                             <div className="text-xs text-success-600 flex items-center mt-1">
                             </div>
                         </div>
                         <div>
-                            <span className="text-xs text-gray-500">Cost</span>
+                            <span className="text-sm text-gray-500">Cost</span>
                             <div className="flex items-end gap-2">
-                                <span className="md:text-2xl text-xl font-semibold text-gray-900 dark:text-white">6.75</span>
+                                <span className="text-xl font-semibold text-gray-900 dark:text-white">6.75</span>
                                 <span className="text-xs text-gray-400">/ mile</span>
                             </div>
                             <div className="text-xs text-success-600 flex items-center mt-1">
                             </div>
+                        </div>
+                        <div>
+                            <span className="text-sm text-gray-600">Notes</span>
+                            <div className="flex items-end gap-2">
+                                <span className="text-xl font-semibold text-gray-900 dark:text-white">
+                                    {fuel?.notes || '--'}
+                                </span>
+                            </div>
+
                         </div>
                     </div>
                 </div>

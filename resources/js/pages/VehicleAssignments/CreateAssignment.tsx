@@ -246,6 +246,22 @@ const CreateAssignment: React.FC = () => {
         }
     };
 
+    useEffect(() => {
+        if (calendarRef.current) {
+            const calendarApi = calendarRef.current.getApi();
+            const viewDate = calendarApi.getDate();
+
+            const viewMonth = viewDate.getMonth() + 1;
+            const viewYear = viewDate.getFullYear();
+
+            setCurrentMonth(viewMonth);
+            setCurrentYear(viewYear);
+
+            fetchEvents(viewMonth, viewYear, true);
+        }
+
+    }, []);
+
     const handleEventClick = async (clickInfo: EventClickArg) => {
         const event = clickInfo.event;
         setSelectedEvent(event as unknown as AssignmentEvent);
@@ -593,6 +609,7 @@ const CreateAssignment: React.FC = () => {
             setCalendarLoader(false);
         }
     }, [calendarLoader]);
+
 
 
     return (

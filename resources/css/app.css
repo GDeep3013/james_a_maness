@@ -219,6 +219,22 @@ span.flatpickr-day.flatpickr-disabled {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
 }
+.monthly-date-picker .flatpickr-wrapper input {
+    width: 100%;
+    background-color: rgb(241, 244, 255);
+    border: 1px solid rgb(0, 0, 0);
+    padding: 5px;
+    font-size: 12px;
+    min-height: 25px;
+    box-sizing: border-box;
+    outline: none;
+    border-radius: 0;
+    height: 30px;
+}
+.monthly-date-picker .date-picker svg {
+    width: 17px;
+    height: 17px;
+}
 
 @media (max-width: 1023px) {
 
