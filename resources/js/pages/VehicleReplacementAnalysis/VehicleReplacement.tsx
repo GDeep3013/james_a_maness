@@ -133,7 +133,7 @@ export default function VehicleReplacement() {
                 }
 
                 setFormData({
-                    vehicleId: String(replacement.vehicle_id),
+                    vehicleId: vehicleId,
                     estimatedVehicleLife: vehicleLife,
                     estimatedAnnualUsage: String(replacement.estimated_annual_usage || ''),
                     estimatedFuelEfficiency: String(replacement.estimated_fuel_efficiency || ''),
@@ -375,7 +375,7 @@ export default function VehicleReplacement() {
 
     const numberOfYears = getNumberOfYears(formData.estimatedVehicleLife);
     const years = Array.from({ length: numberOfYears }, (_, i) => i + 1);
-
+    console.log(formData.vehicleId,"vehicle")
     return (
         <>
             <PageMeta
