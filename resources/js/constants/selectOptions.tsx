@@ -13,7 +13,7 @@ export const PRIORITY_OPTIONS: SelectOption[] = [
 ];
 
 export const LABEL_OPTIONS: SelectOption[] = [
-    { value: "", label: "Please select" },
+    // { value: "", label: "Please select" },
     { value: "electrical", label: "Electrical" },
     { value: "mechanical", label: "Mechanical" },
     { value: "body", label: "Body" },

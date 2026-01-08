@@ -23,7 +23,11 @@ const LayoutContent: React.FC = () => {
                         <Outlet />
                     </div>
                     <div className="py-3 footer-shadow text-center w-full absolute bottom-0 bg-white">
-                        <p className="text-sm text-[#8A8A8A]">© 2025 KAV Expediting. All Rights Reserved</p>
+                        {/* <p className="text-sm text-[#8A8A8A]">© 2025 KAV Expediting. All Rights Reserved</p> */}
+                        <p className="text-sm text-[#8A8A8A]">
+                            © {new Date().getFullYear()} KAV Expediting. All Rights Reserved
+                        </p>
+
                     </div>
                 </div>
 

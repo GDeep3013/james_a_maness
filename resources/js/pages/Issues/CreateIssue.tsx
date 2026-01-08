@@ -187,7 +187,7 @@ export default function CreateIssue() {
     };
 
     const assignedToOptions = [
-        { value: "", label: "Please select" },
+        // { value: "", label: "Please select" },
         ...contacts.map((contact) => ({
             value: contact.id.toString(),
             label: `${contact.first_name} ${contact.last_name || ""}`.trim(),
@@ -195,7 +195,7 @@ export default function CreateIssue() {
     ];
 
     const vehicleOptions = [
-        { value: "", label: "Please select" },
+        // { value: "", label: "Please select" },
         ...vehicles.map((vehicle) => ({
             value: vehicle.id.toString(),
             label: vehicle.vehicle_name,
@@ -357,10 +357,12 @@ export default function CreateIssue() {
                                         </Label>
                                         <Select
                                             options={vehicleOptions}
-                                            placeholder={isLoadingVehicles ? "Loading vehicles..." : "Select vehicle"}
+                                            placeholder= "Select vehicle"
                                             onChange={handleVehicleChange}
                                             defaultValue={formData.vehicle_id?.toString() || ""}
                                             disabled={isLoadingVehicles}
+                                            isPlaceholder={true}
+
                                         />
                                         {errors.asset && (
                                             <p className="mt-1 text-sm text-red-500">{errors.asset}</p>

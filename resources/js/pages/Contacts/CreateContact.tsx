@@ -423,6 +423,22 @@ export default function CreateContact() {
                         Phone <span className="text-error-500">*</span>
                     </Label>
                     <Input
+                        type="text"
+                        id="phone"
+                        name="phone"
+                        value={formData.phone}
+                        maxLength={12}
+                        onChange={(e) => {
+                            const value = e.target.value.replace(/\D/g, ""); // digits only
+                            if (value.length <= 12) {
+                                handleInputChange("phone", value);
+                            }
+                        }}
+                        placeholder="Enter phone number"
+                        className={errors.phone ? "border-error-500" : ""}
+                    />
+
+                    {/* <Input
                         type="tel"
                         id="phone"
                         name="phone"
@@ -430,7 +446,7 @@ export default function CreateContact() {
                         onChange={(e) => handleInputChange("phone", e.target.value)}
                         placeholder="Enter phone number"
                         className={errors.phone ? "border-error-500" : ""}
-                    />
+                    /> */}
                     {errors.phone && (
                         <p className="mt-1 text-sm text-error-500">{errors.phone}</p>
                     )}
