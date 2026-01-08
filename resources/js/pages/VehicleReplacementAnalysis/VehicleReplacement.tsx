@@ -375,7 +375,7 @@ export default function VehicleReplacement() {
 
     const numberOfYears = getNumberOfYears(formData.estimatedVehicleLife);
     const years = Array.from({ length: numberOfYears }, (_, i) => i + 1);
-    console.log(formData.vehicleId,"vehicle")
+    // console.log(formData.vehicleId,"vehicle")
     return (
         <>
             <PageMeta
