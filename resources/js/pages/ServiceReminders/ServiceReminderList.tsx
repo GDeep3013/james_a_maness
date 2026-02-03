@@ -203,7 +203,7 @@ export default function ServiceReminderList() {
 
         <form onSubmit={handleSearch} className="bg-white border border-gray-200 rounded-xl p-4">
           <div className="flex flex-wrap items-center gap-4">
-            <div className="flex-1 sm:max-w-[50%] max-w-[50%]">
+            <div className="flex-1 sm:max-w-[50%] max-w-[100%]">
               <Input
                 type="text"
                 placeholder="Search by vehicle, service task..."

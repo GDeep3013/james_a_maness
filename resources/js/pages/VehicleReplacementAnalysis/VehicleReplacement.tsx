@@ -104,6 +104,7 @@ export default function VehicleReplacement() {
         }
     };
 
+
     const fetchVehicleReplacement = async (vehicleId: string) => {
         if (!vehicleId) {
             setReplacementId(null);
@@ -132,7 +133,7 @@ export default function VehicleReplacement() {
                 }
 
                 setFormData({
-                    vehicleId: String(replacement.vehicle_id),
+                    vehicleId: vehicleId,
                     estimatedVehicleLife: vehicleLife,
                     estimatedAnnualUsage: String(replacement.estimated_annual_usage || ''),
                     estimatedFuelEfficiency: String(replacement.estimated_fuel_efficiency || ''),
@@ -374,7 +375,7 @@ export default function VehicleReplacement() {
 
     const numberOfYears = getNumberOfYears(formData.estimatedVehicleLife);
     const years = Array.from({ length: numberOfYears }, (_, i) => i + 1);
-
+    // console.log(formData.vehicleId,"vehicle")
     return (
         <>
             <PageMeta
@@ -675,7 +676,13 @@ export default function VehicleReplacement() {
                             variant="outline"
                             size='sm'
                             onClick={() => {
-                                 setTimeout(() => scrollToTop(), 100);
+
+                                setFormData(prev => ({
+                                    ...prev,
+                                    vehicleId: '',
+                                }));
+                                setTimeout(() => scrollToTop(), 100);
+
                             }}
                             disabled={isSubmitting}
                         >

@@ -187,18 +187,38 @@ export default function CreateVendor() {
                 throw new Error(response.data?.message || "Failed to save vendor");
             }
         } catch (error: unknown) {
-            const err = error as { response?: { data?: { errors?: Record<string, string[]>; message?: string } } };
-            if (err.response?.data?.errors) {
+            const err = error as {
+                response?: {
+                    data?: {
+                        errors?: Record<string, string[]>;
+                        message?: Record<string, string[]> | string;
+                    };
+                };
+            };
+
+            const apiErrors =
+                err.response?.data?.errors ||
+                (typeof err.response?.data?.message === "object"
+                    ? err.response?.data?.message
+                    : null);
+
+            if (apiErrors) {
                 const validationErrors: Record<string, string> = {};
-                Object.keys(err.response.data.errors).forEach((key) => {
-                    const errorMessages = err.response?.data?.errors?.[key];
-                    if (errorMessages && errorMessages.length > 0) {
-                        validationErrors[key] = errorMessages[0];
+
+                Object.keys(apiErrors).forEach((key) => {
+                    if (apiErrors[key]?.length) {
+                        validationErrors[key] = apiErrors[key][0];
                     }
                 });
+
                 setErrors(validationErrors);
             } else {
-                setErrors({ general: err.response?.data?.message || `Failed to ${isEditMode ? 'update' : 'save'} vendor. Please try again.` });
+                setErrors({
+                    general:
+                        typeof err.response?.data?.message === "string"
+                            ? err.response.data.message
+                            : `Failed to ${isEditMode ? "update" : "save"} vendor. Please try again.`,
+                });
             }
         } finally {
             setIsSubmitting(false);
@@ -284,11 +304,26 @@ export default function CreateVendor() {
                                                 <Input
                                                     type="text"
                                                     id="phone"
+                                                    name="phone"
+                                                    value={formData.phone}
+                                                    maxLength={12}
+                                                    onChange={(e) => {
+                                                        const value = e.target.value.replace(/\D/g, ""); // digits only
+                                                        if (value.length <= 12) {
+                                                            handleInputChange("phone", value);
+                                                        }
+                                                    }}
+                                                    placeholder="Enter phone number"
+                                                    className={errors.phone ? "border-error-500" : ""}
+                                                />
+                                                {/* <Input
+                                                    type="text"
+                                                    id="phone"
                                                     value={formData.phone}
                                                     onChange={(e) => handleInputChange("phone", e.target.value)}
                                                     placeholder="Enter phone number"
                                                     className={errors.phone ? "border-red-500" : ""}
-                                                />
+                                                /> */}
                                                 {errors.phone && (
                                                     <p className="mt-1 text-sm text-red-500">{errors.phone}</p>
                                                 )}

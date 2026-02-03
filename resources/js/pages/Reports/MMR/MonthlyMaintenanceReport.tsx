@@ -8,6 +8,7 @@ import MMRTaskList from "./MMRTaskList";
 import { MMRReport, MaintenanceRecord } from "../../../types/MMRReportTypes";
 import { formatDate } from "../../../utilites/formatting";
 import PageBreadcrumb from "../../../components/common/PageBreadCrumb";
+import DatePicker from "../../../components/form/month-year-picker";
 
 interface Vehicle {
     id: number;
@@ -25,6 +26,8 @@ interface VehiclesResponse {
         total: number;
     };
 }
+
+
 
 export default function MonthlyMaintenanceReport() {
     const { id } = useParams<{ id: string }>();
@@ -51,6 +54,8 @@ export default function MonthlyMaintenanceReport() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [isDownloading, setIsDownloading] = useState(false);
+
+
 
     useEffect(() => {
         const fetchVehicles = async () => {
@@ -342,6 +347,16 @@ export default function MonthlyMaintenanceReport() {
         }
     };
 
+    // Add this helper function at the top of your component, after imports
+    const formatMonthYear = (dateString: string): string => {
+        if (!dateString) return "";
+        const [year, month] = dateString.split('-');
+        const date = new Date(parseInt(year), parseInt(month) - 1);
+        const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+            "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        return `${monthNames[date.getMonth()]} ${year}`;
+    };
+
     return (
         <>
             <PageMeta
@@ -421,17 +436,32 @@ export default function MonthlyMaintenanceReport() {
                                                     <tbody>
                                                         <tr>
                                                             <td style={{ fontSize: "12px", padding: "8px 20px 8px 8px", verticalAlign: "top", width: "35%" }}>
-                                                                <span style={{ fontWeight: "bold", paddingLeft: "10px", paddingBottom: "5px", fontSize: "14px" }}>Maintenance Record for the Month and Year of:</span>
-                                                                <input
-                                                                    type="month"
-                                                                    value={formData.date}
-                                                                    onChange={(e) => handleInputChange("date", e.target.value)}
-                                                                    style={{ width: "100%", backgroundColor: errors.date ? "#fee" : "#f1f4ff", border: errors.date ? "1px solid #f00" : "1px solid #000", padding: "5px", fontSize: "12px", minHeight: "25px", boxSizing: "border-box", outline: "none" }}
-                                                                    onFocus={handleInputFocus}
-                                                                    onBlur={handleInputBlur}
-                                                                    autoComplete="off"
-                                                                />
-                                                                {errors.date && <div style={{ color: "#f00", fontSize: "11px", paddingTop: "2px" }}>{errors.date}</div>}
+                                                                <span style={{ fontWeight: "bold", paddingLeft: "10px", paddingBottom: "5px", fontSize: "14px" }}>
+                                                                    Maintenance Record for the Month and Year of:
+                                                                </span>
+                                                                <div className="monthly-date-picker">
+                                                                    <DatePicker
+                                                                        id="mmr-month-year-picker"
+                                                                        mode="month"
+                                                                        defaultDate={formData.date}
+                                                                        onChange={(selectedDates) => {
+                                                                            if (selectedDates && selectedDates.length > 0) {
+                                                                                const date = selectedDates[0];
+                                                                                const year = date.getFullYear();
+                                                                                const month = String(date.getMonth() + 1).padStart(2, '0');
+                                                                                const formattedDate = `${year}-${month}`;
+                                                                                handleInputChange("date", formattedDate);
+                                                                            }
+                                                                        }}
+                                                                        placeholder="Select month and year"
+                                                                        error={!!errors.date}
+                                                                    />
+                                                                </div>
+                                                                {errors.date && (
+                                                                    <div style={{ color: "#f00", fontSize: "11px", paddingTop: "2px" }}>
+                                                                        {errors.date}
+                                                                    </div>
+                                                                )}
                                                             </td>
                                                             <td style={{ fontSize: "12px", padding: "8px 5px 8px 20px", verticalAlign: "top", width: "35%" }}>
                                                                 <span style={{ fontWeight: "bold", paddingLeft: "10px", paddingBottom: "5px", fontSize: "14px" }}>Domicile Station/Hub: <span style={{ color: "#f00" }}>*</span></span>
@@ -708,7 +738,7 @@ export default function MonthlyMaintenanceReport() {
                                     <Button
                                         type="submit"
                                         size="sm"
-                                        disabled={isSubmitting ||!formData.declaration}
+                                        disabled={isSubmitting || !formData.declaration}
                                         variant="primary"
                                     >
                                         {isSubmitting ? (isEditMode ? "Updating..." : "Saving...") : (isEditMode ? "Update MMR Report" : "Save MMR Report")}

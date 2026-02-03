@@ -64,12 +64,13 @@ const CreateAssignment: React.FC = () => {
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [generalError, setGeneralError] = useState("");
-    const [currentMonth, setCurrentMonth] = useState<number>(new Date().getMonth() + 1);
-    const [currentYear, setCurrentYear] = useState<number>(new Date().getFullYear());
+    const [currentMonth, setCurrentMonth] = useState<number | null>(null);
+    const [currentYear, setCurrentYear] = useState<number | null>(null);
+    const [initialLoadDone, setInitialLoadDone] = useState(false);
     const calendarRef = useRef<FullCalendar>(null);
     const { isOpen, openModal, closeModal } = useModal();
     const [allEventsSorted, setAllEventsSorted] = useState<AssignmentEvent[]>([]);
-    const [calendarLoader, setCalendarLoader] = useState(false);
+
     const calendarsEvents = {
         Danger: "danger",
         Success: "success",
@@ -105,11 +106,10 @@ const CreateAssignment: React.FC = () => {
         }
     };
 
-    const fetchEvents = async (month?: number, year?: number, calendarLoader?: boolean) => {
-
+    const fetchEvents = async (month?: number, year?: number) => {
         try {
-            const fetchMonth = month || currentMonth;
-            const fetchYear = year || currentYear;
+            const fetchMonth = month || (currentMonth ?? new Date().getMonth() + 1);
+            const fetchYear = year || (currentYear ?? new Date().getFullYear());
             const response = await vehicleAssignmentService.getAll({ month: fetchMonth, year: fetchYear });
             if (response.data?.status && response.data?.vehicle_assignments) {
                 const assignments = Array.isArray(response.data.vehicle_assignments)
@@ -190,11 +190,7 @@ const CreateAssignment: React.FC = () => {
                         },
                     };
                 });
-                // setEvents(calendarEvents);
-                if (calendarLoader) {
-                    setEvents(calendarEvents);
-                    setCalendarLoader(true);
-                }
+                setEvents(calendarEvents);
             }
         } catch {
             // Error handling is silent
@@ -202,9 +198,29 @@ const CreateAssignment: React.FC = () => {
     };
 
     useEffect(() => {
-        fetchVehicles();
-        fetchContacts();
-        fetchEvents(currentMonth, currentYear, true);
+        const initializeData = async () => {
+            await Promise.all([fetchVehicles(), fetchContacts()]);
+
+            // Get initial calendar date after calendar has mounted
+            if (calendarRef.current) {
+                const calendarApi = calendarRef.current.getApi();
+                const viewDate = calendarApi.getDate();
+                const viewMonth = viewDate.getMonth() + 1;
+                const viewYear = viewDate.getFullYear();
+
+                setCurrentMonth(viewMonth);
+                setCurrentYear(viewYear);
+                await fetchEvents(viewMonth, viewYear);
+                setInitialLoadDone(true);
+            }
+        };
+
+        // Small delay to ensure calendar is mounted
+        const timer = setTimeout(() => {
+            initializeData();
+        }, 100);
+
+        return () => clearTimeout(timer);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -221,6 +237,11 @@ const CreateAssignment: React.FC = () => {
     };
 
     const handleDatesSet = (dateInfo: { start: Date; end: Date; startStr: string; endStr: string; timeZone: string; view: { type: string; title: string } }) => {
+        // Skip if initial load is not done yet (will be handled by useEffect)
+        if (!initialLoadDone) {
+            return;
+        }
+
         // Get the current date from the calendar to ensure we have the correct month
         let viewDate: Date;
         if (calendarRef.current) {
@@ -228,21 +249,20 @@ const CreateAssignment: React.FC = () => {
             viewDate = calendarApi.getDate();
         } else {
             // Fallback: use the 15th day of the visible range to ensure we're in the correct month
-            // This avoids edge cases where start might be from previous month
             const startDate = new Date(dateInfo.start);
             const day15 = new Date(startDate.getFullYear(), startDate.getMonth(), 15);
             viewDate = day15;
         }
 
         // Update current month and year when calendar view changes
-        // getMonth() returns 0-11, so add 1 to get 1-12 (January = 1, December = 12)
         const viewMonth = viewDate.getMonth() + 1;
         const viewYear = viewDate.getFullYear();
 
+        // Only fetch if month/year actually changed
         if (viewMonth !== currentMonth || viewYear !== currentYear) {
             setCurrentMonth(viewMonth);
             setCurrentYear(viewYear);
-            fetchEvents(viewMonth, viewYear, false);
+            fetchEvents(viewMonth, viewYear);
         }
     };
 
@@ -266,7 +286,6 @@ const CreateAssignment: React.FC = () => {
         }
 
         try {
-
             const eventId = typeof event.id === 'string' ? parseInt(event.id) : event.id;
             const response = await vehicleAssignmentService.getForEdit(eventId);
             if (response.data?.status && response.data?.data) {
@@ -368,20 +387,19 @@ const CreateAssignment: React.FC = () => {
 
             if (response.data?.status === true || response.status === 200 || response.status === 201) {
                 // Determine which month to fetch based on the event's start date
-                // Parse the date string to avoid timezone issues
                 const dateParts = eventStartDate.split('-');
                 const eventYear = parseInt(dateParts[0], 10);
-                const eventMonth = parseInt(dateParts[1], 10); // Already 1-12 format from YYYY-MM-DD
+                const eventMonth = parseInt(dateParts[1], 10);
 
-                // If event is in current view month, refresh current month, otherwise fetch event's month
-                if (eventMonth === currentMonth && eventYear === currentYear) {
-                    await fetchEvents(currentMonth, currentYear, true);
-                } else {
-                    // Fetch the month where the event is located
-                    await fetchEvents(eventMonth, eventYear, true);
+                // Refresh events for the month where event was created/updated
+                await fetchEvents(eventMonth, eventYear);
+
+                // Update current month/year if navigating to different month
+                if (eventMonth !== currentMonth || eventYear !== currentYear) {
                     setCurrentMonth(eventMonth);
                     setCurrentYear(eventYear);
                 }
+
                 closeModal();
                 resetModalFields();
             } else {
@@ -562,38 +580,19 @@ const CreateAssignment: React.FC = () => {
         handleFieldChange(field, currentDateString);
     };
 
-
-    // Get all events sorted by date
-    // const getAllEventsSorted = (): AssignmentEvent[] => {
-    //     return [...events].sort((a, b) => {
-    //         const dateA = a.start && (typeof a.start === 'string' || a.start instanceof Date)
-    //             ? new Date(a.start).getTime()
-    //             : 0;
-    //         const dateB = b.start && (typeof b.start === 'string' || b.start instanceof Date)
-    //             ? new Date(b.start).getTime()
-    //             : 0;
-    //         return dateA - dateB;
-    //     });
-    // };
-
+    // Sort events whenever events array changes
     useEffect(() => {
-        if (calendarLoader) {
-
-            const sorted = [...events].sort((a, b) => {
-                const dateA = a.start && (typeof a.start === 'string' || a.start instanceof Date)
-                    ? new Date(a.start).getTime()
-                    : 0;
-                const dateB = b.start && (typeof b.start === 'string' || b.start instanceof Date)
-                    ? new Date(b.start).getTime()
-                    : 0;
-                return dateA - dateB;
-            });
-
-            setAllEventsSorted(sorted);
-            setCalendarLoader(false);
-        }
-    }, [calendarLoader]);
-
+        const sorted = [...events].sort((a, b) => {
+            const dateA = a.start && (typeof a.start === 'string' || a.start instanceof Date)
+                ? new Date(a.start).getTime()
+                : 0;
+            const dateB = b.start && (typeof b.start === 'string' || b.start instanceof Date)
+                ? new Date(b.start).getTime()
+                : 0;
+            return dateA - dateB;
+        });
+        setAllEventsSorted(sorted);
+    }, [events]);
 
     return (
         <>
@@ -607,7 +606,6 @@ const CreateAssignment: React.FC = () => {
                     <div>
                         <h1 className="text-2xl font-semibold text-gray-800">Vehicle Assignments</h1>
                     </div>
-
                 </div>
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <div className="lg:col-span-2 rounded-2xl border border-gray-200 bg-white">
@@ -645,10 +643,14 @@ const CreateAssignment: React.FC = () => {
                             {/* Events List - All Events */}
                             <div>
                                 <h4 className="text-sm font-medium text-gray-700 mb-3">
-                                    All Events ({new Date(currentYear, currentMonth - 1, 1).toLocaleDateString('en-US', {
-                                        month: 'long',
-                                        year: 'numeric'
-                                    })})
+                                    {currentMonth && currentYear ? (
+                                        <>All Events ({new Date(currentYear, currentMonth - 1, 1).toLocaleDateString('en-US', {
+                                            month: 'long',
+                                            year: 'numeric'
+                                        })})</>
+                                    ) : (
+                                        'All Events'
+                                    )}
                                 </h4>
 
                                 {allEventsSorted.length > 0 ? (

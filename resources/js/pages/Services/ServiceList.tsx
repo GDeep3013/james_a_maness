@@ -335,7 +335,7 @@ export default function ServiceList() {
                                                     </div>
                                                 </TableCell>
                                                 <TableCell className="px-4 py-3 text-start">
-                                                    <div className="">
+                                                    <div className="actions-buttons">
                                                         <Button
                                                             variant="none"
                                                             size="sm"

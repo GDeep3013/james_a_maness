@@ -461,8 +461,9 @@ export default function FuelReportCreate() {
         }
     };
 
-    const handleDateTimeChange = (name: string) => (_dates: unknown, dateString: string) => {
+  const handleDateTimeChange = (name: string) => (_dates: unknown, dateString: string) => {
         setFormData((prev) => ({ ...prev, [name]: dateString }));
+        setIsRefersh(true);
         if (fieldErrors[name]) {
             setFieldErrors(prev => {
                 const newErrors = { ...prev };
@@ -470,7 +471,8 @@ export default function FuelReportCreate() {
                 return newErrors;
             });
         }
-    };
+
+    }
 
     const validateForm = (): boolean => {
         const errors: Record<string, string | string[]> = {};
@@ -513,7 +515,7 @@ export default function FuelReportCreate() {
         setFieldErrors(errors);
         return Object.keys(errors).length === 0;
     };
-
+console.log(formData.end_date)
     return (
         <>
             <PageMeta
@@ -713,16 +715,18 @@ export default function FuelReportCreate() {
                                                                         <DatePicker
                                                                             id="start_date"
                                                                             placeholder="Select start date"
-                                                                            onChange={() => { handleDateTimeChange("start_date"), setIsRefersh(true) }}
+                                                                            onChange={handleDateTimeChange("start_date")}
                                                                             defaultDate={formData.start_date || undefined}
-                                                                        />
+                                                                            />
 
                                                                         <DatePicker
                                                                             id="end_date"
                                                                             placeholder="Select end date"
-                                                                            onChange={() => { handleDateTimeChange("end_date"), setIsRefersh(true) }}
+                                                                            onChange={handleDateTimeChange("end_date") }
                                                                             defaultDate={formData.end_date || undefined}
+                                                                            defaultMinDate={formData.start_date}
                                                                         />
+
 
                                                                     </div>
                                                                 </div>
@@ -851,10 +855,21 @@ export default function FuelReportCreate() {
                                                                     </select>
                                                                 </td> */}
                                                                 <td style={{ border: "none", fontSize: "12px", padding: "4px 2px", textAlign: "center", position: "relative" }}>
-                                                                    <input
+                                                                    {/* <input
                                                                         type="number"
                                                                         value={item.meter_reading}
                                                                         onChange={(e) => handleLineItemChange(index, "meter_reading", e.target.value)}
+                                                                        style={{ width: "75%", border: "1px solid #ccc", padding: "2px", fontSize: "12px", textAlign: "center", backgroundColor: "#f1f4ff" }}
+                                                                    /> */}
+                                                                    <input
+                                                                        type="text"
+                                                                        inputMode="numeric"
+                                                                        pattern="[0-9]*"
+                                                                        value={item.meter_reading}
+                                                                        onChange={(e) => {
+                                                                            const value = e.target.value.replace(/\D/g, "");
+                                                                            handleLineItemChange(index, "meter_reading", value);
+                                                                        }}
                                                                         style={{ width: "75%", border: "1px solid #ccc", padding: "2px", fontSize: "12px", textAlign: "center", backgroundColor: "#f1f4ff" }}
                                                                     />
                                                                     {fieldErrors.lineItems && Array.isArray(fieldErrors.lineItems) && fieldErrors.lineItems[index] && (

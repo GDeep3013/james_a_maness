@@ -756,15 +756,6 @@ export default function CreateServiceReminder() {
                                                 <div>
                                                     <Label htmlFor="next_due_date">Next Due Date</Label>
                                                     <DateTimePicker
-                                                        // id="next_due_date"
-                                                        // label=""
-                                                        // placeholder="Select date"
-                                                        // onChange={handleDateTimeChange("next_due_date")}
-
-                                                        // defaultDate={formData.next_due_date ? new Date(formData.next_due_date) : undefined}
-                                                        // enableTime={false}
-                                                        // dateFormat="m/d/Y"
-
                                                         id="next_due_date"
                                                         label=""
                                                         placeholder="Select date"
@@ -772,6 +763,7 @@ export default function CreateServiceReminder() {
                                                         defaultDate={formData.next_due_date ? new Date(formData.next_due_date) : undefined}
                                                         enableTime={false}
                                                         dateFormat="m/d/Y"
+                                                        minDate={true}
                                                     />
                                                     {errors.next_due_date && (
                                                         <p className="mt-1 text-sm text-error-500">{errors.next_due_date}</p>
@@ -827,7 +819,7 @@ export default function CreateServiceReminder() {
                                     </div>
                                 </div>
 
-                                <div className="mt-6 flex justify-end gap-4">
+                                <div className="md:mt-6 flex flex-wrap md:flex-nowrap justify-center md:justify-end gap-2 md:gap-4">
                                     <Button
                                         variant="outline"
                                         size="sm"
