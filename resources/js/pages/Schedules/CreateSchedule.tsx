@@ -42,6 +42,7 @@ export default function CreateSchedule() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [generalError, setGeneralError] = useState<string>("");
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+  const [currentMileage, setCurrentMileage] = useState<string>("");
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [serviceTaskOptions, setServiceTaskOptions] = useState<ServiceTaskOption[]>([]);
   const [allServiceTasks, setAllServiceTasks] = useState<ServiceTaskOption[]>([]);
@@ -214,6 +215,14 @@ export default function CreateSchedule() {
     };
   }, [searchTimeout]);
 
+  useEffect(() => {
+    if (!formData.vehicle_id || vehicles.length === 0) {
+      if (!formData.vehicle_id) setCurrentMileage("");
+      return;
+    }
+    const selectedVehicle = vehicles.find((v) => v.id.toString() === formData.vehicle_id);
+    setCurrentMileage(selectedVehicle ? String(selectedVehicle.current_mileage ?? "") : "");
+  }, [formData.vehicle_id, vehicles]);
 
   const handleInputChange = (name: string, value: string | boolean) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -228,6 +237,10 @@ export default function CreateSchedule() {
 
   const handleSelectChange = (name: string) => (value: string) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
+    if (name === "vehicle_id") {
+      const selectedVehicle = vehicles.find((v) => v.id.toString() === value);
+      setCurrentMileage(selectedVehicle ? String(selectedVehicle.current_mileage ?? "") : "");
+    }
     if (errors[name]) {
       setErrors((prev) => {
         const newErrors = { ...prev };
@@ -314,6 +327,12 @@ export default function CreateSchedule() {
 
     if (!formData.next_due_meter.trim()) {
       newErrors.next_due_meter = "Next Due Primary Meter is required";
+    } else if (formData.next_due_meter && currentMileage) {
+      const nextDueMeterValue = parseFloat(formData.next_due_meter);
+      const currentMileageValue = parseFloat(currentMileage);
+      if (!isNaN(nextDueMeterValue) && !isNaN(currentMileageValue) && nextDueMeterValue <= currentMileageValue) {
+        newErrors.next_due_meter = `Primary Meter must be greater than current mileage (${currentMileage})`;
+      }
     }
 
     setErrors(newErrors);
@@ -540,6 +559,11 @@ export default function CreateSchedule() {
                           />
                           {errors.next_due_meter && (
                             <p className="mt-1 text-sm text-error-500">{errors.next_due_meter}</p>
+                          )}
+                          {currentMileage && (
+                            <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                              Current mileage: <span className="font-medium">{currentMileage}</span>
+                            </p>
                           )}
                         </div>
                       </div>
