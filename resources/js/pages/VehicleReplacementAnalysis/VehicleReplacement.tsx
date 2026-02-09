@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router';
 import PageMeta from '../../components/common/PageMeta';
 import Label from '../../components/form/Label';
 import Input from '../../components/form/input/InputField';
@@ -40,11 +39,9 @@ interface VehicleReplacementFormData {
 interface Vehicle {
     id: number;
     vehicle_name?: string;
-    name?: string;
 }
 
 export default function VehicleReplacement() {
-    const navigate = useNavigate();
     const [formData, setFormData] = useState<FormData>({
         vehicleId: '',
         estimatedVehicleLife: '96',
@@ -94,7 +91,7 @@ export default function VehicleReplacement() {
             const response = await vehicleService.getAll();
             const vehicleOptions = (response.data?.vehical || response.data?.vehicles || []).map((vehicle: Vehicle) => ({
                 value: String(vehicle.id),
-                label: vehicle.vehicle_name || vehicle.name || `Vehicle #${vehicle.id}`,
+                label: vehicle.vehicle_name || `Vehicle #${vehicle.id}`,
             }));
             setVehicles(vehicleOptions);
         } catch {

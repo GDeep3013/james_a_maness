@@ -28,7 +28,7 @@ interface Expense {
     recurrence_period?: string;
     vehicle?: {
         id: number;
-        name: string;
+        vehicle_name: string;
     };
     vendor?: {
         id: number;
@@ -274,7 +274,7 @@ export default function ExpenseHistoryList() {
                                                 </TableCell>
                                                 <TableCell className="px-4 py-3 text-start">
                                                     <span className="text-gray-800 text-theme-sm dark:text-white/90">
-                                                        {expense.vehicle?.name || `Vehicle #${expense.vehicle_id}`}
+                                                        {expense.vehicle?.vehicle_name || `Vehicle #${expense.vehicle_id}`}
                                                     </span>
                                                 </TableCell>
                                                 <TableCell className="px-4 py-3 text-start">

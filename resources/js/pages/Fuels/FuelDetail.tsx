@@ -16,7 +16,7 @@ interface Fuel {
     date: string;
     vehicle?: {
         id: number;
-        name: string;
+        vehicle_name: string;
     };
     vendor?: {
         id: number;
@@ -64,7 +64,7 @@ export default function FuelDetail() {
                         <div className="flex flex-col">
                             <span className="text-sm text-gray-600 dark:text-gray-400">Vehicle</span>
                             <span className="text-sm font-medium text-gray-900 dark:text-white">
-                            {fuel?.vehicle?.name || `Vehicle #${fuel?.vehicle_id}`}
+                            {fuel?.vehicle?.vehicle_name || `Vehicle #${fuel?.vehicle_id}`}
                             </span>
                         </div>
                         <div className="flex flex-col">

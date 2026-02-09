@@ -22,7 +22,7 @@ interface MeterReading {
     date: string;
     vehicle?: {
         id: number;
-        name: string;
+        vehicle_name: string;
     };
     user?: {
         id: number;
@@ -263,7 +263,7 @@ export default function MeterReadingsList() {
                                                 </TableCell>
                                                 <TableCell className="px-4 py-3 text-start">
                                                     <span className="text-gray-800 text-theme-sm dark:text-white/90">
-                                                        {reading.vehicle?.name || `Vehicle #${reading.vehicle_id}`}
+                                                        {reading.vehicle?.vehicle_name || `Vehicle #${reading.vehicle_id}`}
                                                     </span>
                                                 </TableCell>
                                                 <TableCell className="px-4 py-3 text-start">

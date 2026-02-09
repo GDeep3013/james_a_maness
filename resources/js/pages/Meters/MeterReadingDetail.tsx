@@ -11,7 +11,7 @@ interface MeterReading {
     date: string;
     vehicle?: {
         id: number;
-        name: string;
+        vehicle_name: string;
     };
     user?: {
         id: number;
@@ -104,7 +104,7 @@ export default function MeterReadingDetail() {
                         <div className="flex flex-col">
                             <span className="text-sm text-gray-600 dark:text-gray-400">Vehicle</span>
                             <span className="text-sm font-medium text-gray-900 dark:text-white">
-                                {meterReading?.vehicle?.name || `Vehicle #${meterReading?.vehicle_id}`}
+                                {meterReading?.vehicle?.vehicle_name || `Vehicle #${meterReading?.vehicle_id}`}
                             </span>
                         </div>
                         <div className="flex flex-col">
@@ -160,7 +160,7 @@ export default function MeterReadingDetail() {
                             <span className="text-xs text-gray-500 dark:text-gray-400">Vehicle</span>
                             <div className="flex items-end gap-2 mt-2">
                                 <span className="md:text-lg text-base font-medium text-gray-900 dark:text-white">
-                                    {meterReading?.vehicle?.name || `Vehicle #${meterReading?.vehicle_id}`}
+                                    {meterReading?.vehicle?.vehicle_name || `Vehicle #${meterReading?.vehicle_id}`}
                                 </span>
                             </div>
                         </div>

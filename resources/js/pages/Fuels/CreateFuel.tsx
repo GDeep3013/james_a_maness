@@ -16,7 +16,6 @@ import PageBreadcrumb from "../../components/common/PageBreadCrumb";
 
 interface Vehicle {
     id: number;
-    name?: string;
     vehicle_name?: string;
     current_mileage?: string;
 }
@@ -109,7 +108,7 @@ export default function CreateFuel() {
             // Transform vehicles data for Select component
             const vehicleOptions = (vehiclesRes.data.vehical?.data || vehiclesRes.data.vehical || []).map((vehicle: Vehicle) => ({
                 value: String(vehicle.id),
-                label: vehicle.vehicle_name || vehicle.name || `Vehicle #${vehicle.id}`,
+                label: vehicle.vehicle_name || `Vehicle #${vehicle.id}`,
                 current_mileage: vehicle.current_mileage || "",
             }));
 
@@ -376,12 +375,6 @@ export default function CreateFuel() {
             setIsSubmitting(false);
             setSaveAndAddAnother(false);
         }
-    };
-
-    const handleSaveAndAddAnother = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setSaveAndAddAnother(true);
-        await handleSubmit(e);
     };
 
     const calculateTotalCost = () => {

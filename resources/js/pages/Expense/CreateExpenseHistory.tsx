@@ -100,7 +100,7 @@ export default function CreateExpenseHistory() {
 
             const vehicleOptions = (vehiclesRes.data.vehical || vehiclesRes.data.vehicles || []).map((vehicle: Vehicle) => ({
                 value: String(vehicle.id),
-                label: vehicle.name || `Vehicle #${vehicle.id}`,
+                label: vehicle.vehicle_name || `Vehicle #${vehicle.id}`,
             }));
 
             const vendorOptions = (vendorsRes.data.vendor || vendorsRes.data.vendors || []).map((vendor: Vendor) => ({

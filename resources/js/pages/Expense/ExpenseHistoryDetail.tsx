@@ -17,7 +17,7 @@ interface Expense {
     recurrence_period?: string;
     vehicle?: {
         id: number;
-        name: string;
+        vehicle_name: string;
     };
     vendor?: {
         id: number;
@@ -113,7 +113,7 @@ export default function ExpenseHistoryDetail() {
                         <div className="flex flex-col">
                             <span className="text-sm text-gray-600 dark:text-gray-400">Vehicle</span>
                             <span className="text-sm font-medium text-gray-900 dark:text-white">
-                                {expense.vehicle?.name || `Vehicle #${expense.vehicle_id}`}
+                                {expense.vehicle?.vehicle_name || `Vehicle #${expense.vehicle_id}`}
                             </span>
                         </div>
 

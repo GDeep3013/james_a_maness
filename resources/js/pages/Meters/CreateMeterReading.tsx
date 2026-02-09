@@ -45,9 +45,9 @@ export default function CreateMeterReading() {
         try {
             const vehiclesRes = await vehicleService.getAll();
 
-            const vehicleOptions = (vehiclesRes.data.vehical || vehiclesRes.data.vehicles || []).map((vehicle: { id: number; name?: string; current_mileage?: string }) => ({
+            const vehicleOptions = (vehiclesRes.data.vehical || vehiclesRes.data.vehicles || []).map((vehicle: { id: number; vehicle_name?: string; current_mileage?: string }) => ({
                 value: String(vehicle.id),
-                label: vehicle.name || `Vehicle #${vehicle.id}`,
+                label: vehicle.vehicle_name || `Vehicle #${vehicle.id}`,
                 current_mileage: vehicle.current_mileage || "",
             }));
 
@@ -229,12 +229,6 @@ export default function CreateMeterReading() {
             setIsSubmitting(false);
             setSaveAndAddAnother(false);
         }
-    };
-
-    const handleSaveAndAddAnother = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setSaveAndAddAnother(true);
-        await handleSubmit(e);
     };
 
     const renderMeterReadingDetailsSection = () => (

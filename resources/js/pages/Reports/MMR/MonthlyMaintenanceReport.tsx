@@ -27,7 +27,14 @@ interface VehiclesResponse {
     };
 }
 
+function getCurrentMonthYear(): string {
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+}
 
+function getCurrentDate(): string {
+    return new Date().toISOString().split("T")[0];
+}
 
 export default function MonthlyMaintenanceReport() {
     const { id } = useParams<{ id: string }>();
@@ -36,16 +43,16 @@ export default function MonthlyMaintenanceReport() {
     const isEditMode = location.pathname.includes('/edit');
     const [vehicles, setVehicles] = useState<Vehicle[]>([]);
     const [formData, setFormData] = useState({
-        date: "",
+        date: getCurrentMonthYear(),
         domicile_station: "",
-        provider_company_name: "",
+        provider_company_name: "KAV Expediting",
         current_mileage: "",
         vehicle_id: "",
         preventative_maintenance: null as boolean | null,
         out_of_service: null as boolean | null,
         signature: "",
         declaration: null as boolean | null,
-        completed_date: "",
+        completed_date: getCurrentDate(),
         maintenance_records: [] as MaintenanceRecord[],
     });
     const [errors, setErrors] = useState<Record<string, string>>({});
@@ -241,7 +248,7 @@ export default function MonthlyMaintenanceReport() {
 
                 if (!isEditMode) {
                     setFormData({
-                        date: "",
+                        date: getCurrentMonthYear(),
                         domicile_station: "",
                         provider_company_name: "",
                         current_mileage: "",
@@ -250,7 +257,7 @@ export default function MonthlyMaintenanceReport() {
                         out_of_service: null,
                         signature: "",
                         declaration: null,
-                        completed_date: "",
+                        completed_date: getCurrentDate(),
                         maintenance_records: [],
                     });
                 } else {
@@ -347,16 +354,6 @@ export default function MonthlyMaintenanceReport() {
         }
     };
 
-    // Add this helper function at the top of your component, after imports
-    const formatMonthYear = (dateString: string): string => {
-        if (!dateString) return "";
-        const [year, month] = dateString.split('-');
-        const date = new Date(parseInt(year), parseInt(month) - 1);
-        const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
-            "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-        return `${monthNames[date.getMonth()]} ${year}`;
-    };
-
     return (
         <>
             <PageMeta
@@ -385,7 +382,7 @@ export default function MonthlyMaintenanceReport() {
                     </Button>}
                 </div>
 
-                <div className="w-full max-w-5xl mx-auto border border-gray-200 rounded-xl p-6">
+                <div className="w-full bg-white max-w-5xl mx-auto border border-gray-200 rounded-xl p-6">
                     {(generalError || successMessage) && (
                         <div className={`mb-4 p-4 rounded-lg ${generalError ? 'bg-red-50 border border-red-200 text-red-700' : 'bg-green-50 border border-green-200 text-green-700'}`}>
                             {generalError || successMessage}
@@ -680,16 +677,9 @@ export default function MonthlyMaintenanceReport() {
                                                                         <tr>
                                                                             <td style={{ fontSize: "12px", padding: "8px 20px 8px 8px", verticalAlign: "top", width: "50%" }}>
                                                                                 <span style={{ fontWeight: "bold", paddingLeft: "10px", paddingBottom: "5px", fontSize: "14px" }}>Signature of Authorized Officer or Business Contact:</span>
-                                                                                <input
-                                                                                    type="text"
-                                                                                    value={formData.signature}
-                                                                                    onChange={(e) => handleInputChange("signature", e.target.value)}
-                                                                                    style={{ width: "100%", border: errors.signature ? "1px solid #f00" : "1px solid #000", padding: "5px", fontSize: "12px", minHeight: "25px", boxSizing: "border-box", outline: 'none', backgroundColor: errors.signature ? '#fee' : '#f1f4ff' }}
-                                                                                    onFocus={handleInputFocus}
-                                                                                    onBlur={handleInputBlur}
-                                                                                    autoComplete="off"
-                                                                                />
-                                                                                {errors.signature && <div style={{ color: "#f00", fontSize: "11px", paddingTop: "2px" }}>{errors.signature}</div>}
+                                                                                <div style={{ paddingTop: "8px" }}>
+                                                                                    <img src="/images/kav_signatures.png" alt="KAV Signature" style={{ maxWidth: "100%", height: "100px", display: "block" }} />
+                                                                                </div>
                                                                             </td>
                                                                             <td style={{ fontSize: "12px", padding: "8px 8px 8px 20px", verticalAlign: "top", width: "50%" }}>
                                                                                 <span style={{ fontWeight: "bold", paddingLeft: "10px", paddingBottom: "5px", fontSize: "14px" }}>Date Completed: <span style={{ color: "#f00" }}>*</span></span>

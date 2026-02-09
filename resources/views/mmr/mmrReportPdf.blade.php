@@ -24,6 +24,10 @@
     $checked = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAABOvAAATrwFj5o7DAAAAGXRFWHRTb2Z0d2FyZQB3d3cuaW5rc2NhcGUub3Jnm+48GgAAAbNJREFUWIXl1z9rFEEYBvBfVCTin8oid7G0U0iskzaFSESisUgXQT+HlV9BIYKVZTxCOisF7QQlyRcwhKilXgLhQGMxu9ywLLdztxsClwcG3pf58zzzzu6873DWMTGgr4U7uFyT4wBf8TN1wjQ28A/HDbW/6KCdQr7bIHGx7RZFFI9gA/czexuv8aNKdQVaeIrbmd/BUtnAtn7YtzBZkzjGpLCh/Dim8o5z0aAZ/Yis4ahBAUdCNHPOmTIBVyI7+YsdAvuRfa1MwKlg7ARM4AW+YT5lwoWGyV/hWeav4lPVpKYiUCTv4mXKxFQB57GA64nkd/GlSQHP8V5IKjcTyD8nrpssIL+gbuBDJqI2eRHL+kljudB3EZtR/x7eRv4fzI2yfmoEengoJCtC1lzJ7EMsGnHnw/wFPTyOROTk9/BxFPJhBcQi3giXzUIdcka7iHp4Uoc0xtjlgloCupHdOgGu6cj+XTagJZRLx0L51GRJdgk7SkqyYlHawYPM3hHKqH310BaK0luZv45HgwafZFn+XcLxtvFO/ziaepisl5EPeppNYRZXqxRXoCtk0V811xlT/Ae/AatU1Xv6HwAAAABJRU5ErkJggg==";
 
     $unchecked = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgBAMAAACBVGfHAAAAA3NCSVQICAjb4U/gAAAACXBIWXMAAAEaAAABGgFfsKwBAAAAGXRFWHRTb2Z0d2FyZQB3d3cuaW5rc2NhcGUub3Jnm+48GgAAACRQTFRF////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAxyY+ZQAAAAt0Uk5TAAMfMX6ezujv+fqkTPb8AAAAY0lEQVQoU2NgYA6bvRsKdqYaMDAweu1GAksEGFh2724vh4KK3bsdGKx2BzHAgeruxQzRWxmQAJCXvQlZQHsbw+wGZAGOnQy7C5AF2HePChASwAhCjEDGiAaMiMKISozIRk8OAGOjZ7vyTjoKAAAAAElFTkSuQmCC";
+
+    $dateFormatted = date('F Y', strtotime($mmrReport->date));
+    $completedDateFormatted = date('m/d/Y', strtotime($mmrReport->completed_date));
+
 @endphp
 <body style="padding: 0; margin: 0; font-family: Arial, sans-serif;">
     <div style="max-width: 1236px; margin: 0 auto; padding: 20px;">
@@ -273,8 +277,8 @@
                                                     <tr>
                                                         <td style="font-size: 18px; padding: 8px 20px 8px 8px; vertical-align: top; width: 50%;">
                                                             <span style="font-weight: bold; padding-left: 10px; padding-bottom: 10px; font-size: 18px;">Signature of Authorized Officer or Business Contact:</span>
-                                                            <div style="width: 100%; border: 1px solid #000; padding: 5px; font-size: 18px; min-height: 25px; box-sizing: border-box; background-color: #f1f4ff;">
-                                                                {{ $mmrReport->signature ?? '' }}
+                                                            <div style="padding-top: 8px;">
+                                                                <img src="{{ public_path('images/kav_signatures.png') }}" alt="KAV Signature" style="max-width: 100%; height: 100px;" />
                                                             </div>
                                                         </td>
                                                         <td style="font-size: 18px; padding: 8px 8px 8px 20px; vertical-align: top; width: 50%;">
