@@ -4,7 +4,7 @@ require_once 'includes/header.php';
 require_once 'includes/sidebar.php';
 ?>
     <div class="docs-content">
-        <div class="container">
+        <div class="container-fluid">
             <article class="docs-article" id="section-contacts">
                 <header class="docs-header">
                     <h1 class="docs-heading">Contacts Module – How It Works</h1>

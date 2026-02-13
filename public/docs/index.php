@@ -4,7 +4,7 @@ require_once 'includes/header.php';
 require_once 'includes/sidebar.php';
 ?>
     <div class="docs-content">
-        <div class="container">
+        <div class="container-fluid">
             <?php include 'vehicle.php'; ?>
         </div>
     </div>

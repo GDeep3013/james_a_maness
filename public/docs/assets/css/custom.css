@@ -12,3 +12,6 @@
 .docs-article .docs-heading{
     margin-bottom: 0px !important;
 }
+.docs-sidebar {
+    border-right: 1px solid #e7e7e7 !important;
+}
