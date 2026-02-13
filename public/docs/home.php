@@ -1,6 +1,6 @@
 ﻿			    <article class="docs-article" id="section-1">
 				    <header class="docs-header">
-					    <h1 class="docs-heading">What is Veda theme <span class="docs-time">Theme Version:- 1.0.0</span></h1>
+					    <h1 class="docs-heading">What is Veda theme</h1>
 					    <section class="docs-intro">
 						</section><!--//docs-intro-->
 						<a href="#">
