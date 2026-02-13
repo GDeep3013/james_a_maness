@@ -4,7 +4,7 @@ require_once 'includes/header.php';
 require_once 'includes/sidebar.php';
 ?>
     <div class="docs-content">
-        <div class="container">
+        <div class="container-fluid">
             <article class="docs-article">
 <h2>Fuel & Gas Stations Module – How It Works</h2>
 <p>The <strong>Fuel & Gas Stations</strong> module (shown in the app as <strong>Fuels</strong>) is where you <strong>record refuels and fill-ups </strong>for your vehicles. Each entry is one fuel purchase: which vehicle, which vendor (gas station or supplier), how much fuel, at what price, and the odometer before and after. The system calculates total cost and supports fuel economy and cost statistics. Vendors used here are your gas stations or fuel suppliers from the **Vendors** list (mark them as “Fuel” type when relevant).</p>

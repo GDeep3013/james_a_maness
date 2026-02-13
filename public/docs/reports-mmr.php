@@ -4,7 +4,7 @@ require_once 'includes/header.php';
 require_once 'includes/sidebar.php';
 ?>
     <div class="docs-content">
-        <div class="container">
+        <div class="container-fluid">
             <article class="docs-article" id="section-reports-mmr">
                 <header class="docs-header">
                     <h1 class="docs-heading">Reports – MMR (Monthly Maintenance Report) – How It Works</h1>
