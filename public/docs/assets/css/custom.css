@@ -1,0 +1,11 @@
+.docs-nav .nav-item.section-title .nav-link {
+    font-weight: 600;
+}
+
+.docs-nav .theme-icon-holder .sidebar-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    object-fit: contain;
+    vertical-align: middle;
+    display: inline-block;
+}
