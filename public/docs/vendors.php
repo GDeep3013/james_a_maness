@@ -1,5 +1,5 @@
 <?php
-$pageTitle = 'Vendors - Veda Theme Documentation';
+$pageTitle = 'Vendors - KAV Expediting Documentation';
 require_once 'includes/header.php';
 require_once 'includes/sidebar.php';
 ?>

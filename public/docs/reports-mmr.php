@@ -1,5 +1,5 @@
 <?php
-$pageTitle = 'MMR (Monthly Maintenance Report) - Veda Theme Documentation';
+$pageTitle = 'MMR (Monthly Maintenance Report) - KAV Expediting Documentation';
 require_once 'includes/header.php';
 require_once 'includes/sidebar.php';
 ?>

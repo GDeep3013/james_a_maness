@@ -1,5 +1,5 @@
 <?php
-$pageTitle = 'Service Tasks - Veda Theme Documentation';
+$pageTitle = 'Service Tasks - KAV Expediting Documentation';
 require_once 'includes/header.php';
 require_once 'includes/sidebar.php';
 ?>

@@ -1,5 +1,5 @@
 <?php
-$pageTitle = 'Expense History - Veda Theme Documentation';
+$pageTitle = 'Expense History - KAV Expediting Documentation';
 require_once 'includes/header.php';
 require_once 'includes/sidebar.php';
 ?>

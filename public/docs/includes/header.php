@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en"> 
 <head>
-    <title><?php echo isset($pageTitle) ? htmlspecialchars($pageTitle) : 'Veda Theme Documentation'; ?></title>
+    <title><?php echo isset($pageTitle) ? htmlspecialchars($pageTitle) : 'KAV Expediting Documentation'; ?></title>
     
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
